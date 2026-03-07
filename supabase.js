@@ -2,21 +2,20 @@
 const SUPA_URL = 'https://dvmhstytoonpacxwdxuj.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bWhzdHl0b29ucGFjeHdkeHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTY2NzQsImV4cCI6MjA4ODQ5MjY3NH0.oZQD0Dp6mB0pF7hwAQdvQ7_OJe__cBq-MFtAEdB7K84';
 
-const { createClient } = supabase;
-const sb = createClient(SUPA_URL, SUPA_KEY);
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 let currentUser = null;
 let saveTimer = null;
 
 // ── AUTH HELPERS ───────────────────────────────────────────────────────────
-async function sbSignUp(email, password) {
-  const { data, error } = await sb.auth.signUp({ email, password });
+async function sbSignIn(email, password) {
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
 }
 
-async function sbSignIn(email, password) {
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+async function sbSignUp(email, password) {
+  const { data, error } = await sb.auth.signUp({ email, password });
   if (error) throw error;
   return data;
 }
@@ -24,7 +23,7 @@ async function sbSignIn(email, password) {
 async function sbSignOut() {
   await sb.auth.signOut();
   currentUser = null;
-  showAuthScreen();
+  location.reload();
 }
 
 // ── DATA HELPERS ───────────────────────────────────────────────────────────
@@ -47,23 +46,8 @@ async function sbSaveData(appData) {
   if (error) console.error('Save error:', error);
 }
 
-// Audit Trail — логируем каждое изменение
-async function sbAudit(action, tableName, recordId, oldData, newData) {
-  if (!currentUser) return;
-  await sb.from('audit_log').insert({
-    user_id: currentUser.id,
-    action,
-    table_name: tableName,
-    record_id: recordId,
-    old_data: oldData || null,
-    new_data: newData || null
-  });
-}
-
-// Debounced save — сохраняем через 1.5 сек после последнего изменения
 function sbPersist(appData) {
   clearTimeout(saveTimer);
-  // Показываем индикатор сохранения
   const ind = document.getElementById('save-indicator');
   if (ind) { ind.textContent = '💾 Speichern...'; ind.style.opacity = '1'; }
   saveTimer = setTimeout(async () => {
@@ -77,46 +61,67 @@ function sbPersist(appData) {
 
 // ── AUTH SCREEN ────────────────────────────────────────────────────────────
 function showAuthScreen() {
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('app-wrapper').style.display = 'none';
+  const a = document.getElementById('auth-screen');
+  const w = document.getElementById('app-wrapper');
+  if (a) a.style.display = 'flex';
+  if (w) w.style.display = 'none';
 }
 
 function hideAuthScreen() {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app-wrapper').style.display = 'block';
+  const a = document.getElementById('auth-screen');
+  const w = document.getElementById('app-wrapper');
+  if (a) a.style.display = 'none';
+  if (w) w.style.display = 'block';
 }
 
 function authToggleMode() {
-  const isLogin = document.getElementById('auth-title').textContent.includes('Anmelden');
-  document.getElementById('auth-title').textContent = isLogin ? '📝 Registrieren' : '🔐 Anmelden';
-  document.getElementById('auth-btn').textContent = isLogin ? 'Registrieren' : 'Anmelden';
-  document.getElementById('auth-toggle-text').innerHTML = isLogin
-    ? 'Bereits registriert? <a href="#" onclick="authToggleMode()">Anmelden</a>'
-    : 'Noch kein Konto? <a href="#" onclick="authToggleMode()">Registrieren</a>';
+  const title = document.getElementById('auth-title');
+  const btn = document.getElementById('auth-btn');
+  const toggle = document.getElementById('auth-toggle-text');
+  const isLogin = title.textContent.includes('Anmelden');
+  title.textContent = isLogin ? '📝 Registrieren' : '🔐 Anmelden';
+  btn.textContent = isLogin ? 'Registrieren' : 'Anmelden';
+  toggle.innerHTML = isLogin
+    ? 'Bereits registriert? <a href="#" onclick="authToggleMode()" style="color:var(--blue)">Anmelden</a>'
+    : 'Noch kein Konto? <a href="#" onclick="authToggleMode()" style="color:var(--blue)">Registrieren</a>';
   document.getElementById('auth-error').textContent = '';
 }
 
 async function authSubmit() {
-  const email = document.getElementById('auth-email').value.trim();
+  const email    = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
-  const isLogin = document.getElementById('auth-title').textContent.includes('Anmelden');
-  const btn = document.getElementById('auth-btn');
-  const err = document.getElementById('auth-error');
+  const isLogin  = document.getElementById('auth-title').textContent.includes('Anmelden');
+  const btn      = document.getElementById('auth-btn');
+  const err      = document.getElementById('auth-error');
 
+  err.textContent = '';
   if (!email || !password) { err.textContent = 'Bitte Email und Passwort eingeben.'; return; }
   if (password.length < 6) { err.textContent = 'Passwort mindestens 6 Zeichen.'; return; }
 
   btn.textContent = '...';
   btn.disabled = true;
-  err.textContent = '';
 
   try {
     if (isLogin) {
       await sbSignIn(email, password);
     } else {
       await sbSignUp(email, password);
+      // Показываем сообщение — пусть сам нажмёт Anmelden
+      err.style.color = 'var(--green)';
+      err.textContent = '✅ Registriert! Bitte jetzt anmelden.';
+      btn.textContent = 'Registrieren';
+      btn.disabled = false;
+      // Переключаем на форму входа
+      setTimeout(() => {
+        err.style.color = 'var(--red)';
+        err.textContent = '';
+        authToggleMode();
+        document.getElementById('auth-email').value = email;
+        document.getElementById('auth-password').value = '';
+      }, 1500);
     }
   } catch(e) {
+    console.error('Auth error:', e);
     err.textContent = translateAuthError(e.message);
     btn.textContent = isLogin ? 'Anmelden' : 'Registrieren';
     btn.disabled = false;
@@ -124,14 +129,16 @@ async function authSubmit() {
 }
 
 function translateAuthError(msg) {
-  if (msg.includes('Invalid login')) return '❌ Falsche Email oder Passwort.';
+  if (!msg) return '❌ Unbekannter Fehler.';
+  if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) return '❌ Falsche Email oder Passwort.';
   if (msg.includes('already registered')) return '❌ Diese Email ist bereits registriert.';
   if (msg.includes('valid email')) return '❌ Bitte gültige Email eingeben.';
-  if (msg.includes('Network')) return '❌ Keine Internetverbindung.';
+  if (msg.includes('disabled')) return '❌ Registrierung deaktiviert.';
+  if (msg.includes('Network') || msg.includes('fetch')) return '❌ Keine Internetverbindung.';
   return '❌ ' + msg;
 }
 
-// Enter key on password field
+// ── INIT nach DOM-Load ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('auth-password')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') authSubmit();
@@ -139,43 +146,37 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('auth-email')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') authSubmit();
   });
-});
 
-// ── AUTH STATE LISTENER ────────────────────────────────────────────────────
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (session && session.user) {
-    currentUser = session.user;
+  sb.auth.onAuthStateChange(async (event, session) => {
+    console.log('Auth event:', event, session?.user?.email);
 
-    // Показываем email пользователя
-    const uel = document.getElementById('user-email-display');
-    if (uel) uel.textContent = currentUser.email;
+    if (session && session.user) {
+      currentUser = session.user;
 
-    // Загружаем данные из Supabase
-    const remoteData = await sbLoadData();
+      const uel = document.getElementById('user-email-display');
+      if (uel) uel.textContent = currentUser.email;
 
-    if (remoteData) {
-      // Есть данные в облаке — используем их
-      window._loadedRemoteData = remoteData;
-    } else {
-      // Новый пользователь — проверяем localStorage (миграция)
-      const local = localStorage.getItem('buch_pro_v1');
-      if (local) {
-        try {
-          window._loadedRemoteData = JSON.parse(local);
-          // Сохраняем в облако сразу
-          await sbSaveData(window._loadedRemoteData);
-          localStorage.removeItem('buch_pro_v1');
-          console.log('✅ Migrated from localStorage to Supabase');
-        } catch(e) { window._loadedRemoteData = null; }
+      const remoteData = await sbLoadData();
+
+      if (remoteData) {
+        window._loadedRemoteData = remoteData;
+      } else {
+        const local = localStorage.getItem('buch_pro_v1');
+        if (local) {
+          try {
+            window._loadedRemoteData = JSON.parse(local);
+            await sbSaveData(window._loadedRemoteData);
+            localStorage.removeItem('buch_pro_v1');
+          } catch(e) { window._loadedRemoteData = null; }
+        }
       }
+
+      hideAuthScreen();
+      window.dispatchEvent(new Event('supabase-ready'));
+
+    } else {
+      currentUser = null;
+      showAuthScreen();
     }
-
-    hideAuthScreen();
-    // Сигнализируем app.js что данные готовы
-    window.dispatchEvent(new Event('supabase-ready'));
-
-  } else {
-    currentUser = null;
-    showAuthScreen();
-  }
+  });
 });
