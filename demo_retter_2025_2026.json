@@ -1,0 +1,2213 @@
+{
+  "eintraege": [
+    {
+      "id": "1000010",
+      "datum": "2025-01-04",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung Ringstr.",
+      "notiz": "Schlüssel vergessen, Nachtzeit",
+      "betrag": 95.0
+    },
+    {
+      "id": "1000540",
+      "datum": "2025-01-05",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schlösser & Zylinder Einkauf Dez.",
+      "notiz": "Großhändler Hella",
+      "betrag": 385.2
+    },
+    {
+      "id": "1000020",
+      "datum": "2025-01-09",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder ausgetauscht EFH",
+      "notiz": "",
+      "betrag": 185.0
+    },
+    {
+      "id": "1000550",
+      "datum": "2025-01-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Jan",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000030",
+      "datum": "2025-01-15",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Notöffnung Firma Innenstadt",
+      "notiz": "Einbruchsfolge",
+      "betrag": 220.0
+    },
+    {
+      "id": "1000560",
+      "datum": "2025-01-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Jan",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000570",
+      "datum": "2025-01-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Jan",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000040",
+      "datum": "2025-01-22",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Mietwohnung",
+      "notiz": "",
+      "betrag": 95.0
+    },
+    {
+      "id": "1000050",
+      "datum": "2025-01-28",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "3x Zylinder Mehrfamilienhaus",
+      "notiz": "Schmidt GmbH Auftrag",
+      "betrag": 390.0
+    },
+    {
+      "id": "1000580",
+      "datum": "2025-01-28",
+      "typ": "Ausgabe",
+      "kategorie": "Fahrzeugkosten",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Tankrechnung Jan",
+      "notiz": "Ford Transit",
+      "betrag": 112.4
+    },
+    {
+      "id": "1000060",
+      "datum": "2025-02-03",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Türöffnung Büro Lutherring",
+      "notiz": "",
+      "betrag": 110.0
+    },
+    {
+      "id": "1000590",
+      "datum": "2025-02-05",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schlösser Einkauf",
+      "notiz": "",
+      "betrag": 290.8
+    },
+    {
+      "id": "1000600",
+      "datum": "2025-02-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Feb",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000070",
+      "datum": "2025-02-11",
+      "typ": "Einnahme",
+      "kategorie": "Tresorservice",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresoröffnung & Kombiwechsel",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000610",
+      "datum": "2025-02-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Feb",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000080",
+      "datum": "2025-02-17",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder Haustür 2x",
+      "notiz": "",
+      "betrag": 240.0
+    },
+    {
+      "id": "1000620",
+      "datum": "2025-02-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Feb",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000090",
+      "datum": "2025-02-24",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Nachtbereitschaft",
+      "notiz": "23 Uhr Einsatz",
+      "betrag": 175.0
+    },
+    {
+      "id": "1000630",
+      "datum": "2025-02-25",
+      "typ": "Ausgabe",
+      "kategorie": "Fahrzeugkosten",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Tankrechnung Feb",
+      "notiz": "",
+      "betrag": 98.6
+    },
+    {
+      "id": "1000100",
+      "datum": "2025-03-05",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung",
+      "notiz": "",
+      "betrag": 90.0
+    },
+    {
+      "id": "1000640",
+      "datum": "2025-03-05",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Spezialwerkzeug Lockpicks",
+      "notiz": "Amazon Business",
+      "betrag": 180.0
+    },
+    {
+      "id": "1000650",
+      "datum": "2025-03-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Mär",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000110",
+      "datum": "2025-03-12",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließanlage Bürokomplex",
+      "notiz": "Müller & Partner",
+      "betrag": 1850.0
+    },
+    {
+      "id": "1000660",
+      "datum": "2025-03-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Mär",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000120",
+      "datum": "2025-03-19",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Zylinder 4x Mietshaus",
+      "notiz": "",
+      "betrag": 520.0
+    },
+    {
+      "id": "1000670",
+      "datum": "2025-03-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Mär",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000130",
+      "datum": "2025-03-25",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung + Zylinder",
+      "notiz": "",
+      "betrag": 185.0
+    },
+    {
+      "id": "1000680",
+      "datum": "2025-03-31",
+      "typ": "Ausgabe",
+      "kategorie": "Buchhaltung & Steuer",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Steuerberatung Q1",
+      "notiz": "Kanzlei Vogel",
+      "betrag": 280.0
+    },
+    {
+      "id": "1000140",
+      "datum": "2025-04-02",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "Bar",
+      "beschreibung": "Notöffnung Wochenende",
+      "notiz": "Samstag Nachmittag",
+      "betrag": 195.0
+    },
+    {
+      "id": "1000150",
+      "datum": "2025-04-08",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "5x Zylinder Wohnanlage",
+      "notiz": "Schmidt GmbH",
+      "betrag": 650.0
+    },
+    {
+      "id": "1000690",
+      "datum": "2025-04-08",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schlösser Frühjahrseinkauf",
+      "notiz": "",
+      "betrag": 420.5
+    },
+    {
+      "id": "1000700",
+      "datum": "2025-04-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Apr",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000160",
+      "datum": "2025-04-14",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung zentral",
+      "notiz": "",
+      "betrag": 90.0
+    },
+    {
+      "id": "1000710",
+      "datum": "2025-04-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Apr",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000720",
+      "datum": "2025-04-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Apr",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000170",
+      "datum": "2025-04-22",
+      "typ": "Einnahme",
+      "kategorie": "Tresorservice",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresorservice inkl. Teile",
+      "notiz": "",
+      "betrag": 380.0
+    },
+    {
+      "id": "1000730",
+      "datum": "2025-04-22",
+      "typ": "Ausgabe",
+      "kategorie": "Werbung & Marketing",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Google Ads Apr",
+      "notiz": "",
+      "betrag": 80.0
+    },
+    {
+      "id": "1000740",
+      "datum": "2025-04-28",
+      "typ": "Ausgabe",
+      "kategorie": "Fahrzeugkosten",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Tankrechnung Apr",
+      "notiz": "",
+      "betrag": 125.3
+    },
+    {
+      "id": "1000180",
+      "datum": "2025-04-29",
+      "typ": "Einnahme",
+      "kategorie": "Fahrtkosten",
+      "zahlungsart": "Bar",
+      "beschreibung": "Fahrtkosten Außeneinsatz",
+      "notiz": "",
+      "betrag": 45.0
+    },
+    {
+      "id": "1000190",
+      "datum": "2025-05-06",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung",
+      "notiz": "",
+      "betrag": 90.0
+    },
+    {
+      "id": "1000750",
+      "datum": "2025-05-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Mai",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000200",
+      "datum": "2025-05-13",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder EFH komplett",
+      "notiz": "",
+      "betrag": 310.0
+    },
+    {
+      "id": "1000760",
+      "datum": "2025-05-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Mai",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000210",
+      "datum": "2025-05-20",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Notöffnung Gewerbe Nacht",
+      "notiz": "Bäckerei Hoffmann",
+      "betrag": 280.0
+    },
+    {
+      "id": "1000770",
+      "datum": "2025-05-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Mai",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000780",
+      "datum": "2025-05-25",
+      "typ": "Ausgabe",
+      "kategorie": "Werbung & Marketing",
+      "zahlungsart": "PayPal",
+      "beschreibung": "Visitenkarten Druck",
+      "notiz": "",
+      "betrag": 65.0
+    },
+    {
+      "id": "1000220",
+      "datum": "2025-05-27",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließsystem Hotel Wartung",
+      "notiz": "Hotel Zum Dom Q2",
+      "betrag": 320.0
+    },
+    {
+      "id": "1000230",
+      "datum": "2025-06-03",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung 2x gleicher Tag",
+      "notiz": "",
+      "betrag": 180.0
+    },
+    {
+      "id": "1000240",
+      "datum": "2025-06-10",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder Kellertür",
+      "notiz": "",
+      "betrag": 125.0
+    },
+    {
+      "id": "1000790",
+      "datum": "2025-06-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Jun",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000800",
+      "datum": "2025-06-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Jun",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000250",
+      "datum": "2025-06-17",
+      "typ": "Einnahme",
+      "kategorie": "Tresorservice",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresoröffnung Antiquariat",
+      "notiz": "",
+      "betrag": 520.0
+    },
+    {
+      "id": "1000810",
+      "datum": "2025-06-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Jun",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000260",
+      "datum": "2025-06-24",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "Bar",
+      "beschreibung": "Notöffnung Feiertagszuschlag",
+      "notiz": "",
+      "betrag": 260.0
+    },
+    {
+      "id": "1000820",
+      "datum": "2025-06-30",
+      "typ": "Ausgabe",
+      "kategorie": "Buchhaltung & Steuer",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Steuerberatung Q2",
+      "notiz": "",
+      "betrag": 280.0
+    },
+    {
+      "id": "1000270",
+      "datum": "2025-07-02",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Sommer",
+      "notiz": "",
+      "betrag": 90.0
+    },
+    {
+      "id": "1000830",
+      "datum": "2025-07-05",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresor-Spezialwerkzeug",
+      "notiz": "",
+      "betrag": 340.0
+    },
+    {
+      "id": "1000280",
+      "datum": "2025-07-08",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließanlage Autohaus",
+      "notiz": "Autohaus Rhein GmbH",
+      "betrag": 2200.0
+    },
+    {
+      "id": "1000840",
+      "datum": "2025-07-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Jul",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000290",
+      "datum": "2025-07-15",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder Kelleranlage 3x",
+      "notiz": "",
+      "betrag": 375.0
+    },
+    {
+      "id": "1000850",
+      "datum": "2025-07-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Jul",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000860",
+      "datum": "2025-07-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Jul",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000300",
+      "datum": "2025-07-22",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Türöffnung + Sofortschlüssel",
+      "notiz": "",
+      "betrag": 145.0
+    },
+    {
+      "id": "1000870",
+      "datum": "2025-07-28",
+      "typ": "Ausgabe",
+      "kategorie": "Fahrzeugkosten",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Tankrechnung Jul",
+      "notiz": "Großeinsatz Autohaus",
+      "betrag": 138.7
+    },
+    {
+      "id": "1000310",
+      "datum": "2025-07-29",
+      "typ": "Einnahme",
+      "kategorie": "Fahrtkosten",
+      "zahlungsart": "Bar",
+      "beschreibung": "Fahrtkosten Landkreis",
+      "notiz": "",
+      "betrag": 65.0
+    },
+    {
+      "id": "1000320",
+      "datum": "2025-08-05",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung Hochhaus",
+      "notiz": "",
+      "betrag": 95.0
+    },
+    {
+      "id": "1000880",
+      "datum": "2025-08-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Aug",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000330",
+      "datum": "2025-08-12",
+      "typ": "Einnahme",
+      "kategorie": "Tresorservice",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresor Kombiwechsel Büro",
+      "notiz": "",
+      "betrag": 340.0
+    },
+    {
+      "id": "1000890",
+      "datum": "2025-08-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Aug",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000340",
+      "datum": "2025-08-19",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "5x Zylinder Stadtwerke",
+      "notiz": "Stadtwerke Worms",
+      "betrag": 625.0
+    },
+    {
+      "id": "1000900",
+      "datum": "2025-08-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Aug",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000350",
+      "datum": "2025-08-26",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "Bar",
+      "beschreibung": "Notöffnung Sonntag 6 Uhr",
+      "notiz": "Berger Klaus",
+      "betrag": 310.0
+    },
+    {
+      "id": "1000910",
+      "datum": "2025-08-26",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schlösser Sommereinkauf",
+      "notiz": "",
+      "betrag": 510.0
+    },
+    {
+      "id": "1000360",
+      "datum": "2025-09-02",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung",
+      "notiz": "",
+      "betrag": 90.0
+    },
+    {
+      "id": "1000370",
+      "datum": "2025-09-09",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließanlage Bürokomplex",
+      "notiz": "Müller & Partner Q3",
+      "betrag": 1650.0
+    },
+    {
+      "id": "1000920",
+      "datum": "2025-09-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Sep",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000930",
+      "datum": "2025-09-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Sep",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000380",
+      "datum": "2025-09-16",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder 2x EFH",
+      "notiz": "",
+      "betrag": 250.0
+    },
+    {
+      "id": "1000940",
+      "datum": "2025-09-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Sep",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000390",
+      "datum": "2025-09-23",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung + neuer Schlüssel",
+      "notiz": "",
+      "betrag": 120.0
+    },
+    {
+      "id": "1000400",
+      "datum": "2025-09-29",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließsystem Hotel Wartung",
+      "notiz": "Hotel Zum Dom Q3",
+      "betrag": 320.0
+    },
+    {
+      "id": "1000950",
+      "datum": "2025-09-30",
+      "typ": "Ausgabe",
+      "kategorie": "Buchhaltung & Steuer",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Steuerberatung Q3",
+      "notiz": "",
+      "betrag": 280.0
+    },
+    {
+      "id": "1000410",
+      "datum": "2025-10-07",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung Abend",
+      "notiz": "18 Uhr",
+      "betrag": 105.0
+    },
+    {
+      "id": "1000960",
+      "datum": "2025-10-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Okt",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000420",
+      "datum": "2025-10-14",
+      "typ": "Einnahme",
+      "kategorie": "Tresorservice",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresorservice Notar",
+      "notiz": "",
+      "betrag": 480.0
+    },
+    {
+      "id": "1000970",
+      "datum": "2025-10-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Okt",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000980",
+      "datum": "2025-10-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Okt",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000430",
+      "datum": "2025-10-21",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Zylinder 6x Mietshaus",
+      "notiz": "Schmidt GmbH Herbst",
+      "betrag": 750.0
+    },
+    {
+      "id": "1000990",
+      "datum": "2025-10-22",
+      "typ": "Ausgabe",
+      "kategorie": "Werbung & Marketing",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Google Ads Herbst",
+      "notiz": "",
+      "betrag": 120.0
+    },
+    {
+      "id": "1000440",
+      "datum": "2025-10-28",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "Bar",
+      "beschreibung": "Notöffnung Nacht",
+      "notiz": "",
+      "betrag": 245.0
+    },
+    {
+      "id": "1000450",
+      "datum": "2025-11-04",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung",
+      "notiz": "",
+      "betrag": 90.0
+    },
+    {
+      "id": "1001000",
+      "datum": "2025-11-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Nov",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1000460",
+      "datum": "2025-11-11",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließanlage Betrieb",
+      "notiz": "",
+      "betrag": 1420.0
+    },
+    {
+      "id": "1001010",
+      "datum": "2025-11-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Nov",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000470",
+      "datum": "2025-11-18",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder 4x EFH",
+      "notiz": "Schneider Maria",
+      "betrag": 500.0
+    },
+    {
+      "id": "1001020",
+      "datum": "2025-11-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Nov",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000480",
+      "datum": "2025-11-25",
+      "typ": "Einnahme",
+      "kategorie": "Tresorservice",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresoröffnung Nacht Notfall",
+      "notiz": "Notfall 22:30 Uhr",
+      "betrag": 680.0
+    },
+    {
+      "id": "1001030",
+      "datum": "2025-11-25",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Spezialzylinder Jahresvorrat",
+      "notiz": "Großbestellung",
+      "betrag": 680.0
+    },
+    {
+      "id": "1001040",
+      "datum": "2025-12-01",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Haftpflicht Jahresprämie",
+      "notiz": "Allianz Jahresbeitrag",
+      "betrag": 580.0
+    },
+    {
+      "id": "1000490",
+      "datum": "2025-12-02",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Advent",
+      "notiz": "",
+      "betrag": 95.0
+    },
+    {
+      "id": "1000500",
+      "datum": "2025-12-09",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Jahreswartung Schließanlage Hotel",
+      "notiz": "Hotel Zum Dom Jahresinspektion",
+      "betrag": 890.0
+    },
+    {
+      "id": "1001050",
+      "datum": "2025-12-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Dez",
+      "notiz": "",
+      "betrag": 128.5
+    },
+    {
+      "id": "1001060",
+      "datum": "2025-12-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Dez",
+      "notiz": "",
+      "betrag": 39.99
+    },
+    {
+      "id": "1000510",
+      "datum": "2025-12-16",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder 3x + Einbau",
+      "notiz": "",
+      "betrag": 430.0
+    },
+    {
+      "id": "1001070",
+      "datum": "2025-12-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Dez",
+      "notiz": "",
+      "betrag": 450.0
+    },
+    {
+      "id": "1000520",
+      "datum": "2025-12-22",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "Bar",
+      "beschreibung": "Notöffnung Heiligabend",
+      "notiz": "Zuschlag 150%",
+      "betrag": 350.0
+    },
+    {
+      "id": "1000530",
+      "datum": "2025-12-29",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Silvester",
+      "notiz": "",
+      "betrag": 280.0
+    },
+    {
+      "id": "1001080",
+      "datum": "2025-12-30",
+      "typ": "Ausgabe",
+      "kategorie": "Buchhaltung & Steuer",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Steuerberatung Q4 + Jahresabschluss",
+      "notiz": "Jahresabschluss inkl.",
+      "betrag": 520.0
+    },
+    {
+      "id": "1001090",
+      "datum": "2026-01-05",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung Neustadt",
+      "notiz": "§19→Regel ab 2026",
+      "betrag": 113.05,
+      "mwstRate": 19,
+      "mwstBetrag": 18.05,
+      "nettoBetrag": 95.0
+    },
+    {
+      "id": "1001230",
+      "datum": "2026-01-05",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schlösser & Zylinder Jan",
+      "notiz": "inkl. 19% Vorst.",
+      "betrag": 476.0,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 76.0,
+      "nettoBetrag": 400.0
+    },
+    {
+      "id": "1001240",
+      "datum": "2026-01-07",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Haftpflicht Jahresprämie 2026",
+      "notiz": "",
+      "betrag": 690.2,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 110.2,
+      "nettoBetrag": 580.0
+    },
+    {
+      "id": "1001100",
+      "datum": "2026-01-08",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder EFH 2x",
+      "notiz": "",
+      "betrag": 220.15,
+      "mwstRate": 19,
+      "mwstBetrag": 35.15,
+      "nettoBetrag": 185.0
+    },
+    {
+      "id": "1001250",
+      "datum": "2026-01-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Jan",
+      "notiz": "",
+      "betrag": 152.93,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 24.42,
+      "nettoBetrag": 128.51
+    },
+    {
+      "id": "1001110",
+      "datum": "2026-01-12",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Notöffnung Firma Nacht",
+      "notiz": "23:30 Uhr Einsatz",
+      "betrag": 261.8,
+      "mwstRate": 19,
+      "mwstBetrag": 41.8,
+      "nettoBetrag": 220.0
+    },
+    {
+      "id": "1001120",
+      "datum": "2026-01-15",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließanlage Büro Wartung",
+      "notiz": "Schmidt GmbH",
+      "betrag": 380.9,
+      "mwstRate": 19,
+      "mwstBetrag": 60.82,
+      "nettoBetrag": 320.08
+    },
+    {
+      "id": "1001260",
+      "datum": "2026-01-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Jan",
+      "notiz": "",
+      "betrag": 47.59,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 7.6,
+      "nettoBetrag": 39.99
+    },
+    {
+      "id": "1001130",
+      "datum": "2026-01-20",
+      "typ": "Einnahme",
+      "kategorie": "Tresorservice",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresorservice komplex",
+      "notiz": "Kombiwechsel",
+      "betrag": 535.5,
+      "mwstRate": 19,
+      "mwstBetrag": 85.5,
+      "nettoBetrag": 450.0
+    },
+    {
+      "id": "1001270",
+      "datum": "2026-01-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Jan",
+      "notiz": "",
+      "betrag": 535.5,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 85.5,
+      "nettoBetrag": 450.0
+    },
+    {
+      "id": "1001140",
+      "datum": "2026-01-23",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung 2x Hochhaus",
+      "notiz": "",
+      "betrag": 178.5,
+      "mwstRate": 19,
+      "mwstBetrag": 28.5,
+      "nettoBetrag": 150.0
+    },
+    {
+      "id": "1001150",
+      "datum": "2026-01-28",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "5x Zylinder Wohnanlage",
+      "notiz": "Müller & Partner",
+      "betrag": 773.5,
+      "mwstRate": 19,
+      "mwstBetrag": 123.5,
+      "nettoBetrag": 650.0
+    },
+    {
+      "id": "1001280",
+      "datum": "2026-01-28",
+      "typ": "Ausgabe",
+      "kategorie": "Fahrzeugkosten",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Tankrechnung Jan",
+      "notiz": "",
+      "betrag": 133.77,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 21.36,
+      "nettoBetrag": 112.41
+    },
+    {
+      "id": "1001160",
+      "datum": "2026-02-03",
+      "typ": "Einnahme",
+      "kategorie": "Notfallzuschlag",
+      "zahlungsart": "Bar",
+      "beschreibung": "Notöffnung Wochenende",
+      "notiz": "Samstag",
+      "betrag": 232.05,
+      "mwstRate": 19,
+      "mwstBetrag": 37.05,
+      "nettoBetrag": 195.0
+    },
+    {
+      "id": "1001170",
+      "datum": "2026-02-10",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Bar",
+      "beschreibung": "Zylinder 3x Mietshaus",
+      "notiz": "",
+      "betrag": 440.65,
+      "mwstRate": 19,
+      "mwstBetrag": 70.36,
+      "nettoBetrag": 370.29
+    },
+    {
+      "id": "1001290",
+      "datum": "2026-02-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Feb",
+      "notiz": "",
+      "betrag": 152.93,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 24.42,
+      "nettoBetrag": 128.51
+    },
+    {
+      "id": "1001300",
+      "datum": "2026-02-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Feb",
+      "notiz": "",
+      "betrag": 47.59,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 7.6,
+      "nettoBetrag": 39.99
+    },
+    {
+      "id": "1001180",
+      "datum": "2026-02-16",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Türöffnung Büro Innenstadt",
+      "notiz": "",
+      "betrag": 113.05,
+      "mwstRate": 19,
+      "mwstBetrag": 18.05,
+      "nettoBetrag": 95.0
+    },
+    {
+      "id": "1001190",
+      "datum": "2026-02-20",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließsystem Hotel Wartung Q1",
+      "notiz": "Hotel Zum Dom",
+      "betrag": 380.8,
+      "mwstRate": 19,
+      "mwstBetrag": 60.8,
+      "nettoBetrag": 320.0
+    },
+    {
+      "id": "1001310",
+      "datum": "2026-02-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Feb",
+      "notiz": "",
+      "betrag": 535.5,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 85.5,
+      "nettoBetrag": 450.0
+    },
+    {
+      "id": "1001200",
+      "datum": "2026-02-24",
+      "typ": "Einnahme",
+      "kategorie": "Tresorservice",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Tresoröffnung Notar",
+      "notiz": "",
+      "betrag": 595.0,
+      "mwstRate": 19,
+      "mwstBetrag": 95.0,
+      "nettoBetrag": 500.0
+    },
+    {
+      "id": "1001320",
+      "datum": "2026-02-26",
+      "typ": "Ausgabe",
+      "kategorie": "Werkzeug & Material",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Spezialwerkzeug Tresor",
+      "notiz": "",
+      "betrag": 404.95,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 64.66,
+      "nettoBetrag": 340.29
+    },
+    {
+      "id": "1001330",
+      "datum": "2026-03-01",
+      "typ": "Ausgabe",
+      "kategorie": "Werbung & Marketing",
+      "zahlungsart": "EC-Karte",
+      "beschreibung": "Google Ads Feb",
+      "notiz": "",
+      "betrag": 95.2,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 15.2,
+      "nettoBetrag": 80.0
+    },
+    {
+      "id": "1001210",
+      "datum": "2026-03-03",
+      "typ": "Einnahme",
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Bar",
+      "beschreibung": "Türöffnung Wohnung",
+      "notiz": "",
+      "betrag": 107.1,
+      "mwstRate": 19,
+      "mwstBetrag": 17.1,
+      "nettoBetrag": 90.0
+    },
+    {
+      "id": "1001220",
+      "datum": "2026-03-07",
+      "typ": "Einnahme",
+      "kategorie": "Schlossaustausch",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Schließanlage Stadtwerke",
+      "notiz": "Stadtwerke Worms",
+      "betrag": 744.1,
+      "mwstRate": 19,
+      "mwstBetrag": 118.81,
+      "nettoBetrag": 625.29
+    },
+    {
+      "id": "1001340",
+      "datum": "2026-03-10",
+      "typ": "Ausgabe",
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "KFZ-Versicherung Mär",
+      "notiz": "",
+      "betrag": 152.93,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 24.42,
+      "nettoBetrag": 128.51
+    },
+    {
+      "id": "1001350",
+      "datum": "2026-03-15",
+      "typ": "Ausgabe",
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Handytarif Mär",
+      "notiz": "",
+      "betrag": 47.59,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 7.6,
+      "nettoBetrag": 39.99
+    },
+    {
+      "id": "1001360",
+      "datum": "2026-03-20",
+      "typ": "Ausgabe",
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "beschreibung": "Werkstattmiete Mär",
+      "notiz": "",
+      "betrag": 535.5,
+      "vorsteuerRate": 19,
+      "vorsteuerBet": 85.5,
+      "nettoBetrag": 450.0
+    }
+  ],
+  "rechnungen": [
+    {
+      "id": "r2501",
+      "nr": "2025-001",
+      "datum": "2025-03-12",
+      "faellig": "2025-03-26",
+      "status": "bezahlt",
+      "kunde": "Müller & Partner Hausverwaltung",
+      "adresse": "Nibelungenring 12, 67547 Worms",
+      "email": "k.mueller@muellerpartner.de",
+      "wa": "+49 151 23456789",
+      "notiz": "Auftrag vom 11.03.2025, Schlüsselübergabe erfolgt",
+      "beschreibung": "Schließanlage Bürokomplex komplett",
+      "netto": 1850.0,
+      "mwstBetrag": 0.0,
+      "mwstRate": 0,
+      "betrag": 1850.0,
+      "mwstMode": "§19",
+      "positionen": [
+        {
+          "bez": "Demontage alte Anlage",
+          "menge": 1,
+          "netto": 200.0,
+          "rate": 0,
+          "brutto": 200.0,
+          "preis": 200.0
+        },
+        {
+          "bez": "Zylinder ABUS XP20 (8 Stück)",
+          "menge": 8,
+          "netto": 95.0,
+          "rate": 0,
+          "brutto": 95.0,
+          "preis": 95.0
+        },
+        {
+          "bez": "Einbau & Programmierung",
+          "menge": 1,
+          "netto": 890.0,
+          "rate": 0,
+          "brutto": 890.0,
+          "preis": 890.0
+        }
+      ]
+    },
+    {
+      "id": "r2502",
+      "nr": "2025-002",
+      "datum": "2025-07-08",
+      "faellig": "2025-07-22",
+      "status": "bezahlt",
+      "kunde": "Autohaus Rhein GmbH",
+      "adresse": "Industriestr. 22, 67550 Worms",
+      "email": "d.kaufmann@autohaus-rhein.de",
+      "wa": "+49 171 9988776",
+      "notiz": "Großauftrag Schließsystem Werkstatthalle",
+      "beschreibung": "Schließanlage Werkstatt + Showroom",
+      "netto": 2200.0,
+      "mwstBetrag": 0.0,
+      "mwstRate": 0,
+      "betrag": 2200.0,
+      "mwstMode": "§19",
+      "positionen": [
+        {
+          "bez": "Sicherheitszylinder DOM (12 Stück)",
+          "menge": 12,
+          "netto": 110.0,
+          "rate": 0,
+          "brutto": 110.0,
+          "preis": 110.0
+        },
+        {
+          "bez": "Generalschlüsselanlage Einrichtung",
+          "menge": 1,
+          "netto": 680.0,
+          "rate": 0,
+          "brutto": 680.0,
+          "preis": 680.0
+        },
+        {
+          "bez": "Montage & Inbetriebnahme",
+          "menge": 1,
+          "netto": 200.0,
+          "rate": 0,
+          "brutto": 200.0,
+          "preis": 200.0
+        }
+      ]
+    },
+    {
+      "id": "r2503",
+      "nr": "2025-003",
+      "datum": "2025-12-09",
+      "faellig": "2025-12-23",
+      "status": "bezahlt",
+      "kunde": "Hotel Zum Dom",
+      "adresse": "Domplatz 1, 67547 Worms",
+      "email": "rezeption@hotelzumdom.de",
+      "wa": "+49 151 77665544",
+      "notiz": "Jahresinspektion Schließsystem + Austausch",
+      "beschreibung": "Jahreswartung + Zylindertausch Hotel",
+      "netto": 890.0,
+      "mwstBetrag": 0.0,
+      "mwstRate": 0,
+      "betrag": 890.0,
+      "mwstMode": "§19",
+      "positionen": [
+        {
+          "bez": "Jahresinspektion Schließsystem",
+          "menge": 1,
+          "netto": 320.0,
+          "rate": 0,
+          "brutto": 320.0,
+          "preis": 320.0
+        },
+        {
+          "bez": "Zylinder EVVA 3KS (3 Stück)",
+          "menge": 3,
+          "netto": 130.0,
+          "rate": 0,
+          "brutto": 130.0,
+          "preis": 130.0
+        },
+        {
+          "bez": "Einbau & Protokoll",
+          "menge": 1,
+          "netto": 180.0,
+          "rate": 0,
+          "brutto": 180.0,
+          "preis": 180.0
+        }
+      ]
+    },
+    {
+      "id": "r2504",
+      "nr": "2025-004",
+      "datum": "2025-08-19",
+      "faellig": "2025-09-02",
+      "status": "bezahlt",
+      "kunde": "Stadtwerke Worms GmbH",
+      "adresse": "Energiestr. 1, 67550 Worms",
+      "email": "technik@stadtwerke-worms.de",
+      "wa": "",
+      "notiz": "Rahmenvertrag Notöffnungen + Zylinder",
+      "beschreibung": "5x Sicherheitszylinder Betriebsgelände",
+      "netto": 625.0,
+      "mwstBetrag": 0.0,
+      "mwstRate": 0,
+      "betrag": 625.0,
+      "mwstMode": "§19",
+      "positionen": [
+        {
+          "bez": "Sicherheitszylinder BKS (5 Stück)",
+          "menge": 5,
+          "netto": 85.0,
+          "rate": 0,
+          "brutto": 85.0,
+          "preis": 85.0
+        },
+        {
+          "bez": "Einbau & Schlüsselkopien",
+          "menge": 5,
+          "netto": 40.0,
+          "rate": 0,
+          "brutto": 40.0,
+          "preis": 40.0
+        }
+      ]
+    },
+    {
+      "id": "r2601",
+      "nr": "2026-001",
+      "datum": "2026-01-15",
+      "faellig": "2026-01-29",
+      "status": "bezahlt",
+      "kunde": "Schmidt GmbH",
+      "adresse": "Wormser Str. 45, 67547 Worms",
+      "email": "t.schmidt@schmidt-immobilien.de",
+      "wa": "+49 171 4456789",
+      "notiz": "Schließanlage Bürokomplex Q1 2026, Auftragsbestätigung vom 13.01.",
+      "beschreibung": "Schließanlage Erneuerung Bürokomplex",
+      "netto": 1749.96,
+      "mwstBetrag": 332.49,
+      "mwstRate": 19,
+      "betrag": 2082.45,
+      "mwstMode": "regel",
+      "positionen": [
+        {
+          "bez": "Zylinder ABUS XP20 (10 Stück)",
+          "menge": 10,
+          "netto": 95.0,
+          "rate": 19,
+          "brutto": 113.05,
+          "preis": 95.0
+        },
+        {
+          "bez": "Einbau & Programmierung",
+          "menge": 1,
+          "netto": 549.96,
+          "rate": 19,
+          "brutto": 654.45,
+          "preis": 549.96
+        },
+        {
+          "bez": "Montage Rahmen & Beschläge",
+          "menge": 1,
+          "netto": 250.0,
+          "rate": 19,
+          "brutto": 297.5,
+          "preis": 250.0
+        }
+      ]
+    },
+    {
+      "id": "r2602",
+      "nr": "2026-002",
+      "datum": "2026-02-20",
+      "faellig": "2026-03-06",
+      "status": "bezahlt",
+      "kunde": "Hotel Zum Dom",
+      "adresse": "Domplatz 1, 67547 Worms",
+      "email": "rezeption@hotelzumdom.de",
+      "wa": "+49 151 77665544",
+      "notiz": "Quartals-Wartungsvertrag Q1 2026 inkl. 2 Zylindertausch",
+      "beschreibung": "Schließsystem Wartung Q1 + Austausch",
+      "netto": 630.0,
+      "mwstBetrag": 119.7,
+      "mwstRate": 19,
+      "betrag": 749.7,
+      "mwstMode": "regel",
+      "positionen": [
+        {
+          "bez": "Quartals-Inspektion Schließsystem",
+          "menge": 1,
+          "netto": 320.0,
+          "rate": 19,
+          "brutto": 380.8,
+          "preis": 320.0
+        },
+        {
+          "bez": "EVVA Zylinder Ersatz (2 Stück)",
+          "menge": 2,
+          "netto": 130.0,
+          "rate": 19,
+          "brutto": 154.7,
+          "preis": 130.0
+        },
+        {
+          "bez": "Protokoll & Schlüsselverwaltung",
+          "menge": 1,
+          "netto": 50.0,
+          "rate": 19,
+          "brutto": 59.5,
+          "preis": 50.0
+        }
+      ]
+    },
+    {
+      "id": "r2603",
+      "nr": "2026-003",
+      "datum": "2026-03-07",
+      "faellig": "2026-03-21",
+      "status": "offen",
+      "kunde": "Stadtwerke Worms GmbH",
+      "adresse": "Energiestr. 1, 67550 Worms",
+      "email": "technik@stadtwerke-worms.de",
+      "wa": "",
+      "notiz": "Rahmenvertrag Zylinder + Notöffnungen Betriebsgelände",
+      "beschreibung": "Sicherheitszylinder & Einbau Betriebsgelände",
+      "netto": 670.0,
+      "mwstBetrag": 127.3,
+      "mwstRate": 19,
+      "betrag": 797.3,
+      "mwstMode": "regel",
+      "positionen": [
+        {
+          "bez": "BKS Sicherheitszylinder (6 Stück)",
+          "menge": 6,
+          "netto": 75.0,
+          "rate": 19,
+          "brutto": 89.25,
+          "preis": 75.0
+        },
+        {
+          "bez": "Einbau & Schließplan Update",
+          "menge": 1,
+          "netto": 175.0,
+          "rate": 19,
+          "brutto": 208.25,
+          "preis": 175.0
+        },
+        {
+          "bez": "Fahrtkosten & Nebenkosten",
+          "menge": 1,
+          "netto": 45.0,
+          "rate": 19,
+          "brutto": 53.55,
+          "preis": 45.0
+        }
+      ]
+    }
+  ],
+  "kunden": [
+    {
+      "id": "k001",
+      "name": "Schmidt GmbH",
+      "ansprechpartner": "Thomas Schmidt",
+      "email": "t.schmidt@schmidt-immobilien.de",
+      "tel": "06241 88100",
+      "strasse": "Wormser Str. 45",
+      "plz": "67547",
+      "ort": "Worms",
+      "iban": "DE89370400440532013000",
+      "ustid": "DE123456789",
+      "notiz": "Stammkunde seit 2023, zahlt pünktlich"
+    },
+    {
+      "id": "k002",
+      "name": "Müller & Partner Hausverwaltung",
+      "ansprechpartner": "Klaus Müller",
+      "email": "k.mueller@muellerpartner.de",
+      "tel": "06241 55230",
+      "strasse": "Nibelungenring 12",
+      "plz": "67547",
+      "ort": "Worms",
+      "iban": "DE21500105178215434499",
+      "ustid": "DE987654321",
+      "notiz": "Hausverwaltung, viele Objekte"
+    },
+    {
+      "id": "k003",
+      "name": "Bäckerei Hoffmann",
+      "ansprechpartner": "Anna Hoffmann",
+      "email": "info@baeckerei-hoffmann.de",
+      "tel": "06241 33410",
+      "strasse": "Marktplatz 7",
+      "plz": "67547",
+      "ort": "Worms",
+      "iban": "",
+      "ustid": "",
+      "notiz": "Notöffnung nach Einbruch 2024"
+    },
+    {
+      "id": "k004",
+      "name": "Privat Berger, Klaus",
+      "ansprechpartner": "Klaus Berger",
+      "email": "kberger@gmx.de",
+      "tel": "0171 4421890",
+      "strasse": "Lutherring 28",
+      "plz": "67549",
+      "ort": "Worms",
+      "iban": "",
+      "ustid": "",
+      "notiz": "Wohnungsschlüssel verloren"
+    },
+    {
+      "id": "k005",
+      "name": "Stadtwerke Worms GmbH",
+      "ansprechpartner": "Petra Lang",
+      "email": "technik@stadtwerke-worms.de",
+      "tel": "06241 850",
+      "strasse": "Energiestr. 1",
+      "plz": "67550",
+      "ort": "Worms",
+      "iban": "DE27200400600563702701",
+      "ustid": "DE456789123",
+      "notiz": "Rahmenvertrag Notöffnungen"
+    },
+    {
+      "id": "k006",
+      "name": "Hotel Zum Dom",
+      "ansprechpartner": "Marco Ricci",
+      "email": "rezeption@hotelzumdom.de",
+      "tel": "06241 6970",
+      "strasse": "Domplatz 1",
+      "plz": "67547",
+      "ort": "Worms",
+      "iban": "DE81200400600263702702",
+      "ustid": "DE321654987",
+      "notiz": "Hotelzimmerschlösser, quartalsweise Wartung"
+    },
+    {
+      "id": "k007",
+      "name": "Privat Schneider, Maria",
+      "ansprechpartner": "Maria Schneider",
+      "email": "m.schneider@web.de",
+      "tel": "0162 9983344",
+      "strasse": "Römerstraße 5",
+      "plz": "67549",
+      "ort": "Worms",
+      "iban": "",
+      "ustid": "",
+      "notiz": "Türöffnung Nachtzeit"
+    },
+    {
+      "id": "k008",
+      "name": "Autohaus Rhein GmbH",
+      "ansprechpartner": "Dirk Kaufmann",
+      "email": "d.kaufmann@autohaus-rhein.de",
+      "tel": "06241 77800",
+      "strasse": "Industriestr. 22",
+      "plz": "67550",
+      "ort": "Worms",
+      "iban": "DE44200400600163702703",
+      "ustid": "DE654321789",
+      "notiz": "Schließanlage Werkstatt"
+    }
+  ],
+  "wiederkehrend": [
+    {
+      "id": "w001",
+      "bezeichnung": "KFZ-Versicherung Transit",
+      "typ": "Ausgabe",
+      "betrag": 128.5,
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "intervall": "monatlich",
+      "naechste": "2026-04-01"
+    },
+    {
+      "id": "w002",
+      "bezeichnung": "Handytarif Geschäft (Telekom)",
+      "typ": "Ausgabe",
+      "betrag": 39.99,
+      "kategorie": "Telefon & Internet",
+      "zahlungsart": "Überweisung",
+      "intervall": "monatlich",
+      "naechste": "2026-04-01"
+    },
+    {
+      "id": "w003",
+      "bezeichnung": "Werkstatträume Miete",
+      "typ": "Ausgabe",
+      "betrag": 450.0,
+      "kategorie": "Miete & Büro",
+      "zahlungsart": "Überweisung",
+      "intervall": "monatlich",
+      "naechste": "2026-04-01"
+    },
+    {
+      "id": "w004",
+      "bezeichnung": "DATEV Buchhaltungssoftware",
+      "typ": "Ausgabe",
+      "betrag": 59.0,
+      "kategorie": "Buchhaltung & Steuer",
+      "zahlungsart": "Überweisung",
+      "intervall": "monatlich",
+      "naechste": "2026-04-01"
+    },
+    {
+      "id": "w005",
+      "bezeichnung": "Google Ads Kampagne",
+      "typ": "Ausgabe",
+      "betrag": 80.0,
+      "kategorie": "Werbung & Marketing",
+      "zahlungsart": "EC-Karte",
+      "intervall": "monatlich",
+      "naechste": "2026-04-01"
+    },
+    {
+      "id": "w006",
+      "bezeichnung": "Wartungsvertrag Hotel Zum Dom",
+      "typ": "Einnahme",
+      "betrag": 320.0,
+      "kategorie": "Dienstleistung",
+      "zahlungsart": "Überweisung",
+      "intervall": "quartalsweise",
+      "naechste": "2026-04-01"
+    },
+    {
+      "id": "w007",
+      "bezeichnung": "Haftpflichtversicherung Jahresprämie",
+      "typ": "Ausgabe",
+      "betrag": 580.0,
+      "kategorie": "Versicherung",
+      "zahlungsart": "Überweisung",
+      "intervall": "jährlich",
+      "naechste": "2026-01-01"
+    }
+  ],
+  "ustEintraege": [
+    {
+      "id": "1001090_ust",
+      "datum": "2026-01-05",
+      "typ": "ust",
+      "netto": 95.0,
+      "rate": 19,
+      "betrag": 18.05,
+      "beschreibung": "Türöffnung Wohnung Neustadt"
+    },
+    {
+      "id": "1001100_ust",
+      "datum": "2026-01-08",
+      "typ": "ust",
+      "netto": 185.0,
+      "rate": 19,
+      "betrag": 35.15,
+      "beschreibung": "Zylinder EFH 2x"
+    },
+    {
+      "id": "1001110_ust",
+      "datum": "2026-01-12",
+      "typ": "ust",
+      "netto": 220.0,
+      "rate": 19,
+      "betrag": 41.8,
+      "beschreibung": "Notöffnung Firma Nacht"
+    },
+    {
+      "id": "1001120_ust",
+      "datum": "2026-01-15",
+      "typ": "ust",
+      "netto": 320.08,
+      "rate": 19,
+      "betrag": 60.82,
+      "beschreibung": "Schließanlage Büro Wartung"
+    },
+    {
+      "id": "1001130_ust",
+      "datum": "2026-01-20",
+      "typ": "ust",
+      "netto": 450.0,
+      "rate": 19,
+      "betrag": 85.5,
+      "beschreibung": "Tresorservice komplex"
+    },
+    {
+      "id": "1001140_ust",
+      "datum": "2026-01-23",
+      "typ": "ust",
+      "netto": 150.0,
+      "rate": 19,
+      "betrag": 28.5,
+      "beschreibung": "Türöffnung 2x Hochhaus"
+    },
+    {
+      "id": "1001150_ust",
+      "datum": "2026-01-28",
+      "typ": "ust",
+      "netto": 650.0,
+      "rate": 19,
+      "betrag": 123.5,
+      "beschreibung": "5x Zylinder Wohnanlage"
+    },
+    {
+      "id": "1001160_ust",
+      "datum": "2026-02-03",
+      "typ": "ust",
+      "netto": 195.0,
+      "rate": 19,
+      "betrag": 37.05,
+      "beschreibung": "Notöffnung Wochenende"
+    },
+    {
+      "id": "1001170_ust",
+      "datum": "2026-02-10",
+      "typ": "ust",
+      "netto": 370.29,
+      "rate": 19,
+      "betrag": 70.36,
+      "beschreibung": "Zylinder 3x Mietshaus"
+    },
+    {
+      "id": "1001180_ust",
+      "datum": "2026-02-16",
+      "typ": "ust",
+      "netto": 95.0,
+      "rate": 19,
+      "betrag": 18.05,
+      "beschreibung": "Türöffnung Büro Innenstadt"
+    },
+    {
+      "id": "1001190_ust",
+      "datum": "2026-02-20",
+      "typ": "ust",
+      "netto": 320.0,
+      "rate": 19,
+      "betrag": 60.8,
+      "beschreibung": "Schließsystem Hotel Wartung Q1"
+    },
+    {
+      "id": "1001200_ust",
+      "datum": "2026-02-24",
+      "typ": "ust",
+      "netto": 500.0,
+      "rate": 19,
+      "betrag": 95.0,
+      "beschreibung": "Tresoröffnung Notar"
+    },
+    {
+      "id": "1001210_ust",
+      "datum": "2026-03-03",
+      "typ": "ust",
+      "netto": 90.0,
+      "rate": 19,
+      "betrag": 17.1,
+      "beschreibung": "Türöffnung Wohnung"
+    },
+    {
+      "id": "1001220_ust",
+      "datum": "2026-03-07",
+      "typ": "ust",
+      "netto": 625.29,
+      "rate": 19,
+      "betrag": 118.81,
+      "beschreibung": "Schließanlage Stadtwerke"
+    },
+    {
+      "id": "1001230_vs",
+      "datum": "2026-01-05",
+      "typ": "vorsteuer",
+      "netto": 400.0,
+      "rate": 19,
+      "betrag": 76.0,
+      "beschreibung": "Schlösser & Zylinder Jan"
+    },
+    {
+      "id": "1001240_vs",
+      "datum": "2026-01-07",
+      "typ": "vorsteuer",
+      "netto": 580.0,
+      "rate": 19,
+      "betrag": 110.2,
+      "beschreibung": "Haftpflicht Jahresprämie 2026"
+    },
+    {
+      "id": "1001250_vs",
+      "datum": "2026-01-10",
+      "typ": "vorsteuer",
+      "netto": 128.51,
+      "rate": 19,
+      "betrag": 24.42,
+      "beschreibung": "KFZ-Versicherung Jan"
+    },
+    {
+      "id": "1001260_vs",
+      "datum": "2026-01-15",
+      "typ": "vorsteuer",
+      "netto": 39.99,
+      "rate": 19,
+      "betrag": 7.6,
+      "beschreibung": "Handytarif Jan"
+    },
+    {
+      "id": "1001270_vs",
+      "datum": "2026-01-20",
+      "typ": "vorsteuer",
+      "netto": 450.0,
+      "rate": 19,
+      "betrag": 85.5,
+      "beschreibung": "Werkstattmiete Jan"
+    },
+    {
+      "id": "1001280_vs",
+      "datum": "2026-01-28",
+      "typ": "vorsteuer",
+      "netto": 112.41,
+      "rate": 19,
+      "betrag": 21.36,
+      "beschreibung": "Tankrechnung Jan"
+    },
+    {
+      "id": "1001290_vs",
+      "datum": "2026-02-10",
+      "typ": "vorsteuer",
+      "netto": 128.51,
+      "rate": 19,
+      "betrag": 24.42,
+      "beschreibung": "KFZ-Versicherung Feb"
+    },
+    {
+      "id": "1001300_vs",
+      "datum": "2026-02-15",
+      "typ": "vorsteuer",
+      "netto": 39.99,
+      "rate": 19,
+      "betrag": 7.6,
+      "beschreibung": "Handytarif Feb"
+    },
+    {
+      "id": "1001310_vs",
+      "datum": "2026-02-20",
+      "typ": "vorsteuer",
+      "netto": 450.0,
+      "rate": 19,
+      "betrag": 85.5,
+      "beschreibung": "Werkstattmiete Feb"
+    },
+    {
+      "id": "1001320_vs",
+      "datum": "2026-02-26",
+      "typ": "vorsteuer",
+      "netto": 340.29,
+      "rate": 19,
+      "betrag": 64.66,
+      "beschreibung": "Spezialwerkzeug Tresor"
+    },
+    {
+      "id": "1001330_vs",
+      "datum": "2026-03-01",
+      "typ": "vorsteuer",
+      "netto": 80.0,
+      "rate": 19,
+      "betrag": 15.2,
+      "beschreibung": "Google Ads Feb"
+    },
+    {
+      "id": "1001340_vs",
+      "datum": "2026-03-10",
+      "typ": "vorsteuer",
+      "netto": 128.51,
+      "rate": 19,
+      "betrag": 24.42,
+      "beschreibung": "KFZ-Versicherung Mär"
+    },
+    {
+      "id": "1001350_vs",
+      "datum": "2026-03-15",
+      "typ": "vorsteuer",
+      "netto": 39.99,
+      "rate": 19,
+      "betrag": 7.6,
+      "beschreibung": "Handytarif Mär"
+    },
+    {
+      "id": "1001360_vs",
+      "datum": "2026-03-20",
+      "typ": "vorsteuer",
+      "netto": 450.0,
+      "rate": 19,
+      "betrag": 85.5,
+      "beschreibung": "Werkstattmiete Mär"
+    },
+    {
+      "id": "r_ust_r2601",
+      "datum": "2026-01-15",
+      "typ": "ust",
+      "netto": 1749.96,
+      "rate": 19,
+      "betrag": 332.49,
+      "beschreibung": "Schließanlage Erneuerung Bürokomplex"
+    },
+    {
+      "id": "r_ust_r2602",
+      "datum": "2026-02-20",
+      "typ": "ust",
+      "netto": 630.0,
+      "rate": 19,
+      "betrag": 119.7,
+      "beschreibung": "Schließsystem Wartung Q1 + Austausch"
+    },
+    {
+      "id": "r_ust_r2603",
+      "datum": "2026-03-07",
+      "typ": "ust",
+      "netto": 670.0,
+      "rate": 19,
+      "betrag": 127.3,
+      "beschreibung": "Sicherheitszylinder & Einbau Betriebsgelände"
+    }
+  ],
+  "ustModeByYear": {
+    "2025": "§19",
+    "2026": "regel"
+  }
+}
