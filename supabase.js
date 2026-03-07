@@ -103,15 +103,23 @@ async function authSubmit() {
 
   try {
     if (isLogin) {
-      await sbSignIn(email, password);
+      const result = await sbSignIn(email, password);
+      console.log('SignIn result:', result);
+      if (result && result.user) {
+        currentUser = result.user;
+        const uel = document.getElementById('user-email-display');
+        if (uel) uel.textContent = currentUser.email;
+        const remoteData = await sbLoadData();
+        window._loadedRemoteData = remoteData || null;
+        hideAuthScreen();
+        window.dispatchEvent(new Event('supabase-ready'));
+      }
     } else {
       await sbSignUp(email, password);
-      // Показываем сообщение — пусть сам нажмёт Anmelden
       err.style.color = 'var(--green)';
       err.textContent = '✅ Registriert! Bitte jetzt anmelden.';
       btn.textContent = 'Registrieren';
       btn.disabled = false;
-      // Переключаем на форму входа
       setTimeout(() => {
         err.style.color = 'var(--red)';
         err.textContent = '';
