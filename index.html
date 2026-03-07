@@ -13,6 +13,33 @@
 </head>
 <body>
 
+<!-- ── AUTH SCREEN ─────────────────────────────────────────────────────── -->
+<div id="auth-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);padding:20px">
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:40px;margin-bottom:8px">📊</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text)">Buchaltung Pro</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:4px">Für Kleinunternehmer & Regelbesteuerung</div>
+    </div>
+    <div id="auth-title" style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:20px">🔐 Anmelden</div>
+    <input id="auth-email" type="email" placeholder="Email" autocomplete="email"
+      style="width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 14px;font-size:14px;outline:none;margin-bottom:12px;box-sizing:border-box">
+    <input id="auth-password" type="password" placeholder="Passwort (min. 6 Zeichen)" autocomplete="current-password"
+      style="width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 14px;font-size:14px;outline:none;margin-bottom:8px;box-sizing:border-box">
+    <div id="auth-error" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:12px"></div>
+    <button id="auth-btn" onclick="authSubmit()"
+      style="width:100%;background:var(--blue);border:none;border-radius:8px;color:#fff;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
+      Anmelden
+    </button>
+    <div id="auth-toggle-text" style="text-align:center;margin-top:16px;font-size:12px;color:var(--sub)">
+      Noch kein Konto? <a href="#" onclick="authToggleMode()" style="color:var(--blue)">Registrieren</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP WRAPPER ─────────────────────────────────────────────────────── -->
+<div id="app-wrapper" style="display:none">
+
 <!-- ══════════════════════════════════════════════════════════
      DISCLAIMER MODAL — shown on first visit, must be accepted
      ══════════════════════════════════════════════════════════ -->
@@ -73,19 +100,17 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
   <div class="beta-badge">BETA · TEST</div>
 
   <div class="hd">
-    <div class="as-pill" id="as-pill-wrap" onclick="document.getElementById('as-chk').click()">
-      <span class="dot" id="as-dot"></span>
-      <label for="as-chk" style="cursor:pointer">Autospeichern</label>
-      <label class="tog" onclick="event.stopPropagation()"><input type="checkbox" id="as-chk" onchange="toggleAS()"><span class="tog-s"></span></label>
-      <span class="as-txt" id="as-txt">Aus.</span>
-    </div>
+
   </div>
 
   <div class="hr">
-    <button class="btn" onclick="loadFile()">📂<span class="btn-lbl"> Öffnen</span></button>
-    <button class="btn" id="btn-sas" onclick="doSaveAs()">💾<span class="btn-lbl"> Speichern als…</span></button>
-    <button class="btn success" id="btn-sv" style="display:none" onclick="doSave()">💾<span class="btn-lbl"> Speichern</span></button>
-
+    <!-- Индикатор сохранения в облако -->
+    <span id="save-indicator" style="font-size:11px;color:var(--sub);opacity:0;transition:opacity .4s;margin-right:8px"></span>
+    <!-- Пользователь -->
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="user-email-display" style="font-size:11px;color:var(--sub);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+      <button class="btn" onclick="sbSignOut()" title="Abmelden" style="padding:6px 10px;font-size:11px">🚪 Abmelden</button>
+    </div>
   </div>
   <input type="file" id="fi" accept=".json" style="display:none" onchange="onLoad(event)">
 </header>
@@ -937,7 +962,10 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 <script src="ru.js"></script>
 <script src="app.js"></script>
+</div><!-- /app-wrapper -->
 </body>
 </html>

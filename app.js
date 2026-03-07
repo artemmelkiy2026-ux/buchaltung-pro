@@ -69,11 +69,37 @@ function calcMwst(netto, rate){ return r2(netto * rate/100); }
 const MN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const MS=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 
-let data=JSON.parse(localStorage.getItem(SK)||'{"eintraege":[]}');
-// Нормализуем старые записи из localStorage (русские → немецкие ключи)
-if(data&&data.eintraege) data.eintraege.forEach(e=>{
-  if(e.zahlungsart) e.zahlungsart=normZahl(e.zahlungsart);
-  if(e.kategorie)   e.kategorie=normKat(e.kategorie);
+// Данные загружаются из Supabase — инициализируем пустым объектом
+let data = { eintraege: [] };
+
+// Когда Supabase готов — загружаем данные
+window.addEventListener('supabase-ready', () => {
+  const remote = window._loadedRemoteData;
+  if (remote) {
+    data = remote;
+    // Нормализуем старые записи
+    if (data.eintraege) data.eintraege.forEach(e => {
+      if (e.zahlungsart) e.zahlungsart = normZahl(e.zahlungsart);
+      if (e.kategorie)   e.kategorie   = normKat(e.kategorie);
+    });
+  }
+  // Инициализация
+  if (!data.eintraege)    data.eintraege = [];
+  if (!data.rechnungen)   data.rechnungen = [];
+  if (!data.kunden)       data.kunden = [];
+  if (!data.ustEintraege) data.ustEintraege = [];
+  if (!data.ustModeByYear) data.ustModeByYear = {};
+  if (!data.wiederkehrend) data.wiederkehrend = [];
+  // Migrate old ustMode
+  if (data.ustMode) {
+    const oldMode = data.ustMode;
+    if (Object.keys(data.ustModeByYear).length === 0) {
+      const curYr = new Date().getFullYear() + '';
+      data.ustModeByYear[curYr] = oldMode;
+    }
+    delete data.ustMode;
+  }
+  appInit();
 });
 let curTyp='Einnahme', fTyp='Alle', sortCol='datum', sortAsc=false;
 let fileHandle=null, asOn=false, asTimer=null, curPage='dashboard';
@@ -84,30 +110,17 @@ let einPage=1, einPerPage=50;
 let zPage=1, zPerPage=50;  // Пагинация для Zahlungsarten
 let ustPage=1;              // Пагинация для USt-Buchungen
 
-// ── INIT ──────────────────────────────────────────────────────────────────
-document.getElementById('nf-dat').value=new Date().toISOString().split('T')[0];
-if(!data.rechnungen) data.rechnungen=[];
-if(!data.kunden) data.kunden=[];
-  if(!data.ustEintraege) data.ustEintraege=[];
-  if(!data.ustModeByYear) data.ustModeByYear={};
-  // Migrate old single ustMode → per-year
-  if(data.ustMode){
-    const oldMode=data.ustMode;
-    if(Object.keys(data.ustModeByYear).length===0){
-      const curYr=new Date().getFullYear()+'';
-      data.ustModeByYear[curYr]=oldMode;
-    }
-    delete data.ustMode;
-  }
-if(!data.wiederkehrend) data.wiederkehrend=[];
-updateKatSel(); buildYearFilters(); renderAll();
-updateMwstFormVisibility();
-// Auto-detect due recurring payments on startup
-setTimeout(()=>{
-  const today=new Date().toISOString().split('T')[0];
-  const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
-  if(due.length) toast(`🔁 ${due.length} ${t('wiederkehrende Zahlung')}${due.length>1?t('en'):''} ${t('fällig!')}`,'ok');
-},800);
+// ── INIT — вызывается после загрузки данных из Supabase ──────────────────
+function appInit(){
+  document.getElementById('nf-dat').value=new Date().toISOString().split('T')[0];
+  updateKatSel(); buildYearFilters(); renderAll();
+  updateMwstFormVisibility();
+  setTimeout(()=>{
+    const today=new Date().toISOString().split('T')[0];
+    const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
+    if(due.length) toast(`🔁 ${due.length} ${t('wiederkehrende Zahlung')}${due.length>1?t('en'):''} ${t('fällig!')}`, 'ok');
+  },800);
+}
 
 function buildYearFilters(){
   const js=[...new Set(data.eintraege.map(e=>e.datum.substring(0,4)))].sort().reverse();
@@ -148,56 +161,11 @@ function nav(id, el){
   if(id==='wiederkehrend') renderWied();
 }
 
-// ── AUTOSAVE ─────────────────────────────────────────────────────────────
-function toggleAS(){
-  asOn=document.getElementById('as-chk').checked;
-  const dot=document.getElementById('as-dot'), txt=document.getElementById('as-txt');
-  
-  if(asOn){
-    dot.classList.add('on'); 
-    txt.textContent = t('Ein (5 Min)'); // Берет из словаря
-    clearInterval(asTimer); 
-    asTimer=setInterval(asTick, 5*60*1000);
-    
-    // ОБЯЗАТЕЛЬНО добавляем t() сюда:
-    toast(t('✅ Autospeichern aktiv'), 'ok'); 
-  } else {
-    dot.classList.remove('on'); 
-    txt.textContent = t('Aus.'); // Или t('Ausgeschaltet'), смотря что в словаре
-    clearInterval(asTimer); 
-    
-    // ОБЯЗАТЕЛЬНО добавляем t() сюда:
-    toast(t('Autospeichern deaktiviert'), 'err'); 
-  }
-}
-async function asTick(){
-  if(!asOn)return;
-  if(fileHandle){await writeH(fileHandle);flashDot();}
-  else toast('⚠ Выберите файл: кнопка "Сохранить как..."','err');
-}
-function flashDot(){
-  const d=document.getElementById('as-dot'),t=document.getElementById('as-txt');
-  d.classList.add('flash'); d.classList.remove('on');
-  t.textContent=t('Gespeichert ✓');
-  setTimeout(()=>{d.classList.remove('flash');if(asOn)d.classList.add('on');t.textContent=asOn?t('Ein (5 Min)'):t('Ausgeschaltet');},1800);
-}
+// ── AUTOSAVE (облако — сохраняется автоматически через persist) ──────────
 
-// ── FILE IO ───────────────────────────────────────────────────────────────
-function persist(){localStorage.setItem(SK,JSON.stringify(data));}
-async function doSaveAs(){
-  if(window.showSaveFilePicker){
-    try{
-      fileHandle=await window.showSaveFilePicker({suggestedName:`buchaltung_${new Date().getFullYear()}.json`,types:[{description:'JSON',accept:{'application/json':['.json']}}]});
-      await writeH(fileHandle);
-      document.getElementById('btn-sv').style.display='';
-      document.getElementById('btn-sas').textContent='📁 Сменить файл';
-      toast('✅ Файл сохранён: '+fileHandle.name,'ok');
-    }catch(e){if(e.name!=='AbortError')toast('❌ Ошибка','err');}
-  }else{dlJson();}
-}
-async function doSave(){if(!fileHandle)return doSaveAs();await writeH(fileHandle);toast(t('✅ Gespeichert!'),'ok');}
-async function writeH(h){const w=await h.createWritable();await w.write(JSON.stringify(data,null,2));await w.close();flashDot();}
-function dlJson(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`buchaltung_${new Date().getFullYear()}.json`;a.click();toast('✅ Скачан!','ok');}
+// ── FILE IO (только экспорт/импорт для резервной копии) ──────────────────
+function persist(){ sbPersist(data); }
+function dlJson(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`buchaltung_${new Date().getFullYear()}.json`;a.click();toast('✅ Backup heruntergeladen!','ok');}
 function loadFile(){document.getElementById('fi').click();}
 function onLoad(ev){
   const f=ev.target.files[0];if(!f)return;
@@ -205,19 +173,16 @@ function onLoad(ev){
   r.onload=e=>{try{
     const d=JSON.parse(e.target.result);
     if(!d.eintraege)throw 0;
-    // ✅ Инициализируем все нужные поля если их нет
     if(!d.rechnungen) d.rechnungen=[];
     if(!d.wiederkehrend) d.wiederkehrend=[];
     if(data.eintraege.length&&!confirm(`Заменить ${data.eintraege.length} записей?`))return;
     data=d;
-    // Нормализуем старые записи с переведёнными значениями
     if(data.eintraege) data.eintraege.forEach(e=>{
       if(e.zahlungsart) e.zahlungsart=normZahl(e.zahlungsart);
       if(e.kategorie)   e.kategorie=normKat(e.kategorie);
     });
     persist();
     renderAll();
-    // ✅ Обновляем Dashboard явно
     renderDash();
     toast(`✅ Загружено ${data.eintraege.length} записей`,'ok');
   }catch{
@@ -1071,7 +1036,7 @@ function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape') document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));
-  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();fileHandle?doSave():doSaveAs();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();persist();toast('✅ Gespeichert!','ok');}
 });
 document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');}));
 
