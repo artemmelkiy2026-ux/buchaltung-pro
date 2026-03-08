@@ -311,8 +311,15 @@ function setTab(tab) {
 
 function togglePwd(id, btn) {
   const inp = document.getElementById(id);
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  btn.textContent = inp.type === 'password' ? '<img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto">' : '<img src="auge-schliessen.png" alt="Passwort anzeigen" width="20px" height="auto">';
+  
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    // Используем .innerHTML для вставки тега картинки
+    btn.innerHTML = '<img src="auge-schliessen.png" alt="Passwort verbergen" width="20px" height="auto">';
+  } else {
+    inp.type = 'password';
+    btn.innerHTML = '<img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto">';
+  }
 }
 
 async function loginGoogle() {
