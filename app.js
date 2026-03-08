@@ -181,7 +181,6 @@ function onLoad(ev){
       if(e.zahlungsart) e.zahlungsart=normZahl(e.zahlungsart);
       if(e.kategorie)   e.kategorie=normKat(e.kategorie);
     });
-    persist();
     renderAll();
     renderDash();
     toast(`✅ Загружено ${data.eintraege.length} записей`,'ok');
@@ -300,7 +299,8 @@ function addEintrag(){
     }
   }
   data.eintraege.unshift(entry);
-  persist(); renderAll();
+  sbSaveEintrag(entry);
+  renderAll();
   renderDash();
   const fj=document.getElementById('f-jahr');
   if(fj){
@@ -984,7 +984,9 @@ function renderZ(){
 // ── ACTIONS ───────────────────────────────────────────────────────────────
 function delE(e,id){
   e.stopPropagation();if(!confirm('Eintrag löschen?'))return;
-  data.eintraege=data.eintraege.filter(x=>x.id!==id);persist();renderAll();toast('Gelöscht','err');
+  data.eintraege=data.eintraege.filter(x=>x.id!==id);
+  sbDeleteEintrag(id);
+  renderAll();toast('Gelöscht','err');
 }
 function selR(tr){document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('sel'));tr.classList.add('sel');}
 
@@ -1028,7 +1030,8 @@ function saveEdit(){
     beschreibung:document.getElementById('edit-dsc').value.trim()||normKat(document.getElementById('edit-kat').value),
     notiz:document.getElementById('edit-note').value.trim()
   };
-  persist(); renderAll(); closeModal('edit-modal'); toast('✅ Gespeichert!','ok');
+  sbSaveEintrag(data.eintraege[i]);
+  renderAll(); closeModal('edit-modal'); toast('✅ Gespeichert!','ok');
 }
 
 // ── MODAL HELPERS ────────────────────────────────────────────────────────
@@ -1351,25 +1354,30 @@ function saveRechnung(){
   };
   if(editRechId){
     const r=data.rechnungen.find(x=>x.id===editRechId);
-    if(r){Object.assign(r,obj);}
+    if(r){Object.assign(r,obj); sbSaveRechnung(r);}
     editRechId=null;
   } else {
-    data.rechnungen.push({id:Date.now()+'', ...obj});
+    const newR={id:Date.now()+'', ...obj};
+    data.rechnungen.push(newR);
+    sbSaveRechnung(newR);
   }
-  persist();renderRech();closeModal('rech-modal');toast('✅ Rechnung gespeichert!','ok');
+  renderRech();closeModal('rech-modal');toast('✅ Rechnung gespeichert!','ok');
 }
 function rechBezahlt(id){
   const r=data.rechnungen.find(x=>x.id===id);if(!r)return;
   if(confirm(`Rechnung ${r.nr} als bezahlt markieren und automatisch als Einnahme buchen?`)){
     r.status='bezahlt';
-    data.eintraege.unshift({id:Date.now()+'',datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:'Dienstleistung',zahlungsart:'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag});
-    persist();renderAll();toast(`✅ Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');
+    const newE={id:Date.now()+'',datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:'Dienstleistung',zahlungsart:'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag};
+    data.eintraege.unshift(newE);
+    sbSaveRechnung(r); sbSaveEintrag(newE);
+    renderAll();toast(`✅ Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');
   } else if(confirm(`Nur als bezahlt markieren (ohne Einnahme buchen)?`)){
     r.status='bezahlt';
-    persist();renderRech();toast(`✅ Rechnung ${r.nr} als bezahlt markiert`,'ok');
+    sbSaveRechnung(r);
+    renderRech();toast(`✅ Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
 }
-function delRech(id){if(!confirm('Rechnung löschen?'))return;data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);persist();renderRech();toast('Gelöscht','err');}
+function delRech(id){if(!confirm('Rechnung löschen?'))return;data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);sbDeleteRechnung(id);renderRech();toast('Gelöscht','err');}
 // ── RECHNUNG POSITIONEN ───────────────────────────────────────────────────
 
 // Хелпер: округление до 2 знаков без ошибок float
@@ -1775,34 +1783,33 @@ function saveWied(){
   const ab=document.getElementById('wied-ab').value;
   if(!bez||!betrag||!ab)return toast('Alle Felder ausfüllen!','err');
   if(!data.wiederkehrend)data.wiederkehrend=[];
-  data.wiederkehrend.push({
+  const newW={
     id:Date.now()+'',bezeichnung:bez,typ:wiedTyp,betrag,
     kategorie:normKat(document.getElementById('wied-kat').value),
     zahlungsart:normZahl(document.getElementById('wied-zahl').value),
     intervall:document.getElementById('wied-int').value,
     naechste:ab
-  });
-  persist();renderWied();closeModal('wied-modal');toast('✅ Vorlage gespeichert!','ok');
+  };
+  data.wiederkehrend.push(newW);
+  sbSaveWied(newW);
+  renderWied();closeModal('wied-modal');toast('✅ Vorlage gespeichert!','ok');
 }
 function wBuchen(id){
   const w=data.wiederkehrend.find(x=>x.id===id); if(!w) return;
-  
-  data.eintraege.unshift({
-    id:Date.now()+'', datum:w.naechste, typ:w.typ, kategorie:w.kategorie, 
-    zahlungsart:w.zahlungsart, beschreibung:w.bezeichnung, 
+  const newE={
+    id:Date.now()+'', datum:w.naechste, typ:w.typ, kategorie:w.kategorie,
+    zahlungsart:w.zahlungsart, beschreibung:w.bezeichnung,
     notiz:'Wiederkehrend', betrag:w.betrag
-  });
-
-  // Расчет следующей даты
+  };
+  data.eintraege.unshift(newE);
+  sbSaveEintrag(newE);
   const d=new Date(w.naechste);
   if(w.intervall==='monatlich') d.setMonth(d.getMonth()+1);
   else if(w.intervall==='quartalsweise') d.setMonth(d.getMonth()+3);
   else d.setFullYear(d.getFullYear()+1);
   w.naechste=d.toISOString().split('T')[0];
-
-  persist(); renderAll(); renderWied();
-
-  // ИСПРАВЛЕНИЕ ТУТ: Собираем фразу из иконки, названия и переведенного слова
+  sbSaveWied(w);
+  renderAll(); renderWied();
   toast(`✅ ${w.bezeichnung} ${t('gebucht!')}`, 'ok');
 }
 
@@ -1818,7 +1825,7 @@ function wBuchenAlle(){
   // ИСПРАВЛЕНИЕ ТУТ: Переводим сообщение об успехе
   toast(`✅ ${faellig.length} ${t('Zahlungen gebucht!')}`, 'ok');
 }
-function delWied(id){if(!confirm('Vorlage löschen?'))return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);persist();renderWied();toast('Gelöscht','err');}
+function delWied(id){if(!confirm('Vorlage löschen?'))return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
 
 
 
@@ -2857,19 +2864,21 @@ function saveKunde(){
   };
   if(editKundeId){
     const k=data.kunden.find(x=>x.id===editKundeId);
-    if(k) Object.assign(k,obj);
+    if(k){ Object.assign(k,obj); sbSaveKunde(k); }
     editKundeId=null;
   } else {
-    data.kunden.push({id:Date.now()+'', ...obj});
+    const newK={id:Date.now()+'', ...obj};
+    data.kunden.push(newK);
+    sbSaveKunde(newK);
   }
-  persist(); renderKunden(); closeModal('kunde-modal');
+  renderKunden(); closeModal('kunde-modal');
   toast('✅ Kunde gespeichert!','ok');
 }
 
 function delKunde(id){
   if(!confirm('Kunde löschen?'))return;
   data.kunden=(data.kunden||[]).filter(k=>k.id!==id);
-  persist(); renderKunden(); toast('Gelöscht','err');
+  sbDeleteKunde(id); renderKunden(); toast('Gelöscht','err');
 }
 
 // Выбор клиента в модале счёта
@@ -3092,7 +3101,7 @@ function saveUstMode(){
   const yr = document.getElementById('ust-yr')?.value || new Date().getFullYear()+'';
   if(!data.ustModeByYear) data.ustModeByYear={};
   data.ustModeByYear[yr] = sel.value;
-  persist();
+  sbSaveUstMode(yr, sel.value);
   _ustSaving = true;
   updateMwstFormVisibility();
   renderUst();
@@ -3435,7 +3444,7 @@ function addUstEintrag(){
     id: Date.now()+'',
     datum, typ, betrag: bet, rate, beschreibung: dsc
   });
-  persist(); renderUst();
+  renderUst();
   document.getElementById('ust-new-bet').value='';
   document.getElementById('ust-new-dsc').value='';
   toast('✅ USt-Eintrag gespeichert','ok');
@@ -3444,7 +3453,7 @@ function addUstEintrag(){
 function delUstEintrag(id){
   if(!confirm('Eintrag löschen?')) return;
   data.ustEintraege = (data.ustEintraege||[]).filter(e=>e.id!==id);
-  persist(); renderUst();
+  renderUst();
   toast('Gelöscht','err');
 }
 
