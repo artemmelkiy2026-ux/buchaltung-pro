@@ -744,7 +744,7 @@ th.sort-desc::after {
   #mon-modal-stats { grid-template-columns: 1fr !important; }
   .page-inner { padding: 10px 10px 14px; }
   .logo { font-size: 12px; }
-  .sc-val { font-size: 19px; }
+  .sc-val { font-size: 22px; }
   #mob-bottom-nav {   display: flex;
     position: fixed;
     bottom: 0;
