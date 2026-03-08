@@ -261,13 +261,13 @@ body {
   <!-- Пароль -->
   <div class="field">
     <input id="auth-password" type="password" placeholder="Passwort" autocomplete="current-password" class="has-eye">
-    <span class="eye" onclick="togglePwd('auth-password',this)">👁</span>
+    <span class="eye" onclick="togglePwd('auth-password',this)"> <img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto"></span>
   </div>
 
   <!-- Подтверждение пароля (только регистрация) -->
   <div class="field" id="confirm-wrap" style="display:none">
     <input id="auth-password2" type="password" placeholder="Passwort wiederholen" class="has-eye">
-    <span class="eye" onclick="togglePwd('auth-password2',this)">👁</span>
+    <span class="eye" onclick="togglePwd('auth-password2',this)"><img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto"><img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto"></span>
   </div>
 
   <!-- Запомнить (только вход) -->
@@ -312,7 +312,7 @@ function setTab(tab) {
 function togglePwd(id, btn) {
   const inp = document.getElementById(id);
   inp.type = inp.type === 'password' ? 'text' : 'password';
-  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  btn.textContent = inp.type === 'password' ? '<img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto">' : '<img src="auge-schliessen.png" alt="Passwort anzeigen" width="20px" height="auto">';
 }
 
 async function loginGoogle() {
