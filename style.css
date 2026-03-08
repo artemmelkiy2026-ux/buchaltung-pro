@@ -789,3 +789,24 @@ th.sort-desc::after {
   color: #fff;
   transform: scale(0.93);
 }
+
+/* ── AUTH SCREEN RESPONSIVE ─────────────────────────────────────────────── */
+#auth-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #f8f9fb;
+  overflow-y: auto;
+  display: none;
+}
+.auth-inner {
+  width: 400px;
+  margin: 0 auto;
+  padding: 60px 0;
+}
+@media (max-width: 600px) {
+  .auth-inner {
+    width: 100%;
+    padding: 40px 24px;
+  }
+}
