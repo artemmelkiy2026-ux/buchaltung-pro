@@ -141,7 +141,7 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
     <!-- Пользователь -->
     <div style="display:flex;align-items:center;gap:8px">
       <span id="user-email-display" style="font-size:11px;color:var(--sub);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-      <button class="btn" onclick="sbSignOut()" title="Abmelden" style="padding:6px 10px;font-size:11px">🚪 Abmelden</button>
+      <button class="btn" onclick="sbSignOut()" title="Abmelden" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-door-open"></i></button>
     </div>
   </div>
   <input type="file" id="fi" accept=".json" style="display:none" onchange="onLoad(event)">
