@@ -315,10 +315,10 @@ function togglePwd(id, btn) {
   if (inp.type === 'password') {
     inp.type = 'text';
     // Используем .innerHTML для вставки тега картинки
-    btn.innerHTML = '<img src="auge-schliessen.png" alt="Passwort verbergen" width="20px" height="auto">';
+    btn.innerHTML = '<img src="auge-schliessen.png" alt="Passwort verbergen" width="20px" height="auto" style=" opacity: 0.3;">';
   } else {
     inp.type = 'password';
-    btn.innerHTML = '<img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto">';
+    btn.innerHTML = '<img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto" style=" opacity: 0.3;">';
   }
 }
 
