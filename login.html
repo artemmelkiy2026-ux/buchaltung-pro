@@ -316,9 +316,10 @@ function togglePwd(id, btn) {
 }
 
 async function loginGoogle() {
+  const redirectTo = location.href.replace('login.html', 'index.html');
   await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: location.origin + '/buchaltung-pro/index.html' }
+    options: { redirectTo }
   });
 }
 
