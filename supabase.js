@@ -150,12 +150,17 @@ function showPinScreen(mode) {
     ? 'Neuen PIN festlegen' : 'PIN eingeben';
   document.getElementById('pin-screen').style.display = 'flex';
   document.getElementById('app-wrapper').style.display = 'none';
-  // Биометрия
+  // Биометрия — показываем только если уже зарегистрирована
   const bioBtn = document.getElementById('pin-bio-btn');
-  if (mode === 'unlock' && window.PublicKeyCredential) {
+  const hasBioId = localStorage.getItem('bp_bio_id');
+  if (mode === 'unlock' && window.PublicKeyCredential && hasBioId) {
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
+    bioBtn.textContent = (isIOS || isMac) ? '👤' : '👆';
+    bioBtn.title = (isIOS || isMac) ? 'Face ID' : 'Fingerabdruck';
     bioBtn.style.display = '';
-    // Авто-запуск биометрии
-    setTimeout(pinBiometric, 500);
+    setTimeout(pinBiometric, 600);
   } else {
     bioBtn.style.display = 'none';
   }
@@ -244,17 +249,39 @@ function translateAuthError(msg) {
 
 // ── PIN LOGIC ──────────────────────────────────────────────────────────────
 function offerPinSetup() {
-  if (confirm('🔒 PIN-Code für schnellen Zugang einrichten?')) {
-    showPinScreen('setup');
-  } else {
-    localStorage.setItem('bp_pin_skipped', '1');
-  }
+  // Показываем красивый диалог вместо confirm()
+  const banner = document.createElement('div');
+  banner.id = 'pin-offer-banner';
+  banner.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#1a4578;color:#fff;border-radius:16px;padding:18px 24px;
+    display:flex;align-items:center;gap:16px;z-index:99999;
+    box-shadow:0 8px 32px rgba(26,69,120,.35);font-family:var(--sans);
+    max-width:380px;width:calc(100% - 48px);
+  `;
+  banner.innerHTML = `
+    <span style="font-size:28px">🔒</span>
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">PIN-Code einrichten?</div>
+      <div style="font-size:12px;opacity:.8">Schneller Zugang mit 4-stelligem PIN</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="document.getElementById('pin-offer-banner').remove();localStorage.setItem('bp_pin_skipped','1')"
+        style="background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer">Nein</button>
+      <button onclick="document.getElementById('pin-offer-banner').remove();showPinScreen('setup')"
+        style="background:#fff;border:none;border-radius:8px;color:#1a4578;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Ja, einrichten</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+  setTimeout(() => banner?.remove(), 12000);
 }
 
 function pinPress(digit) {
   if (pinValue.length >= 4) return;
   pinValue += digit;
   updatePinDots();
+  // Вибрация на мобильных
+  if (navigator.vibrate) navigator.vibrate(30);
   if (pinValue.length === 4) {
     setTimeout(pinConfirm, 150);
   }
@@ -273,29 +300,39 @@ function updatePinDots() {
   }
 }
 
+function pinUnlockSuccess() {
+  pinValue = '';
+  updatePinDots();
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('app-wrapper').style.display = 'block';
+  isAppUnlocked = true;
+  resetInactivityTimer();
+}
+
 function pinConfirm() {
   if (pinMode === 'setup') {
-    // Хэшируем PIN простым способом
     const hash = btoa(pinValue + '_bp_salt_2026');
     localStorage.setItem('bp_pin', hash);
+    // Предлагаем также зарегистрировать биометрию
+    const hasBio = window.PublicKeyCredential;
     pinValue = '';
     updatePinDots();
     document.getElementById('pin-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
     if (typeof toast === 'function') toast('✅ PIN gesetzt!', 'ok');
+    // Предложить биометрию если поддерживается и ещё не зарегистрирована
+    if (hasBio && !localStorage.getItem('bp_bio_id')) {
+      setTimeout(offerBiometricSetup, 1000);
+    }
   } else {
-    // Проверяем
     const stored = localStorage.getItem('bp_pin');
     const hash = btoa(pinValue + '_bp_salt_2026');
     if (hash === stored) {
-      pinValue = '';
-      document.getElementById('pin-screen').style.display = 'none';
-      document.getElementById('app-wrapper').style.display = 'block';
-      isAppUnlocked = true;
-      resetInactivityTimer();
+      pinUnlockSuccess();
     } else {
       pinValue = '';
       document.getElementById('pin-error').textContent = '❌ Falscher PIN';
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       for (let i = 0; i < 4; i++) {
         const dot = document.getElementById('pin-dot-' + i);
         dot.classList.add('error');
@@ -303,7 +340,7 @@ function pinConfirm() {
       setTimeout(() => {
         updatePinDots();
         document.getElementById('pin-error').textContent = '';
-      }, 800);
+      }, 900);
     }
   }
 }
@@ -312,31 +349,144 @@ function pinLogout() {
   if (confirm('Abmelden?')) sbSignOut();
 }
 
-async function pinBiometric() {
-  if (!window.PublicKeyCredential) return;
+// ── BIOMETRIC (Face ID / Fingerprint) ──────────────────────────────────────
+// Работает через WebAuthn Platform Authenticator:
+// - iPhone  → Face ID или Touch ID
+// - Android → Отпечаток пальца или разблокировка экрана
+// - Desktop → Windows Hello, Touch ID на Mac
+
+async function isBiometricAvailable() {
+  if (!window.PublicKeyCredential) return false;
   try {
-    const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-    if (!available) return;
-    // Используем simple credential get для биометрии
-    const challenge = new Uint8Array(32);
-    crypto.getRandomValues(challenge);
+    return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  } catch { return false; }
+}
+
+// Регистрация биометрии (один раз при настройке)
+async function registerBiometric() {
+  if (!await isBiometricAvailable()) return false;
+  try {
+    const userId = currentUser?.id || 'local';
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userIdBytes = new TextEncoder().encode(userId.substring(0, 64));
+
+    const credential = await navigator.credentials.create({
+      publicKey: {
+        challenge,
+        rp: { name: 'MelaLogic', id: location.hostname },
+        user: {
+          id: userIdBytes,
+          name: currentUser?.email || 'user',
+          displayName: 'MelaLogic User',
+        },
+        pubKeyCredParams: [
+          { alg: -7,  type: 'public-key' }, // ES256
+          { alg: -257, type: 'public-key' }, // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform', // только встроенный (Face ID / Fingerprint)
+          userVerification: 'required',
+          residentKey: 'preferred',
+        },
+        timeout: 60000,
+      }
+    });
+
+    if (credential) {
+      // Сохраняем ID credential для последующей проверки
+      const credIdBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+      localStorage.setItem('bp_bio_id', credIdBase64);
+      return true;
+    }
+  } catch(e) {
+    console.log('Biometric register:', e.message);
+  }
+  return false;
+}
+
+// Верификация биометрии (каждый раз при разблокировке)
+async function pinBiometric() {
+  if (!await isBiometricAvailable()) return;
+
+  const credIdBase64 = localStorage.getItem('bp_bio_id');
+  if (!credIdBase64) {
+    // Нет зарегистрированной биометрии — предложить настроить
+    return;
+  }
+
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    // Декодируем сохранённый ID
+    const credIdBytes = Uint8Array.from(atob(credIdBase64), c => c.charCodeAt(0));
+
     await navigator.credentials.get({
       publicKey: {
         challenge,
-        timeout: 30000,
-        userVerification: 'required',
+        timeout: 60000,
         rpId: location.hostname,
+        userVerification: 'required',
+        allowCredentials: [{
+          type: 'public-key',
+          id: credIdBytes,
+          transports: ['internal'],
+        }],
       }
     });
-    // Если дошли сюда — биометрия прошла
-    document.getElementById('pin-screen').style.display = 'none';
-    document.getElementById('app-wrapper').style.display = 'block';
-    isAppUnlocked = true;
-    resetInactivityTimer();
+
+    // Биометрия прошла — разблокируем
+    pinUnlockSuccess();
+    if (typeof toast === 'function') toast('✅ Entsperrt', 'ok');
+
   } catch(e) {
-    // Биометрия не прошла или не настроена — ничего не делаем
-    console.log('Biometric:', e.message);
+    console.log('Biometric verify:', e.message);
+    // Не показываем ошибку — просто оставляем PIN экран
   }
+}
+
+// Предложение зарегистрировать биометрию
+async function offerBiometricSetup() {
+  if (!await isBiometricAvailable()) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'bio-offer-banner';
+  banner.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#5d9d69;color:#fff;border-radius:16px;padding:18px 24px;
+    display:flex;align-items:center;gap:16px;z-index:99999;
+    box-shadow:0 8px 32px rgba(93,157,105,.35);font-family:var(--sans);
+    max-width:380px;width:calc(100% - 48px);
+  `;
+
+  // Определяем тип биометрии для иконки
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const bioIcon = isIOS ? '👤' : '👆';
+  const bioLabel = isIOS ? 'Face ID einrichten' : 'Fingerabdruck einrichten';
+
+  banner.innerHTML = `
+    <span style="font-size:28px">${bioIcon}</span>
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">${bioLabel}?</div>
+      <div style="font-size:12px;opacity:.8">Noch schneller entsperren</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="document.getElementById('bio-offer-banner').remove()"
+        style="background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer">Nein</button>
+      <button id="bio-setup-btn"
+        style="background:#fff;border:none;border-radius:8px;color:#5d9d69;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Einrichten</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+
+  document.getElementById('bio-setup-btn').addEventListener('click', async () => {
+    banner.remove();
+    const ok = await registerBiometric();
+    if (ok && typeof toast === 'function') {
+      toast('✅ Biometrie aktiviert!', 'ok');
+    }
+  });
+
+  setTimeout(() => banner?.remove(), 15000);
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
