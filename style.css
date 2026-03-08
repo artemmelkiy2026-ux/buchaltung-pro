@@ -751,3 +751,37 @@ th.sort-desc::after {
 @media(max-width:768px){
   #kunden-cards { grid-template-columns:1fr }
 }
+
+/* ── PIN SCREEN ─────────────────────────────────────────────────────────── */
+.pin-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  transition: all .2s;
+}
+.pin-dot.filled {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+.pin-dot.error {
+  background: var(--red);
+  border-color: var(--red);
+}
+.pin-btn {
+  width: 100%; aspect-ratio: 1;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+.pin-btn:active {
+  background: var(--blue);
+  color: #fff;
+  transform: scale(0.93);
+}
