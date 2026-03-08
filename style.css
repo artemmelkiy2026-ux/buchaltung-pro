@@ -347,7 +347,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   margin: 0 auto 14px;
 }
 .mob-drawer-title {
-  font-size: 12px; font-weight: 700;
+  font-size: 10px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .12em;
   color: var(--sub);
   padding: 0 16px 6px;
@@ -355,7 +355,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .mob-drawer-item {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 20px;
-  color: var(--muted); font-size: 16px; font-weight: 500;
+  color: var(--muted); font-size: 14px; font-weight: 500;
   cursor: pointer;
   transition: background .12s, color .12s;
   border-radius: 0;
@@ -363,7 +363,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .mob-drawer-item:hover,
 .mob-drawer-item:active { background: var(--s2); color: var(--text); }
 .mob-drawer-item.active { color: var(--blue); }
-.mob-drawer-item .ic { font-size: 23px; width: 24px; text-align: center; }
+.mob-drawer-item .ic { font-size: 20px; width: 24px; text-align: center; }
 .mob-drawer-sep { height: 1px; background: var(--border); margin: 6px 16px; }
 .mob-drawer-action {
   display: flex; align-items: center; gap: 12px;
