@@ -196,7 +196,7 @@ tr:hover .del-btn{opacity:1}
 .tt.aa{background:var(--rdim);border-color:var(--red);color:var(--red)}
 .fg{margin-bottom:12px}
 .fg label{display:block;font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
-.fg input,.fg select,.fg textarea{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 10px;outline:none;transition:border-color .15s}
+.fg input,.fg select,.fg textarea{width:100%; box-sizing: border-box; background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 10px;outline:none;transition:border-color .15s}
 .fg input:focus,.fg select:focus{border-color:var(--blue)}
 .fg select option{background:var(--s2)}
 .fg textarea{resize:vertical;min-height:60px}
