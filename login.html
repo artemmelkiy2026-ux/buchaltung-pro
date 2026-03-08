@@ -19,24 +19,24 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Центрируем всё через body */
         body {
             font-family: 'Inter', sans-serif;
             background: #f1f5f9;
             min-height: 100vh;
             display: flex;
-            align-items: center; /* Центр по вертикали */
-            justify-content: center; /* Центр по горизонтали */
+            align-items: center; 
+            justify-content: center; 
             padding: 20px;
         }
 
-        /* КАРТОЧКА: Это то, что фиксирует размер на десктопе */
         .card {
-          
+            background: #ffffff;
+            border-radius: 24px;
             padding: 40px;
             width: 100%;
-            max-width: 400px; /* ФОРМА БОЛЬШЕ НЕ БУДЕТ ЗДОРОВЕННОЙ */
-         
+            max-width: 400px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+            border: 1px solid var(--slate-200);
         }
 
         .logo-wrap { text-align: center; margin-bottom: 32px; }
@@ -88,7 +88,6 @@
 
         .footer { text-align: center; margin-top: 24px; font-size: 11px; color: var(--slate-400); }
 
-        /* Мобильная версия: на весь экран */
         @media (max-width: 480px) {
             body { padding: 0; align-items: flex-start; background: #fff; }
             .card { width: 100%; min-height: 100vh; border-radius: 0; border: none; box-shadow: none; padding: 60px 24px; }
@@ -123,7 +122,7 @@
     </div>
 
     <div class="field">
-        <input id="auth-email" type="email" placeholder="Email-Adresse" autocomplete="email">
+        <input id="auth-email" type="email" placeholder="E-Mail-Adresse" autocomplete="email">
     </div>
 
     <div class="field">
@@ -132,7 +131,7 @@
     </div>
 
     <div class="field" id="confirm-wrap" style="display:none">
-        <input id="auth-password2" type="password" placeholder="Passwort повторить" class="has-eye">
+        <input id="auth-password2" type="password" placeholder="Passwort wiederholen" class="has-eye">
         <span class="eye" onclick="togglePwd('auth-password2',this)">👁</span>
     </div>
 
@@ -150,9 +149,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // ТУТ ТВОЯ ЛОГИКА SUPABASE И СКРИПТЫ
     const SUPA_URL = 'https://dvmhstytoonpacxwdxuj.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Твой ключ
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; 
     const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
     let isLogin = true;
@@ -173,7 +171,7 @@
     }
 
     async function submit() {
-        // Твоя функция сабмита остается прежней
+        // Deine Submit-Funktion
     }
 </script>
 </body>
