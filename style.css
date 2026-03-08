@@ -745,7 +745,20 @@ th.sort-desc::after {
   .page-inner { padding: 10px 10px 14px; }
   .logo { font-size: 12px; }
   .sc-val { font-size: 15px; }
-  #mob-bottom-nav { height: 58px; }
+  #mob-bottom-nav {   display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--s1);
+    border-top: 1px solid var(--border);
+    z-index: 200;
+    align-items: stretch;
+    box-shadow: 0 -4px 20px #00000044;
+    /* Фикс для iOS Chrome */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0); }
   .app { padding-bottom: 58px; }
 }
 </style>
