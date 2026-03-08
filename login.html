@@ -1,98 +1,225 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MelaLogic — Anmelden</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --blue: #3b82f6;
-            --blue-dark: #2563eb;
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-400: #94a3b8;
-            --slate-600: #475569;
-            --slate-900: #1e293b;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MelaLogic — Anmelden</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f0f4f8;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f1f5f9;
-            min-height: 100vh;
-            display: flex;
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px;
-        }
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 44px 40px;
+  width: 420px;
+  max-width: 100%;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+}
 
-        .card {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
-            border: 1px solid var(--slate-200);
-        }
+/* Логотип */
+.logo-wrap {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.logo-wrap img {
+  height: 50px;
+  width: auto;
+}
+.logo-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 8px;
+}
 
-        .logo-wrap { text-align: center; margin-bottom: 32px; }
-        .logo-wrap img { height: 48px; width: auto; margin-bottom: 8px; }
-        .logo-sub { font-size: 12px; color: var(--slate-400); font-weight: 500; }
+/* Вкладки */
+.tabs {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+.tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .2s;
+  background: transparent;
+  color: #94a3b8;
+}
+.tab.active {
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59,130,246,.3);
+}
 
-        .tabs { display: flex; background: var(--slate-100); border-radius: 12px; padding: 4px; margin-bottom: 24px; }
-        .tab { 
-            flex: 1; padding: 10px; border: none; border-radius: 9px; 
-            font-size: 13px; font-weight: 600; cursor: pointer; 
-            transition: all .2s; background: transparent; color: var(--slate-400); font-family: inherit;
-        }
-        .tab.active { background: var(--blue); color: #fff; }
+/* Google кнопка */
+.google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  color: #1e293b;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-family: inherit;
+  transition: all .2s;
+}
+.google-btn:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+}
 
-        .google-btn {
-            width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
-            background: #fff; border: 1.5px solid var(--slate-200); border-radius: 12px;
-            padding: 12px; font-size: 14px; font-weight: 500; cursor: pointer;
-            margin-bottom: 20px; transition: all .2s; font-family: inherit;
-        }
-        .google-btn:hover { border-color: var(--blue); background: var(--slate-50); }
+/* Разделитель */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.divider hr {
+  flex: 1;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+}
+.divider span {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+}
 
-        .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .divider hr { flex: 1; border: none; border-top: 1px solid var(--slate-200); }
-        .divider span { font-size: 11px; color: var(--slate-400); font-weight: 600; text-transform: uppercase; }
+/* Поля */
+.field {
+  position: relative;
+  margin-bottom: 12px;
+}
+.field input {
+  width: 100%;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  color: #1e293b;
+  padding: 13px 16px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  transition: all .2s;
+}
+.field input:focus {
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+}
+.field input.has-eye {
+  padding-right: 46px;
+}
+.eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 16px;
+  user-select: none;
+}
 
-        .field { position: relative; margin-bottom: 12px; }
-        .field input {
-            width: 100%; background: var(--slate-50); border: 1.5px solid var(--slate-200);
-            border-radius: 12px; color: var(--slate-900); padding: 13px 16px;
-            font-size: 14px; outline: none; transition: all .2s; font-family: inherit;
-        }
-        .field input:focus { border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-        .field input.has-eye { padding-right: 46px; }
-        .eye { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--slate-400); font-size: 18px; user-select: none; }
+/* Запомнить */
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.remember input {
+  width: 15px;
+  height: 15px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+.remember label {
+  font-size: 12px;
+  color: #64748b;
+  cursor: pointer;
+}
 
-        .remember { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
-        .remember input { width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; }
-        .remember label { font-size: 13px; color: var(--slate-600); cursor: pointer; }
+/* Ошибка */
+.error {
+  color: #ef4444;
+  font-size: 12px;
+  min-height: 16px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 500;
+}
 
-        .error { color: #ef4444; font-size: 12px; min-height: 18px; margin-bottom: 10px; text-align: center; font-weight: 500; }
+/* Кнопка входа */
+.submit-btn {
+  width: 100%;
+  background: #3b82f6;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .2s;
+  box-shadow: 0 4px 12px rgba(59,130,246,.3);
+}
+.submit-btn:hover {
+  background: #2563eb;
+  box-shadow: 0 6px 16px rgba(59,130,246,.4);
+}
+.submit-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
 
-        .submit-btn {
-            width: 100%; background: var(--blue); border: none; border-radius: 12px; color: #fff;
-            padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer;
-            transition: all .2s; font-family: inherit;
-        }
-        .submit-btn:hover { background: var(--blue-dark); }
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 11px;
+  color: #94a3b8;
+}
 
-        .footer { text-align: center; margin-top: 24px; font-size: 11px; color: var(--slate-400); }
-
-        @media (max-width: 480px) {
-            body { padding: 0; align-items: flex-start; background: #fff; }
-            .card { width: 100%; min-height: 100vh; border-radius: 0; border: none; box-shadow: none; padding: 60px 24px; }
-        }
-   </style>
+/* Мобильный */
+@media (max-width: 480px) {
+  body { padding: 0; align-items: flex-start; background: #fff; }
+  .card {
+    width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 40px 24px;
+  }
+}
+</style>
 </head>
 <body>
 
