@@ -479,7 +479,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     background: var(--blue);
     border-radius: 0 0 2px 2px;
   }
-  .mob-tab .tab-ic { font-size: 18px; line-height: 1; }
+  .mob-tab .tab-ic { font-size: 25px; line-height: 1; }
   .mob-tab .tab-lbl { font-size: 9px; }
 
   /* Кнопка «Ещё» как отдельный таб */
