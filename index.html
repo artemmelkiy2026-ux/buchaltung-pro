@@ -23,25 +23,124 @@
 </div>
 
 <!-- ── AUTH SCREEN ─────────────────────────────────────────────────────── -->
-<div id="auth-screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);padding:20px">
-  <div style="background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.4)">
-    <div style="text-align:center;margin-bottom:32px">
-      <div style="font-size:40px;margin-bottom:8px">📊</div>
-      <div style="font-size:22px;font-weight:700;color:var(--text)">Buchaltung Pro</div>
-      <div style="font-size:12px;color:var(--sub);margin-top:4px">Für Kleinunternehmer & Regelbesteuerung</div>
+<div id="auth-screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);padding:24px">
+  <div style="width:100%;max-width:360px">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:40px">
+      <div style="font-size:44px;margin-bottom:10px">📊</div>
+      <div style="font-size:24px;font-weight:700;color:var(--text);letter-spacing:-0.5px">Buchaltung Pro</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:5px">Für Kleinunternehmer & Regelbesteuerung</div>
     </div>
-    <div id="auth-title" style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:20px">🔐 Anmelden</div>
-    <input id="auth-email" type="email" placeholder="Email" autocomplete="email"
-      style="width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 14px;font-size:14px;outline:none;margin-bottom:12px;box-sizing:border-box">
-    <input id="auth-password" type="password" placeholder="Passwort (min. 6 Zeichen)" autocomplete="current-password"
-      style="width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 14px;font-size:14px;outline:none;margin-bottom:8px;box-sizing:border-box">
-    <div id="auth-error" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:12px"></div>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;background:var(--s1);border-radius:10px;padding:4px;margin-bottom:28px;border:1px solid var(--border)">
+      <button id="tab-login" onclick="authSetTab('login')"
+        style="flex:1;padding:8px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:var(--blue);color:#fff;transition:all .2s">
+        Anmelden
+      </button>
+      <button id="tab-register" onclick="authSetTab('register')"
+        style="flex:1;padding:8px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--sub);transition:all .2s">
+        Registrieren
+      </button>
+    </div>
+
+    <!-- Google button -->
+    <button onclick="authGoogle()"
+      style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:20px;transition:all .2s"
+      onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.58-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Mit Google anmelden
+    </button>
+
+    <!-- Divider -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <div style="font-size:11px;color:var(--sub)">oder</div>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+
+    <!-- Email field -->
+    <input id="auth-email" type="email" placeholder="Email-Adresse" autocomplete="email"
+      style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:13px 14px;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box;transition:border-color .2s"
+      onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+
+    <!-- Password field -->
+    <div style="position:relative;margin-bottom:10px">
+      <input id="auth-password" type="password" placeholder="Passwort" autocomplete="current-password"
+        style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:13px 44px 13px 14px;font-size:14px;outline:none;box-sizing:border-box;transition:border-color .2s"
+        onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+      <span onclick="authTogglePwd('auth-password',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--sub);font-size:16px">👁</span>
+    </div>
+
+    <!-- Confirm password (only for register) -->
+    <div id="auth-confirm-wrap" style="display:none;position:relative;margin-bottom:10px">
+      <input id="auth-password2" type="password" placeholder="Passwort wiederholen"
+        style="width:100%;background:var(--s1);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:13px 44px 13px 14px;font-size:14px;outline:none;box-sizing:border-box;transition:border-color .2s"
+        onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+      <span onclick="authTogglePwd('auth-password2',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--sub);font-size:16px">👁</span>
+    </div>
+
+    <!-- hCaptcha (only for register) -->
+    <div id="auth-captcha-wrap" style="display:none;margin-bottom:10px">
+      <div id="auth-captcha"></div>
+    </div>
+
+    <!-- Remember me (only for login) -->
+    <div id="auth-remember-wrap" style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <input type="checkbox" id="auth-remember" style="width:15px;height:15px;accent-color:var(--blue);cursor:pointer">
+      <label for="auth-remember" style="font-size:12px;color:var(--sub);cursor:pointer">Angemeldet bleiben</label>
+    </div>
+
+    <!-- Error -->
+    <div id="auth-error" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:10px;text-align:center"></div>
+
+    <!-- Submit button -->
     <button id="auth-btn" onclick="authSubmit()"
-      style="width:100%;background:var(--blue);border:none;border-radius:8px;color:#fff;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
+      style="width:100%;background:var(--blue);border:none;border-radius:10px;color:#fff;padding:13px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s">
       Anmelden
     </button>
-    <div id="auth-toggle-text" style="text-align:center;margin-top:16px;font-size:12px;color:var(--sub)">
-      Noch kein Konto? <a href="#" onclick="authToggleMode()" style="color:var(--blue)">Registrieren</a>
+
+  </div>
+</div>
+
+<!-- ── PIN SCREEN ──────────────────────────────────────────────────────────── -->
+<div id="pin-screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);padding:24px">
+  <div style="width:100%;max-width:320px;text-align:center">
+    <div style="font-size:44px;margin-bottom:12px">🔒</div>
+    <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px">Buchaltung Pro</div>
+    <div id="pin-subtitle" style="font-size:13px;color:var(--sub);margin-bottom:32px">PIN eingeben</div>
+
+    <!-- PIN dots -->
+    <div style="display:flex;justify-content:center;gap:16px;margin-bottom:32px">
+      <div class="pin-dot" id="pin-dot-0"></div>
+      <div class="pin-dot" id="pin-dot-1"></div>
+      <div class="pin-dot" id="pin-dot-2"></div>
+      <div class="pin-dot" id="pin-dot-3"></div>
+    </div>
+
+    <!-- PIN error -->
+    <div id="pin-error" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:16px"></div>
+
+    <!-- Number pad -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:240px;margin:0 auto">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn" onclick="pinBiometric()" id="pin-bio-btn" style="font-size:22px">👆</button>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn" onclick="pinBackspace()" style="font-size:18px">⌫</button>
+    </div>
+
+    <!-- Other account -->
+    <div style="margin-top:24px">
+      <a href="#" onclick="pinLogout()" style="font-size:12px;color:var(--sub)">Anderes Konto verwenden</a>
     </div>
   </div>
 </div>
