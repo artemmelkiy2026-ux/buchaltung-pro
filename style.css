@@ -9,8 +9,9 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;display:flex;flex-direction:column}
-#auth-screen{align-self:stretch}
-#auth-screen > div{margin:0 auto}
+#auth-screen{position:fixed;inset:0;z-index:9999}
+#loading-screen{position:fixed;inset:0;z-index:9998}
+#pin-screen{position:fixed;inset:0;z-index:9999}
 /* Скрываем мобильное модальное окно на экранах шире 768px */
 @media (min-width: 769px) {
     #mob-detail-modal {
