@@ -147,7 +147,7 @@ function translateAuthError(msg) {
 }
 
 // ── INIT nach DOM-Load ─────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('auth-password')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') authSubmit();
   });
@@ -155,35 +155,51 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') authSubmit();
   });
 
+  // Флаг — appInit вызываем только один раз
+  let appStarted = false;
+
+  async function startApp(user) {
+    if (appStarted) return;
+    appStarted = true;
+    currentUser = user;
+
+    const uel = document.getElementById('user-email-display');
+    if (uel) uel.textContent = currentUser.email;
+
+    const remoteData = await sbLoadData();
+    if (remoteData) {
+      window._loadedRemoteData = remoteData;
+    } else {
+      const local = localStorage.getItem('buch_pro_v1');
+      if (local) {
+        try {
+          window._loadedRemoteData = JSON.parse(local);
+          await sbSaveData(window._loadedRemoteData);
+          localStorage.removeItem('buch_pro_v1');
+        } catch(e) { window._loadedRemoteData = null; }
+      }
+    }
+
+    hideAuthScreen();
+    window.dispatchEvent(new Event('supabase-ready'));
+  }
+
+  // Сначала проверяем существующую сессию
+  const { data: { session } } = await sb.auth.getSession();
+  console.log('Existing session:', session?.user?.email || 'none');
+  if (session && session.user) {
+    await startApp(session.user);
+  } else {
+    showAuthScreen();
+  }
+
+  // Слушаем новые события (логин/логаут)
   sb.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth event:', event, session?.user?.email);
-
-    if (session && session.user) {
-      currentUser = session.user;
-
-      const uel = document.getElementById('user-email-display');
-      if (uel) uel.textContent = currentUser.email;
-
-      const remoteData = await sbLoadData();
-
-      if (remoteData) {
-        window._loadedRemoteData = remoteData;
-      } else {
-        const local = localStorage.getItem('buch_pro_v1');
-        if (local) {
-          try {
-            window._loadedRemoteData = JSON.parse(local);
-            await sbSaveData(window._loadedRemoteData);
-            localStorage.removeItem('buch_pro_v1');
-          } catch(e) { window._loadedRemoteData = null; }
-        }
-      }
-
-      hideAuthScreen();
-      window.dispatchEvent(new Event('supabase-ready'));
-
-    } else {
-      currentUser = null;
+    if (event === 'SIGNED_IN' && session && session.user) {
+      await startApp(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      appStarted = false;
       showAuthScreen();
     }
   });
