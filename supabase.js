@@ -61,17 +61,15 @@ function sbPersist(appData) {
 
 // ── AUTH SCREEN ────────────────────────────────────────────────────────────
 function showAuthScreen() {
-  const a = document.getElementById('auth-screen');
-  const w = document.getElementById('app-wrapper');
-  if (a) a.style.display = 'flex';
-  if (w) w.style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-wrapper').style.display = 'none';
 }
 
 function hideAuthScreen() {
-  const a = document.getElementById('auth-screen');
-  const w = document.getElementById('app-wrapper');
-  if (a) a.style.display = 'none';
-  if (w) w.style.display = 'block';
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-wrapper').style.display = 'block';
 }
 
 function authToggleMode() {
