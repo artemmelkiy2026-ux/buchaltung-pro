@@ -139,7 +139,7 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .sc-lbl{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .sc-val{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1}
 .sc.g .sc-val{color:var(--green)}.sc.r .sc-val{color:var(--red)}.sc.b .sc-val{color:var(--blue)}.sc.y .sc-val{color:var(--yellow)}.sc.p .sc-val{color:#fff)}
-.sc-sub{font-size:10px;color:var(--sub);margin-top:5px}
+.sc-sub{font-size:15px;color:var(--sub);margin-top:5px}
 .sc-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
 .sc-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
 
@@ -499,7 +499,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   }
   .sc { padding: 12px 12px; }
   .sc-val { font-size: 17px; }
-  .sc-lbl { font-size: 9px; }
+  .sc-lbl { font-size: 15px; }
 
   /* ── Dashboard заголовок ── */
   #p-dashboard .page-inner > div:first-child {
@@ -744,7 +744,7 @@ th.sort-desc::after {
   #mon-modal-stats { grid-template-columns: 1fr !important; }
   .page-inner { padding: 10px 10px 14px; }
   .logo { font-size: 12px; }
-  .sc-val { font-size: 15px; }
+  .sc-val { font-size: 30px; }
   #mob-bottom-nav {   display: flex;
     position: fixed;
     bottom: 0;
