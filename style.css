@@ -5,6 +5,7 @@
      Фон:              #f0f4f8
   ──────────────────────────────────────────────────────────── */
 
+  
   /* Фоны */
   --bg:#f0f4f8;
   --s1:#ffffff;
@@ -50,6 +51,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         display: none !important;
     }
 }
+
+input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 /* ── HEADER ── */
 header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:200}
 .logo{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.06em;white-space:nowrap;color:var(--text)}
