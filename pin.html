@@ -26,7 +26,6 @@ body {
   width:100%;
   max-width:320px;
   text-align:center;
-  padding-top:30px;
 }
 .logo { margin-bottom:28px; }
 .logo img { height:44px; width:auto; }
@@ -222,9 +221,10 @@ function checkPin() {
 }
 
 function goToApp() {
-  // Ставим флаг что PIN введён
   sessionStorage.setItem('pin_unlocked', '1');
-  location.replace('index.html');
+  const returnTo = sessionStorage.getItem('pin_return') || 'index.html';
+  sessionStorage.removeItem('pin_return');
+  location.replace(returnTo);
 }
 
 async function pinLogout() {
