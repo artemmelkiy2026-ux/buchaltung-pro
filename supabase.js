@@ -160,6 +160,37 @@ async function sbDeletePin() {
 function sbPersist() {}
 function persist() {}
 
+// ── Баннер удаления аккаунта ──────────────────────────────────────────────
+function showDeletionBanner(daysLeft) {
+  if (document.getElementById('deletion-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'deletion-banner';
+  banner.style.cssText = `
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:#e08c1a;color:#fff;border-radius:16px;padding:14px 20px;
+    display:flex;align-items:center;gap:14px;z-index:9998;
+    box-shadow:0 8px 32px rgba(224,140,26,.4);font-family:inherit;
+    max-width:380px;width:calc(100% - 32px);
+  `;
+  banner.innerHTML = `
+    <i class="fa-solid fa-triangle-exclamation" style="font-size:22px;flex-shrink:0"></i>
+    <div style="flex:1;font-size:13px">
+      <div style="font-weight:600;margin-bottom:2px">Konto wird gelöscht</div>
+      <div style="opacity:.9;font-size:12px">Noch ${daysLeft} Tage bis zur Löschung</div>
+    </div>
+    <button onclick="cancelDeletionFromApp()" style="background:#fff;border:none;border-radius:8px;color:#e08c1a;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">Widerrufen</button>
+  `;
+  document.body.appendChild(banner);
+  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 10000);
+}
+
+async function cancelDeletionFromApp() {
+  if (!currentUser) return;
+  await sb.from('user_data').upsert({ user_id: currentUser.id, deleted_at: null }, { onConflict: 'user_id' });
+  document.getElementById('deletion-banner')?.remove();
+  if (typeof toast === 'function') toast('✅ Kontolöschung widerrufen');
+}
+
 // ── SCREENS ────────────────────────────────────────────────────────────────
 function showAuthScreen() {
   location.href = 'login.html';
@@ -555,6 +586,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     await launchApp();
+
+    // Проверяем не помечен ли аккаунт на удаление
+    const { data: userData } = await sb.from('user_data')
+      .select('deleted_at')
+      .eq('user_id', currentUser.id)
+      .single();
+
+    if (userData?.deleted_at) {
+      const deleteDate = new Date(new Date(userData.deleted_at).getTime() + 30 * 24 * 60 * 60 * 1000);
+      const daysLeft = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
+      setTimeout(() => showDeletionBanner(daysLeft), 1500);
+    }
 
     // Предлагаем настроить PIN если ещё не создан
     if (!remotePin && !localStorage.getItem('bp_pin_skipped')) {
