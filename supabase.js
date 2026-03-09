@@ -145,7 +145,7 @@ async function sbLoadPin() {
   const { data } = await sb.from('user_data')
     .select('pin_hash')
     .eq('user_id', currentUser.id)
-    .single();
+    .maybeSingle();
   return data?.pin_hash || null;
 }
 
@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: userData } = await sb.from('user_data')
       .select('deleted_at')
       .eq('user_id', currentUser.id)
-      .single();
+      .maybeSingle();
 
     if (userData?.deleted_at) {
       const deleteDate = new Date(new Date(userData.deleted_at).getTime() + 30 * 24 * 60 * 60 * 1000);
