@@ -40,7 +40,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: #000000;
+  background: #1a4578;
   border: none;
   border-radius: 12px;
   color: #fff;
@@ -51,7 +51,7 @@ body {
   margin-bottom: 12px;
   font-family: inherit;
   transition: all .2s;
-  
+  box-shadow: 0 4px 12px rgba(26,69,120,.3);
 }
 .bio-btn:hover { background: #2c61a0; }
 .bio-btn-icon { font-size: 20px; }
@@ -215,6 +215,10 @@ body {
 
   <!-- Кнопка входа -->
   <button class="submit-btn" id="auth-btn" onclick="submit()">Anmelden</button>
+
+  <div style="text-align:center;margin-top:16px">
+    <span onclick="forgotPassword()" style="font-size:12px;color:#5a6a7e;cursor:pointer;text-decoration:underline">Passwort vergessen?</span>
+  </div>
 
   <div class="footer">© 2026 MelaLogic · Datenschutz</div>
 
@@ -509,6 +513,21 @@ function translateError(msg) {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+
+async function forgotPassword() {
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) {
+    document.getElementById('auth-error').textContent = '❌ Bitte zuerst Ihre E-Mail eingeben.';
+    document.getElementById('auth-email').focus();
+    return;
+  }
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: location.origin + '/buchaltung-pro/login.html'
+  });
+  if (error) { document.getElementById('auth-error').textContent = '❌ ' + error.message; return; }
+  document.getElementById('auth-error').style.color = '#22c55e';
+  document.getElementById('auth-error').textContent = '✅ Reset-Link wurde an ' + email + ' gesendet.';
+}
 
 // Инициализация — проверяем есть ли биометрия
 (async () => {
