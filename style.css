@@ -506,7 +506,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     margin-bottom: 12px;
   }
   .sc { padding: 12px 12px; }
-  .sc-val { font-size: 17px; }
+  .sc-val { font-size: 19px; }
   .sc-lbl { font-size: 13px; }
 
   /* ── Dashboard заголовок ── */
