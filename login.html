@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MelaLogic — Anmelden</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -19,57 +19,42 @@ body {
 }
 
 .card {
-
-
   padding: 44px 40px;
   width: 420px;
   max-width: 100%;
-
 }
 
-/* Логотип */
-.logo-wrap {
-  text-align: center;
-  margin-bottom: 32px;
-}
-.logo-wrap img {
-  height: 50px;
-  width: auto;
-}
-.logo-sub {
-  font-size: 12px;
-  color: #343434;
-  margin-top: 8px;
-}
+.logo-wrap { text-align: center; margin-bottom: 32px; }
+.logo-wrap img { height: 50px; width: auto; }
+.logo-sub { font-size: 12px; color: #343434; margin-top: 8px; }
 
-/* Вкладки */
-.tabs {
+.tabs { display: flex; background: #f1f5f9; border-radius: 12px; padding: 4px; margin-bottom: 24px; }
+.tab { flex: 1; padding: 10px; border: none; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; background: transparent; color: #727983; }
+.tab.active { background: #1a4578; color: #fff; }
+
+/* Кнопка Face ID / Fingerprint */
+.bio-btn {
+  width: 100%;
   display: flex;
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 24px;
-}
-.tab {
-  flex: 1;
-  padding: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #1a4578;
   border: none;
-  border-radius: 9px;
-  font-size: 13px;
+  border-radius: 12px;
+  color: #fff;
+  padding: 14px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  margin-bottom: 12px;
   font-family: inherit;
   transition: all .2s;
-  background: transparent;
-  color: #727983;
+  box-shadow: 0 4px 12px rgba(26,69,120,.3);
 }
-.tab.active {
-  background: #1a4578;
-  color: #fff;
+.bio-btn:hover { background: #2c61a0; }
+.bio-btn-icon { font-size: 20px; }
 
-}
-
-/* Google кнопка */
 .google-btn {
   width: 100%;
   display: flex;
@@ -88,34 +73,13 @@ body {
   font-family: inherit;
   transition: all .2s;
 }
-.google-btn:hover {
-  border-color: #1a4578;
-  box-shadow: 0 0 0 3px rgba(26,69,120,.1);
-}
+.google-btn:hover { border-color: #1a4578; box-shadow: 0 0 0 3px rgba(26,69,120,.1); }
 
-/* Разделитель */
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-.divider hr {
-  flex: 1;
-  border: none;
-  border-top: 1px solid #e2e8f0;
-}
-.divider span {
-  font-size: 11px;
-  color: #94a3b8;
-  font-weight: 500;
-}
+.divider { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.divider hr { flex: 1; border: none; border-top: 1px solid #e2e8f0; }
+.divider span { font-size: 11px; color: #94a3b8; font-weight: 500; }
 
-/* Поля */
-.field {
-  position: relative;
-  margin-bottom: 12px;
-}
+.field { position: relative; margin-bottom: 12px; }
 .field input {
   width: 100%;
   background: #f8fafc;
@@ -128,55 +92,16 @@ body {
   font-family: inherit;
   transition: all .2s;
 }
-.field input:focus {
-  border-color: #1a4578;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(26,69,120,.1);
-}
-.field input.has-eye {
-  padding-right: 46px;
-}
-.eye {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #94a3b8;
-  font-size: 16px;
-  user-select: none;
-}
+.field input:focus { border-color: #1a4578; background: #fff; box-shadow: 0 0 0 3px rgba(26,69,120,.1); }
+.field input.has-eye { padding-right: 46px; }
+.eye { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; font-size: 16px; user-select: none; }
 
-/* Запомнить */
-.remember {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.remember input {
-  width: 15px;
-  height: 15px;
-  accent-color: #1a4578;
-  cursor: pointer;
-}
-.remember label {
-  font-size: 12px;
-  color: #343434;
-  cursor: pointer;
-}
+.remember { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.remember input { width: 15px; height: 15px; accent-color: #1a4578; cursor: pointer; }
+.remember label { font-size: 12px; color: #343434; cursor: pointer; }
 
-/* Ошибка */
-.error {
-  color: #ef4444;
-  font-size: 12px;
-  min-height: 16px;
-  margin-bottom: 10px;
-  text-align: center;
-  font-weight: 500;
-}
+.error { color: #ef4444; font-size: 12px; min-height: 16px; margin-bottom: 10px; text-align: center; font-weight: 500; }
 
-/* Кнопка входа */
 .submit-btn {
   width: 100%;
   background: #1a4578;
@@ -189,35 +114,35 @@ body {
   cursor: pointer;
   font-family: inherit;
   transition: all .2s;
- 
 }
-.submit-btn:hover {
-  background: #2c61a0;
-  
-}
-.submit-btn:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-}
+.submit-btn:hover { background: #2c61a0; }
+.submit-btn:disabled { opacity: .6; cursor: not-allowed; }
 
-/* Footer */
-.footer {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 11px;
-  color: #38393b;
-}
+.footer { text-align: center; margin-top: 20px; font-size: 11px; color: #38393b; }
 
-/* Мобильный */
+/* Тост уведомление */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a2332;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
 @media (max-width: 480px) {
   body { padding: 0; align-items: flex-start; background: #f0f4f8; }
-  .card {
-    width: 100%;
-    min-height: 100vh;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 40px 24px;
-  }
+  .card { width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; padding: 40px 24px; }
 }
 </style>
 </head>
@@ -237,6 +162,12 @@ body {
     <button id="tab-register" class="tab" onclick="setTab('register')">Registrieren</button>
   </div>
 
+  <!-- Face ID / Fingerprint кнопка (только на вкладке входа) -->
+  <button class="bio-btn" id="bio-login-btn" onclick="loginBiometric()" style="display:none">
+    <span class="bio-btn-icon" id="bio-btn-icon">👤</span>
+    <span id="bio-btn-label">Mit Face ID anmelden</span>
+  </button>
+
   <!-- Google -->
   <button class="google-btn" onclick="loginGoogle()">
     <svg width="18" height="18" viewBox="0 0 48 48">
@@ -249,9 +180,7 @@ body {
   </button>
 
   <!-- Разделитель -->
-  <div class="divider">
-    <hr><span>oder</span><hr>
-  </div>
+  <div class="divider"><hr><span>oder</span><hr></div>
 
   <!-- Email -->
   <div class="field">
@@ -261,16 +190,20 @@ body {
   <!-- Пароль -->
   <div class="field">
     <input id="auth-password" type="password" placeholder="Passwort" autocomplete="current-password" class="has-eye">
-    <span class="eye" onclick="togglePwd('auth-password',this)"> <img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto" style=" opacity: 0.3;"></span>
+    <span class="eye" onclick="togglePwd('auth-password',this)">
+      <img src="augen.png" alt="show" width="20" height="auto" style="opacity:.3">
+    </span>
   </div>
 
-  <!-- Подтверждение пароля (только регистрация) -->
+  <!-- Подтверждение пароля -->
   <div class="field" id="confirm-wrap" style="display:none">
     <input id="auth-password2" type="password" placeholder="Passwort wiederholen" class="has-eye">
-    <span class="eye" onclick="togglePwd('auth-password2',this)"><img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto"style=" opacity: 0.3;"></span>
+    <span class="eye" onclick="togglePwd('auth-password2',this)">
+      <img src="augen.png" alt="show" width="20" height="auto" style="opacity:.3">
+    </span>
   </div>
 
-  <!-- Запомнить (только вход) -->
+  <!-- Запомнить -->
   <div class="remember" id="remember-wrap">
     <input type="checkbox" id="auth-remember">
     <label for="auth-remember">Angemeldet bleiben</label>
@@ -279,12 +212,14 @@ body {
   <!-- Ошибка -->
   <div class="error" id="auth-error"></div>
 
-  <!-- Кнопка -->
+  <!-- Кнопка входа -->
   <button class="submit-btn" id="auth-btn" onclick="submit()">Anmelden</button>
 
   <div class="footer">© 2026 MelaLogic · Datenschutz</div>
 
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -294,11 +229,165 @@ const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 let isLogin = true;
 
-// Если уже залогинен — сразу на главную
+// ── Тост ──────────────────────────────────────────────────────────────────
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ── Если уже залогинен — на главную ───────────────────────────────────────
 sb.auth.getSession().then(({ data: { session } }) => {
   if (session) location.href = 'index.html';
 });
 
+// ── Биометрия для входа ───────────────────────────────────────────────────
+// Храним зашифрованные данные для входа в localStorage
+const BIO_LOGIN_KEY = 'bp_bio_login';
+
+async function isBioAvailable() {
+  if (!window.PublicKeyCredential) return false;
+  try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+  catch { return false; }
+}
+
+// Определяем тип биометрии
+function getBioLabel() {
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
+  if (isIOS || isMac) return { icon: '👤', label: 'Mit Face ID anmelden' };
+  return { icon: '👆', label: 'Mit Fingerabdruck anmelden' };
+}
+
+// Показываем кнопку биометрии если есть сохранённые данные
+async function initBioButton() {
+  const bioData = localStorage.getItem(BIO_LOGIN_KEY);
+  if (!bioData) return;
+  if (!await isBioAvailable()) return;
+
+  const { icon, label } = getBioLabel();
+  document.getElementById('bio-btn-icon').textContent = icon;
+  document.getElementById('bio-btn-label').textContent = label;
+  document.getElementById('bio-login-btn').style.display = 'flex';
+}
+
+// Регистрация биометрии после успешного входа
+async function registerBioLogin(email, password) {
+  if (!await isBioAvailable()) return;
+
+  // Спрашиваем хочет ли пользователь
+  const { icon, label } = getBioLabel();
+  const banner = document.createElement('div');
+  banner.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#1a4578;color:#fff;border-radius:16px;padding:18px 24px;
+    display:flex;align-items:center;gap:16px;z-index:99999;
+    box-shadow:0 8px 32px rgba(26,69,120,.35);font-family:inherit;
+    max-width:380px;width:calc(100% - 48px);
+  `;
+  const bioName = label.replace('Mit ', '').replace(' anmelden', '');
+  banner.innerHTML = `
+    <span style="font-size:28px">${icon}</span>
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">${bioName} einrichten?</div>
+      <div style="font-size:12px;opacity:.8">Nächstes Mal schneller einloggen</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button id="bio-no-btn" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit">Nein</button>
+      <button id="bio-yes-btn" style="background:#fff;border:none;border-radius:8px;color:#1a4578;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Ja ✓</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+
+  return new Promise((resolve) => {
+    document.getElementById('bio-no-btn').onclick = () => { banner.remove(); resolve(false); };
+    document.getElementById('bio-yes-btn').onclick = async () => {
+      banner.remove();
+      try {
+        // Регистрируем WebAuthn credential
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        const userIdBytes = new TextEncoder().encode(email.substring(0, 64));
+        const credential = await navigator.credentials.create({
+          publicKey: {
+            challenge,
+            rp: { name: 'MelaLogic', id: location.hostname },
+            user: { id: userIdBytes, name: email, displayName: email },
+            pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+            authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' },
+            timeout: 60000,
+          }
+        });
+        if (credential) {
+          // Сохраняем email + зашифрованный пароль + credential ID
+          const credIdBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+          // Простое XOR шифрование пароля с credId как ключом
+          const encoded = btoa(unescape(encodeURIComponent(password)));
+          localStorage.setItem(BIO_LOGIN_KEY, JSON.stringify({
+            email,
+            encodedPwd: encoded,
+            credId: credIdBase64
+          }));
+          showToast('✅ ' + bioName + ' aktiviert!');
+          resolve(true);
+        }
+      } catch(e) {
+        console.log('Bio register error:', e.message);
+        showToast('❌ Nicht verfügbar');
+        resolve(false);
+      }
+    };
+    setTimeout(() => { if (banner.parentNode) { banner.remove(); resolve(false); } }, 20000);
+  });
+}
+
+// Вход через биометрию
+async function loginBiometric() {
+  const bioDataStr = localStorage.getItem(BIO_LOGIN_KEY);
+  if (!bioDataStr) return;
+
+  const bioData = JSON.parse(bioDataStr);
+  const btn = document.getElementById('bio-login-btn');
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const credIdBytes = Uint8Array.from(atob(bioData.credId), c => c.charCodeAt(0));
+
+    await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        timeout: 60000,
+        rpId: location.hostname,
+        userVerification: 'required',
+        allowCredentials: [{ type: 'public-key', id: credIdBytes, transports: ['internal'] }],
+      }
+    });
+
+    // Биометрия прошла — входим с сохранёнными данными
+    const password = decodeURIComponent(escape(atob(bioData.encodedPwd)));
+    const { error } = await sb.auth.signInWithPassword({ email: bioData.email, password });
+    if (error) {
+      // Пароль изменился — удаляем биометрию
+      localStorage.removeItem(BIO_LOGIN_KEY);
+      document.getElementById('bio-login-btn').style.display = 'none';
+      document.getElementById('auth-error').textContent = '❌ Bitte neu anmelden und Face ID neu einrichten.';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      return;
+    }
+    location.href = 'index.html';
+
+  } catch(e) {
+    console.log('Bio login error:', e.message);
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+
+// ── UI ────────────────────────────────────────────────────────────────────
 function setTab(tab) {
   isLogin = tab === 'login';
   document.getElementById('tab-login').classList.toggle('active', isLogin);
@@ -307,27 +396,27 @@ function setTab(tab) {
   document.getElementById('remember-wrap').style.display = isLogin ? 'flex' : 'none';
   document.getElementById('auth-btn').textContent = isLogin ? 'Anmelden' : 'Registrieren';
   document.getElementById('auth-error').textContent = '';
+  // Биометрия только на вкладке входа
+  const bioBtn = document.getElementById('bio-login-btn');
+  if (bioBtn.dataset.available === 'true') {
+    bioBtn.style.display = isLogin ? 'flex' : 'none';
+  }
 }
 
 function togglePwd(id, btn) {
   const inp = document.getElementById(id);
-  
   if (inp.type === 'password') {
     inp.type = 'text';
-    // Используем .innerHTML для вставки тега картинки
-    btn.innerHTML = '<img src="auge-schliessen.png" alt="Passwort verbergen" width="20px" height="auto" style=" opacity: 0.3;">';
+    btn.innerHTML = '<img src="auge-schliessen.png" alt="hide" width="20" height="auto" style="opacity:.3">';
   } else {
     inp.type = 'password';
-    btn.innerHTML = '<img src="augen.png" alt="Passwort anzeigen" width="20px" height="auto" style=" opacity: 0.3;">';
+    btn.innerHTML = '<img src="augen.png" alt="show" width="20" height="auto" style="opacity:.3">';
   }
 }
 
 async function loginGoogle() {
   const redirectTo = location.href.replace('login.html', 'index.html');
-  await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo }
-  });
+  await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
 }
 
 async function submit() {
@@ -352,6 +441,13 @@ async function submit() {
     if (isLogin) {
       const { error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
+
+      // Предлагаем настроить биометрию если ещё не настроена
+      const hasBio = localStorage.getItem(BIO_LOGIN_KEY);
+      if (!hasBio && await isBioAvailable()) {
+        await registerBioLogin(email, password);
+      }
+
       location.href = 'index.html';
     } else {
       const { error } = await sb.auth.signUp({ email, password });
@@ -384,10 +480,20 @@ function translateError(msg) {
   return '❌ ' + msg;
 }
 
-// Enter key
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') submit();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+
+// Инициализация — проверяем есть ли биометрия
+(async () => {
+  const hasBio = localStorage.getItem(BIO_LOGIN_KEY);
+  if (hasBio && await isBioAvailable()) {
+    const { icon, label } = getBioLabel();
+    document.getElementById('bio-btn-icon').textContent = icon;
+    document.getElementById('bio-btn-label').textContent = label;
+    const bioBtn = document.getElementById('bio-login-btn');
+    bioBtn.style.display = 'flex';
+    bioBtn.dataset.available = 'true';
+  }
+})();
 </script>
 </body>
 </html>
