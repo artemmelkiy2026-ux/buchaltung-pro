@@ -620,10 +620,11 @@ async function verifyOtp() {
   btn.textContent = '...';
   btn.disabled = true;
 
+  // Сначала верифицируем OTP
   const { error } = await sb.auth.verifyOtp({
     email: otpEmail,
     token: code,
-    type: 'signup'
+    type: 'email'
   });
 
   if (error) {
@@ -636,7 +637,21 @@ async function verifyOtp() {
     return;
   }
 
-  // Успех — входим в приложение
+  // OTP прошёл — устанавливаем пароль если это регистрация
+  const savedPwd = sessionStorage.getItem('reg_password');
+  if (savedPwd) {
+    const password = atob(savedPwd);
+    await sb.auth.updateUser({ password });
+    sessionStorage.removeItem('reg_email');
+    sessionStorage.removeItem('reg_password');
+
+    // Предлагаем биометрию
+    const hasBio = localStorage.getItem('bp_bio_login');
+    if (!hasBio && await isBioAvailable()) {
+      await registerBioLogin(otpEmail, password);
+    }
+  }
+
   location.href = 'index.html';
 }
 
