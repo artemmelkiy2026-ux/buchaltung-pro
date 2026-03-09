@@ -28,46 +28,7 @@
 <!-- ── AUTH SCREEN moved to login.html ──>
 <div id="auth-screen" style="display:none"></div>
 
-<!-- ── PIN SCREEN ──────────────────────────────────────────────────────────── -->
-<div id="pin-screen" style="display:none;justify-content:center;min-height:100vh;background:var(--bg);padding-top:50px; margin:0px">
-  <div style="width:100%;max-width:320px;text-align:center">
-    <div style="font-size:44px;margin-bottom:12px"><img src="MelaLogic-logo.svg" alt="MelaLogic" height="50px" width="auto"></div>
 
-    <div id="pin-subtitle" style="font-size:13px;color:var(--sub);margin-bottom:32px">PIN eingeben</div>
-
-    <!-- PIN dots -->
-    <div style="display:flex;justify-content:center;gap:16px;margin-bottom:32px">
-      <div class="pin-dot" id="pin-dot-0"></div>
-      <div class="pin-dot" id="pin-dot-1"></div>
-      <div class="pin-dot" id="pin-dot-2"></div>
-      <div class="pin-dot" id="pin-dot-3"></div>
-    </div>
-
-    <!-- PIN error -->
-    <div id="pin-error" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:16px"></div>
-
-    <!-- Number pad -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:240px;margin:0 auto">
-      <button class="pin-btn" onclick="pinPress('1')">1</button>
-      <button class="pin-btn" onclick="pinPress('2')">2</button>
-      <button class="pin-btn" onclick="pinPress('3')">3</button>
-      <button class="pin-btn" onclick="pinPress('4')">4</button>
-      <button class="pin-btn" onclick="pinPress('5')">5</button>
-      <button class="pin-btn" onclick="pinPress('6')">6</button>
-      <button class="pin-btn" onclick="pinPress('7')">7</button>
-      <button class="pin-btn" onclick="pinPress('8')">8</button>
-      <button class="pin-btn" onclick="pinPress('9')">9</button>
-      <button class="pin-btn" onclick="pinBiometric()" id="pin-bio-btn" style="font-size:22px">👆</button>
-      <button class="pin-btn" onclick="pinPress('0')">0</button>
-      <button class="pin-btn" onclick="pinBackspace()" style="font-size:18px">⌫</button>
-    </div>
-
-    <!-- Other account -->
-    <div style="margin-top:24px">
-      <a href="#" onclick="pinLogout()" style="font-size:12px;color:var(--sub)">Anderes Konto verwenden</a>
-    </div>
-  </div>
-</div>
 
 <!-- ── APP WRAPPER ─────────────────────────────────────────────────────── -->
 <div id="app-wrapper" style="display:none">
