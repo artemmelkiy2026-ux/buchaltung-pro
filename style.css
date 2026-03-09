@@ -329,7 +329,6 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   padding: 12px 0 env(safe-area-inset-bottom, 0);
   transform: translateY(100%);
   transition: transform .3s cubic-bezier(.4,0,.2,1);
-  box-shadow: 0 -8px 40px #00000077;
 }
 #mob-drawer.open { transform: translateY(0); }
 #mob-drawer-overlay {
