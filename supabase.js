@@ -222,24 +222,8 @@ function showPinScreen(mode) {
   if (subEl) subEl.textContent = 'PIN festlegen (1/2)';
   const loadEl = document.getElementById('loading-screen');
   if (loadEl) loadEl.style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'none';
-  // PIN экран теперь на pin.html
-  document.getElementById('app-wrapper').style.display = 'none';
-
-  // Биометрия — только при разблокировке и если уже зарегистрирована
-  const bioBtn = document.getElementById('pin-bio-btn');
-  const hasBioId = localStorage.getItem('bp_bio_id');
-  if (mode === 'unlock' && window.PublicKeyCredential && hasBioId) {
-    const ua = navigator.userAgent;
-    const isIOS = /iPad|iPhone|iPod/.test(ua);
-    const isMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
-    bioBtn.textContent = (isIOS || isMac) ? '👤' : '👆';
-    bioBtn.title = (isIOS || isMac) ? 'Face ID' : 'Fingerabdruck';
-    bioBtn.style.display = '';
-    setTimeout(pinBiometric, 600);
-  } else {
-    bioBtn.style.display = 'none';
-  }
+  const wrapEl = document.getElementById('app-wrapper');
+  if (wrapEl) wrapEl.style.display = 'none';
 }
 
 // ── AUTH FORM (legacy — used only in index.html if auth-screen exists) ─────
