@@ -555,6 +555,7 @@ async function init() {
   const storedPin = localStorage.getItem('bp_pin');
   const pinUnlocked = sessionStorage.getItem('pin_unlocked');
   if (storedPin && !pinUnlocked) {
+    sessionStorage.setItem('pin_return', 'profile.html');
     location.replace('pin.html');
     return;
   }
