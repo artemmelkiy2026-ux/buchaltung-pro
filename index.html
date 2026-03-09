@@ -2,8 +2,9 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Buchaltung Pro — Kleinunternehmer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>MelaLogic — Kleinunternehmer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="style.css">
@@ -15,11 +16,12 @@
 <body>
 
 <!-- ── LOADING SCREEN ────────────────────────────────────────────────────── -->
-<div id="loading-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)">
+<div id="loading-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background: #ffffff;">
   <div style="text-align:center">
-    <div style="font-size:48px;margin-bottom:16px">📊</div>
-    <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">Buchaltung Pro</div>
-    <div style="font-size:13px;color:var(--sub)">Laden...</div>
+    <div style="font-size:48px;margin-bottom:16px"><img src="mini-logo.svg" width="80px" height="auto" alt="mini logo MelaLogic">
+<p style="font-size:13px;color:var(--sub)">Laden...</p></div>
+    
+    
   </div>
 </div>
 
@@ -27,10 +29,10 @@
 <div id="auth-screen" style="display:none"></div>
 
 <!-- ── PIN SCREEN ──────────────────────────────────────────────────────────── -->
-<div id="pin-screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);padding:24px">
+<div id="pin-screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);padding:0px; margin:0px">
   <div style="width:100%;max-width:320px;text-align:center">
-    <div style="font-size:44px;margin-bottom:12px">🔒</div>
-    <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px">Buchaltung Pro</div>
+    <div style="font-size:44px;margin-bottom:12px"><img src="MelaLogic-logo.svg" alt="MelaLogic" height="50px" width="auto"></div>
+
     <div id="pin-subtitle" style="font-size:13px;color:var(--sub);margin-bottom:32px">PIN eingeben</div>
 
     <!-- PIN dots -->
@@ -126,8 +128,8 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
 
 <!-- HEADER -->
 <header>
-  <div class="logo">BUCH<em>.</em>ALTUNG <span style="font-size:10px;color:var(--sub);font-weight:400">PRO</span></div>
-  <div class="beta-badge">BETA · TEST</div>
+  <div class="logo"><img src="MelaLogic-logo.svg" width="140px" height="auto" alt="mini logo MelaLogic"> </div>
+  
 
   <div class="hd">
 
@@ -138,8 +140,9 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
     <span id="save-indicator" style="font-size:11px;color:var(--sub);opacity:0;transition:opacity .4s;margin-right:8px"></span>
     <!-- Пользователь -->
     <div style="display:flex;align-items:center;gap:8px">
-      <span id="user-email-display" onclick="location.href='profile.html'" title="Profil öffnen" style="font-size:11px;color:var(--sub);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background=''"></span>
-      <button class="btn" onclick="sbSignOut()" title="Abmelden" style="padding:6px 10px;font-size:11px">🚪 Abmelden</button>
+      <span id="user-email-display" onclick="location.href='profile.html'" style="font-size:14px;color:var(--sub);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline"></span>
+      <button class="btn" onclick="sbSignOut()" title="Abmelden" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-door-open" style="
+    font-size: 1.3rem;"></i></button>
     </div>
   </div>
   <input type="file" id="fi" accept=".json" style="display:none" onchange="onLoad(event)">
@@ -156,7 +159,7 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
     <span class="tab-ic"><i class="fas fa-list"></i></span><span class="tab-lbl">Einträge</span>
   </button>
   <button class="mob-tab" id="mobt-neu" onclick="mobNav('neu',this)">
-    <span class="tab-ic" style="font-size:22px;color:var(--blue)"><i class="fas fa-plus-circle"></i></span><span class="tab-lbl">Neu</span>
+    <span class="tab-ic" style="font-size:25px;color:var(--blue)"><i class="fas fa-plus-circle"></i></span><span class="tab-lbl">Neu</span>
   </button>
   <button class="mob-tab" id="mobt-bericht" onclick="mobNav('bericht',this)">
     <span class="tab-ic"><i class="fas fa-chart-bar"></i></span><span class="tab-lbl">Bericht</span>
@@ -222,10 +225,10 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
 <!-- ── DASHBOARD ── -->
 <div class="page active" id="p-dashboard">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+  <div style="display:flex;align-items: flex-start;justify-content:space-between;margin-bottom:20px;">
     <div>
       <h1 style="font-size:20px;font-weight:700">Dashboard</h1>
-      <p style="color:var(--sub);font-size:12px;margin-top:3px">Übersicht — <span id="dash-yr-lbl"></span></p>
+      <p style="color:var(--sub);font-size:14px;margin-top:3px">Übersicht — <span id="dash-yr-lbl"></span></p>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <select id="dash-yr" onchange="renderDash()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:12px;outline:none;font-family:var(--sans)">
@@ -283,8 +286,8 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
 <!-- ── EINTRÄGE ── -->
 <div class="page" id="p-eintraege">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-    <h1 style="font-size:18px;font-weight:700">Einträge</h1>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h1 style="font-size:20px;font-weight:700">Einträge</h1>
   </div>
 
   <div class="toolbar">
@@ -358,7 +361,7 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
 <!-- ── NEUER EINTRAG ── -->
 <div class="page" id="p-neu">
 <div class="page-inner" style="max-width:620px">
-  <h1 style="font-size:18px;font-weight:700;margin-bottom:12px">Neuer Eintrag</h1>
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:12px">Neuer Eintrag</h1>
   <!-- USt-Mode Banner in Neuer Eintrag -->
   <div class="form-panel">
     <div class="typ-toggle">
@@ -366,7 +369,7 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
       <button class="tt" id="btn-a" onclick="setTyp('Ausgabe')">▼ Ausgabe</button>
     </div>
     <div class="fgrow c2">
-      <div class="fg"><label>Datum</label><input type="date" id="nf-dat" max="2099-12-31" min="2000-01-01" onchange="updateMwstFormVisibility()"></div>
+      <div class="fg"><label>Datum</label><input type="date" id="nf-dat" max="2099-12-31" min="2000-01-01" onchange="updateMwstFormVisibility()" style="-webkit-appearance:none;appearance:none;width:100%;box-sizing:border-box;"></div>
       <div class="fg"><label>Betrag (€) <span id="nf-betrag-info" style="font-size:10px;color:#f97316;font-weight:700"></span></label><input type="number" id="nf-bet" placeholder="0,00" step="0.01" min="0.01" oninput="calcNfVorsteuer();calcNfMwst()"></div>
     </div>
     <div class="fgrow c2">
@@ -417,7 +420,7 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
 <div class="page" id="p-bericht">
 <div class="page-inner">
   <div class="rep-year-row">
-    <h1 style="font-size:18px;font-weight:700">Monatsbericht</h1>
+    <h1 style="font-size:20px;font-weight:700">Monatsbericht</h1>
     <select id="rep-yr" onchange="renderRep()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-family:var(--mono);font-size:13px;outline:none;margin-left:12px"></select>
     <div style="margin-left:auto;display:flex;gap:8px">
       <button class="btn" onclick="exportRepCSV()">📤 Jahresbericht CSV</button>
@@ -925,7 +928,7 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
 
   <!-- Нижняя строка -->
   <div class="footer-bottom">
-    <p class="footer-copyright">© 2024-2026 Buchaltung Pro • Datenschutz • Bedingungen</p>
+    <p class="footer-copyright">© 2024-2026 MelaLogic • Datenschutz • Bedingungen</p>
     <p class="footer-status">Version 14.0 • Lokale Datenspeicherung</p>
   </div>
 </footer>
