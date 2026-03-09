@@ -22,7 +22,8 @@ function resetInactivityTimer() {
     const storedPin = localStorage.getItem('bp_pin');
     if (storedPin) {
       isAppUnlocked = false;
-      showPinScreen('unlock');
+      sessionStorage.removeItem('pin_unlocked');
+      location.href = 'pin.html';
     }
   }, PIN_TIMEOUT);
 }
@@ -204,15 +205,23 @@ function hideAuthScreen() {
 }
 
 function showPinScreen(mode) {
+  // PIN экран теперь на pin.html — эта функция только для setup внутри приложения
+  if (mode === 'unlock') {
+    sessionStorage.removeItem('pin_unlocked');
+    location.href = 'pin.html';
+    return;
+  }
   pinMode = mode;
   pinValue = '';
-  updatePinDots();
-  document.getElementById('pin-error').textContent = '';
+  if (typeof updatePinDots === 'function') updatePinDots();
+  const errEl = document.getElementById('pin-error');
+  if (errEl) errEl.textContent = '';
   pinSetupStep = 1;
   pinFirstValue = '';
-  document.getElementById('pin-subtitle').textContent = mode === 'setup'
-    ? 'PIN festlegen (1/2)' : 'PIN eingeben';
-  document.getElementById('loading-screen').style.display = 'none';
+  const subEl = document.getElementById('pin-subtitle');
+  if (subEl) subEl.textContent = 'PIN festlegen (1/2)';
+  const loadEl = document.getElementById('loading-screen');
+  if (loadEl) loadEl.style.display = 'none';
   document.getElementById('loading-screen').style.display = 'none';
   // PIN экран теперь на pin.html
   document.getElementById('app-wrapper').style.display = 'none';
