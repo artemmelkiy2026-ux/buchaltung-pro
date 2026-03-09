@@ -578,13 +578,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       localStorage.removeItem('bp_pin');
     }
 
-    // Если PIN есть и не разблокирован через pin.html — редирект
-    const pinUnlocked = sessionStorage.getItem('pin_unlocked');
-    if (remotePin && !pinUnlocked) {
-      location.href = 'pin.html';
-      return;
-    }
-    // Сбрасываем флаг после использования
+    // Сбрасываем флаг pin_unlocked — при входе PIN не нужен
     sessionStorage.removeItem('pin_unlocked');
 
     await launchApp();
