@@ -23,7 +23,7 @@ function resetInactivityTimer() {
     if (storedPin) {
       isAppUnlocked = false;
       sessionStorage.removeItem('pin_unlocked');
-      location.href = 'pin.html';
+      location.replace('pin.html');
     }
   }, PIN_TIMEOUT);
 }
@@ -208,7 +208,7 @@ function showPinScreen(mode) {
   // PIN экран теперь на pin.html — эта функция только для setup внутри приложения
   if (mode === 'unlock') {
     sessionStorage.removeItem('pin_unlocked');
-    location.href = 'pin.html';
+    location.replace('pin.html');
     return;
   }
   pinMode = mode;
