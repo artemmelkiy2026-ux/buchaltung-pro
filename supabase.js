@@ -482,6 +482,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (uel) uel.textContent = currentUser.email;
 
     const storedPin = localStorage.getItem('bp_pin');
+    console.log('startApp: storedPin=', storedPin, 'bp_pin_skipped=', localStorage.getItem('bp_pin_skipped'));
 
     if (storedPin) {
       // Есть PIN — показываем PIN экран, грузим данные в фоне
@@ -494,7 +495,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       window._loadedRemoteData = await sbLoadAll() || null;
       await launchApp();
       // Предлагаем настроить PIN если ещё не предлагали
+      console.log('Checking offerPin: skipped=', localStorage.getItem('bp_pin_skipped'));
       if (!localStorage.getItem('bp_pin_skipped')) {
+        console.log('Calling offerPinSetup in 2s...');
         setTimeout(offerPinSetup, 2000);
       }
     }
