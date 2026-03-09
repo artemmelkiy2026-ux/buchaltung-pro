@@ -3423,7 +3423,7 @@ function renderUst(){
       </td></tr>` : '';
       tfoot.innerHTML=`<tr style="background:var(--s2);font-weight:700">
         <td colspan="4" style="padding:8px 20px">Gesamt ${yr}</td>
-        <td style="text-align:right;font-family:var(--mono);color:${totZahl>0?'var(--red)':'var(--green)'}">
+        <td style="padding-right:10px;text-align:right;font-family:var(--mono);color:${totZahl>0?'var(--red)':'var(--green)'}">
           ${totZahl>0?'+':''}${fmt(totZahl)}
         </td>
         <td colspan="2"></td>
