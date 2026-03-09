@@ -7,7 +7,7 @@ let currentUser = null;
 let saveTimer = null;
 
 // ── PIN / INACTIVITY ───────────────────────────────────────────────────────
-const PIN_TIMEOUT = 1 * 60 * 1000; // 10 минут (для теста поставь 1 * 60 * 1000)
+const PIN_TIMEOUT = 1 * 60 * 1000; // 1 минута для теста
 let inactivityTimer = null;
 let pinValue = '';
 let pinMode = 'unlock'; // 'unlock' | 'setup'
@@ -46,9 +46,7 @@ async function sbSignUp(email, password) {
 async function sbSignOut() {
   await sb.auth.signOut();
   currentUser = null;
-  localStorage.removeItem('bp_pin');
-  localStorage.removeItem('bp_pin_skipped');
-  localStorage.removeItem('bp_bio_id');
+  // PIN не удаляем — он привязан к аккаунту
   location.href = 'login.html';
 }
 async function authGoogle() {
@@ -131,6 +129,32 @@ async function sbDeleteRechnung(id) {
 async function sbSaveWied(w) { await sb.from('wiederkehrend').upsert(wiedToDb(w),{onConflict:'id'}); }
 async function sbDeleteWied(id) { await sb.from('wiederkehrend').delete().eq('id',id).eq('user_id',currentUser.id); }
 async function sbSaveUstMode(jahr, mode) { await sb.from('ust_mode').upsert({user_id:currentUser.id,jahr,mode},{onConflict:'user_id,jahr'}); }
+// ── PIN в Supabase ────────────────────────────────────────────────────────
+async function sbSavePin(hash) {
+  if (!currentUser) return;
+  await sb.from('user_data').upsert(
+    { user_id: currentUser.id, pin_hash: hash },
+    { onConflict: 'user_id' }
+  );
+}
+
+async function sbLoadPin() {
+  if (!currentUser) return null;
+  const { data } = await sb.from('user_data')
+    .select('pin_hash')
+    .eq('user_id', currentUser.id)
+    .single();
+  return data?.pin_hash || null;
+}
+
+async function sbDeletePin() {
+  if (!currentUser) return;
+  await sb.from('user_data').upsert(
+    { user_id: currentUser.id, pin_hash: null },
+    { onConflict: 'user_id' }
+  );
+}
+
 function sbPersist() {}
 function persist() {}
 
@@ -333,12 +357,15 @@ function pinConfirm() {
   if (pinMode === 'setup') {
     const hash = btoa(pinValue + '_bp_salt_2026');
     localStorage.setItem('bp_pin', hash);
+    // Сохраняем PIN в Supabase
+    sbSavePin(hash).then(() => {
+      if (typeof toast === 'function') toast('✅ PIN gesetzt!', 'ok');
+    });
     pinValue = '';
     updatePinDots();
     document.getElementById('pin-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
     isAppUnlocked = true;
-    if (typeof toast === 'function') toast('✅ PIN gesetzt!', 'ok');
     // Предложить биометрию
     if (window.PublicKeyCredential && !localStorage.getItem('bp_bio_id')) {
       setTimeout(offerBiometricSetup, 1000);
@@ -481,25 +508,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const uel = document.getElementById('user-email-display');
     if (uel) uel.textContent = currentUser.email;
 
-    const storedPin = localStorage.getItem('bp_pin');
-    console.log('startApp: storedPin=', storedPin, 'bp_pin_skipped=', localStorage.getItem('bp_pin_skipped'));
+    // Загружаем данные и PIN из Supabase
+    const [remoteData, remotePin] = await Promise.all([
+      sbLoadAll(),
+      sbLoadPin(),
+    ]);
+    window._loadedRemoteData = remoteData || null;
+    window._dataReady = true;
 
-    if (storedPin) {
-      // Есть PIN — показываем PIN экран, грузим данные в фоне
-      showPinScreen('unlock');
-      window._loadedRemoteData = await sbLoadAll() || null;
-      window._dataReady = true;
-      // _unlockApp вызовется из pinUnlockSuccess
+    if (remotePin) {
+      // PIN есть в базе — сохраняем в localStorage для быстрой проверки
+      localStorage.setItem('bp_pin', remotePin);
     } else {
-      // PIN нет — сразу показываем приложение
-      window._loadedRemoteData = await sbLoadAll() || null;
-      await launchApp();
-      // Предлагаем настроить PIN если ещё не предлагали
-      console.log('Checking offerPin: skipped=', localStorage.getItem('bp_pin_skipped'));
-      if (!localStorage.getItem('bp_pin_skipped')) {
-        console.log('Calling offerPinSetup in 2s...');
-        setTimeout(offerPinSetup, 2000);
-      }
+      // PIN нет в базе — чистим localStorage на случай старых данных
+      localStorage.removeItem('bp_pin');
+    }
+
+    await launchApp();
+
+    // Предлагаем настроить PIN если ещё не создан
+    if (!remotePin && !localStorage.getItem('bp_pin_skipped')) {
+      setTimeout(offerPinSetup, 2000);
     }
   }
 
