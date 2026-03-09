@@ -40,7 +40,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: #000000;
+  background: #1a4578;
   border: none;
   border-radius: 12px;
   color: #fff;
@@ -51,6 +51,7 @@ body {
   margin-bottom: 12px;
   font-family: inherit;
   transition: all .2s;
+  box-shadow: 0 4px 12px rgba(26,69,120,.3);
 }
 .bio-btn:hover { background: #2c61a0; }
 .bio-btn-icon { font-size: 20px; }
@@ -144,6 +145,28 @@ body {
   body { padding: 0; align-items: flex-start; background: #f0f4f8; }
   .card { width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; padding: 40px 24px; }
 }
+.otp-box {
+  width: 44px;
+  height: 54px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #1a2332;
+  outline: none;
+  font-family: inherit;
+  transition: all .2s;
+  -webkit-appearance: none;
+}
+.otp-box:focus {
+  border-color: #1a4578;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(26,69,120,.1);
+}
+.otp-box.filled { border-color: #1a4578; background: #fff; }
+.otp-box.error-box { border-color: #ef4444; background: #fff5f5; }
 </style>
 </head>
 <body>
@@ -221,6 +244,44 @@ body {
 
   <div class="footer">© 2026 MelaLogic · Datenschutz</div>
 
+</div>
+
+<!-- OTP Verification Card -->
+<div class="card" id="otp-card" style="display:none">
+  <div class="logo-wrap">
+    <img src="MelaLogic-logo.svg" alt="MelaLogic">
+    <div class="logo-sub">E-Mail Bestätigung</div>
+  </div>
+
+  <div style="text-align:center;margin-bottom:24px">
+    <div style="font-size:40px;margin-bottom:12px">📧</div>
+    <div style="font-size:15px;font-weight:600;color:#1a2332;margin-bottom:6px">Code eingeben</div>
+    <div style="font-size:13px;color:#5a6a7e" id="otp-email-hint">Wir haben einen Code an Ihre E-Mail gesendet</div>
+  </div>
+
+  <!-- 6 цифр OTP -->
+  <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px" id="otp-inputs">
+    <input type="tel" maxlength="1" class="otp-box" id="otp-0" oninput="otpInput(0)" onkeydown="otpKey(event,0)">
+    <input type="tel" maxlength="1" class="otp-box" id="otp-1" oninput="otpInput(1)" onkeydown="otpKey(event,1)">
+    <input type="tel" maxlength="1" class="otp-box" id="otp-2" oninput="otpInput(2)" onkeydown="otpKey(event,2)">
+    <input type="tel" maxlength="1" class="otp-box" id="otp-3" oninput="otpInput(3)" onkeydown="otpKey(event,3)">
+    <input type="tel" maxlength="1" class="otp-box" id="otp-4" oninput="otpInput(4)" onkeydown="otpKey(event,4)">
+    <input type="tel" maxlength="1" class="otp-box" id="otp-5" oninput="otpInput(5)" onkeydown="otpKey(event,5)">
+  </div>
+
+  <div class="error" id="otp-error"></div>
+
+  <button class="submit-btn" id="otp-btn" onclick="verifyOtp()">Bestätigen</button>
+
+  <div style="text-align:center;margin-top:14px">
+    <span onclick="resendOtp()" style="font-size:12px;color:#5a6a7e;cursor:pointer;text-decoration:underline" id="resend-link">Code erneut senden</span>
+  </div>
+
+  <div style="text-align:center;margin-top:8px">
+    <span onclick="backToLogin()" style="font-size:12px;color:#5a6a7e;cursor:pointer">← Zurück zur Anmeldung</span>
+  </div>
+
+  <div class="footer" style="margin-top:20px">© 2026 MelaLogic · Datenschutz</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -483,17 +544,8 @@ async function submit() {
     } else {
       const { error } = await sb.auth.signUp({ email, password });
       if (error) throw error;
-      err.style.color = '#22c55e';
-      err.textContent = '✅ Registriert! Bitte jetzt anmelden.';
-      btn.disabled = false;
-      setTimeout(() => {
-        err.style.color = '';
-        err.textContent = '';
-        setTab('login');
-        document.getElementById('auth-email').value = email;
-        document.getElementById('auth-password').value = '';
-        btn.textContent = 'Anmelden';
-      }, 1800);
+      // Показываем форму ввода OTP кода
+      showOtpCard(email);
     }
   } catch(e) {
     err.style.color = '#ef4444';
@@ -512,6 +564,99 @@ function translateError(msg) {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+
+// ── OTP верификация ──────────────────────────────────────────────────────
+let otpEmail = '';
+
+function showOtpCard(email) {
+  otpEmail = email;
+  document.querySelector('.card').style.display = 'none';
+  document.getElementById('otp-card').style.display = 'block';
+  document.getElementById('otp-email-hint').textContent = 'Code wurde an ' + email + ' gesendet';
+  // Очищаем все поля
+  for (let i = 0; i < 6; i++) {
+    const box = document.getElementById('otp-' + i);
+    box.value = '';
+    box.classList.remove('filled', 'error-box');
+  }
+  document.getElementById('otp-error').textContent = '';
+  setTimeout(() => document.getElementById('otp-0').focus(), 300);
+}
+
+function otpInput(index) {
+  const box = document.getElementById('otp-' + index);
+  const val = box.value.replace(/\D/g, '');
+  box.value = val;
+  if (val) {
+    box.classList.add('filled');
+    if (index < 5) {
+      document.getElementById('otp-' + (index + 1)).focus();
+    } else {
+      // Все 6 цифр введены — авто-подтверждаем
+      setTimeout(verifyOtp, 150);
+    }
+  }
+}
+
+function otpKey(e, index) {
+  if (e.key === 'Backspace' && !document.getElementById('otp-' + index).value && index > 0) {
+    document.getElementById('otp-' + (index - 1)).focus();
+  }
+}
+
+async function verifyOtp() {
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += document.getElementById('otp-' + i).value;
+  }
+  if (code.length < 6) {
+    document.getElementById('otp-error').textContent = '❌ Bitte alle 6 Ziffern eingeben';
+    return;
+  }
+
+  const btn = document.getElementById('otp-btn');
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  const { error } = await sb.auth.verifyOtp({
+    email: otpEmail,
+    token: code,
+    type: 'signup'
+  });
+
+  if (error) {
+    document.getElementById('otp-error').textContent = '❌ Falscher oder abgelaufener Code';
+    for (let i = 0; i < 6; i++) {
+      document.getElementById('otp-' + i).classList.add('error-box');
+    }
+    btn.textContent = 'Bestätigen';
+    btn.disabled = false;
+    return;
+  }
+
+  // Успех — входим в приложение
+  location.href = 'index.html';
+}
+
+async function resendOtp() {
+  if (!otpEmail) return;
+  const { error } = await sb.auth.resend({ type: 'signup', email: otpEmail });
+  if (error) {
+    document.getElementById('otp-error').textContent = '❌ ' + error.message;
+    return;
+  }
+  document.getElementById('resend-link').textContent = '✅ Code gesendet!';
+  setTimeout(() => {
+    document.getElementById('resend-link').textContent = 'Code erneut senden';
+  }, 3000);
+}
+
+function backToLogin() {
+  document.getElementById('otp-card').style.display = 'none';
+  document.querySelector('.card').style.display = 'block';
+  setTab('login');
+  document.getElementById('auth-email').value = otpEmail;
+}
 
 async function forgotPassword() {
   const email = document.getElementById('auth-email').value.trim();
