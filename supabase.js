@@ -578,12 +578,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     window._dataReady = true;
 
     if (remotePin) {
-      // PIN есть в базе — сохраняем в localStorage для быстрой проверки
       localStorage.setItem('bp_pin', remotePin);
     } else {
-      // PIN нет в базе — чистим localStorage на случай старых данных
       localStorage.removeItem('bp_pin');
     }
+
+    // Если PIN есть и не разблокирован через pin.html — редирект
+    const pinUnlocked = sessionStorage.getItem('pin_unlocked');
+    if (remotePin && !pinUnlocked) {
+      location.href = 'pin.html';
+      return;
+    }
+    // Сбрасываем флаг после использования
+    sessionStorage.removeItem('pin_unlocked');
 
     await launchApp();
 
