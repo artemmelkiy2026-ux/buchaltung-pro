@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MelaLogic — Profil</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --blue:#1a4578;
+  --blue-light:#2c61a0;
+  --green:#5d9d69;
+  --red:#dc3545;
+  --bg:#f0f4f8;
+  --card:#ffffff;
+  --border:#dde3ec;
+  --text:#1a2332;
+  --sub:#5a6a7e;
+  --muted:#8496aa;
+  --r:12px;
+}
+
+body {
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  min-height:100vh;
+  color:var(--text);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* ── Шапка ── */
+.header {
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  height:54px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.header-back {
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--blue);font-size:14px;
+  transition:all .2s;flex-shrink:0;
+}
+.header-back:hover { background:var(--blue);color:#fff; }
+.header-title { font-size:15px;font-weight:600;flex:1; }
+
+/* ── Контент ── */
+.content { max-width:560px;margin:0 auto;padding:24px 16px; }
+
+/* ── Аватар блок ── */
+.avatar-block {
+  background:var(--card);
+  border-radius:20px;
+  border:1px solid var(--border);
+  padding:28px 24px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+  margin-bottom:16px;
+}
+.avatar {
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--blue-light));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:28px;flex-shrink:0;
+}
+.avatar-info h2 { font-size:16px;font-weight:600;margin-bottom:4px; }
+.avatar-info p { font-size:13px;color:var(--sub); }
+
+/* ── Секция ── */
+.section { margin-bottom:16px; }
+.section-title {
+  font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);
+  padding:0 4px;margin-bottom:8px;
+}
+
+/* ── Карточка настроек ── */
+.settings-card {
+  background:var(--card);
+  border-radius:var(--r);
+  border:1px solid var(--border);
+  overflow:hidden;
+}
+.setting-row {
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;cursor:pointer;
+  transition:background .15s;
+  border-bottom:1px solid var(--border);
+}
+.setting-row:last-child { border-bottom:none; }
+.setting-row:hover { background:#f8fafc; }
+.setting-icon {
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.setting-icon.blue { background:#1a457818;color:var(--blue); }
+.setting-icon.green { background:#5d9d6918;color:var(--green); }
+.setting-icon.red { background:#dc354518;color:var(--red); }
+.setting-icon.orange { background:#e08c1a18;color:#e08c1a; }
+.setting-icon.purple { background:#6f42c118;color:#6f42c1; }
+
+.setting-body { flex:1;min-width:0; }
+.setting-label { font-size:13px;font-weight:500; }
+.setting-sub { font-size:11px;color:var(--muted);margin-top:2px; }
+.setting-arrow { color:var(--muted);font-size:12px; }
+
+/* Тоггл */
+.toggle {
+  position:relative;width:44px;height:24px;flex-shrink:0;
+}
+.toggle input { opacity:0;width:0;height:0; }
+.toggle-slider {
+  position:absolute;inset:0;background:#dde3ec;
+  border-radius:24px;cursor:pointer;transition:.2s;
+}
+.toggle-slider:before {
+  content:'';position:absolute;
+  width:18px;height:18px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:.2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.toggle input:checked + .toggle-slider { background:var(--green); }
+.toggle input:checked + .toggle-slider:before { transform:translateX(20px); }
+
+/* ── Модальное окно ── */
+.modal-overlay {
+  position:fixed;inset:0;background:rgba(0,0,0,.4);
+  z-index:1000;display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--card);border-radius:20px 20px 0 0;
+  width:100%;max-width:560px;padding:24px;
+  animation:slideUp .3s ease;
+  padding-bottom:calc(24px + env(safe-area-inset-bottom, 0));
+}
+@keyframes slideUp {
+  from { transform:translateY(100%); }
+  to { transform:translateY(0); }
+}
+.modal-handle {
+  width:40px;height:4px;background:var(--border);
+  border-radius:2px;margin:0 auto 20px;
+}
+.modal h3 { font-size:16px;font-weight:600;margin-bottom:20px; }
+
+/* ── Поля ── */
+.field { margin-bottom:14px; }
+.field label { font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px; }
+.field input {
+  width:100%;background:#f8fafc;border:1.5px solid var(--border);
+  border-radius:10px;color:var(--text);padding:12px 14px;
+  font-size:14px;outline:none;font-family:inherit;transition:all .2s;
+}
+.field input:focus { border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,69,120,.08); }
+.field-hint { font-size:11px;color:var(--muted);margin-top:4px; }
+
+/* ── Кнопки ── */
+.btn-primary {
+  width:100%;background:var(--blue);border:none;border-radius:10px;
+  color:#fff;padding:13px;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .2s;margin-top:4px;
+}
+.btn-primary:hover { background:var(--blue-light); }
+.btn-primary:disabled { opacity:.6;cursor:not-allowed; }
+.btn-danger {
+  width:100%;background:#fff;border:1.5px solid var(--red);border-radius:10px;
+  color:var(--red);padding:13px;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .2s;margin-top:8px;
+}
+.btn-danger:hover { background:var(--red);color:#fff; }
+.btn-cancel {
+  width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
+  color:var(--sub);padding:12px;font-size:13px;font-weight:500;
+  cursor:pointer;font-family:inherit;transition:all .2s;margin-top:8px;
+}
+
+/* ── Ошибка / успех ── */
+.msg { font-size:12px;min-height:16px;margin-bottom:8px;text-align:center;font-weight:500; }
+.msg.error { color:var(--red); }
+.msg.success { color:var(--green); }
+
+/* ── Тост ── */
+.toast {
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+  background:#1a2332;color:#fff;padding:12px 20px;
+  border-radius:10px;font-size:13px;font-weight:500;
+  z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;
+}
+.toast.show { opacity:1; }
+
+/* ── PIN dots ── */
+.pin-dots { display:flex;justify-content:center;gap:14px;margin:20px 0; }
+.pin-dot {
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid var(--border);transition:all .15s;
+}
+.pin-dot.filled { background:var(--blue);border-color:var(--blue); }
+.pin-dot.error { background:var(--red);border-color:var(--red); }
+
+/* ── Numpad ── */
+.numpad {
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;max-width:240px;margin:0 auto;
+}
+.num-btn {
+  aspect-ratio:1;background:#f8fafc;border:1px solid var(--border);
+  border-radius:50%;font-size:20px;font-weight:500;
+  cursor:pointer;font-family:inherit;transition:all .15s;color:var(--text);
+}
+.num-btn:active { background:var(--blue);color:#fff;transform:scale(.93); }
+
+/* ── Абонент ── */
+.logout-row {
+  background:var(--card);border-radius:var(--r);border:1px solid var(--border);
+  padding:14px 16px;display:flex;align-items:center;gap:14px;
+  cursor:pointer;transition:background .15s;margin-top:8px;
+}
+.logout-row:hover { background:#fff0f0; }
+</style>
+</head>
+<body>
+
+<!-- Шапка -->
+<div class="header">
+  <div class="header-back" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i></div>
+  <div class="header-title">Mein Profil</div>
+</div>
+
+<!-- Контент -->
+<div class="content">
+
+  <!-- Аватар -->
+  <div class="avatar-block">
+    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="avatar-info">
+      <h2 id="profile-name">Laden...</h2>
+      <p id="profile-email">–</p>
+    </div>
+  </div>
+
+  <!-- Аккаунт -->
+  <div class="section">
+    <div class="section-title">Konto</div>
+    <div class="settings-card">
+      <div class="setting-row" onclick="openModal('modal-email')">
+        <div class="setting-icon blue"><i class="fa-solid fa-envelope"></i></div>
+        <div class="setting-body">
+          <div class="setting-label">E-Mail ändern</div>
+          <div class="setting-sub" id="current-email-sub">–</div>
+        </div>
+        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+      </div>
+      <div class="setting-row" onclick="openModal('modal-password')">
+        <div class="setting-icon blue"><i class="fa-solid fa-lock"></i></div>
+        <div class="setting-body">
+          <div class="setting-label">Passwort ändern</div>
+          <div class="setting-sub">Sicherheit Ihres Kontos</div>
+        </div>
+        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+      </div>
+      <div class="setting-row" onclick="forgotPassword()">
+        <div class="setting-icon orange"><i class="fa-solid fa-key"></i></div>
+        <div class="setting-body">
+          <div class="setting-label">Passwort vergessen?</div>
+          <div class="setting-sub">Reset-Link per E-Mail senden</div>
+        </div>
+        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Безопасность -->
+  <div class="section">
+    <div class="section-title">Sicherheit</div>
+    <div class="settings-card">
+      <!-- PIN вкл/выкл -->
+      <div class="setting-row" style="cursor:default">
+        <div class="setting-icon green"><i class="fa-solid fa-hashtag"></i></div>
+        <div class="setting-body">
+          <div class="setting-label">PIN-Code</div>
+          <div class="setting-sub" id="pin-status-sub">Nicht aktiv</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="pin-toggle" onchange="handlePinToggle()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- Сменить PIN (только если включён) -->
+      <div class="setting-row" id="change-pin-row" style="display:none" onclick="openChangePinModal()">
+        <div class="setting-icon green"><i class="fa-solid fa-rotate"></i></div>
+        <div class="setting-body">
+          <div class="setting-label">PIN ändern</div>
+          <div class="setting-sub">Alten PIN bestätigen</div>
+        </div>
+        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+      </div>
+      <!-- Face ID вкл/выкл -->
+      <div class="setting-row" id="bio-row" style="cursor:default">
+        <div class="setting-icon purple"><i class="fa-solid fa-fingerprint" id="bio-icon-fa"></i></div>
+        <div class="setting-body">
+          <div class="setting-label" id="bio-label-text">Face ID / Fingerabdruck</div>
+          <div class="setting-sub" id="bio-status-sub">Nicht aktiv</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="bio-toggle" onchange="handleBioToggle()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Выход -->
+  <div class="section">
+    <div class="section-title">Sitzung</div>
+    <div class="settings-card">
+      <div class="setting-row" onclick="confirmLogout()">
+        <div class="setting-icon red"><i class="fa-solid fa-right-from-bracket"></i></div>
+        <div class="setting-body">
+          <div class="setting-label">Abmelden</div>
+          <div class="setting-sub">Von diesem Gerät abmelden</div>
+        </div>
+        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── МОДАЛКИ ──────────────────────────────────────────────────────── -->
+
+<!-- Email -->
+<div class="modal-overlay" id="modal-email">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3><i class="fa-solid fa-envelope" style="color:var(--blue);margin-right:8px"></i>E-Mail ändern</h3>
+    <div class="field">
+      <label>Neue E-Mail</label>
+      <input type="email" id="new-email" placeholder="neue@email.de">
+    </div>
+    <div class="field">
+      <label>Passwort bestätigen</label>
+      <input type="password" id="email-confirm-pwd" placeholder="Ihr aktuelles Passwort">
+    </div>
+    <div class="msg" id="email-msg"></div>
+    <button class="btn-primary" onclick="changeEmail()">Ändern</button>
+    <button class="btn-cancel" onclick="closeModal('modal-email')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- Пароль -->
+<div class="modal-overlay" id="modal-password">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3><i class="fa-solid fa-lock" style="color:var(--blue);margin-right:8px"></i>Passwort ändern</h3>
+    <div class="field">
+      <label>Aktuelles Passwort</label>
+      <input type="password" id="old-pwd" placeholder="••••••••">
+    </div>
+    <div class="field">
+      <label>Neues Passwort</label>
+      <input type="password" id="new-pwd" placeholder="Mindestens 6 Zeichen">
+    </div>
+    <div class="field">
+      <label>Neues Passwort wiederholen</label>
+      <input type="password" id="new-pwd2" placeholder="••••••••">
+    </div>
+    <div class="msg" id="pwd-msg"></div>
+    <button class="btn-primary" onclick="changePassword()">Ändern</button>
+    <button class="btn-cancel" onclick="closeModal('modal-password')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- PIN — отключение (требует старый PIN) -->
+<div class="modal-overlay" id="modal-pin-disable">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3><i class="fa-solid fa-hashtag" style="color:var(--green);margin-right:8px"></i>PIN deaktivieren</h3>
+    <p style="font-size:13px;color:var(--sub);margin-bottom:8px">Bitte aktuellen PIN eingeben</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd-dot-0"></div>
+      <div class="pin-dot" id="pd-dot-1"></div>
+      <div class="pin-dot" id="pd-dot-2"></div>
+      <div class="pin-dot" id="pd-dot-3"></div>
+    </div>
+    <div class="msg error" id="pd-msg"></div>
+    <div class="numpad">
+      <button class="num-btn" onclick="pdPress('1')">1</button>
+      <button class="num-btn" onclick="pdPress('2')">2</button>
+      <button class="num-btn" onclick="pdPress('3')">3</button>
+      <button class="num-btn" onclick="pdPress('4')">4</button>
+      <button class="num-btn" onclick="pdPress('5')">5</button>
+      <button class="num-btn" onclick="pdPress('6')">6</button>
+      <button class="num-btn" onclick="pdPress('7')">7</button>
+      <button class="num-btn" onclick="pdPress('8')">8</button>
+      <button class="num-btn" onclick="pdPress('9')">9</button>
+      <button class="num-btn" style="font-size:14px" onclick="pdPress('')">–</button>
+      <button class="num-btn" onclick="pdPress('0')">0</button>
+      <button class="num-btn" style="font-size:16px" onclick="pdBackspace()">⌫</button>
+    </div>
+    <button class="btn-cancel" onclick="cancelPinDisable()">Abbrechen</button>
+  </div>
+</div>
+
+<!-- PIN — смена -->
+<div class="modal-overlay" id="modal-pin-change">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3><i class="fa-solid fa-rotate" style="color:var(--green);margin-right:8px"></i>PIN ändern</h3>
+    <p style="font-size:13px;color:var(--sub);margin-bottom:4px" id="pc-subtitle">Aktuellen PIN eingeben</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pc-dot-0"></div>
+      <div class="pin-dot" id="pc-dot-1"></div>
+      <div class="pin-dot" id="pc-dot-2"></div>
+      <div class="pin-dot" id="pc-dot-3"></div>
+    </div>
+    <div class="msg error" id="pc-msg"></div>
+    <div class="numpad">
+      <button class="num-btn" onclick="pcPress('1')">1</button>
+      <button class="num-btn" onclick="pcPress('2')">2</button>
+      <button class="num-btn" onclick="pcPress('3')">3</button>
+      <button class="num-btn" onclick="pcPress('4')">4</button>
+      <button class="num-btn" onclick="pcPress('5')">5</button>
+      <button class="num-btn" onclick="pcPress('6')">6</button>
+      <button class="num-btn" onclick="pcPress('7')">7</button>
+      <button class="num-btn" onclick="pcPress('8')">8</button>
+      <button class="num-btn" onclick="pcPress('9')">9</button>
+      <button class="num-btn" style="font-size:14px" onclick="pcPress('')">–</button>
+      <button class="num-btn" onclick="pcPress('0')">0</button>
+      <button class="num-btn" style="font-size:16px" onclick="pcBackspace()">⌫</button>
+    </div>
+    <button class="btn-cancel" onclick="closeModal('modal-pin-change')">Abbrechen</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPA_URL = 'https://dvmhstytoonpacxwdxuj.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bWhzdHl0b29ucGFjeHdkeHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTY2NzQsImV4cCI6MjA4ODQ5MjY3NH0.oZQD0Dp6mB0pF7hwAQdvQ7_OJe__cBq-MFtAEdB7K84';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let currentUser = null;
+let currentEmail = '';
+
+// ── Инициализация ──────────────────────────────────────────────────────────
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'login.html'; return; }
+  currentUser = session.user;
+  currentEmail = currentUser.email;
+
+  document.getElementById('profile-name').textContent = currentEmail.split('@')[0];
+  document.getElementById('profile-email').textContent = currentEmail;
+  document.getElementById('current-email-sub').textContent = currentEmail;
+
+  // PIN статус
+  const { data } = await sb.from('user_data').select('pin_hash').eq('user_id', currentUser.id).single();
+  const hasPin = !!data?.pin_hash;
+  document.getElementById('pin-toggle').checked = hasPin;
+  document.getElementById('pin-status-sub').textContent = hasPin ? 'Aktiv' : 'Nicht aktiv';
+  document.getElementById('change-pin-row').style.display = hasPin ? 'flex' : 'none';
+
+  // Bio статус
+  initBioUI();
+}
+
+// ── Биометрия UI ───────────────────────────────────────────────────────────
+function initBioUI() {
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
+  const isWindows = /Windows/.test(ua);
+
+  let icon = 'fa-fingerprint', label = 'Fingerabdruck';
+  if (isIOS) { icon = 'fa-face-smile'; label = 'Face ID'; }
+  else if (isMac) { icon = 'fa-apple fa-brands'; label = 'Touch ID'; }
+  else if (isWindows) { icon = 'fa-windows fa-brands'; label = 'Windows Hello'; }
+
+  document.getElementById('bio-icon-fa').className = `fa-solid ${icon}`;
+  document.getElementById('bio-label-text').textContent = label;
+
+  const hasBio = !!localStorage.getItem('bp_bio_login') || !!localStorage.getItem('bp_bio_id');
+  document.getElementById('bio-toggle').checked = hasBio;
+  document.getElementById('bio-status-sub').textContent = hasBio ? 'Aktiv' : 'Nicht aktiv';
+}
+
+// ── Тост ───────────────────────────────────────────────────────────────────
+function toast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ── Навигация ──────────────────────────────────────────────────────────────
+function goBack() { history.back(); }
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  // Чистим поля
+  document.querySelectorAll(`#${id} input`).forEach(i => i.value = '');
+  document.querySelectorAll(`#${id} .msg`).forEach(m => { m.textContent=''; m.className='msg'; });
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Закрытие по клику на оверлей
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ── Смена email ────────────────────────────────────────────────────────────
+async function changeEmail() {
+  const newEmail = document.getElementById('new-email').value.trim();
+  const password = document.getElementById('email-confirm-pwd').value;
+  const msg = document.getElementById('email-msg');
+
+  if (!newEmail || !password) { setMsg('email-msg', '❌ Alle Felder ausfüllen', 'error'); return; }
+
+  // Сначала проверяем пароль через повторный вход
+  const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password });
+  if (signInErr) { setMsg('email-msg', '❌ Falsches Passwort', 'error'); return; }
+
+  const { error } = await sb.auth.updateUser({ email: newEmail });
+  if (error) { setMsg('email-msg', '❌ ' + error.message, 'error'); return; }
+
+  setMsg('email-msg', '✅ Bestätigungs-E-Mail gesendet', 'success');
+  setTimeout(() => closeModal('modal-email'), 2000);
+}
+
+// ── Смена пароля ───────────────────────────────────────────────────────────
+async function changePassword() {
+  const oldPwd = document.getElementById('old-pwd').value;
+  const newPwd = document.getElementById('new-pwd').value;
+  const newPwd2 = document.getElementById('new-pwd2').value;
+
+  if (!oldPwd || !newPwd || !newPwd2) { setMsg('pwd-msg', '❌ Alle Felder ausfüllen', 'error'); return; }
+  if (newPwd.length < 6) { setMsg('pwd-msg', '❌ Mindestens 6 Zeichen', 'error'); return; }
+  if (newPwd !== newPwd2) { setMsg('pwd-msg', '❌ Passwörter stimmen nicht überein', 'error'); return; }
+
+  // Проверяем старый пароль
+  const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password: oldPwd });
+  if (signInErr) { setMsg('pwd-msg', '❌ Aktuelles Passwort falsch', 'error'); return; }
+
+  const { error } = await sb.auth.updateUser({ password: newPwd });
+  if (error) { setMsg('pwd-msg', '❌ ' + error.message, 'error'); return; }
+
+  // Обновляем сохранённые данные биометрии
+  const bioData = localStorage.getItem('bp_bio_login');
+  if (bioData) {
+    const parsed = JSON.parse(bioData);
+    parsed.encodedPwd = btoa(unescape(encodeURIComponent(newPwd)));
+    localStorage.setItem('bp_bio_login', JSON.stringify(parsed));
+  }
+
+  setMsg('pwd-msg', '✅ Passwort geändert', 'success');
+  setTimeout(() => closeModal('modal-password'), 2000);
+}
+
+// ── Забыли пароль ──────────────────────────────────────────────────────────
+async function forgotPassword() {
+  const { error } = await sb.auth.resetPasswordForEmail(currentEmail, {
+    redirectTo: location.origin + '/buchaltung-pro/login.html'
+  });
+  if (error) { toast('❌ Fehler: ' + error.message); return; }
+  toast('✅ Reset-Link an ' + currentEmail + ' gesendet');
+}
+
+// ── PIN тоггл ─────────────────────────────────────────────────────────────
+async function handlePinToggle() {
+  const checked = document.getElementById('pin-toggle').checked;
+  if (checked) {
+    // Включаем PIN — открываем экран настройки в основном приложении
+    // Просто редиректим на index с параметром
+    localStorage.setItem('bp_request_pin_setup', '1');
+    toast('✅ PIN-Einrichtung beim nächsten Öffnen');
+    document.getElementById('pin-status-sub').textContent = 'Wird eingerichtet...';
+  } else {
+    // Выключаем — требуем подтверждение старым PIN
+    document.getElementById('pin-toggle').checked = true; // откатываем до подтверждения
+    openPinDisableModal();
+  }
+}
+
+// ── Смена PIN ──────────────────────────────────────────────────────────────
+function openChangePinModal() {
+  pcValue = '';
+  pcStep = 'old'; // old → new1 → new2
+  pcOldValue = '';
+  pcNewValue = '';
+  document.getElementById('pc-subtitle').textContent = 'Aktuellen PIN eingeben';
+  updatePcDots();
+  document.getElementById('pc-msg').textContent = '';
+  openModal('modal-pin-change');
+}
+
+let pcValue = '', pcStep = 'old', pcOldValue = '', pcNewValue = '';
+
+function pcPress(digit) {
+  if (!digit) return;
+  if (pcValue.length >= 4) return;
+  pcValue += digit;
+  updatePcDots();
+  if (navigator.vibrate) navigator.vibrate(25);
+  if (pcValue.length === 4) setTimeout(pcConfirm, 150);
+}
+function pcBackspace() { pcValue = pcValue.slice(0,-1); updatePcDots(); }
+function updatePcDots() {
+  for (let i=0;i<4;i++) {
+    const d = document.getElementById('pc-dot-'+i);
+    d.classList.toggle('filled', i < pcValue.length);
+    d.classList.remove('error');
+  }
+}
+async function pcConfirm() {
+  const storedHash = localStorage.getItem('bp_pin');
+  if (pcStep === 'old') {
+    const hash = btoa(pcValue + '_bp_salt_2026');
+    if (hash !== storedHash) {
+      pcPinError('pc'); return;
+    }
+    pcOldValue = pcValue;
+    pcValue = '';
+    pcStep = 'new1';
+    document.getElementById('pc-subtitle').textContent = 'Neuen PIN festlegen (1/2)';
+    updatePcDots();
+  } else if (pcStep === 'new1') {
+    pcNewValue = pcValue;
+    pcValue = '';
+    pcStep = 'new2';
+    document.getElementById('pc-subtitle').textContent = 'Neuen PIN wiederholen (2/2)';
+    updatePcDots();
+  } else {
+    if (pcValue !== pcNewValue) {
+      document.getElementById('pc-msg').textContent = '❌ PINs stimmen nicht überein';
+      pcValue = ''; pcStep = 'new1'; pcNewValue = '';
+      document.getElementById('pc-subtitle').textContent = 'Neuen PIN festlegen (1/2)';
+      setTimeout(() => { updatePcDots(); document.getElementById('pc-msg').textContent=''; }, 1000);
+      return;
+    }
+    // Сохраняем новый PIN
+    const hash = btoa(pcValue + '_bp_salt_2026');
+    localStorage.setItem('bp_pin', hash);
+    await sb.from('user_data').upsert({ user_id: currentUser.id, pin_hash: hash }, { onConflict: 'user_id' });
+    closeModal('modal-pin-change');
+    toast('✅ PIN geändert');
+  }
+}
+
+// ── Отключение PIN ─────────────────────────────────────────────────────────
+let pdValue = '';
+function openPinDisableModal() {
+  pdValue = '';
+  updatePdDots();
+  document.getElementById('pd-msg').textContent = '';
+  openModal('modal-pin-disable');
+}
+function pdPress(digit) {
+  if (!digit) return;
+  if (pdValue.length >= 4) return;
+  pdValue += digit;
+  updatePdDots();
+  if (navigator.vibrate) navigator.vibrate(25);
+  if (pdValue.length === 4) setTimeout(pdConfirm, 150);
+}
+function pdBackspace() { pdValue = pdValue.slice(0,-1); updatePdDots(); }
+function updatePdDots() {
+  for (let i=0;i<4;i++) {
+    const d = document.getElementById('pd-dot-'+i);
+    d.classList.toggle('filled', i < pdValue.length);
+    d.classList.remove('error');
+  }
+}
+async function pdConfirm() {
+  const hash = btoa(pdValue + '_bp_salt_2026');
+  if (hash !== localStorage.getItem('bp_pin')) {
+    pcPinError('pd'); return;
+  }
+  // Удаляем PIN
+  localStorage.removeItem('bp_pin');
+  localStorage.setItem('bp_pin_skipped', '1');
+  await sb.from('user_data').upsert({ user_id: currentUser.id, pin_hash: null }, { onConflict: 'user_id' });
+  document.getElementById('pin-toggle').checked = false;
+  document.getElementById('pin-status-sub').textContent = 'Nicht aktiv';
+  document.getElementById('change-pin-row').style.display = 'none';
+  closeModal('modal-pin-disable');
+  toast('✅ PIN deaktiviert');
+}
+function cancelPinDisable() {
+  document.getElementById('pin-toggle').checked = true;
+  closeModal('modal-pin-disable');
+}
+
+function pcPinError(prefix) {
+  if (prefix === 'pc') { pcValue = ''; updatePcDots(); }
+  else { pdValue = ''; updatePdDots(); }
+  if (navigator.vibrate) navigator.vibrate([100,50,100]);
+  for(let i=0;i<4;i++) document.getElementById(`${prefix}-dot-${i}`).classList.add('error');
+  document.getElementById(`${prefix}-msg`).textContent = '❌ Falscher PIN';
+  setTimeout(() => {
+    if (prefix==='pc') updatePcDots(); else updatePdDots();
+    document.getElementById(`${prefix}-msg`).textContent = '';
+  }, 900);
+}
+
+// ── Биометрия тоггл ────────────────────────────────────────────────────────
+async function handleBioToggle() {
+  const checked = document.getElementById('bio-toggle').checked;
+  if (checked) {
+    // Включаем — регистрируем биометрию
+    try {
+      if (!window.PublicKeyCredential) throw new Error('Not supported');
+      const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if (!available) throw new Error('Not available');
+
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+      const userIdBytes = new TextEncoder().encode(currentUser.id.substring(0, 64));
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge,
+          rp: { name: 'MelaLogic', id: location.hostname },
+          user: { id: userIdBytes, name: currentEmail, displayName: currentEmail },
+          pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+          authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' },
+          timeout: 60000,
+        }
+      });
+      if (credential) {
+        const credIdBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+        localStorage.setItem('bp_bio_id', credIdBase64);
+        document.getElementById('bio-status-sub').textContent = 'Aktiv';
+        toast('✅ Biometrie aktiviert');
+      }
+    } catch(e) {
+      document.getElementById('bio-toggle').checked = false;
+      document.getElementById('bio-status-sub').textContent = 'Nicht aktiv';
+      toast('❌ Biometrie nicht verfügbar');
+    }
+  } else {
+    // Выключаем
+    localStorage.removeItem('bp_bio_id');
+    localStorage.removeItem('bp_bio_login');
+    document.getElementById('bio-status-sub').textContent = 'Nicht aktiv';
+    toast('✅ Biometrie deaktiviert');
+  }
+}
+
+// ── Выход ──────────────────────────────────────────────────────────────────
+async function confirmLogout() {
+  if (!confirm('Wirklich abmelden?')) return;
+  await sb.auth.signOut();
+  location.href = 'login.html';
+}
+
+// ── Хелпер сообщений ──────────────────────────────────────────────────────
+function setMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+
+init();
+</script>
+</body>
+</html>
