@@ -570,9 +570,9 @@ function renderDash(){
   document.getElementById('d-recent').innerHTML=recent.length?recent.map(e=>`
     <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''}">
       <td style="font-family:var(--mono);font-size:11px;color:var(--sub);white-space:nowrap">${mob?fdm(e.datum):fd(e.datum)}</td>
-      <td><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}</span></td>
+      <td style="white-space:nowrap"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}" style="display:inline-flex;align-items:center;gap:4px">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}${mob?'':('<span style="font-size:11px;font-weight:600">'+(e.typ==='Einnahme'?'Einnahme':'Ausgabe')+'</span>')}</span></td>
       <td class="mob-hide" style="color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.kategorie}">${e.kategorie}</td>
-      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:10px">${mob?(ZICONS[e.zahlungsart]||'<i class="fas fa-solid fa-euro-sign"></i>'):e.zahlungsart||'—'}</span></td>
+      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:11px">${e.zahlungsart||'—'}</span></td>
       <td class="mob-hide" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${e.beschreibung}">${e.beschreibung}</td>
       <td style="text-align:right;white-space:nowrap"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
     </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--sub)">'+t('Keine Einträge')+'</td></tr>';
@@ -3456,4 +3456,3 @@ function delUstEintrag(id){
   renderUst();
   toast('Gelöscht','err');
 }
-
