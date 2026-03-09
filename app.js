@@ -678,10 +678,10 @@ function renderEin(){
         ${showMwst&&!mob?`<td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:var(--sub)">${hasMwst?fmt(nettoVal):'—'}</td>
         <td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:#f97316">${hasMwst?'+'+fmt(mwstVal)+' ('+mwstRate+'%)':'—'}</td>`:''}
         <td style="text-align:right"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
-        ${mob?'':`<td style="white-space:nowrap">
+        <td class="mob-hide" style="white-space:nowrap">
           <button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,'${e.id}')"><i class="fas fa-edit"></i></button>
           <button class="del-btn" onclick="delE(event,'${e.id}')"><i class="fas fa-times"></i></button>
-        </td>`}
+        </td>
       </tr>`;}).join('');
     
     // ✅ Пагинация навигация
