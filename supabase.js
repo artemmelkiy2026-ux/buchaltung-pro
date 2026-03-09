@@ -10,7 +10,9 @@ let saveTimer = null;
 const PIN_TIMEOUT = 1 * 60 * 1000; // 1 минута для теста
 let inactivityTimer = null;
 let pinValue = '';
+let pinFirstValue = ''; // для подтверждения при setup
 let pinMode = 'unlock'; // 'unlock' | 'setup'
+let pinSetupStep = 1; // 1 = первый ввод, 2 = подтверждение
 let isAppUnlocked = false;
 
 function resetInactivityTimer() {
@@ -176,8 +178,10 @@ function showPinScreen(mode) {
   pinValue = '';
   updatePinDots();
   document.getElementById('pin-error').textContent = '';
+  pinSetupStep = 1;
+  pinFirstValue = '';
   document.getElementById('pin-subtitle').textContent = mode === 'setup'
-    ? 'Neuen PIN festlegen' : 'PIN eingeben';
+    ? 'PIN festlegen (1/2)' : 'PIN eingeben';
   document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('pin-screen').style.display = 'flex';
   document.getElementById('app-wrapper').style.display = 'none';
@@ -366,8 +370,10 @@ function pinConfirm() {
     document.getElementById('pin-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
     isAppUnlocked = true;
-    // Предложить биометрию
-    if (window.PublicKeyCredential && !localStorage.getItem('bp_bio_id')) {
+    // Предложить биометрию для PIN экрана только если нет ни одной биометрии
+    const hasBioLogin = localStorage.getItem('bp_bio_login');
+    const hasBioPin = localStorage.getItem('bp_bio_id');
+    if (window.PublicKeyCredential && !hasBioLogin && !hasBioPin) {
       setTimeout(offerBiometricSetup, 1000);
     }
   } else {
