@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MelaLogic — PIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#f0f4f8; --s1:#ffffff; --border:#dde3ec;
+  --blue:#1a4578; --red:#dc3545; --text:#1a2332; --sub:#5a6a7e;
+}
+body {
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  min-height:100vh;
+  min-height:-webkit-fill-available;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:env(safe-area-inset-top,0) 24px env(safe-area-inset-bottom,0);
+}
+.pin-wrap {
+  width:100%;
+  max-width:320px;
+  text-align:center;
+}
+.logo { margin-bottom:28px; }
+.logo img { height:44px; width:auto; }
+.pin-subtitle { font-size:13px; color:var(--sub); margin-bottom:28px; }
+.pin-dots {
+  display:flex; justify-content:center; gap:16px; margin-bottom:24px;
+}
+.pin-dot {
+  width:14px; height:14px; border-radius:50%;
+  border:2px solid var(--border); background:transparent; transition:all .2s;
+}
+.pin-dot.filled { background:var(--blue); border-color:var(--blue); }
+.pin-dot.error { background:var(--red); border-color:var(--red); }
+.pin-error { color:var(--red); font-size:12px; min-height:16px; margin-bottom:16px; }
+.numpad {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:12px; max-width:240px; margin:0 auto;
+}
+.pin-btn {
+  width:100%; aspect-ratio:1;
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:50%; color:var(--text);
+  font-size:20px; font-weight:500;
+  cursor:pointer; transition:all .15s; font-family:inherit;
+}
+.pin-btn:active { background:var(--blue); color:#fff; transform:scale(.93); }
+.pin-other { margin-top:24px; }
+.pin-other a { font-size:12px; color:var(--sub); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<div class="pin-wrap">
+  <div class="logo">
+    <img src="MelaLogic-logo.svg" alt="MelaLogic">
+  </div>
+
+  <div class="pin-subtitle" id="pin-subtitle">PIN eingeben</div>
+
+  <div class="pin-dots">
+    <div class="pin-dot" id="pin-dot-0"></div>
+    <div class="pin-dot" id="pin-dot-1"></div>
+    <div class="pin-dot" id="pin-dot-2"></div>
+    <div class="pin-dot" id="pin-dot-3"></div>
+  </div>
+
+  <div class="pin-error" id="pin-error"></div>
+
+  <div class="numpad">
+    <button class="pin-btn" onclick="pinPress('1')">1</button>
+    <button class="pin-btn" onclick="pinPress('2')">2</button>
+    <button class="pin-btn" onclick="pinPress('3')">3</button>
+    <button class="pin-btn" onclick="pinPress('4')">4</button>
+    <button class="pin-btn" onclick="pinPress('5')">5</button>
+    <button class="pin-btn" onclick="pinPress('6')">6</button>
+    <button class="pin-btn" onclick="pinPress('7')">7</button>
+    <button class="pin-btn" onclick="pinPress('8')">8</button>
+    <button class="pin-btn" onclick="pinPress('9')">9</button>
+    <button class="pin-btn" id="pin-bio-btn" onclick="pinBiometric()" style="font-size:20px;display:none">
+      <i class="fa-solid fa-fingerprint"></i>
+    </button>
+    <button class="pin-btn" onclick="pinPress('0')">0</button>
+    <button class="pin-btn" onclick="pinBackspace()" style="font-size:18px">⌫</button>
+  </div>
+
+  <div class="pin-other">
+    <a href="#" onclick="pinLogout()">Anderes Konto verwenden</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPA_URL = 'https://dvmhstytoonpacxwdxuj.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bWhzdHl0b29ucGFjeHdkeHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTY2NzQsImV4cCI6MjA4ODQ5MjY3NH0.oZQD0Dp6mB0pF7hwAQdvQ7_OJe__cBq-MFtAEdB7K84';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let pinValue = '';
+
+// ── Инициализация ──────────────────────────────────────────────────────────
+async function init() {
+  // Проверяем сессию
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'login.html'; return; }
+
+  // Проверяем есть ли PIN
+  const storedPin = localStorage.getItem('bp_pin');
+  if (!storedPin) {
+    // PIN нет — грузим из Supabase
+    const { data } = await sb.from('user_data')
+      .select('pin_hash')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+    if (data?.pin_hash) {
+      localStorage.setItem('bp_pin', data.pin_hash);
+    } else {
+      // PIN не настроен — в приложение
+      location.href = 'index.html';
+      return;
+    }
+  }
+
+  // Показываем биометрию если доступна
+  initBio();
+
+  // Авто-биометрия через 600ms
+  setTimeout(() => {
+    if (localStorage.getItem('bp_bio_id') || localStorage.getItem('bp_bio_login')) {
+      pinBiometric();
+    }
+  }, 600);
+}
+
+// ── Биометрия ──────────────────────────────────────────────────────────────
+function initBio() {
+  const hasBio = localStorage.getItem('bp_bio_id') || localStorage.getItem('bp_bio_login');
+  if (!hasBio || !window.PublicKeyCredential) return;
+
+  const ua = navigator.userAgent;
+  const btn = document.getElementById('pin-bio-btn');
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isWindows = /Windows/.test(ua);
+  const isMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
+
+  let iconClass = 'fa-solid fa-fingerprint';
+  if (isIOS) iconClass = 'fa-solid fa-face-smile';
+  else if (isMac) iconClass = 'fa-brands fa-apple';
+  else if (isWindows) iconClass = 'fa-brands fa-windows';
+
+  btn.innerHTML = `<i class="${iconClass}"></i>`;
+  btn.style.display = '';
+}
+
+async function pinBiometric() {
+  const credIdStr = localStorage.getItem('bp_bio_id');
+  if (!credIdStr) return;
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const credIdBytes = Uint8Array.from(atob(credIdStr), c => c.charCodeAt(0));
+    await navigator.credentials.get({
+      publicKey: {
+        challenge, timeout:60000,
+        rpId: location.hostname,
+        userVerification:'required',
+        allowCredentials:[{ type:'public-key', id:credIdBytes, transports:['internal'] }]
+      }
+    });
+    // Биометрия прошла
+    goToApp();
+  } catch(e) {
+    console.log('Bio error:', e.message);
+  }
+}
+
+// ── PIN ввод ───────────────────────────────────────────────────────────────
+function pinPress(digit) {
+  if (!digit || pinValue.length >= 4) return;
+  pinValue += digit;
+  updateDots();
+  if (navigator.vibrate) navigator.vibrate(25);
+  if (pinValue.length === 4) setTimeout(checkPin, 150);
+}
+
+function pinBackspace() {
+  pinValue = pinValue.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    const d = document.getElementById('pin-dot-' + i);
+    d.classList.toggle('filled', i < pinValue.length);
+    d.classList.remove('error');
+  }
+}
+
+function checkPin() {
+  const stored = localStorage.getItem('bp_pin');
+  const hash = btoa(pinValue + '_bp_salt_2026');
+  if (hash === stored) {
+    goToApp();
+  } else {
+    pinValue = '';
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    for (let i = 0; i < 4; i++) {
+      document.getElementById('pin-dot-' + i).classList.add('error');
+    }
+    document.getElementById('pin-error').textContent = '❌ Falscher PIN';
+    setTimeout(() => {
+      updateDots();
+      document.getElementById('pin-error').textContent = '';
+    }, 900);
+  }
+}
+
+function goToApp() {
+  // Ставим флаг что PIN введён
+  sessionStorage.setItem('pin_unlocked', '1');
+  location.href = 'index.html';
+}
+
+async function pinLogout() {
+  await sb.auth.signOut();
+  localStorage.removeItem('bp_pin');
+  localStorage.removeItem('bp_pin_skipped');
+  localStorage.removeItem('bp_bio_id');
+  location.href = 'login.html';
+}
+
+init();
+</script>
+</body>
+</html>
