@@ -573,8 +573,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       localStorage.removeItem('bp_pin');
     }
 
-    // Сбрасываем флаг pin_unlocked — при входе PIN не нужен
-    sessionStorage.removeItem('pin_unlocked');
+    // При входе считаем что сессия разблокирована
+    sessionStorage.setItem('pin_unlocked', '1');
 
     await launchApp();
 
