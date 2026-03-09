@@ -544,6 +544,8 @@ async function submit() {
     } else {
       const { error } = await sb.auth.signUp({ email, password });
       if (error) throw error;
+      // Сразу выходим — сессия не должна создаваться до подтверждения email
+      await sb.auth.signOut();
       // Показываем форму ввода OTP кода
       showOtpCard(email);
     }
