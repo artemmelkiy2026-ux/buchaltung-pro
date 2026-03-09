@@ -3350,7 +3350,7 @@ function renderUst(){
         <td><strong>Q${q.q} ${yr}</strong></td>
         <td style="text-align:right;font-family:var(--mono)">${q.netto>0?fmt(q.netto):'—'}</td>
         <td style="text-align:right;font-family:var(--mono);color:var(--red)">${q.ust>0?'+'+fmt(q.ust):'—'}</td>
-        <td style="text-align:right;font-family:var(--mono);color:var(--green)">${q.vst>0?'-'+fmt(q.vst):'—'}</td>
+        <td style="padding-right:10px;text-align:right;font-family:var(--mono);color:var(--green)">${q.vst>0?'-'+fmt(q.vst):'—'}</td>
         <td style="text-align:right;font-family:var(--mono);font-weight:700;color:${q.zl>0?'var(--red)':'var(--green)'}">
           ${q.any?(q.zl>0?'+':'')+fmt(q.zl):'—'}
         </td>
@@ -3359,7 +3359,7 @@ function renderUst(){
       <td style="padding:8px 20px">Gesamt ${yr}</td>
       <td style="text-align:right;font-family:var(--mono)">${fmt(totNetto)}</td>
       <td style="text-align:right;font-family:var(--mono);color:var(--red)">${totUst>0?'+'+fmt(totUst):'—'}</td>
-      <td style="text-align:right;font-family:var(--mono);color:var(--green)">${totVorst>0?'-'+fmt(totVorst):'—'}</td>
+      <td style="padding-right:10px;text-align:right;font-family:var(--mono);color:var(--green)">${totVorst>0?'-'+fmt(totVorst):'—'}</td>
       <td style="text-align:right;font-family:var(--mono);font-weight:800;color:${totZahl>0?'var(--red)':'var(--green)'}">
         ${totZahl>0?'+':''}${fmt(totZahl)}
       </td>
