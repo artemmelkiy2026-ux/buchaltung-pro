@@ -333,6 +333,14 @@ body {
         </div>
         <i class="fa-solid fa-chevron-right setting-arrow"></i>
       </div>
+      <div class="setting-row" id="delete-account-row" onclick="openDeleteModal()">
+        <div class="setting-icon red"><i class="fa-solid fa-trash"></i></div>
+        <div class="setting-body">
+          <div class="setting-label">Konto löschen</div>
+          <div class="setting-sub" id="delete-account-sub">Konto und alle Daten löschen</div>
+        </div>
+        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+      </div>
     </div>
   </div>
 
@@ -475,6 +483,38 @@ body {
   </div>
 </div>
 
+<!-- Удаление аккаунта -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 style="color:var(--red)"><i class="fa-solid fa-trash" style="margin-right:8px"></i>Konto löschen</h3>
+    <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.5">
+      Ihr Konto wird <strong>nach 30 Tagen</strong> endgültig gelöscht. Sie können die Löschung jederzeit in Ihrem Profil widerrufen.
+    </p>
+    <div class="field">
+      <label>Passwort bestätigen</label>
+      <input type="password" id="delete-pwd" placeholder="Ihr aktuelles Passwort">
+    </div>
+    <div class="msg" id="delete-msg"></div>
+    <button class="btn-danger" onclick="deleteAccount()"><i class="fa-solid fa-trash" style="margin-right:6px"></i>Konto zur Löschung markieren</button>
+    <button class="btn-cancel" onclick="closeModal('modal-delete')">Abbrechen</button>
+  </div>
+</div>
+
+<!-- Отмена удаления -->
+<div class="modal-overlay" id="modal-cancel-delete">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 style="color:var(--green)"><i class="fa-solid fa-rotate-left" style="margin-right:8px"></i>Löschung widerrufen</h3>
+    <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.5">
+      Möchten Sie die Kontolöschung wirklich abbrechen? Ihr Konto bleibt dann erhalten.
+    </p>
+    <div class="msg" id="cancel-delete-msg"></div>
+    <button class="btn-primary" onclick="cancelDeleteAccount()"><i class="fa-solid fa-rotate-left" style="margin-right:6px"></i>Löschung abbrechen</button>
+    <button class="btn-cancel" onclick="closeModal('modal-cancel-delete')">Schließen</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -498,7 +538,7 @@ async function init() {
   document.getElementById('current-email-sub').textContent = currentEmail;
 
   // Загружаем user_data (pin + client_id)
-  const { data } = await sb.from('user_data').select('pin_hash, client_id').eq('user_id', currentUser.id).single();
+  const { data } = await sb.from('user_data').select('pin_hash, client_id, deleted_at').eq('user_id', currentUser.id).single();
 
   // Генерируем client_id если нет
   let clientId = data?.client_id;
@@ -507,6 +547,10 @@ async function init() {
     await sb.from('user_data').upsert({ user_id: currentUser.id, client_id: clientId }, { onConflict: 'user_id' });
   }
   document.getElementById('client-id-display').textContent = clientId;
+
+  // Статус удаления
+  window._deletedAt = data?.deleted_at || null;
+  if (window._deletedAt) updateDeleteUI(window._deletedAt);
 
   // PIN статус
   const hasPin = !!data?.pin_hash;
@@ -873,6 +917,62 @@ async function psConfirm() {
 function cancelPinSetup() {
   document.getElementById('pin-toggle').checked = false;
   closeModal('modal-pin-setup');
+}
+
+// ── Удаление аккаунта ─────────────────────────────────────────────────────
+function openDeleteModal() {
+  const deletedAt = window._deletedAt;
+  if (deletedAt) {
+    // Уже помечен — показываем отмену
+    openModal('modal-cancel-delete');
+  } else {
+    openModal('modal-delete');
+  }
+}
+
+async function deleteAccount() {
+  const password = document.getElementById('delete-pwd').value;
+  if (!password) { setMsg('delete-msg', '❌ Bitte Passwort eingeben', 'error'); return; }
+
+  const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password });
+  if (signInErr) { setMsg('delete-msg', '❌ Falsches Passwort', 'error'); return; }
+
+  const now = new Date().toISOString();
+  await sb.from('user_data').upsert({ user_id: currentUser.id, deleted_at: now }, { onConflict: 'user_id' });
+  window._deletedAt = now;
+
+  // Обновляем UI
+  updateDeleteUI(now);
+  closeModal('modal-delete');
+  toast('⚠️ Konto wird in 30 Tagen gelöscht');
+}
+
+async function cancelDeleteAccount() {
+  await sb.from('user_data').upsert({ user_id: currentUser.id, deleted_at: null }, { onConflict: 'user_id' });
+  window._deletedAt = null;
+  updateDeleteUI(null);
+  closeModal('modal-cancel-delete');
+  toast('✅ Löschung abgebrochen');
+}
+
+function updateDeleteUI(deletedAt) {
+  const row = document.getElementById('delete-account-row');
+  const sub = document.getElementById('delete-account-sub');
+  if (deletedAt) {
+    const deleteDate = new Date(new Date(deletedAt).getTime() + 30 * 24 * 60 * 60 * 1000);
+    const daysLeft = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
+    row.querySelector('.setting-icon').style.background = '#e08c1a18';
+    row.querySelector('.setting-icon').style.color = '#e08c1a';
+    row.querySelector('.setting-label').textContent = 'Löschung widerrufen';
+    sub.textContent = `Konto wird in ${daysLeft} Tagen gelöscht`;
+    sub.style.color = '#e08c1a';
+  } else {
+    row.querySelector('.setting-icon').style.background = '';
+    row.querySelector('.setting-icon').style.color = '';
+    row.querySelector('.setting-label').textContent = 'Konto löschen';
+    sub.textContent = 'Konto und alle Daten löschen';
+    sub.style.color = '';
+  }
 }
 
 function copyClientId() {
