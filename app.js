@@ -851,7 +851,7 @@ function renderRep(){
         <span style="font-size:10px;color:var(--green)">E: ${fmt(tot.ein)}</span><br/>
         <span style="font-size:10px;color:var(--red)">A: ${fmt(tot.aus)}</span>
       </td>
-      <td style="text-align:right;color:${tg>=0?'var(--green)':'var(--red)'};font-weight:600">
+      <td style="padding-right:10px; text-align:right;color:${tg>=0?'var(--green)':'var(--red)'};font-weight:600">
         <span style="font-size:12px">${tg>=0?'+':''}${fmt(tg)}</span>
       </td>
     </tr>`;
