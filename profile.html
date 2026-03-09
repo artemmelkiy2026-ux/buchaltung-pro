@@ -568,7 +568,7 @@ async function init() {
   document.getElementById('current-email-sub').textContent = currentEmail;
 
   // Загружаем user_data (pin + client_id)
-  const { data } = await sb.from('user_data').select('pin_hash, client_id, deleted_at').eq('user_id', currentUser.id).single();
+  const { data } = await sb.from('user_data').select('pin_hash, client_id, deleted_at').eq('user_id', currentUser.id).maybeSingle();
 
   // Генерируем client_id если нет
   let clientId = data?.client_id;
