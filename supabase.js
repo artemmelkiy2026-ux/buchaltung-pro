@@ -7,7 +7,7 @@ let currentUser = null;
 let saveTimer = null;
 
 // ── PIN / INACTIVITY ───────────────────────────────────────────────────────
-const PIN_TIMEOUT = 1 * 60 * 1000; // 10 минут
+const PIN_TIMEOUT = 10 * 60 * 1000; // 10 минут (для теста поставь 1 * 60 * 1000)
 let inactivityTimer = null;
 let pinValue = '';
 let pinMode = 'unlock'; // 'unlock' | 'setup'
@@ -19,11 +19,9 @@ function resetInactivityTimer() {
     if (!isAppUnlocked) return;
     const storedPin = localStorage.getItem('bp_pin');
     if (storedPin) {
-      // Есть PIN — показываем PIN экран
       isAppUnlocked = false;
       showPinScreen('unlock');
     }
-    // Нет PIN — приложение остаётся открытым (PIN не настроен)
   }, PIN_TIMEOUT);
 }
 
@@ -49,7 +47,9 @@ async function sbSignOut() {
   await sb.auth.signOut();
   currentUser = null;
   localStorage.removeItem('bp_pin');
-  location.reload();
+  localStorage.removeItem('bp_pin_skipped');
+  localStorage.removeItem('bp_bio_id');
+  location.href = 'login.html';
 }
 async function authGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
@@ -138,6 +138,7 @@ function persist() {}
 function showAuthScreen() {
   location.href = 'login.html';
 }
+
 function hideAuthScreen() {
   document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('pin-screen').style.display = 'none';
@@ -145,6 +146,7 @@ function hideAuthScreen() {
   isAppUnlocked = true;
   startInactivityWatch();
 }
+
 function showPinScreen(mode) {
   pinMode = mode;
   pinValue = '';
@@ -152,9 +154,11 @@ function showPinScreen(mode) {
   document.getElementById('pin-error').textContent = '';
   document.getElementById('pin-subtitle').textContent = mode === 'setup'
     ? 'Neuen PIN festlegen' : 'PIN eingeben';
+  document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('pin-screen').style.display = 'flex';
   document.getElementById('app-wrapper').style.display = 'none';
-  // Биометрия — показываем только если уже зарегистрирована
+
+  // Биометрия — только при разблокировке и если уже зарегистрирована
   const bioBtn = document.getElementById('pin-bio-btn');
   const hasBioId = localStorage.getItem('bp_bio_id');
   if (mode === 'unlock' && window.PublicKeyCredential && hasBioId) {
@@ -170,50 +174,61 @@ function showPinScreen(mode) {
   }
 }
 
-// ── AUTH FORM ──────────────────────────────────────────────────────────────
+// ── AUTH FORM (legacy — used only in index.html if auth-screen exists) ─────
 function authSetTab(tab) {
   const isLogin = tab === 'login';
-  document.getElementById('tab-login').style.background = isLogin ? 'var(--blue)' : 'transparent';
-  document.getElementById('tab-login').style.color = isLogin ? '#fff' : 'var(--sub)';
-  document.getElementById('tab-register').style.background = isLogin ? 'transparent' : 'var(--blue)';
-  document.getElementById('tab-register').style.color = isLogin ? 'var(--sub)' : '#fff';
-  document.getElementById('auth-confirm-wrap').style.display = isLogin ? 'none' : 'block';
-  document.getElementById('auth-captcha-wrap').style.display = isLogin ? 'none' : 'block';
-  document.getElementById('auth-remember-wrap').style.display = isLogin ? 'flex' : 'none';
-  document.getElementById('auth-btn').textContent = isLogin ? 'Anmelden' : 'Registrieren';
-  document.getElementById('auth-error').textContent = '';
+  const tl = document.getElementById('tab-login');
+  const tr = document.getElementById('tab-register');
+  if (!tl || !tr) return;
+  tl.style.background = isLogin ? 'var(--blue)' : 'transparent';
+  tl.style.color = isLogin ? '#fff' : 'var(--sub)';
+  tr.style.background = isLogin ? 'transparent' : 'var(--blue)';
+  tr.style.color = isLogin ? 'var(--sub)' : '#fff';
+  const cw = document.getElementById('auth-confirm-wrap');
+  const cap = document.getElementById('auth-captcha-wrap');
+  const rem = document.getElementById('auth-remember-wrap');
+  const btn = document.getElementById('auth-btn');
+  if (cw) cw.style.display = isLogin ? 'none' : 'block';
+  if (cap) cap.style.display = isLogin ? 'none' : 'block';
+  if (rem) rem.style.display = isLogin ? 'flex' : 'none';
+  if (btn) btn.textContent = isLogin ? 'Anmelden' : 'Registrieren';
+  const err = document.getElementById('auth-error');
+  if (err) err.textContent = '';
 }
 function authTogglePwd(inputId, btn) {
   const inp = document.getElementById(inputId);
+  if (!inp) return;
   if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
   else { inp.type = 'password'; btn.textContent = '👁'; }
 }
-function authToggleMode() { /* legacy */ }
+function authToggleMode() {}
 
 async function authSubmit() {
-  const email    = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const isLogin  = document.getElementById('tab-login').style.background.includes('var(--blue)') ||
-                   document.getElementById('tab-login').style.background === 'var(--blue)';
-  const btn      = document.getElementById('auth-btn');
-  const err      = document.getElementById('auth-error');
-  err.textContent = '';
-  if (!email || !password) { err.textContent = '❌ Bitte Email und Passwort eingeben.'; return; }
-  if (password.length < 6) { err.textContent = '❌ Passwort mindestens 6 Zeichen.'; return; }
+  const emailEl = document.getElementById('auth-email');
+  const passEl  = document.getElementById('auth-password');
+  const btnEl   = document.getElementById('auth-btn');
+  const errEl   = document.getElementById('auth-error');
+  if (!emailEl || !passEl) return;
+  const email    = emailEl.value.trim();
+  const password = passEl.value;
+  const tl       = document.getElementById('tab-login');
+  const isLogin  = !tl || tl.style.background.includes('var(--blue)') || tl.classList.contains('active');
+  errEl.textContent = '';
+  if (!email || !password) { errEl.textContent = '❌ Bitte Email und Passwort eingeben.'; return; }
+  if (password.length < 6) { errEl.textContent = '❌ Passwort mindestens 6 Zeichen.'; return; }
   if (!isLogin) {
-    const pw2 = document.getElementById('auth-password2').value;
-    if (password !== pw2) { err.textContent = '❌ Passwörter stimmen nicht überein.'; return; }
+    const pw2 = document.getElementById('auth-password2')?.value;
+    if (password !== pw2) { errEl.textContent = '❌ Passwörter stimmen nicht überein.'; return; }
   }
-  btn.textContent = '...';
-  btn.disabled = true;
+  btnEl.textContent = '...';
+  btnEl.disabled = true;
   try {
     if (isLogin) {
       const result = await sbSignIn(email, password);
       if (result && result.user) {
         currentUser = result.user;
-        document.getElementById('user-email-display').textContent = currentUser.email;
         window._loadedRemoteData = await sbLoadAll();
-        // PIN setup prompt если ещё нет
+        window._dataReady = true;
         hideAuthScreen();
         window.dispatchEvent(new Event('supabase-ready'));
         if (!localStorage.getItem('bp_pin') && !localStorage.getItem('bp_pin_skipped')) {
@@ -222,23 +237,23 @@ async function authSubmit() {
       }
     } else {
       await sbSignUp(email, password);
-      err.style.color = 'var(--green)';
-      err.textContent = '✅ Registriert! Bitte jetzt anmelden.';
-      btn.disabled = false;
+      errEl.style.color = 'var(--green)';
+      errEl.textContent = '✅ Registriert! Bitte jetzt anmelden.';
+      btnEl.disabled = false;
       setTimeout(() => {
-        err.style.color = '';
-        err.textContent = '';
+        errEl.style.color = '';
+        errEl.textContent = '';
         authSetTab('login');
-        document.getElementById('auth-email').value = email;
-        document.getElementById('auth-password').value = '';
-        btn.textContent = 'Anmelden';
+        emailEl.value = email;
+        passEl.value = '';
+        btnEl.textContent = 'Anmelden';
       }, 1800);
     }
   } catch(e) {
     console.error('Auth error:', e);
-    err.textContent = translateAuthError(e.message);
-    btn.textContent = isLogin ? 'Anmelden' : 'Registrieren';
-    btn.disabled = false;
+    errEl.textContent = translateAuthError(e.message);
+    btnEl.textContent = isLogin ? 'Anmelden' : 'Registrieren';
+    btnEl.disabled = false;
   }
 }
 
@@ -253,14 +268,16 @@ function translateAuthError(msg) {
 
 // ── PIN LOGIC ──────────────────────────────────────────────────────────────
 function offerPinSetup() {
-  // Показываем красивый диалог вместо confirm()
+  // Не показывать если уже есть баннер
+  if (document.getElementById('pin-offer-banner')) return;
+
   const banner = document.createElement('div');
   banner.id = 'pin-offer-banner';
   banner.style.cssText = `
-    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
     background:#1a4578;color:#fff;border-radius:16px;padding:18px 24px;
     display:flex;align-items:center;gap:16px;z-index:99999;
-    box-shadow:0 8px 32px rgba(26,69,120,.35);font-family:var(--sans);
+    box-shadow:0 8px 32px rgba(26,69,120,.35);font-family:sans-serif;
     max-width:380px;width:calc(100% - 48px);
   `;
   banner.innerHTML = `
@@ -269,26 +286,23 @@ function offerPinSetup() {
       <div style="font-weight:600;font-size:14px;margin-bottom:4px">PIN-Code einrichten?</div>
       <div style="font-size:12px;opacity:.8">Schneller Zugang mit 4-stelligem PIN</div>
     </div>
-    <div style="display:flex;gap:8px">
+    <div style="display:flex;gap:8px;flex-shrink:0">
       <button onclick="document.getElementById('pin-offer-banner').remove();localStorage.setItem('bp_pin_skipped','1')"
-        style="background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer">Nein</button>
+        style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer;font-family:sans-serif">Nein</button>
       <button onclick="document.getElementById('pin-offer-banner').remove();showPinScreen('setup')"
-        style="background:#fff;border:none;border-radius:8px;color:#1a4578;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Ja, einrichten</button>
+        style="background:#fff;border:none;border-radius:8px;color:#1a4578;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif">Ja ✓</button>
     </div>
   `;
   document.body.appendChild(banner);
-  setTimeout(() => banner?.remove(), 12000);
+  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 15000);
 }
 
 function pinPress(digit) {
   if (pinValue.length >= 4) return;
   pinValue += digit;
   updatePinDots();
-  // Вибрация на мобильных
   if (navigator.vibrate) navigator.vibrate(30);
-  if (pinValue.length === 4) {
-    setTimeout(pinConfirm, 150);
-  }
+  if (pinValue.length === 4) setTimeout(pinConfirm, 150);
 }
 
 function pinBackspace() {
@@ -299,6 +313,7 @@ function pinBackspace() {
 function updatePinDots() {
   for (let i = 0; i < 4; i++) {
     const dot = document.getElementById('pin-dot-' + i);
+    if (!dot) continue;
     dot.classList.toggle('filled', i < pinValue.length);
     dot.classList.remove('error');
   }
@@ -311,25 +326,21 @@ function pinUnlockSuccess() {
   document.getElementById('app-wrapper').style.display = 'block';
   isAppUnlocked = true;
   resetInactivityTimer();
-  // Запускаем приложение если ещё не запущено
-  if (typeof window._unlockApp === 'function') {
-    window._unlockApp();
-  }
+  if (typeof window._unlockApp === 'function') window._unlockApp();
 }
 
 function pinConfirm() {
   if (pinMode === 'setup') {
     const hash = btoa(pinValue + '_bp_salt_2026');
     localStorage.setItem('bp_pin', hash);
-    // Предлагаем также зарегистрировать биометрию
-    const hasBio = window.PublicKeyCredential;
     pinValue = '';
     updatePinDots();
     document.getElementById('pin-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
+    isAppUnlocked = true;
     if (typeof toast === 'function') toast('✅ PIN gesetzt!', 'ok');
-    // Предложить биометрию если поддерживается и ещё не зарегистрирована
-    if (hasBio && !localStorage.getItem('bp_bio_id')) {
+    // Предложить биометрию
+    if (window.PublicKeyCredential && !localStorage.getItem('bp_bio_id')) {
       setTimeout(offerBiometricSetup, 1000);
     }
   } else {
@@ -343,7 +354,7 @@ function pinConfirm() {
       if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       for (let i = 0; i < 4; i++) {
         const dot = document.getElementById('pin-dot-' + i);
-        dot.classList.add('error');
+        if (dot) dot.classList.add('error');
       }
       setTimeout(() => {
         updatePinDots();
@@ -357,197 +368,145 @@ function pinLogout() {
   if (confirm('Abmelden?')) sbSignOut();
 }
 
-// ── BIOMETRIC (Face ID / Fingerprint) ──────────────────────────────────────
-// Работает через WebAuthn Platform Authenticator:
-// - iPhone  → Face ID или Touch ID
-// - Android → Отпечаток пальца или разблокировка экрана
-// - Desktop → Windows Hello, Touch ID на Mac
-
+// ── BIOMETRIC ──────────────────────────────────────────────────────────────
 async function isBiometricAvailable() {
   if (!window.PublicKeyCredential) return false;
-  try {
-    return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-  } catch { return false; }
+  try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+  catch { return false; }
 }
 
-// Регистрация биометрии (один раз при настройке)
 async function registerBiometric() {
   if (!await isBiometricAvailable()) return false;
   try {
     const userId = currentUser?.id || 'local';
     const challenge = crypto.getRandomValues(new Uint8Array(32));
     const userIdBytes = new TextEncoder().encode(userId.substring(0, 64));
-
     const credential = await navigator.credentials.create({
       publicKey: {
         challenge,
         rp: { name: 'MelaLogic', id: location.hostname },
-        user: {
-          id: userIdBytes,
-          name: currentUser?.email || 'user',
-          displayName: 'MelaLogic User',
-        },
-        pubKeyCredParams: [
-          { alg: -7,  type: 'public-key' }, // ES256
-          { alg: -257, type: 'public-key' }, // RS256
-        ],
-        authenticatorSelection: {
-          authenticatorAttachment: 'platform', // только встроенный (Face ID / Fingerprint)
-          userVerification: 'required',
-          residentKey: 'preferred',
-        },
+        user: { id: userIdBytes, name: currentUser?.email || 'user', displayName: 'MelaLogic User' },
+        pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+        authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'preferred' },
         timeout: 60000,
       }
     });
-
     if (credential) {
-      // Сохраняем ID credential для последующей проверки
       const credIdBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
       localStorage.setItem('bp_bio_id', credIdBase64);
       return true;
     }
-  } catch(e) {
-    console.log('Biometric register:', e.message);
-  }
+  } catch(e) { console.log('Biometric register:', e.message); }
   return false;
 }
 
-// Верификация биометрии (каждый раз при разблокировке)
 async function pinBiometric() {
   if (!await isBiometricAvailable()) return;
-
   const credIdBase64 = localStorage.getItem('bp_bio_id');
-  if (!credIdBase64) {
-    // Нет зарегистрированной биометрии — предложить настроить
-    return;
-  }
-
+  if (!credIdBase64) return;
   try {
     const challenge = crypto.getRandomValues(new Uint8Array(32));
-    // Декодируем сохранённый ID
     const credIdBytes = Uint8Array.from(atob(credIdBase64), c => c.charCodeAt(0));
-
     await navigator.credentials.get({
       publicKey: {
-        challenge,
-        timeout: 60000,
-        rpId: location.hostname,
+        challenge, timeout: 60000, rpId: location.hostname,
         userVerification: 'required',
-        allowCredentials: [{
-          type: 'public-key',
-          id: credIdBytes,
-          transports: ['internal'],
-        }],
+        allowCredentials: [{ type: 'public-key', id: credIdBytes, transports: ['internal'] }],
       }
     });
-
-    // Биометрия прошла — разблокируем
     pinUnlockSuccess();
     if (typeof toast === 'function') toast('✅ Entsperrt', 'ok');
-
-  } catch(e) {
-    console.log('Biometric verify:', e.message);
-    // Не показываем ошибку — просто оставляем PIN экран
-  }
+  } catch(e) { console.log('Biometric verify:', e.message); }
 }
 
-// Предложение зарегистрировать биометрию
 async function offerBiometricSetup() {
   if (!await isBiometricAvailable()) return;
-
-  const banner = document.createElement('div');
-  banner.id = 'bio-offer-banner';
-  banner.style.cssText = `
-    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-    background:#5d9d69;color:#fff;border-radius:16px;padding:18px 24px;
-    display:flex;align-items:center;gap:16px;z-index:99999;
-    box-shadow:0 8px 32px rgba(93,157,105,.35);font-family:var(--sans);
-    max-width:380px;width:calc(100% - 48px);
-  `;
-
-  // Определяем тип биометрии для иконки
+  if (document.getElementById('bio-offer-banner')) return;
   const ua = navigator.userAgent;
   const isIOS = /iPad|iPhone|iPod/.test(ua);
   const bioIcon = isIOS ? '👤' : '👆';
-  const bioLabel = isIOS ? 'Face ID einrichten' : 'Fingerabdruck einrichten';
-
+  const bioLabel = isIOS ? 'Face ID einrichten?' : 'Fingerabdruck einrichten?';
+  const banner = document.createElement('div');
+  banner.id = 'bio-offer-banner';
+  banner.style.cssText = `
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:#5d9d69;color:#fff;border-radius:16px;padding:18px 24px;
+    display:flex;align-items:center;gap:16px;z-index:99999;
+    box-shadow:0 8px 32px rgba(93,157,105,.35);font-family:sans-serif;
+    max-width:380px;width:calc(100% - 48px);
+  `;
   banner.innerHTML = `
     <span style="font-size:28px">${bioIcon}</span>
     <div style="flex:1">
-      <div style="font-weight:600;font-size:14px;margin-bottom:4px">${bioLabel}?</div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">${bioLabel}</div>
       <div style="font-size:12px;opacity:.8">Noch schneller entsperren</div>
     </div>
-    <div style="display:flex;gap:8px">
+    <div style="display:flex;gap:8px;flex-shrink:0">
       <button onclick="document.getElementById('bio-offer-banner').remove()"
-        style="background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer">Nein</button>
+        style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer;font-family:sans-serif">Nein</button>
       <button id="bio-setup-btn"
-        style="background:#fff;border:none;border-radius:8px;color:#5d9d69;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Einrichten</button>
+        style="background:#fff;border:none;border-radius:8px;color:#5d9d69;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif">Ja ✓</button>
     </div>
   `;
   document.body.appendChild(banner);
-
   document.getElementById('bio-setup-btn').addEventListener('click', async () => {
     banner.remove();
     const ok = await registerBiometric();
-    if (ok && typeof toast === 'function') {
-      toast('✅ Biometrie aktiviert!', 'ok');
-    }
+    if (typeof toast === 'function') toast(ok ? '✅ Biometrie aktiviert!' : '❌ Nicht verfügbar', ok ? 'ok' : 'err');
   });
-
-  setTimeout(() => banner?.remove(), 15000);
+  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 15000);
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-  document.getElementById('auth-password')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') authSubmit();
-  });
-  document.getElementById('auth-password2')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') authSubmit();
-  });
-  document.getElementById('auth-email')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') authSubmit();
-  });
 
   let appStarted = false;
+  let appDispatched = false;
 
-  async function startApp(user, fromPinUnlock = false) {
-    if (appStarted && !fromPinUnlock) return;
+  async function launchApp() {
+    // Показываем приложение и запускаем его
+    hideAuthScreen();
+    if (!appDispatched) {
+      appDispatched = true;
+      window.dispatchEvent(new Event('supabase-ready'));
+    }
+  }
+
+  async function startApp(user) {
+    if (appStarted) return;
     appStarted = true;
     currentUser = user;
+
+    // Показываем email в шапке
     const uel = document.getElementById('user-email-display');
     if (uel) uel.textContent = currentUser.email;
 
     const storedPin = localStorage.getItem('bp_pin');
 
-    if (!fromPinUnlock && storedPin) {
-      // Есть PIN и это не разблокировка — показываем PIN экран
-      // Данные грузим в фоне
-      document.getElementById('loading-screen').style.display = 'none';
+    if (storedPin) {
+      // Есть PIN — показываем PIN экран, грузим данные в фоне
       showPinScreen('unlock');
-      // Грузим данные пока пользователь вводит PIN
       window._loadedRemoteData = await sbLoadAll() || null;
       window._dataReady = true;
+      // _unlockApp вызовется из pinUnlockSuccess
     } else {
-      // PIN нет или это разблокировка — показываем приложение
-      if (!window._dataReady) {
-        window._loadedRemoteData = await sbLoadAll() || null;
+      // PIN нет — сразу показываем приложение
+      window._loadedRemoteData = await sbLoadAll() || null;
+      await launchApp();
+      // Предлагаем настроить PIN если ещё не предлагали
+      if (!localStorage.getItem('bp_pin_skipped')) {
+        setTimeout(offerPinSetup, 2000);
       }
-      hideAuthScreen();
-      window.dispatchEvent(new Event('supabase-ready'));
     }
   }
 
-  // Разблокировка по PIN — вызывается из pinUnlockSuccess
+  // Вызывается из pinUnlockSuccess после успешного ввода PIN / биометрии
   window._unlockApp = async function() {
     if (!currentUser) return;
-    hideAuthScreen();
-    if (!window._dispatchedReady) {
-      window._dispatchedReady = true;
-      window.dispatchEvent(new Event('supabase-ready'));
-    }
+    await launchApp();
   };
 
+  // Проверяем сессию при загрузке
   const { data: { session } } = await sb.auth.getSession();
   if (session && session.user) {
     await startApp(session.user);
@@ -556,18 +515,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     showAuthScreen();
   }
 
+  // Следим за изменениями авторизации
   sb.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth event:', event);
-    if (event === 'SIGNED_IN' && session && session.user) {
+    if (event === 'SIGNED_IN' && session && session.user && !appStarted) {
       await startApp(session.user);
-    } else if (event === 'TOKEN_REFRESHED' && session && session.user) {
-      // Токен обновился — не делаем ничего, приложение уже работает
+    } else if (event === 'TOKEN_REFRESHED' && session?.user) {
       currentUser = session.user;
     } else if (event === 'SIGNED_OUT') {
       appStarted = false;
+      appDispatched = false;
       isAppUnlocked = false;
       window._dataReady = false;
-      window._dispatchedReady = false;
       location.href = 'login.html';
     }
   });
