@@ -444,6 +444,37 @@ body {
   </div>
 </div>
 
+<!-- PIN — настройка новая -->
+<div class="modal-overlay" id="modal-pin-setup">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3><i class="fa-solid fa-hashtag" style="color:var(--green);margin-right:8px"></i>PIN einrichten</h3>
+    <p style="font-size:13px;color:var(--sub);margin-bottom:4px" id="ps-subtitle">Neuen PIN festlegen (1/2)</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="ps-dot-0"></div>
+      <div class="pin-dot" id="ps-dot-1"></div>
+      <div class="pin-dot" id="ps-dot-2"></div>
+      <div class="pin-dot" id="ps-dot-3"></div>
+    </div>
+    <div class="msg error" id="ps-msg"></div>
+    <div class="numpad">
+      <button class="num-btn" onclick="psPress('1')">1</button>
+      <button class="num-btn" onclick="psPress('2')">2</button>
+      <button class="num-btn" onclick="psPress('3')">3</button>
+      <button class="num-btn" onclick="psPress('4')">4</button>
+      <button class="num-btn" onclick="psPress('5')">5</button>
+      <button class="num-btn" onclick="psPress('6')">6</button>
+      <button class="num-btn" onclick="psPress('7')">7</button>
+      <button class="num-btn" onclick="psPress('8')">8</button>
+      <button class="num-btn" onclick="psPress('9')">9</button>
+      <button class="num-btn" style="font-size:14px" onclick="psPress('')">–</button>
+      <button class="num-btn" onclick="psPress('0')">0</button>
+      <button class="num-btn" style="font-size:16px" onclick="psBackspace()">⌫</button>
+    </div>
+    <button class="btn-cancel" onclick="cancelPinSetup()">Abbrechen</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -594,11 +625,9 @@ async function forgotPassword() {
 async function handlePinToggle() {
   const checked = document.getElementById('pin-toggle').checked;
   if (checked) {
-    // Включаем PIN — открываем экран настройки в основном приложении
-    // Просто редиректим на index с параметром
-    localStorage.setItem('bp_request_pin_setup', '1');
-    toast('✅ PIN-Einrichtung beim nächsten Öffnen');
-    document.getElementById('pin-status-sub').textContent = 'Wird eingerichtet...';
+    // Включаем PIN — открываем экран настройки прямо здесь
+    document.getElementById('pin-toggle').checked = false; // откатываем до завершения
+    openPinSetupModal();
   } else {
     // Выключаем — требуем подтверждение старым PIN
     document.getElementById('pin-toggle').checked = true; // откатываем до подтверждения
@@ -781,6 +810,69 @@ function setMsg(id, text, type) {
   const el = document.getElementById(id);
   el.textContent = text;
   el.className = 'msg ' + type;
+}
+
+// ── PIN Setup (включение) ─────────────────────────────────────────────────
+let psValue = '', psStep = 1, psFirst = '';
+
+function openPinSetupModal() {
+  psValue = ''; psStep = 1; psFirst = '';
+  document.getElementById('ps-subtitle').textContent = 'Neuen PIN festlegen (1/2)';
+  document.getElementById('ps-msg').textContent = '';
+  updatePsDots();
+  openModal('modal-pin-setup');
+}
+function psPress(digit) {
+  if (!digit) return;
+  if (psValue.length >= 4) return;
+  psValue += digit;
+  updatePsDots();
+  if (navigator.vibrate) navigator.vibrate(25);
+  if (psValue.length === 4) setTimeout(psConfirm, 150);
+}
+function psBackspace() { psValue = psValue.slice(0,-1); updatePsDots(); }
+function updatePsDots() {
+  for (let i=0;i<4;i++) {
+    const d = document.getElementById('ps-dot-'+i);
+    d.classList.toggle('filled', i < psValue.length);
+    d.classList.remove('error');
+  }
+}
+async function psConfirm() {
+  if (psStep === 1) {
+    psFirst = psValue;
+    psValue = '';
+    psStep = 2;
+    document.getElementById('ps-subtitle').textContent = 'PIN wiederholen (2/2)';
+    updatePsDots();
+    return;
+  }
+  if (psValue !== psFirst) {
+    document.getElementById('ps-msg').textContent = '❌ PINs stimmen nicht überein';
+    if (navigator.vibrate) navigator.vibrate([100,50,100]);
+    for(let i=0;i<4;i++) document.getElementById('ps-dot-'+i).classList.add('error');
+    psValue = ''; psFirst = ''; psStep = 1;
+    setTimeout(() => {
+      updatePsDots();
+      document.getElementById('ps-msg').textContent = '';
+      document.getElementById('ps-subtitle').textContent = 'Neuen PIN festlegen (1/2)';
+    }, 1000);
+    return;
+  }
+  // Сохраняем
+  const hash = btoa(psValue + '_bp_salt_2026');
+  localStorage.setItem('bp_pin', hash);
+  localStorage.removeItem('bp_pin_skipped');
+  await sb.from('user_data').upsert({ user_id: currentUser.id, pin_hash: hash }, { onConflict: 'user_id' });
+  document.getElementById('pin-toggle').checked = true;
+  document.getElementById('pin-status-sub').textContent = 'Aktiv';
+  document.getElementById('change-pin-row').style.display = 'flex';
+  closeModal('modal-pin-setup');
+  toast('✅ PIN eingerichtet');
+}
+function cancelPinSetup() {
+  document.getElementById('pin-toggle').checked = false;
+  closeModal('modal-pin-setup');
 }
 
 function copyClientId() {
