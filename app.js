@@ -570,10 +570,10 @@ function renderDash(){
   document.getElementById('d-recent').innerHTML=recent.length?recent.map(e=>`
     <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''}">
       <td style="font-family:var(--mono);font-size:11px;color:var(--sub);white-space:nowrap">${mob?fdm(e.datum):fd(e.datum)}</td>
-      <td style="${mob?'width:32px;text-align:center':''};overflow:hidden"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}" style="display:inline-flex;align-items:center;gap:4px;white-space:nowrap">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}${mob?'':('<span style="font-size:11px;font-weight:600">'+(e.typ==='Einnahme'?'Einnahme':'Ausgabe')+'</span>')}</span></td>
+      <td style="white-space:nowrap"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}" style="display:inline-flex;align-items:center;gap:5px">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}${mob?'':'<span style="font-size:11px;font-weight:600">'+(e.typ==='Einnahme'?'Einnahme':'Ausgabe')+'</span>'}</span></td>
       <td class="mob-hide" style="color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.kategorie}">${e.kategorie}</td>
-      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:11px">${e.zahlungsart||'—'}</span></td>
-      <td class="mob-hide" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px" title="${e.beschreibung}">${e.beschreibung}</td>
+      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:10px">${e.zahlungsart||'—'}</span></td>
+      <td class="mob-hide" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${e.beschreibung}">${e.beschreibung}</td>
       <td style="text-align:right;white-space:nowrap"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
     </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--sub)">'+t('Keine Einträge')+'</td></tr>';
 }
@@ -678,10 +678,10 @@ function renderEin(){
         ${showMwst&&!mob?`<td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:var(--sub)">${hasMwst?fmt(nettoVal):'—'}</td>
         <td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:#f97316">${hasMwst?'+'+fmt(mwstVal)+' ('+mwstRate+'%)':'—'}</td>`:''}
         <td style="text-align:right"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
-        <td style="white-space:nowrap">
-          ${mob?'':`<button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,'${e.id}')"><i class="fas fa-edit"></i></button>`}
+        ${mob?'':`<td style="white-space:nowrap">
+          <button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,'${e.id}')"><i class="fas fa-edit"></i></button>
           <button class="del-btn" onclick="delE(event,'${e.id}')"><i class="fas fa-times"></i></button>
-        </td>
+        </td>`}
       </tr>`;}).join('');
     
     // ✅ Пагинация навигация
