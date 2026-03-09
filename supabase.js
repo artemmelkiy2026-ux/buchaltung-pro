@@ -16,10 +16,14 @@ let isAppUnlocked = false;
 function resetInactivityTimer() {
   clearTimeout(inactivityTimer);
   inactivityTimer = setTimeout(() => {
+    if (!isAppUnlocked) return;
     const storedPin = localStorage.getItem('bp_pin');
-    if (storedPin && isAppUnlocked) {
+    if (storedPin) {
+      // Есть PIN — показываем PIN экран
+      isAppUnlocked = false;
       showPinScreen('unlock');
     }
+    // Нет PIN — приложение остаётся открытым (PIN не настроен)
   }, PIN_TIMEOUT);
 }
 
@@ -307,6 +311,10 @@ function pinUnlockSuccess() {
   document.getElementById('app-wrapper').style.display = 'block';
   isAppUnlocked = true;
   resetInactivityTimer();
+  // Запускаем приложение если ещё не запущено
+  if (typeof window._unlockApp === 'function') {
+    window._unlockApp();
+  }
 }
 
 function pinConfirm() {
@@ -502,33 +510,65 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   let appStarted = false;
-  async function startApp(user) {
-    if (appStarted) return;
+
+  async function startApp(user, fromPinUnlock = false) {
+    if (appStarted && !fromPinUnlock) return;
     appStarted = true;
     currentUser = user;
     const uel = document.getElementById('user-email-display');
     if (uel) uel.textContent = currentUser.email;
-    window._loadedRemoteData = await sbLoadAll() || null;
-    hideAuthScreen();
-    window.dispatchEvent(new Event('supabase-ready'));
+
+    const storedPin = localStorage.getItem('bp_pin');
+
+    if (!fromPinUnlock && storedPin) {
+      // Есть PIN и это не разблокировка — показываем PIN экран
+      // Данные грузим в фоне
+      document.getElementById('loading-screen').style.display = 'none';
+      showPinScreen('unlock');
+      // Грузим данные пока пользователь вводит PIN
+      window._loadedRemoteData = await sbLoadAll() || null;
+      window._dataReady = true;
+    } else {
+      // PIN нет или это разблокировка — показываем приложение
+      if (!window._dataReady) {
+        window._loadedRemoteData = await sbLoadAll() || null;
+      }
+      hideAuthScreen();
+      window.dispatchEvent(new Event('supabase-ready'));
+    }
   }
+
+  // Разблокировка по PIN — вызывается из pinUnlockSuccess
+  window._unlockApp = async function() {
+    if (!currentUser) return;
+    hideAuthScreen();
+    if (!window._dispatchedReady) {
+      window._dispatchedReady = true;
+      window.dispatchEvent(new Event('supabase-ready'));
+    }
+  };
 
   const { data: { session } } = await sb.auth.getSession();
   if (session && session.user) {
     await startApp(session.user);
   } else {
+    document.getElementById('loading-screen').style.display = 'none';
     showAuthScreen();
-    authSetTab('login');
   }
 
   sb.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth event:', event);
     if (event === 'SIGNED_IN' && session && session.user) {
       await startApp(session.user);
+    } else if (event === 'TOKEN_REFRESHED' && session && session.user) {
+      // Токен обновился — не делаем ничего, приложение уже работает
+      currentUser = session.user;
     } else if (event === 'SIGNED_OUT') {
       appStarted = false;
       isAppUnlocked = false;
-      showAuthScreen();
+      window._dataReady = false;
+      window._dispatchedReady = false;
+      location.href = 'login.html';
     }
   });
 });
