@@ -343,7 +343,7 @@ function offerPinSetup() {
     <div style="display:flex;gap:8px;flex-shrink:0">
       <button onclick="document.getElementById('pin-offer-banner').remove();localStorage.setItem('bp_pin_skipped','1')"
         style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer;font-family:sans-serif">Nein</button>
-      <button onclick="document.getElementById('pin-offer-banner').remove();showPinScreen('setup')"
+      <button onclick="document.getElementById('pin-offer-banner').remove();location.href='profile.html'"
         style="background:#fff;border:none;border-radius:8px;color:#1a4578;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif">Ja ✓</button>
     </div>
   `;
