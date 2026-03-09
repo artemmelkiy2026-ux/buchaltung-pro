@@ -7,7 +7,7 @@ let currentUser = null;
 let saveTimer = null;
 
 // ── PIN / INACTIVITY ───────────────────────────────────────────────────────
-const PIN_TIMEOUT = 10 * 60 * 1000; // 10 минут (для теста поставь 1 * 60 * 1000)
+const PIN_TIMEOUT = 1 * 60 * 1000; // 10 минут (для теста поставь 1 * 60 * 1000)
 let inactivityTimer = null;
 let pinValue = '';
 let pinMode = 'unlock'; // 'unlock' | 'setup'
