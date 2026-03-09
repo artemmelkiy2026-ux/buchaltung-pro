@@ -183,6 +183,7 @@ function showPinScreen(mode) {
   document.getElementById('pin-subtitle').textContent = mode === 'setup'
     ? 'PIN festlegen (1/2)' : 'PIN eingeben';
   document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('pin-screen').style.display = 'flex';
   document.getElementById('app-wrapper').style.display = 'none';
 
@@ -359,23 +360,46 @@ function pinUnlockSuccess() {
 
 function pinConfirm() {
   if (pinMode === 'setup') {
+    if (pinSetupStep === 1) {
+      // Первый ввод — запоминаем и просим повторить
+      pinFirstValue = pinValue;
+      pinValue = '';
+      updatePinDots();
+      pinSetupStep = 2;
+      document.getElementById('pin-subtitle').textContent = 'PIN wiederholen (2/2)';
+      return;
+    }
+    // Второй ввод — проверяем совпадение
+    if (pinValue !== pinFirstValue) {
+      pinValue = '';
+      pinFirstValue = '';
+      pinSetupStep = 1;
+      document.getElementById('pin-error').textContent = '❌ PINs stimmen nicht überein';
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById('pin-dot-' + i);
+        if (dot) dot.classList.add('error');
+      }
+      setTimeout(() => {
+        updatePinDots();
+        document.getElementById('pin-error').textContent = '';
+        document.getElementById('pin-subtitle').textContent = 'PIN festlegen (1/2)';
+      }, 1000);
+      return;
+    }
+    // PINы совпали — сохраняем
     const hash = btoa(pinValue + '_bp_salt_2026');
     localStorage.setItem('bp_pin', hash);
-    // Сохраняем PIN в Supabase
     sbSavePin(hash).then(() => {
       if (typeof toast === 'function') toast('✅ PIN gesetzt!', 'ok');
     });
     pinValue = '';
+    pinFirstValue = '';
+    pinSetupStep = 1;
     updatePinDots();
     document.getElementById('pin-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
     isAppUnlocked = true;
-    // Предложить биометрию для PIN экрана только если нет ни одной биометрии
-    const hasBioLogin = localStorage.getItem('bp_bio_login');
-    const hasBioPin = localStorage.getItem('bp_bio_id');
-    if (window.PublicKeyCredential && !hasBioLogin && !hasBioPin) {
-      setTimeout(offerBiometricSetup, 1000);
-    }
   } else {
     const stored = localStorage.getItem('bp_pin');
     const hash = btoa(pinValue + '_bp_salt_2026');
