@@ -527,9 +527,39 @@ let currentUser = null;
 let currentEmail = '';
 
 // ── Инициализация ──────────────────────────────────────────────────────────
+// ── PIN защита ────────────────────────────────────────────────────────────
+const PIN_TIMEOUT = 1 * 60 * 1000;
+let inactivityTimer = null;
+
+function startProfilePinWatch() {
+  const storedPin = localStorage.getItem('bp_pin');
+  if (!storedPin) return;
+  const reset = () => {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      sessionStorage.removeItem('pin_unlocked');
+      location.replace('pin.html');
+    }, PIN_TIMEOUT);
+  };
+  ['mousemove','keydown','touchstart','click'].forEach(ev =>
+    document.addEventListener(ev, reset)
+  );
+  reset();
+}
+
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { location.href = 'login.html'; return; }
+
+  // Проверяем PIN — если есть и не разблокирован
+  const storedPin = localStorage.getItem('bp_pin');
+  const pinUnlocked = sessionStorage.getItem('pin_unlocked');
+  if (storedPin && !pinUnlocked) {
+    location.replace('pin.html');
+    return;
+  }
+
+  startProfilePinWatch();
   currentUser = session.user;
   currentEmail = currentUser.email;
 
