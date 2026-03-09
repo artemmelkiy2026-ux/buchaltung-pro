@@ -198,7 +198,6 @@ function showAuthScreen() {
 
 function hideAuthScreen() {
   document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('pin-screen').style.display = 'none';
   document.getElementById('app-wrapper').style.display = 'block';
   isAppUnlocked = true;
   startInactivityWatch();
@@ -215,7 +214,7 @@ function showPinScreen(mode) {
     ? 'PIN festlegen (1/2)' : 'PIN eingeben';
   document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('pin-screen').style.display = 'flex';
+  // PIN экран теперь на pin.html
   document.getElementById('app-wrapper').style.display = 'none';
 
   // Биометрия — только при разблокировке и если уже зарегистрирована
@@ -381,9 +380,6 @@ function updatePinDots() {
 
 function pinUnlockSuccess() {
   pinValue = '';
-  updatePinDots();
-  document.getElementById('pin-screen').style.display = 'none';
-  document.getElementById('app-wrapper').style.display = 'block';
   isAppUnlocked = true;
   resetInactivityTimer();
   if (typeof window._unlockApp === 'function') window._unlockApp();
@@ -428,7 +424,6 @@ function pinConfirm() {
     pinFirstValue = '';
     pinSetupStep = 1;
     updatePinDots();
-    document.getElementById('pin-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
     isAppUnlocked = true;
   } else {
