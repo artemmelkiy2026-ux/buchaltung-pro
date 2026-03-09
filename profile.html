@@ -249,6 +249,11 @@ body {
     <div class="avatar-info">
       <h2 id="profile-name">Laden...</h2>
       <p id="profile-email">–</p>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+        <span style="font-size:11px;color:var(--muted)">Kunden-ID:</span>
+        <span id="client-id-display" style="font-size:12px;font-weight:600;color:var(--blue);letter-spacing:.05em;cursor:pointer" onclick="copyClientId()" title="Kopieren">–</span>
+        <i class="fa-regular fa-copy" style="font-size:11px;color:var(--muted);cursor:pointer" onclick="copyClientId()"></i>
+      </div>
     </div>
   </div>
 
@@ -272,14 +277,7 @@ body {
         </div>
         <i class="fa-solid fa-chevron-right setting-arrow"></i>
       </div>
-      <div class="setting-row" onclick="forgotPassword()">
-        <div class="setting-icon orange"><i class="fa-solid fa-key"></i></div>
-        <div class="setting-body">
-          <div class="setting-label">Passwort vergessen?</div>
-          <div class="setting-sub">Reset-Link per E-Mail senden</div>
-        </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
-      </div>
+
     </div>
   </div>
 
@@ -468,8 +466,18 @@ async function init() {
   document.getElementById('profile-email').textContent = currentEmail;
   document.getElementById('current-email-sub').textContent = currentEmail;
 
+  // Загружаем user_data (pin + client_id)
+  const { data } = await sb.from('user_data').select('pin_hash, client_id').eq('user_id', currentUser.id).single();
+
+  // Генерируем client_id если нет
+  let clientId = data?.client_id;
+  if (!clientId) {
+    clientId = 'M' + Math.floor(10000000 + Math.random() * 90000000);
+    await sb.from('user_data').upsert({ user_id: currentUser.id, client_id: clientId }, { onConflict: 'user_id' });
+  }
+  document.getElementById('client-id-display').textContent = clientId;
+
   // PIN статус
-  const { data } = await sb.from('user_data').select('pin_hash').eq('user_id', currentUser.id).single();
   const hasPin = !!data?.pin_hash;
   document.getElementById('pin-toggle').checked = hasPin;
   document.getElementById('pin-status-sub').textContent = hasPin ? 'Aktiv' : 'Nicht aktiv';
@@ -773,6 +781,11 @@ function setMsg(id, text, type) {
   const el = document.getElementById(id);
   el.textContent = text;
   el.className = 'msg ' + type;
+}
+
+function copyClientId() {
+  const id = document.getElementById('client-id-display').textContent;
+  navigator.clipboard.writeText(id).then(() => toast('✅ ' + id + ' kopiert'));
 }
 
 init();
