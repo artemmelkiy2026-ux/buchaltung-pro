@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MelaLogic — Anmelden</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -164,7 +165,7 @@ body {
 
   <!-- Face ID / Fingerprint кнопка (только на вкладке входа) -->
   <button class="bio-btn" id="bio-login-btn" onclick="loginBiometric()" style="display:none">
-    <span class="bio-btn-icon" id="bio-btn-icon">👤</span>
+    <i id="bio-btn-icon" class="fa-solid fa-face-smile" style="font-size:18px"></i>
     <span id="bio-btn-label">Mit Face ID anmelden</span>
   </button>
 
@@ -252,13 +253,40 @@ async function isBioAvailable() {
   catch { return false; }
 }
 
-// Определяем тип биометрии
+// Определяем тип биометрии и устройство
 function getBioLabel() {
   const ua = navigator.userAgent;
   const isIOS = /iPad|iPhone|iPod/.test(ua);
   const isMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
-  if (isIOS || isMac) return { icon: '👤', label: 'Mit Face ID anmelden' };
-  return { icon: '👆', label: 'Mit Fingerabdruck anmelden' };
+  const isWindows = /Windows/.test(ua);
+  const isAndroid = /Android/.test(ua);
+
+  if (isIOS) {
+    return {
+      iconClass: 'fa-solid fa-face-smile',
+      label: 'Mit Face ID anmelden'
+    };
+  } else if (isMac) {
+    return {
+      iconClass: 'fa-brands fa-apple',
+      label: 'Mit Touch ID anmelden'
+    };
+  } else if (isWindows) {
+    return {
+      iconClass: 'fa-brands fa-windows',
+      label: 'Mit Windows Hello anmelden'
+    };
+  } else if (isAndroid) {
+    return {
+      iconClass: 'fa-solid fa-fingerprint',
+      label: 'Mit Fingerabdruck anmelden'
+    };
+  } else {
+    return {
+      iconClass: 'fa-solid fa-fingerprint',
+      label: 'Mit Biometrie anmelden'
+    };
+  }
 }
 
 // Показываем кнопку биометрии если есть сохранённые данные
@@ -267,8 +295,8 @@ async function initBioButton() {
   if (!bioData) return;
   if (!await isBioAvailable()) return;
 
-  const { icon, label } = getBioLabel();
-  document.getElementById('bio-btn-icon').textContent = icon;
+  const { iconClass, label } = getBioLabel();
+  document.getElementById('bio-btn-icon').className = iconClass + ' bio-btn-icon-el';
   document.getElementById('bio-btn-label').textContent = label;
   document.getElementById('bio-login-btn').style.display = 'flex';
 }
@@ -278,7 +306,7 @@ async function registerBioLogin(email, password) {
   if (!await isBioAvailable()) return;
 
   // Спрашиваем хочет ли пользователь
-  const { icon, label } = getBioLabel();
+  const { iconClass, label } = getBioLabel();
   const banner = document.createElement('div');
   banner.style.cssText = `
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
@@ -289,7 +317,7 @@ async function registerBioLogin(email, password) {
   `;
   const bioName = label.replace('Mit ', '').replace(' anmelden', '');
   banner.innerHTML = `
-    <span style="font-size:28px">${icon}</span>
+    <i class="${iconClass}" style="font-size:28px"></i>
     <div style="flex:1">
       <div style="font-weight:600;font-size:14px;margin-bottom:4px">${bioName} einrichten?</div>
       <div style="font-size:12px;opacity:.8">Nächstes Mal schneller einloggen</div>
@@ -486,8 +514,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
 (async () => {
   const hasBio = localStorage.getItem(BIO_LOGIN_KEY);
   if (hasBio && await isBioAvailable()) {
-    const { icon, label } = getBioLabel();
-    document.getElementById('bio-btn-icon').textContent = icon;
+    const { iconClass, label } = getBioLabel();
+    document.getElementById('bio-btn-icon').className = iconClass;
     document.getElementById('bio-btn-label').textContent = label;
     const bioBtn = document.getElementById('bio-login-btn');
     bioBtn.style.display = 'flex';
