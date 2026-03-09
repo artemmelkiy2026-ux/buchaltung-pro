@@ -3456,4 +3456,3 @@ function delUstEintrag(id){
   renderUst();
   toast('Gelöscht','err');
 }
-
