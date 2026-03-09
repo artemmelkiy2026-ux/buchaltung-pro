@@ -495,7 +495,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   .mob-tab.more-tab { color: var(--sub); }
 
   /* ── Drawer виден ── */
-  #mob-drawer { display: block; }
+ 
 
   /* ── Контентные зоны ── */
   .page-inner { padding: 12px 12px 16px; }
