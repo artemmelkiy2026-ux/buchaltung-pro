@@ -565,15 +565,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Глобальный делегат кликов — ловим кнопку выхода на любом уровне DOM
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('#signout-btn');
-    if (btn) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('[signout] click via delegate');
-      sbSignOut();
-    }
-  }, true); // true = capture phase — перехватываем раньше всего
+
 
 
 
@@ -583,12 +575,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function launchApp() {
     // Показываем приложение и запускаем его
     hideAuthScreen();
-    // Привязываем кнопку выхода ПОСЛЕ показа приложения
-    const btn = document.getElementById('signout-btn');
-    if (btn) {
-      btn.onclick = () => sbSignOut();
-      console.log('[signout-btn] attached in launchApp');
-    }
+
     if (!appDispatched) {
       appDispatched = true;
       window.dispatchEvent(new Event('supabase-ready'));
