@@ -446,6 +446,16 @@ async function offerBiometricSetup() {
   setTimeout(() => { if (b.parentNode) b.remove(); }, 15000);
 }
 
+// ── LOCK APP (вызывается из логотипа в шапке) ──────────────────────────────
+function lockApp() {
+  const pin = localStorage.getItem('bp_pin');
+  if (!pin) return;
+  isAppUnlocked = false;
+  sessionStorage.removeItem('pin_unlocked');
+  sessionStorage.setItem('pin_return', 'index.html');
+  location.replace('pin.html');
+}
+
 // ── INIT ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
 
