@@ -5,6 +5,14 @@ function fd(d){if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}.${m}.${y}`
 function fdm(d){if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}.${m}.${y.slice(2)}`}
 function isMob(){return window.innerWidth<=768}
 function sum(arr,t){return arr.filter(e=>e.typ===t).reduce((s,e)=>s+e.betrag,0)}
+
+// ── USt-Modus (нужен dashboard.js и другим модулям) ──────────────────────
+function getUstModeForYear(yr){
+  if(!yr) yr = new Date().getFullYear()+'';
+  return (typeof data !== 'undefined' && data.ustModeByYear ? data.ustModeByYear[yr] : null) || '§19';
+}
+function isKleinunternehmer(yr){ return getUstModeForYear(yr)==='§19'; }
+
 function g(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
 function dl(csv,name){const b=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click()}
 function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3200)}
