@@ -554,7 +554,55 @@ async function offerBiometricSetup() {
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
+// Сессия может прийти до DOMContentLoaded — сохраняем её
+// undefined = ещё не пришло, null = пришло без сессии, object = пришло с сессией
+let _pendingSession = undefined;
+let _domReady = false;
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  console.log('[Auth event]:', event, session?.user?.email);
+
+  if (event === 'SIGNED_OUT') {
+    localStorage.removeItem('buch_disclaimer_v2');
+    localStorage.removeItem('bp_pin_skipped');
+    location.href = 'login.html';
+    return;
+  }
+
+  if (event === 'TOKEN_REFRESHED' && session?.user) {
+    currentUser = session.user;
+    return;
+  }
+
+  if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session?.user) {
+    if (_domReady) {
+      _startAppWhenReady(session.user);
+    } else {
+      _pendingSession = session; // сохраняем до DOMContentLoaded
+    }
+  } else if (event === 'INITIAL_SESSION' && !session) {
+    if (_domReady) {
+      document.getElementById('loading-screen').style.display = 'none';
+      showAuthScreen();
+    } else {
+      _pendingSession = null; // нет сессии, ждём DOM чтобы показать логин
+    }
+  }
+});
+
+function _startAppWhenReady(user) {
+  if (window._appStartCalled) return;
+  window._appStartCalled = true;
+  if (typeof window.startApp === 'function') {
+    window.startApp(user).catch(e => {
+      console.error('[startApp error]:', e);
+      showAuthScreen();
+    });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  _domReady = true;
 
   // Глобальный перехват ошибок
   window.onerror = (msg, src, line, col, err) => {
@@ -572,7 +620,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let appStarted = false;
   let appDispatched = false;
 
-  async function launchApp() {
+  window.launchApp = async function launchApp() {
     // Показываем приложение и запускаем его
     hideAuthScreen();
 
@@ -582,7 +630,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  async function startApp(user) {
+  window.startApp = async function startApp(user) {
     if (appStarted) return;
     appStarted = true;
     currentUser = user;
@@ -646,48 +694,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     await launchApp();
   };
 
-  // Ждём пока Supabase восстановит сессию через onAuthStateChange (INITIAL_SESSION)
-  let authResolved = false;
-
-  sb.auth.onAuthStateChange(async (event, session) => {
-    console.log('[Auth event]:', event, session?.user?.email);
-
-    if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !authResolved) {
-      authResolved = true;
-      if (session && session.user) {
-        try {
-          await startApp(session.user);
-        } catch(e) {
-          console.error('[startApp error]:', e);
-          document.getElementById('loading-screen').style.display = 'none';
-          showAuthScreen();
-        }
-      } else {
+  // Если сессия пришла до DOMContentLoaded — обрабатываем сейчас
+  if (_pendingSession && _pendingSession.user) {
+    // SIGNED_IN/INITIAL_SESSION пришёл до DOMContentLoaded — запускаем сейчас
+    console.log('[DOMContentLoaded] pendingSession found, starting app');
+    _startAppWhenReady(_pendingSession.user);
+  } else if (_pendingSession === null) {
+    // INITIAL_SESSION пришёл без сессии — показываем логин
+    console.log('[DOMContentLoaded] no session, show login');
+    document.getElementById('loading-screen').style.display = 'none';
+    showAuthScreen();
+  } else {
+    // _pendingSession === undefined — INITIAL_SESSION ещё не пришёл, ждём
+    console.log('[DOMContentLoaded] waiting for auth event...');
+    setTimeout(() => {
+      if (!window._appStartCalled) {
+        console.log('[DOMContentLoaded] timeout — show login');
         document.getElementById('loading-screen').style.display = 'none';
         showAuthScreen();
       }
-      return;
-    }
-
-    if (event === 'SIGNED_IN' && session && session.user && !appStarted) {
-      await startApp(session.user);
-    } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-      currentUser = session.user;
-    } else if (event === 'SIGNED_OUT') {
-      appStarted = false;
-      appDispatched = false;
-      isAppUnlocked = false;
-      window._dataReady = false;
-      location.href = 'login.html';
-    }
-  });
-
-  // Страховка: если onAuthStateChange не выстрелил за 3 сек — редиректим на логин
-  setTimeout(() => {
-    if (!authResolved) {
-      authResolved = true;
-      document.getElementById('loading-screen').style.display = 'none';
-      showAuthScreen();
-    }
-  }, 3000);
+    }, 3000);
+  }
 });
