@@ -263,18 +263,16 @@
 
   function accept() {
     if (!checked) return;
-    sessionStorage.setItem('buch_disclaimer_v2', '1');
+    localStorage.setItem('buch_disclaimer_v2', '1');
     const btn = document.getElementById('accept-btn');
     document.getElementById('btn-txt').textContent = texts[lang].done;
     btn.style.background = 'linear-gradient(135deg, var(--green), #4a8a56)';
     // Всегда на login.html — он сам проверит сессию и пустит в приложение
-    setTimeout(() => { window.location.href = 'login.html'; }, 600);
+    setTimeout(() => { window.location.href = 'index.html'; }, 600);
   }
 
   // Если уже принято — сразу на login.html (он проверит сессию)
-  if (sessionStorage.getItem('buch_disclaimer_v2') === '1') {
-    window.location.replace('login.html');
-  }
+  // (ключ проверяется в index.html — сюда попадают только если его нет)
 </script>
 
 </body>
