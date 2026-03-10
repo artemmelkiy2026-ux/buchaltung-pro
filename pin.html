@@ -100,6 +100,13 @@ body {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+
+  // SHA-256 hash (тот же алгоритм что в supabase.js)
+  async function pinToHash(pin) {
+    const data = new TextEncoder().encode(pin + '_bp_salt_2026');
+    const buf  = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
 const SUPA_URL = 'https://dvmhstytoonpacxwdxuj.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bWhzdHl0b29ucGFjeHdkeHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTY2NzQsImV4cCI6MjA4ODQ5MjY3NH0.oZQD0Dp6mB0pF7hwAQdvQ7_OJe__cBq-MFtAEdB7K84';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
@@ -251,9 +258,9 @@ function updateDots() {
   }
 }
 
-function checkPin() {
+async function checkPin() {
   const stored = localStorage.getItem('bp_pin');
-  const hash = btoa(pinValue + '_bp_salt_2026');
+  const hash = await pinToHash(pinValue);
   if (hash === stored) {
     goToApp();
   } else {

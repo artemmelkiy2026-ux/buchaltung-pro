@@ -361,13 +361,28 @@ const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 let isLogin = true;
 
 // ── Умный редирект: disclaimer если не принято, иначе index ───────────────
-function goAfterLogin() {
-  const disc = localStorage.getItem('buch_disclaimer_v2');
-  if (disc !== '1') {
-    location.href = 'disclaimer.html';
-  } else {
+async function goAfterLogin() {
+  // Сначала проверяем localStorage (быстро)
+  if (localStorage.getItem('buch_disclaimer_v2') === '1') {
     location.href = 'index.html';
+    return;
   }
+  // Если нет в кэше — проверяем Supabase (работает после очистки кэша / нового устройства)
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      const { data } = await sb.from('user_data')
+        .select('disclaimer_accepted')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+      if (data?.disclaimer_accepted) {
+        localStorage.setItem('buch_disclaimer_v2', '1');
+        location.href = 'index.html';
+        return;
+      }
+    }
+  } catch(e) { /* при ошибке сети — идём на disclaimer */ }
+  location.href = 'disclaimer.html';
 }
 
 // ── Тост ──────────────────────────────────────────────────────────────────
