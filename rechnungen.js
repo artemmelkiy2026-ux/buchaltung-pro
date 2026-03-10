@@ -538,24 +538,24 @@ ${firma.name||''}${firma.tel?'\nTel: '+firma.tel:''}${firma.email?'\n'+firma.ema
   const overlay = document.createElement('div');
   overlay.id = 'email-service-picker';
   overlay.style.cssText = 'position:fixed;inset:0;background:#00000066;z-index:9999;display:flex;align-items:center;justify-content:center';
-  overlay.innerHTML = \`
+  overlay.innerHTML = `
     <div style="background:var(--s1);border-radius:16px;padding:24px;width:320px;max-width:90vw;box-shadow:0 20px 60px #0004">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <strong style="font-size:15px">E-Mail senden über...</strong>
         <button onclick="document.getElementById('email-service-picker').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
       </div>
       <p style="font-size:12px;color:var(--sub);margin-bottom:14px">PDF wird zuerst gespeichert. Dann bitte anhängen.</p>
-      \${services.map(s=>\`
+      \${services.map(s=>`
         <button onclick="emailPickerChoose('\${encodeURIComponent(s.url)}')" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;color:var(--text);text-align:left">
           \${s.svg||'<i class=\"fas '+s.icon+'\" style=\"color:'+s.color+'\"></i>'}
           <span>\${s.label}</span>
-        </button>\`).join('')}
-    </div>\`;
+        </button>`).join('')}
+    </div>`;
   document.body.appendChild(overlay);
   overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
 
   // Скачиваем PDF сразу
-  generateRechnungPDF(r).then(doc => doc.save(\`Rechnung_\${safeNr}.pdf\`)).catch(()=>{});
+  generateRechnungPDF(r).then(doc => doc.save(`Rechnung_\${safeNr}.pdf`)).catch(()=>{});
 }
 
 async function emailPickerChoose(encodedUrl) {
@@ -585,17 +585,17 @@ async function waRechnung(){
   try {
     const doc = await generateRechnungPDF(r);
     const safeNr = nr.replace(/[\/]/g,'-');
-    doc.save(\`Rechnung_\${safeNr}.pdf\`);
+    doc.save(`Rechnung_\${safeNr}.pdf`);
   } catch(e) { console.error(e); }
   // 2. Открыть WhatsApp с текстом (файл прикрепить вручную)
   const msg=encodeURIComponent(
-\`🧾 *Rechnung Nr. \${nr}*
+`🧾 *Rechnung Nr. \${nr}*
 \${firma.name||''}
 
 \${kunde?'Kunde: '+kunde+'\n':''}Betrag: *\${fmt(total)}*\${faellig?'\nFällig bis: '+fd(faellig):''}
 \${firma.iban?'\nIBAN: '+firma.iban:''}
 
-Bitte überweisen Sie den Betrag fristgerecht.\${firma.tel?'\nBei Fragen: '+firma.tel:''}\`);
+Bitte überweisen Sie den Betrag fristgerecht.\${firma.tel?'\nBei Fragen: '+firma.tel:''}`);
   const url=wa?`https://wa.me/\${wa.replace('+','')}?text=\${msg}`:`https://wa.me/?text=\${msg}`;
   setTimeout(()=>{
     window.open(url,'_blank');
@@ -913,3 +913,4 @@ function downloadZUGFeRDId(id) {
   const r = data.rechnungen.find(x => x.id === id);
   if (r) downloadZUGFeRD(r);
 }
+
