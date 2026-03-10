@@ -12,22 +12,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js" defer></script>
+<script src="ru.js" defer></script>
+<script src="core.js" defer></script>
+<script src="dashboard.js" defer></script>
+<script src="ui.js" defer></script>
+<script src="reports.js" defer></script>
+<script src="rechnungen.js" defer></script>
+<script src="kunden.js" defer></script>
+<script src="umsatzsteuer.js" defer></script>
+<script src="helpers.js" defer></script>
 </head>
 <body>
-<script>
-// Определяем sbSignOut сразу — до загрузки supabase.js
-// Если supabase ещё не готов — ждём и повторяем
-function sbSignOut() {
-  if (window._sbSignOutReady) {
-    window._sbSignOutReady();
-    return;
-  }
-  // supabase ещё не загружен — редиректим напрямую
-  localStorage.removeItem('buch_disclaimer_v2');
-  localStorage.removeItem('bp_pin_skipped');
-  window.location.href = 'login.html';
-}
-</script>
 
 <!-- ── LOADING SCREEN ────────────────────────────────────────────────────── -->
 <div id="loading-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background: #ffffff;">
@@ -933,17 +930,5 @@ function sbSignOut() {
 </div>
 
 </div><!-- /app-wrapper -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-<script src="ru.js"></script>
-<!-- MelaLogic Modules -->
-<script src="core.js"></script>
-<script src="dashboard.js"></script>
-<script src="ui.js"></script>
-<script src="reports.js"></script>
-<script src="rechnungen.js"></script>
-<script src="kunden.js"></script>
-<script src="umsatzsteuer.js"></script>
-<script src="helpers.js"></script>
 </body>
 </html>
