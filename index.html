@@ -728,7 +728,7 @@
 
 <!-- ── RECHNUNG MODAL ── -->
 <div class="modal-bg" id="rech-modal">
-  <div class="modal" style="width:680px">
+  <div class="modal" style="max-width:680px;width:100%">
     <div class="modal-hdr">
       <h2>🧾 Rechnung erstellen</h2>
       <button class="modal-close" onclick="closeModal('rech-modal')">✕</button>
@@ -766,8 +766,8 @@
       <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Positionen</span>
       <span style="font-size:10px;color:var(--sub)">Eingabe: Netto oder Brutto möglich</span>
     </div>
-    <!-- Шапка колонок -->
-    <div style="display:grid;grid-template-columns:1fr 60px 90px 70px 90px 28px;gap:6px;margin-bottom:4px;padding:0 2px">
+    <!-- Шапка колонок (nur Desktop) -->
+    <div id="rn-pos-header" class="mob-hide" style="display:grid;grid-template-columns:1fr 60px 90px 70px 90px 28px;gap:6px;margin-bottom:4px;padding:0 2px">
       <span style="font-size:10px;color:var(--sub)">Bezeichnung</span>
       <span style="font-size:10px;color:var(--sub);text-align:center">Menge</span>
       <span style="font-size:10px;color:var(--sub);text-align:right">Netto/St.</span>

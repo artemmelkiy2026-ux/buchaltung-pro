@@ -187,7 +187,7 @@ function addRechPos(){
 function addRechPosRow(i,p){
   const div=document.createElement('div');
   div.className='rn-pos-row';
-  div.style.cssText='display:grid;grid-template-columns:1fr 60px 90px 70px 90px 28px;gap:6px;margin-bottom:6px;align-items:center';
+  const mob = isMob();
   const rDatumYr=document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
   const klein = isKleinunternehmer(rDatumYr);
   // Совместимость со старым форматом (preis = нетто)
@@ -197,17 +197,52 @@ function addRechPosRow(i,p){
     ? p.brutto
     : (nettoVal !== '' ? calcBrutto(parseFloat(nettoVal)||0, klein?0:rateVal) : '');
 
-  div.innerHTML=`
-    <input type="text"   placeholder="Bezeichnung" value="${p.bez||''}" oninput="calcRechTotal()" style="${INP};font-size:13px">
-    <input type="number" placeholder="Menge" value="${p.menge||1}" min="0.01" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:center">
-    <input type="number" placeholder="Netto" value="${nettoVal}" min="0" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:right">
-    <select onchange="posRateChanged(this)" style="${INP};padding:7px 4px;${klein?'opacity:.4;pointer-events:none':''}">
-      <option value="0"  ${rateVal==0 ?'selected':''}>§19 / 0%</option>
-      <option value="7"  ${rateVal==7 ?'selected':''}>7%</option>
-      <option value="19" ${rateVal==19?'selected':''}>19%</option>
-    </select>
-    <input type="number" placeholder="Brutto" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue)">
-    <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0">✕</button>`;
+  if (mob) {
+    // Мобильный layout: Bezeichnung на всю ширину, числа в строку
+    div.style.cssText='background:var(--s2,#f7f8fa);border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid var(--border)';
+    div.innerHTML=`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Position ${i+1}</span>
+        <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:18px;padding:0;line-height:1">✕</button>
+      </div>
+      <input type="text" placeholder="Bezeichnung / Leistung" value="${p.bez||''}" oninput="calcRechTotal()" style="${INP};font-size:14px;width:100%;box-sizing:border-box;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px;gap:6px;align-items:end">
+        <div>
+          <div style="font-size:10px;color:var(--sub);margin-bottom:2px">Menge</div>
+          <input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:center;width:100%;box-sizing:border-box">
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--sub);margin-bottom:2px">Netto/St.</div>
+          <input type="number" placeholder="0.00" value="${nettoVal}" min="0" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:right;width:100%;box-sizing:border-box">
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--sub);margin-bottom:2px">Brutto/St.</div>
+          <input type="number" placeholder="0.00" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue);width:100%;box-sizing:border-box">
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--sub);margin-bottom:2px">USt %</div>
+          <select onchange="posRateChanged(this)" style="${INP};padding:7px 4px;width:100%;box-sizing:border-box;${klein?'opacity:.4;pointer-events:none':''}">
+            <option value="0"  ${rateVal==0 ?'selected':''}>0%</option>
+            <option value="7"  ${rateVal==7 ?'selected':''}>7%</option>
+            <option value="19" ${rateVal==19?'selected':''}>19%</option>
+          </select>
+        </div>
+      </div>`;
+  } else {
+    // Desktop layout: оригинальный grid
+    div.style.cssText='display:grid;grid-template-columns:1fr 60px 90px 70px 90px 28px;gap:6px;margin-bottom:6px;align-items:center';
+    div.innerHTML=`
+      <input type="text"   placeholder="Bezeichnung" value="${p.bez||''}" oninput="calcRechTotal()" style="${INP};font-size:13px">
+      <input type="number" placeholder="Menge" value="${p.menge||1}" min="0.01" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:center">
+      <input type="number" placeholder="Netto" value="${nettoVal}" min="0" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:right">
+      <select onchange="posRateChanged(this)" style="${INP};padding:7px 4px;${klein?'opacity:.4;pointer-events:none':''}">
+        <option value="0"  ${rateVal==0 ?'selected':''}>§19 / 0%</option>
+        <option value="7"  ${rateVal==7 ?'selected':''}>7%</option>
+        <option value="19" ${rateVal==19?'selected':''}>19%</option>
+      </select>
+      <input type="number" placeholder="Brutto" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue)">
+      <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0">✕</button>`;
+  }
   document.getElementById('rn-positionen').appendChild(div);
 }
 
@@ -705,8 +740,10 @@ function downloadXRechnungId(id) {
   if (r) downloadXRechnung(r);
 }
 
-// ── ZUGFeRD: PDF + eingebettetes XML ─────────────────────────────────────
-// Используем jsPDF + встраиваем XML как вложение (XMP metadata + file attachment)
+// ── ZUGFeRD: PDF + XML (Factur-X / EN 16931) ────────────────────────────
+// jsPDF 2.5.1 unterstützt kein addEmbeddedFile (nur in jsPDF ≥3.x).
+// Lösung: PDF-Bytes per ArrayBuffer laden, XML manuell als PDF-Attachment
+// einbetten (low-level PDF stream), dann als Blob speichern.
 async function downloadZUGFeRD(r) {
   if (!r) {
     const pos = getRechPositionen();
@@ -722,61 +759,149 @@ async function downloadZUGFeRD(r) {
       email:    document.getElementById('rn-email').value.trim(),
       notiz:    document.getElementById('rn-notiz').value.trim(),
       positionen: pos,
-      betrag: pos.reduce((s, p) => s + p.menge * p.preis, 0)
+      betrag: pos.reduce((s, p) => s + (p.menge||1) * (p.netto||p.preis||0), 0)
     };
   }
 
-  toast('📄 ZUGFeRD PDF wird erstellt...', 'ok');
+  toast('📄 ZUGFeRD wird erstellt...', 'ok');
   try {
-    // 1. Генерируем обычный PDF
+    // 1. PDF generieren
     const doc = await generateRechnungPDF(r);
+    const pdfBytes = doc.output('arraybuffer');
 
-    // 2. Генерируем XML
+    // 2. XML generieren (UTF-8 bytes)
     const xmlStr = generateXRechnungXML(r);
+    const xmlBytes = new TextEncoder().encode(xmlStr);
 
-    // 3. Встраиваем XML как вложение в PDF (ZUGFeRD/Factur-X совместимость)
-    // jsPDF поддерживает addFileToVFS + attach
-    doc.addFileToVFS('factur-x.xml', btoa(unescape(encodeURIComponent(xmlStr))));
-    doc.addEmbeddedFile(
-      'factur-x.xml',
-      'application/xml',
-      'Factur-X / ZUGFeRD XML',
-      doc.getFileFromVFS('factur-x.xml')
-    );
+    // 3. XML als Attachment in PDF einbetten (low-level PDF object injection)
+    const pdfWithXml = embedXmlInPdf(pdfBytes, xmlBytes, 'factur-x.xml', r.nr);
 
-    // 4. Добавляем XMP метаданные для ZUGFeRD идентификации
-    const xmp = `<?xpacket begin="\uFEFF" id="W5M0MpCehiHzreSzNTczkc9d"?>
-<x:xmpmeta xmlns:x="adobe:ns:meta/">
-  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <rdf:Description xmlns:fx="urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#">
-      <fx:DocumentType>INVOICE</fx:DocumentType>
-      <fx:DocumentFileName>factur-x.xml</fx:DocumentFileName>
-      <fx:Version>1.0</fx:Version>
-      <fx:ConformanceLevel>EN 16931</fx:ConformanceLevel>
-    </rdf:Description>
-  </rdf:RDF>
-</x:xmpmeta>
-<?xpacket end="w"?>`;
+    // 4. Blob speichern
+    const safeNr = r.nr.replace(/[\/]/g, '-');
+    const blob = new Blob([pdfWithXml], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ZUGFeRD_${safeNr}.pdf`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-    // Сохраняем
-    doc.save(`ZUGFeRD_${r.nr.replace(/\//g, '-')}.pdf`);
-
-    // Также предлагаем скачать XML отдельно
+    // 5. XML auch separat anbieten
     setTimeout(() => {
-      const blob = new Blob([xmlStr], { type: 'application/xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `factur-x_${r.nr.replace(/\//g, '-')}.xml`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }, 800);
+      const xblob = new Blob([xmlStr], { type: 'application/xml;charset=utf-8' });
+      const xurl = URL.createObjectURL(xblob);
+      const xa = document.createElement('a');
+      xa.href = xurl;
+      xa.download = `factur-x_${safeNr}.xml`;
+      xa.click();
+      setTimeout(() => URL.revokeObjectURL(xurl), 2000);
+    }, 600);
 
     toast('✅ ZUGFeRD PDF + XML gespeichert!', 'ok');
   } catch(e) {
-    console.error(e);
-    toast('Fehler: ' + e.message, 'err');
+    console.error('[ZUGFeRD error]', e);
+    toast('❌ Fehler: ' + e.message, 'err');
   }
+}
+
+// ── Bettet XML-Datei als EmbeddedFile in bestehende PDF-Bytes ein ─────────
+// Implementiert PDF-Spezifikation §7.11 (Embedded File Streams)
+function embedXmlInPdf(pdfBytes, xmlBytes, filename, invoiceNr) {
+  // PDF als Text dekodieren (Latin-1 safe für binäre streams)
+  const decoder = new TextDecoder('latin1');
+  const encoder = new TextEncoder();
+  let pdfText = decoder.decode(pdfBytes);
+
+  // Letzte Objekt-Nummer finden
+  const objNums = [...pdfText.matchAll(/(\d+)\s+0\s+obj/g)].map(m => parseInt(m[1]));
+  let nextObj = (objNums.length ? Math.max(...objNums) : 10) + 1;
+
+  // XML bytes als Latin-1 String für PDF stream
+  const xmlLatin1 = Array.from(xmlBytes).map(b => String.fromCharCode(b)).join('');
+  const xmlLen = xmlBytes.length;
+
+  // ISO 8601 Timestamp
+  const now = new Date();
+  const ts = now.toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'').replace('T','') + "Z";
+  const pdfDate = `D:${ts.replace('Z', "+00'00'")}`;
+
+  // EmbeddedFile stream object
+  const efObjNum = nextObj++;
+  const afObjNum = nextObj++;
+  const nameObjNum = nextObj++;
+
+  const efStream = `${efObjNum} 0 obj
+<< /Type /EmbeddedFile /Subtype /application#2Fxml /Length ${xmlLen}
+   /Params << /Size ${xmlLen} /CreationDate (${pdfDate}) /ModDate (${pdfDate}) >> >>
+stream
+${xmlLatin1}
+endstream
+endobj
+`;
+
+  const afStream = `${afObjNum} 0 obj
+<< /Type /Filespec /F (${filename}) /UF (${filename})
+   /EF << /F ${efObjNum} 0 R /UF ${efObjNum} 0 R >>
+   /Desc (Factur-X / ZUGFeRD EN 16931 Invoice ${invoiceNr||''}) /AFRelationship /Data >>
+endobj
+`;
+
+  const nameStream = `${nameObjNum} 0 obj
+<< /Names [(${filename}) ${afObjNum} 0 R] >>
+endobj
+`;
+
+  // xref und trailer finden
+  const xrefIdx = pdfText.lastIndexOf('\nxref');
+  if (xrefIdx === -1) {
+    // Fallback: einfach neue Objekte anhängen ohne xref update (Reader tolerant)
+    const newObjs = efStream + afStream + nameStream;
+    const latin1Buf = new Uint8Array(newObjs.length);
+    for (let i=0;i<newObjs.length;i++) latin1Buf[i]=newObjs.charCodeAt(i)&0xff;
+    const result = new Uint8Array(pdfBytes.byteLength + latin1Buf.byteLength);
+    result.set(new Uint8Array(pdfBytes), 0);
+    result.set(latin1Buf, pdfBytes.byteLength);
+    return result.buffer;
+  }
+
+  // Root-Katalog finden und Names + AF eintragen
+  const rootMatch = pdfText.match(/\/Type\s*\/Catalog/);
+  if (rootMatch) {
+    const catStart = pdfText.lastIndexOf('obj', rootMatch.index);
+    const catEnd   = pdfText.indexOf('endobj', catStart) + 6;
+    let catStr = pdfText.slice(catStart, catEnd);
+
+    // Names-Dictionary patchen
+    if (catStr.includes('/Names')) {
+      catStr = catStr.replace('/Names <<', `/Names << /EmbeddedFiles ${nameObjNum} 0 R `);
+    } else {
+      catStr = catStr.replace('<<', `<< /Names << /EmbeddedFiles ${nameObjNum} 0 R >> /AF [${afObjNum} 0 R] `);
+    }
+    pdfText = pdfText.slice(0, catStart) + catStr + pdfText.slice(catEnd);
+  }
+
+  // XMP Metadata für ZUGFeRD-Erkennung anhängen (als Kommentar-Stream)
+  const xmpObjNum = nextObj++;
+  const xmpStr = `<?xpacket begin="\xEF\xBB\xBF" id="W5M0MpCehiHzreSzNTczkc9d"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description xmlns:fx="urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#"><fx:DocumentType>INVOICE</fx:DocumentType><fx:DocumentFileName>${filename}</fx:DocumentFileName><fx:Version>1.0</fx:Version><fx:ConformanceLevel>EN 16931</fx:ConformanceLevel></rdf:Description></rdf:RDF></x:xmpmeta><?xpacket end="w"?>`;
+  const xmpObj = `${xmpObjNum} 0 obj
+<< /Type /Metadata /Subtype /XML /Length ${xmpStr.length} >>
+stream
+${xmpStr}
+endstream
+endobj
+`;
+
+  const inject = efStream + afStream + nameStream + xmpObj;
+
+  // Neues PDF zusammenbauen: vor xref einfügen
+  const before = pdfText.slice(0, xrefIdx + 1);
+  const after  = pdfText.slice(xrefIdx + 1);
+  const newPdfText = before + inject + after;
+
+  // Latin-1 → Uint8Array
+  const out = new Uint8Array(newPdfText.length);
+  for (let i = 0; i < newPdfText.length; i++) out[i] = newPdfText.charCodeAt(i) & 0xff;
+  return out.buffer;
 }
 
 function downloadZUGFeRDId(id) {
