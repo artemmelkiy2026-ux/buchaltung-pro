@@ -517,6 +517,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     align-items: flex-start;
     gap: 6px;
     margin-bottom: 12px;
+    margin-left: 5px;
   }
 
   /* ── Toolbar ── */
@@ -760,7 +761,7 @@ th.sort-desc::after {
   #rech-cards { grid-template-columns: 1fr !important; }
   #rep-stats { grid-template-columns: 1fr !important; }
   #mon-modal-stats { grid-template-columns: 1fr !important; }
-  .page-inner { padding: 10px 10px 14px; }
+  .page-inner { padding: 10px 15px; }
   .logo { font-size: 12px; }
   .sc-val { font-size: 22px; }
   #mob-bottom-nav {   display: flex;
