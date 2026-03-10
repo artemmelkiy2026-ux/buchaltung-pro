@@ -55,6 +55,7 @@ async function sbSignOut() {
   }
   currentUser = null;
   localStorage.removeItem('buch_disclaimer_v2');
+  localStorage.removeItem('bp_pin_skipped');
   location.href = 'login.html';
 }
 async function authGoogle() {
@@ -329,7 +330,6 @@ function translateAuthError(msg) {
 
 // ── PIN LOGIC ──────────────────────────────────────────────────────────────
 function offerPinSetup() {
-  // Не показывать если уже есть баннер
   if (document.getElementById('pin-offer-banner')) return;
 
   const banner = document.createElement('div');
@@ -339,20 +339,26 @@ function offerPinSetup() {
     background:#1a4578;color:#fff;border-radius:16px;padding:18px 24px;
     display:flex;align-items:center;gap:16px;z-index:99999;
     box-shadow:0 8px 32px rgba(26,69,120,.35);font-family:sans-serif;
-    max-width:380px;width:calc(100% - 48px);
+    max-width:400px;width:calc(100% - 48px);flex-direction:column;
   `;
   banner.innerHTML = `
-    <span style="font-size:28px">🔒</span>
-    <div style="flex:1">
-      <div style="font-weight:600;font-size:14px;margin-bottom:4px">PIN-Code einrichten?</div>
-      <div style="font-size:12px;opacity:.8">Schneller Zugang mit 4-stelligem PIN</div>
+    <div style="display:flex;align-items:center;gap:16px;width:100%">
+      <span style="font-size:28px">🔒</span>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:14px;margin-bottom:4px">PIN-Code einrichten?</div>
+        <div style="font-size:12px;opacity:.8">Schneller Zugang mit 4-stelligem PIN</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button onclick="document.getElementById('pin-offer-banner').remove()"
+          style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer;font-family:sans-serif">Nein</button>
+        <button onclick="document.getElementById('pin-offer-banner').remove();location.href='profile.html'"
+          style="background:#fff;border:none;border-radius:8px;color:#1a4578;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif">Ja ✓</button>
+      </div>
     </div>
-    <div style="display:flex;gap:8px;flex-shrink:0">
-      <button onclick="document.getElementById('pin-offer-banner').remove();localStorage.setItem('bp_pin_skipped','1')"
-        style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer;font-family:sans-serif">Nein</button>
-      <button onclick="document.getElementById('pin-offer-banner').remove();location.href='profile.html'"
-        style="background:#fff;border:none;border-radius:8px;color:#1a4578;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif">Ja ✓</button>
-    </div>
+    <button onclick="document.getElementById('pin-offer-banner').remove();localStorage.setItem('bp_pin_skipped','1')"
+      style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.6);padding:6px 14px;font-size:11px;cursor:pointer;font-family:sans-serif;width:100%">
+      Nicht mehr vorschlagen
+    </button>
   `;
   document.body.appendChild(banner);
   setTimeout(() => { if (banner.parentNode) banner.remove(); }, 15000);
@@ -601,7 +607,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // Предлагаем настроить PIN если ещё не создан
-      if (!remotePin && !localStorage.getItem('bp_pin_skipped')) {
+      // bp_pin_skipped сбрасывается каждый раз при входе — баннер показывается при каждой сессии
+      if (!remotePin) {
+        localStorage.removeItem('bp_pin_skipped');
         setTimeout(offerPinSetup, 2000);
       }
 
