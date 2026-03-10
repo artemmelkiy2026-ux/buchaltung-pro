@@ -6,7 +6,7 @@ const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 let currentUser = null;
 
 // ── PIN / INACTIVITY ───────────────────────────────────────────────────────
-const PIN_TIMEOUT = 15 * 60 * 1000;
+const PIN_TIMEOUT = 1 * 60 * 1000;
 let inactivityTimer = null;
 let pinValue = '';
 let pinFirstValue = '';
