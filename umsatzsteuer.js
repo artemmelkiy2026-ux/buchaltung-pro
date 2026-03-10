@@ -1,0 +1,673 @@
+// ── STEUERERKLÄRUNG ──────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════
+// STEUERTABELLEN — AKTUELL GEPRÜFTE WERTE (Stand: März 2026)
+// ═══════════════════════════════════════════════════════════════════════
+// Quellen: BMF, § 32a EStG (Steuerfortentwicklungsgesetz), IHK, Sparkasse
+//
+// 2025: Grundfreibetrag 12.096 €
+// 2026: Grundfreibetrag 12.348 € (+252 €)
+//
+// Kleinunternehmergrenze (§ 19 UStG, ab 01.01.2025):
+//   - Vorjahresumsatz: max. 25.000 € (netto) [alt: 22.000 €]
+//   - Laufendes Jahr: max. 100.000 € (netto, HARD LIMIT mit Fallbeil-Effekt) [alt: 50.000 €]
+//   - Achtung: 100.000€-Grenze wirkt sofort bei Überschreitung!
+//
+// Gewerbesteuer: Freibetrag 24.500 €, Messzahl 3,5% × Hebesatz (Gemeinde)
+//
+// KV Selbstständige 2026: BBG 5.812,50 €/Monat, KV-Satz 14,6% + Ø ZB 2,9%
+//   Mindestbemessungsgrundlage: 1.318,33 €/Monat
+//   GKV-Höchstbeitrag (inkl. Pflege, kinderlos): ~1.261 €/Monat
+// ═══════════════════════════════════════════════════════════════════════
+
+
+
+
+
+function updateGKVDisplay(gewinn, gkvGezahlt, isFamilienversichert) {
+  const result = calcGKVNachzahlung(gewinn, gkvGezahlt, isFamilienversichert);
+  document.getElementById('st-gkv-basis').textContent = fmt(result.gkvSoll);
+  document.getElementById('st-gkv-schuld').textContent = fmt(result.gkvSoll);
+  document.getElementById('st-gkv-nachzahlung').textContent = fmt(result.nachzahlung);
+  document.getElementById('st-gkv-abzug').textContent = fmt(result.abzugsfaehig);
+  
+  // Цвет зависит от величины nachzahlung
+  const nachzahlEl = document.getElementById('st-gkv-nachzahlung');
+  if (result.nachzahlung > 5000) {
+    nachzahlEl.style.color = 'var(--red)';
+    nachzahlEl.style.fontWeight = '700';
+  } else if (result.nachzahlung > 0) {
+    nachzahlEl.style.color = 'var(--yellow)';
+  } else {
+    nachzahlEl.style.color = 'var(--green)';
+  }
+}
+
+// ─── PKW & AfA ───
+function togglePKWFields() {
+  const nutzung = document.getElementById('st-pkw-nutzung').value;
+  document.getElementById('st-pkw-fields').style.display = nutzung === 'nein' ? 'none' : 'block';
+  document.getElementById('st-pkw-1prozent').style.display = nutzung === '1prozent' ? 'block' : 'none';
+  document.getElementById('st-pkw-fahrtenbuch').style.display = nutzung === 'fahrtenbuch' ? 'block' : 'none';
+}
+
+function addAFARow() {
+  const list = document.getElementById('st-afa-list');
+  const id = 'st-afa-' + Date.now();
+  const row = document.createElement('div');
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 80px 80px 30px;gap:8px;margin-bottom:8px;padding:8px;background:var(--s3);border-radius:var(--r)';
+  row.innerHTML = `
+    <input type="text" placeholder="Beschreibung (z.B. Drehmaschine)" style="padding:6px;border:1px solid var(--border);border-radius:var(--r);background:var(--s2);color:var(--text);font-size:12px">
+    <input type="number" placeholder="Betrag €" min="0" step="100" value="0" style="padding:6px;border:1px solid var(--border);border-radius:var(--r);background:var(--s2);color:var(--text);font-size:12px">
+    <input type="number" placeholder="Jahre" min="1" max="20" value="5" style="padding:6px;border:1px solid var(--border);border-radius:var(--r);background:var(--s2);color:var(--text);font-size:12px">
+    <button class="btn" style="padding:6px;font-size:11px" onclick="this.parentElement.remove()">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+function getAFATotal() {
+  let total = 0;
+  const rows = document.querySelectorAll('#st-afa-list > div');
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const betrag = parseFloat(inputs[1].value) || 0;
+    const jahre = parseInt(inputs[2].value) || 1;
+    total += betrag / jahre; // Jahresabschreibung
+  });
+  return total;
+}
+
+function calcUSTSaldo() {
+  const eingezogen = parseFloat(document.getElementById('st-ust-eingezogen').value) || 0;
+  const bezahlt = parseFloat(document.getElementById('st-ust-bezahlt').value) || 0;
+  const saldo = eingezogen - bezahlt;
+  const display = document.getElementById('st-ust-ausgleich');
+  if (display) {
+    display.textContent = fmt(Math.abs(saldo));
+    display.style.color = saldo >= 0 ? 'var(--red)' : 'var(--green)';
+  }
+  return saldo;
+}
+
+function stReset() {
+  ['st-name','st-ein','st-aus','st-gew','st-ho','st-km','st-arbtage',
+   'st-spenden','st-wk','st-vorausz','st-kap','st-kest','st-kv','st-pv','st-av','st-buv',
+   'st-pkw-nutzung','st-pkw-wert','st-pkw-km','st-iab','st-gwg','st-ust-eingezogen','st-ust-bezahlt',
+   'st-bu','st-haft','st-fortbildung','st-verpflegung-tage'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value=id==='st-arbtage'?'220':id==='st-pkw-nutzung'?'nein':'';
+  });
+  document.getElementById('st-ho-val').textContent='0,00 €';
+  document.getElementById('st-fk-val').textContent='0,00 €';
+  document.getElementById('st-afa-list').innerHTML='';
+  document.getElementById('st-result').style.display='none';
+  togglePKWFields();
+  calcUSTSaldo();
+  toast('Zurückgesetzt','err');
+}
+
+function stCard(cls,label,val,sub='') {
+  return `<div class="sc ${cls}" style="cursor:default">
+    <div class="sc-lbl">${label}</div>
+    <div class="sc-val">${val}</div>
+    ${sub?`<div class="sc-sub">${sub}</div>`:''}
+  </div>`;
+}
+
+function stRow(label,val,bold=false,color=''){
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+    <span style="font-size:12px;color:var(--sub)">${label}</span>
+    <span style="font-family:var(--mono);font-size:13px;font-weight:${bold?700:500};color:${color||'var(--text)'}">${val}</span>
+  </div>`;
+}
+
+function stBerechnen() {
+  try {
+  // ── Eingaben lesen ──
+  const jahr    = parseInt(document.getElementById('st-jahr').value)||2025;
+  const fam     = document.getElementById('st-fam').value;
+  const partner = document.getElementById('st-partner').value;
+  const pein    = parseFloat(document.getElementById('st-pein')?.value)||0;
+  const nKinder = parseInt(document.getElementById('st-kinder').value)||0;
+  const kirche  = parseFloat(document.getElementById('st-kirche').value)||0;
+  const ein     = parseFloat(document.getElementById('st-ein').value)||0;
+  const aus     = parseFloat(document.getElementById('st-aus').value)||0;
+  const gewinn  = ein - aus;
+  const ho      = Math.min(parseInt(document.getElementById('st-ho').value)||0, 210);
+  const km      = parseFloat(document.getElementById('st-km').value)||0;
+  const arbt    = parseInt(document.getElementById('st-arbtage').value)||220;
+  const spenden = parseFloat(document.getElementById('st-spenden').value)||0;
+  const wk      = parseFloat(document.getElementById('st-wk').value)||0;
+  const vorausz = parseFloat(document.getElementById('st-vorausz').value)||0;
+  const kap     = parseFloat(document.getElementById('st-kap').value)||0;
+  const kest    = parseFloat(document.getElementById('st-kest').value)||0;
+
+  // ── NEUE FELDER: Soziale Versicherungen ──
+  const kv      = parseFloat(document.getElementById('st-kv')?.value)||0;
+  const pv      = parseFloat(document.getElementById('st-pv')?.value)||0;
+  const av      = parseFloat(document.getElementById('st-av')?.value)||0;
+  const buv     = parseFloat(document.getElementById('st-buv')?.value)||0;
+  const kircheneuralt = parseFloat(document.getElementById('st-kirchensteuer-eur')?.value)||0;
+  const sozVersSum = kv + pv + av + buv; // Summa Sozialversicherungen
+
+  // ── NEUE FELDER: PKW, AfA, USt, Sonderausgaben ──
+  const pkwNutzung = document.getElementById('st-pkw-nutzung')?.value || 'nein';
+  let pkwKosten = 0;
+  if (pkwNutzung === '1prozent') {
+    const pkwWert = parseFloat(document.getElementById('st-pkw-wert')?.value) || 0;
+    pkwKosten = pkwWert * 0.01 / 12 * 12; // 1% vom Jahreswert zur Einnahme (wird später addiert!)
+  } else if (pkwNutzung === 'fahrtenbuch') {
+    const pkwKm = parseFloat(document.getElementById('st-pkw-km')?.value) || 0;
+    pkwKosten = pkwKm * 0.30; // Geschäftsfahrten als Ausgaben
+  }
+  
+  const iab = parseFloat(document.getElementById('st-iab')?.value) || 0;
+  const iabAbzug = Math.min(iab * 0.5, iab); // Max 50%
+  
+  const gwg = parseFloat(document.getElementById('st-gwg')?.value) || 0;
+  const afaJahresabschreibung = getAFATotal(); // Funktion berechnet AfA
+  
+  const bu = parseFloat(document.getElementById('st-bu')?.value) || 0;
+  const haft = parseFloat(document.getElementById('st-haft')?.value) || 0;
+  const fortbildung = parseFloat(document.getElementById('st-fortbildung')?.value) || 0;
+  const verpflegungTage = parseInt(document.getElementById('st-verpflegung-tage')?.value) || 0;
+  const verpflegungAbzug = verpflegungTage * 14; // 14€/Tag
+
+  const isSplitting = fam === 'zusammen';
+  const isAlleinerziehend = fam === 'alleinerziehend';
+
+  // ── Freibeträge (jahresabhängig) ──
+  const sw = getSteuerwerte(jahr);
+  const grundfb  = isSplitting ? sw.grundfb * 2 : sw.grundfb;
+  const hoPausch = Math.min(ho * 6, 1260);
+  const fahrtk   = km * arbt * 0.30;
+
+  // Kinderfreibetrag vs Kindergeld: was ist günstiger?
+  const kindergeld_jahr = nKinder * sw.kindergeld * 12;
+  const kinderfb_gesamt = nKinder * sw.kfreibetrag;
+
+  // Alleinerziehend-Freibetrag 2026 (§ 24b EStG)
+  const alleinerziehendFB = isAlleinerziehend ? (4260 + Math.max(0, nKinder-1)*240) : 0;
+
+  // ─── GKV NACHZAHLUNG (ПЕРЕД расчётом налога!) ───
+  // КРИТИЧНО: GKV взносы вычитаются из базы для подоходного налога (§10 EStG)
+  const gkvGezahlt = parseFloat(document.getElementById('st-gkv-gezahlt')?.value) || 0;
+  const isFamilienversichert = document.getElementById('st-gkv-familienvers')?.value === 'ja';
+  const gkvData = calcGKVNachzahlung(gewinn, gkvGezahlt, isFamilienversichert);
+  const gkvNachzahlung = gkvData.nachzahlung;
+  const gkvAbzugsfaehig = gkvData.abzugsfaehig; // Это вычитается из дохода
+
+  // Sparerpauschbetrag
+  const sparerpausch = isSplitting ? 2000 : 1000;
+  const kapNach = Math.max(0, kap - sparerpausch);
+
+  // ── zu versteuerndes Einkommen (ohne Kinder zuerst) ──
+  let einkommen = gewinn
+    - hoPausch
+    - fahrtk
+    - spenden
+    - wk
+    - sozVersSum    // Социальные страховки
+    - gkvAbzugsfaehig  // ← НОВОЕ: GKV вычитается как Sonderausgaben!
+    - bu            // Berufsunfähigkeitsversicherung
+    - haft          // Haftpflichtversicherung
+    - fortbildung   // Fortbildung
+    - verpflegungAbzug // Verpflegungsmehraufwand
+    - gwg           // GWG (sofort abzugsfähig)
+    - afaJahresabschreibung // AfA Jahresabschreibung
+    - iabAbzug      // Investitionsabzugsbetrag
+    - pkwKosten     // PKW Kosten (je nach Methode)
+    - alleinerziehendFB;
+
+  if (isSplitting && partner === 'nein') {
+    // Partner-Einkommen 0 → volles Splitting
+  }
+
+  einkommen = Math.max(0, einkommen);
+
+  // Steuer ohne Kinderfreibetrag
+  let estOhneKind = isSplitting ? estSplitting(einkommen, jahr) : estGrundtarifY(einkommen, jahr);
+
+  // Kinderfreibetrag: Steuerersparnis
+  let zveMitKind = Math.max(0, einkommen - kinderfb_gesamt);
+  let estMitKind = isSplitting ? estSplitting(zveMitKind, jahr) : estGrundtarifY(zveMitKind, jahr);
+  const steuerersparnis = estOhneKind - estMitKind;
+
+  // Günstiger: Kinderfreibetrag oder Kindergeld?
+  let kindAbzug, kindMethod;
+  if (nKinder > 0 && steuerersparnis > kindergeld_jahr) {
+    kindAbzug = kinderfb_gesamt;
+    kindMethod = `Kinderfreibetrag (${fmt(steuerersparnis)} Ersparnis > Kindergeld ${fmt(kindergeld_jahr)})`;
+  } else if (nKinder > 0) {
+    kindAbzug = 0; // Kindergeld bleibt, kein Freibetrag abzuziehen
+    kindMethod = `Kindergeld (${fmt(kindergeld_jahr)}/Jahr günstiger)`;
+  } else {
+    kindAbzug = 0;
+    kindMethod = 'Keine Kinder';
+  }
+
+  // Finales zvE
+  const zveEndgueltig = Math.max(0, einkommen - kindAbzug);
+  let estFinal = isSplitting ? estSplitting(zveEndgueltig, jahr) : estGrundtarifY(zveEndgueltig, jahr);
+
+  // Kindergeld anrechnen wenn Kindergeld günstiger
+  let kindergeldAnrechnung = 0;
+  if (nKinder > 0 && kindAbzug === 0) {
+    kindergeldAnrechnung = kindergeld_jahr; // wird ausgezahlt, nicht angerechnet
+  }
+
+  // Kapitalertragsteuer (Abgeltungsteuer 25% auf kapNach)
+  const kapSteuer = Math.round(kapNach * 0.25);
+  const kapSoli   = calcSoli(kapSteuer, jahr);
+
+  // Soli (auf Einkommensteuer)
+  const soli = calcSoli(estFinal, jahr);
+
+  // Kirchensteuer
+  const kirchenst = kirche > 0 ? Math.round(estFinal * kirche / 100) : 0;
+
+  // ─── НОВОЕ: GEWERBESTEUER ───
+  const gewstData = calcGewerbesteuer(gewinn);
+  const gewst = gewstData.gewst;
+  const gewstVerrechenbar = gewstData.verrechenbar;
+  
+  // Показать предупреждение если Mindestbeitrag и не Familienversichert
+  if (gkvData.hasMindestbeitrag && !isFamilienversichert) {
+    document.getElementById('st-gkv-warning-mindest').style.display = 'block';
+  } else {
+    document.getElementById('st-gkv-warning-mindest').style.display = 'none';
+  }
+
+  // ─── НОВОЕ: USt SALDO (автоматически из EÜR) ───
+  // ВАЖНО: Если Kleinunternehmer, то УСт = 0!
+  const isKleinunternehmer = document.getElementById('st-kleinunternehmer-option')?.value === 'ja';
+  let ustEingezogen = isKleinunternehmer ? 0 : ein * 0.19; // 19% от брутто-доходов (или 0 если KU)
+  let ustBezahlt = isKleinunternehmer ? 0 : aus * 0.19;     // 19% от брутто-расходов (или 0 если KU)
+  const ustSaldo = ustEingezogen - ustBezahlt; // Если положительно - платим государству
+  
+  // Рекомендация по Kleinunternehmer
+  const ustPercent = ein > 0 ? ((ustEingezogen / ein) * 100) : 0;
+  if (!isKleinunternehmer && ein < 25000 && ustSaldo > 100) {
+    document.getElementById('st-klein-recommendation').textContent = 
+      `✅ EMPFOHLEN: Sie zahlen ${fmt(ustSaldo)} USt. Als Kleinunternehmer sparen Sie diese Summe!`;
+    document.getElementById('st-klein-recommendation').style.color = 'var(--green)';
+  } else if (!isKleinunternehmer && ein >= 25000) {
+    document.getElementById('st-klein-recommendation').textContent = 
+      `'+t('⚠️ Umsatz > 25.000€: Sie sind kein Kleinunternehmer mehr (ab nächstem Jahr).')+'`;
+    document.getElementById('st-klein-recommendation').style.color = 'var(--yellow)';
+  } else if (isKleinunternehmer) {
+    document.getElementById('st-klein-recommendation').textContent = 
+      `✅ Kleinunternehmer aktiv — Sie zahlen KEINE Umsatzsteuer!`;
+    document.getElementById('st-klein-recommendation').style.color = 'var(--cyan)';
+  }
+
+  // Gesamtsteuer (теперь с GewSt)
+  const gesamtSteuer = estFinal + soli + kirchenst + kapSteuer + kapSoli + gewst - gewstVerrechenbar;
+
+  // ─── КРИТИЧЕСКОЕ: NETTO-GEWINN (реальные деньги в кармане) ───
+  // ПРАВИЛЬНАЯ ФОРМУЛА (без "взаимозачётов"):
+  // Gewinn - ALL real payments = что физически останется
+  const ihabeitrag = 200; // IHK (примерно)
+  const bgbeitrag = 300;  // BG (примерно)
+  const netoGewinnKriterion = gewinn - estFinal - soli - gewst - gkvNachzahlung - Math.max(0, ustSaldo) - ihabeitrag - bgbeitrag;
+
+  // Ergebnis: Zahlung oder Erstattung
+  const diff = gesamtSteuer - vorausz - kest;
+
+  // ── Ausgabe ──
+  document.getElementById('st-result').style.display = 'block';
+  document.getElementById('st-res-jr').textContent = jahr;
+
+  // Обновить Gewerbesteuer дисплей
+  updateGewersteuherDisplay(gewinn);
+  updateGKVDisplay(gewinn, gkvGezahlt, isFamilienversichert);
+
+  // Cards
+  const cardColor = diff > 0 ? 'r' : 'g';
+  document.getElementById('st-cards').innerHTML =
+    stCard('b','Zu verst. Einkommen', fmt(zveEndgueltig), `Splitting: ${isSplitting?'Ja':'Nein'}`) +
+    stCard('y','Einkommensteuer', fmt(estFinal), isSplitting?'Splittingtarif':'Grundtarif') +
+    stCard('p','Gesamtsteuer', fmt(gesamtSteuer), `inkl. GewSt, Soli${kirche>0?', Kirche':''}`) +
+    stCard(cardColor, diff>0?t('Nachzahlung'):t('Erstattung'), fmt(Math.abs(diff)), diff>0?t('zu zahlen an Finanzamt'):t('vom Finanzamt zurück'));
+
+  // Left breakdown: Einkommensberechnung
+  document.getElementById('st-bl').innerHTML = `
+    <h3 style="margin-bottom:12px">📐 Einkommensberechnung</h3>
+    ${stRow('Betriebseinnahmen', '+'+fmt(ein))}
+    ${stRow('Betriebsausgaben', '−'+fmt(aus))}
+    ${stRow('Gewinn (EÜR)', fmt(gewinn), true, 'var(--green)')}
+    ${stRow('Homeoffice-Pauschale', '−'+fmt(hoPausch), false, 'var(--yellow)')}
+    ${stRow('Fahrtkosten', '−'+fmt(fahrtk), false, 'var(--yellow)')}
+    ${kv?stRow('Krankenversicherung', '−'+fmt(kv), false, 'var(--cyan)'):''}
+    ${pv?stRow('Pflegeversicherung', '−'+fmt(pv), false, 'var(--cyan)'):''}
+    ${av?stRow('Altersversicherung', '−'+fmt(av), false, 'var(--cyan)'):''}
+    ${buv?stRow('Berufsunfähigkeitsvers.', '−'+fmt(buv), false, 'var(--cyan)'):''}
+    ${bu?stRow('Berufsunfähigkeitsvers. (zusätzlich)', '−'+fmt(bu), false, 'var(--purple)'):''}
+    ${haft?stRow('Haftpflichtversicherung', '−'+fmt(haft), false, 'var(--purple)'):''}
+    ${gkvAbzugsfaehig>0?stRow('GKV Nachzahlung (Sonderausgaben)', '−'+fmt(gkvAbzugsfaehig), false, 'var(--red)'):''}
+    ${spenden?stRow('Spenden', '−'+fmt(spenden)):''}
+    ${wk?stRow('Sonstige Werbungskosten', '−'+fmt(wk)):''}
+    ${fortbildung?stRow('Fortbildung / Kurse', '−'+fmt(fortbildung)):''}
+    ${gwg?stRow('GWG (< 800€)', '−'+fmt(gwg), false, 'var(--yellow)'):''}
+    ${afaJahresabschreibung>0?stRow('AfA (Abschreibung)', '−'+fmt(afaJahresabschreibung), false, 'var(--yellow)'):''}
+    ${iabAbzug>0?stRow('Investitionsabzugsbetrag (IAB)', '−'+fmt(iabAbzug), false, 'var(--yellow)'):''}
+    ${pkwKosten>0?stRow(pkwNutzung==='1prozent'?'PKW 1%-Regelung':'PKW Fahrtenbuch', '−'+fmt(pkwKosten), false, 'var(--yellow)'):''}
+    ${verpflegungAbzug>0?stRow('Verpflegungsmehraufwand ('+verpflegungTage+' Tage)', '−'+fmt(verpflegungAbzug), false, 'var(--purple)'):''}
+    ${alleinerziehendFB?stRow('Alleinerziehend-Freibetrag', '−'+fmt(alleinerziehendFB)):''}
+    ${kindAbzug?stRow('Kinderfreibetrag ('+nKinder+' Kinder)', '−'+fmt(kindAbzug)):''}
+    <div style="display:flex;justify-content:space-between;padding:10px 0 0;margin-top:4px">
+      <span style="font-size:13px;font-weight:700">Zu versteuerndes Einkommen</span>
+      <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--blue)">${fmt(zveEndgueltig)}</span>
+    </div>`;
+
+  // Right breakdown: Steuerberechnung
+  document.getElementById('st-br').innerHTML = `
+    <h3 style="margin-bottom:12px">🧮 Steuerberechnung</h3>
+    ${stRow('Tarif', isSplitting?'Splittingtarif §32a (2)':'Grundtarif §32a (1)')}
+    ${stRow('Einkommensteuer', fmt(estFinal), true, 'var(--red)')}
+    ${stRow('Solidaritätszuschlag (5,5%)', fmt(soli))}
+    ${kirche>0?stRow(`Kirchensteuer (${kirche}%)`, fmt(kirchenst)):''}
+    ${kapNach>0?stRow('Kapitalertragsteuer (25%)', fmt(kapSteuer+kapSoli)):''}
+    ${stRow('Gesamtsteuer', fmt(gesamtSteuer), true)}
+    ${stRow('− Vorauszahlungen', '−'+fmt(vorausz), false, 'var(--green)')}
+    ${kest?stRow('− Einbehaltene KapESt', '−'+fmt(kest), false, 'var(--green)'):''}
+    <div style="display:flex;justify-content:space-between;padding:10px 0 0;margin-top:4px;border-top:2px solid var(--border)">
+      <span style="font-size:13px;font-weight:700">${diff>0?'⬆ Nachzahlung':'⬇ Erstattung'}</span>
+      <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:${diff>0?'var(--red)':'var(--green)'}">${fmt(Math.abs(diff))}</span>
+    </div>`;
+
+  // Freibeträge block
+  document.getElementById('st-fb').innerHTML = `
+    <h3 style="margin-bottom:12px">📋 Angewandte Freibeträge & Hinweise</h3>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px">
+      <div style="background:var(--s2);border-radius:var(--r);padding:10px">
+        <div style="color:var(--sub);margin-bottom:4px">Grundfreibetrag ${jahr}</div>
+        <div style="font-family:var(--mono);color:var(--green)">${fmt(grundfb)}</div>
+        <div style="color:var(--sub);font-size:10px;margin-top:3px">${isSplitting?'Splitting (×2)':'Einzelveranlagung'}</div>
+      </div>
+      ${nKinder>0?`<div style="background:var(--s2);border-radius:var(--r);padding:10px">
+        <div style="color:var(--sub);margin-bottom:4px">Kinderfreibetrag / Kindergeld</div>
+        <div style="font-family:var(--mono);color:var(--yellow)">${nKinder} × ${fmt(KFREIBETRAG_2025)}</div>
+        <div style="color:var(--sub);font-size:10px;margin-top:3px">${kindMethod}</div>
+      </div>`:''}
+      ${isAlleinerziehend?`<div style="background:var(--s2);border-radius:var(--r);padding:10px">
+        <div style="color:var(--sub);margin-bottom:4px">Alleinerziehend-Freibetrag</div>
+        <div style="font-family:var(--mono);color:var(--purple)">${fmt(alleinerziehendFB)}</div>
+        <div style="color:var(--sub);font-size:10px;margin-top:3px">§24b EStG</div>
+      </div>`:''}
+      ${isSplitting?`<div style="background:var(--s2);border-radius:var(--r);padding:10px">
+        <div style="color:var(--sub);margin-bottom:4px">Zusammenveranlagung</div>
+        <div style="font-family:var(--mono);color:var(--blue)">Splitting aktiv</div>
+        <div style="color:var(--sub);font-size:10px;margin-top:3px">Halbes ZvE × 2 → Steuervorteil</div>
+      </div>`:''}
+      <div style="background:var(--s2);border-radius:var(--r);padding:10px">
+        <div style="color:var(--sub);margin-bottom:4px">Sparerpauschbetrag</div>
+        <div style="font-family:var(--mono);color:var(--cyan)">${fmt(sparerpausch)}</div>
+        <div style="color:var(--sub);font-size:10px;margin-top:3px">§20 Abs.9 EStG</div>
+      </div>
+      ${nKinder>0&&kindAbzug===0?`<div style="background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:10px">
+        <div style="color:var(--sub);margin-bottom:4px">Kindergeld ${jahr}</div>
+        <div style="font-family:var(--mono);color:var(--green)">${fmt(kindergeld_jahr)}/Jahr</div>
+        <div style="color:var(--sub);font-size:10px;margin-top:3px">${nKinder} × 255 €/Monat · günstiger!</div>
+      </div>`:''}
+    </div>
+    <div style="margin-top:14px;padding:10px 12px;background:var(--s2);border-radius:var(--r);font-size:11px;color:var(--sub);line-height:1.7">
+      <strong style="color:var(--muted)">Nächste Schritte:</strong><br>
+      1. Daten in <strong>ELSTER Online</strong> (elster.de) eingeben — kostenlos und offiziell<br>
+      2. Anlage <strong>S</strong> (Selbstständige) + Anlage <strong>EÜR</strong> ausfüllen<br>
+      ${isSplitting?'3. Anlage <strong>U</strong> für Zusammenveranlagung<br>':''}
+      ${nKinder>0?`${isSplitting?'4':'3'}. ${t('Anlage')} <strong>${t('Kind')}</strong> ${t('für')} ${nKinder} ${t('Kind')}${nKinder>1?t('er'):''}<br>`:''}
+      <strong style="color:var(--yellow)">Abgabefrist:</strong> 31. Juli des Folgejahres (mit Steuerberater: 28. Februar übernächstes Jahr)
+    </div>`;
+
+  // USt & Steuerrücklage Info
+  const steuerRuecklage = Math.round(gesamtSteuer * 0.3); // 30% Reserve
+  document.getElementById('st-result').innerHTML += `
+    
+    <!-- ═══ KRITISCH: NETTO-GEWINN ═══ -->
+    <div style="background:var(--gdim);border:3px solid var(--green);border-radius:var(--r2);padding:20px;margin:20px 0">
+      <h3 style="color:var(--green);margin-bottom:16px;font-size:18px">💰 KRITISCH: Netto-Gewinn nach ALLEM</h3>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:4px">BRUTTO Gewinn</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green)">${fmt(gewinn)}</div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Minus: Einkommensteuer</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--red)">−${fmt(estFinal)}</div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Minus: Soli + Kirche</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--red)">−${fmt(soli + kirchenst)}</div>
+        </div>
+      <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Minus: Gewerbesteuer (реально платить)</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--red)">−${fmt(gewst)}</div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Minus: GKV Nachzahlung</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--red)">−${fmt(gkvNachzahlung)}</div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Minus: USt Saldo (Staat)</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--red)">−${fmt(Math.max(0, ustSaldo))}</div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Minus: IHK-Beitrag (~200€)</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--red)">−200,00 €</div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Minus: Berufsgenossenschaft (~300€)</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--red)">−300,00 €</div>
+        </div>
+      </div>
+      <div style="background:var(--gdim);border:2px solid var(--green);border-radius:var(--r2);padding:16px;text-align:center">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:8px">🎯 <strong>NETTO ZUM LEBEN — Ваш реальный доход:</strong></div>
+        <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--green)">${fmt(Math.max(0, netoGewinnKriterion))}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">Это деньги для Их жизни, семьи, рентабельности, инвестиций</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+      <div style="background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:14px">
+        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${t('📊 Umsatzsteuer (USt) Saldo')}</h3>
+        <div style="background:var(--s2);padding:10px;border-radius:var(--r);margin-bottom:10px">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:3px">USt eingezogen (19% × Einnahmen)</div>
+          <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green)">${fmt(ustEingezogen)}</div>
+        </div>
+        <div style="background:var(--s2);padding:10px;border-radius:var(--r);margin-bottom:10px">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:3px">USt bezahlt (19% × Ausgaben)</div>
+          <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--red)">−${fmt(ustBezahlt)}</div>
+        </div>
+        <div style="background:var(--s3);padding:10px;border-radius:var(--r);border:1px solid var(--green)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:3px">Saldo: ${ustSaldo > 0 ? 'zu zahlen' : 'Erstattung'}</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${ustSaldo > 0 ? 'var(--red)' : 'var(--green)'}">${ustSaldo > 0 ? '−' : '+'} ${fmt(Math.abs(ustSaldo))}</div>
+        </div>
+      </div>
+
+      <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:14px">
+        <h3 style="color:var(--yellow);margin-bottom:12px;font-size:14px">🏦 Steuerrücklage (Empfehlung)</h3>
+        <div style="background:var(--s2);padding:10px;border-radius:var(--r);margin-bottom:10px">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:3px">Gesamtsteuer</div>
+          <div style="font-family:var(--mono);font-size:13px;font-weight:600">${fmt(gesamtSteuer)}</div>
+        </div>
+        <div style="background:var(--s3);padding:10px;border-radius:var(--r);border:1px solid var(--yellow)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:3px">30% Reserve</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--yellow)">${fmt(steuerRuecklage)}</div>
+          <div style="font-size:10px;color:var(--sub);margin-top:6px">⚠️ На отдельный счёт для налогов!</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+      <div style="background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:14px">
+        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${t('📊 Umsatzsteuer (USt) Saldo')}</h3>
+        ${stRow('USt eingezogen (19%)', fmt(ustEingezogen), false, 'var(--green)')}
+        ${stRow('USt bezahlt (19%)', fmt(ustBezahlt), false, 'var(--red)')}
+        <div style="border-top:1px solid var(--green);padding-top:8px;margin-top:8px">
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-weight:600;color:var(--green)">Saldo: ${ustSaldo>=0?'zu zahlen':'Erstattung'}</span>
+            <span style="font-family:var(--mono);font-weight:700;color:var(--green)">${fmt(Math.abs(ustSaldo))}</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:14px">
+        <h3 style="color:var(--yellow);margin-bottom:12px;font-size:14px">🏦 Steuerrücklage (Empfehlung)</h3>
+        <div style="background:var(--s2);padding:10px;border-radius:var(--r);margin-bottom:10px">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:3px">Gesamtsteuer</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:600">${fmt(gesamtSteuer)}</div>
+        </div>
+        <div style="background:var(--s3);padding:10px;border-radius:var(--r)">
+          <div style="font-size:10px;color:var(--sub);margin-bottom:3px">30% Reserve empfohlen</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--yellow)">${fmt(steuerRuecklage)}</div>
+          <div style="font-size:10px;color:var(--sub);margin-top:6px">⚠️ Halten Sie diesen Betrag auf separatem Konto für Steuerzahlungen!</div>
+        </div>
+      </div>
+    </div>`;
+
+  // ─── ОБЪЯВИТЬ переменные ДО использования в hinweiseHTML ───
+  const nettoGewinnFinal = Math.max(0, netoGewinnKriterion); // Используем уже рассчитанное значение
+  const monatlichReserve = Math.round(gesamtSteuer / 12);
+  const monatlichNettoLeben = Math.round(nettoGewinnFinal / 12);
+
+  // Финальный блок предупреждений и советов
+  const hinweiseHTML = `
+    <div style="background:var(--ydim);border:2px solid var(--yellow);border-radius:var(--r2);padding:16px;margin-top:20px">
+      <h3 style="color:var(--yellow);margin-bottom:12px">⚠️ WICHTIGE HINWEISE & MASSNAHMEN FÜR 2025/2026</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600">1️⃣ GKV NACHZAHLUNG</div>
+          <div style="font-size:12px;line-height:1.6">
+            <strong>Sofort handeln:</strong> Schicken Sie Ihren Steuerbescheid (Steuerbescheid) an Ihre Krankenkasse. Sie werden dann automatisch die Beiträge für ${jahr} neu berechnen und Sie nicht mit 11k€ überraschen.
+          </div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600">2️⃣ USt-VORANMELDUNG</div>
+          <div style="font-size:12px;line-height:1.6">
+            <strong>Pflicht:</strong> Bei einem Umsatz von ${fmt(ein)} müssen Sie monatlich oder quartalsweise eine Voranmeldung beim Finanzamt einreichen. Dies ist in ELSTER automatisiert.
+          </div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600">3️⃣ TAGESGELDKONTO</div>
+          <div style="font-size:12px;line-height:1.6">
+            <strong>Eröffnen Sie sofort:</strong> Ein separates Tagesgeldkonto (z.B. bei comdirect, ING) und legen Sie jeden Monat <strong>${fmt(monatlichReserve)}</strong> zur Seite. So vermeiden Sie die \"November-Überraschung\".
+          </div>
+        </div>
+        <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
+          <div style="font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600">4️⃣ JAHRESABRECHNUNG</div>
+          <div style="font-size:12px;line-height:1.6">
+            <strong>Im Frühjahr ${jahr+1}:</strong> Das Finanzamt schickt den Steuerbescheid (Bescheid). Zahlen Sie alle rückständigen Steuern schnell — Verzugszinsen sind hoch (6% pro Jahr).
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r);padding:10px;margin-top:12px;font-size:11px;color:var(--muted)">
+        <strong style="color:var(--red)">🔴 KRITISCH:</strong> Diese Zahl (${fmt(nettoGewinnFinal)}/Jahr oder ${fmt(monatlichNettoLeben)}/Monat) ist Ihr reales verfügbares Einkommen NACH allen Steuern. Nicht verwechseln mit Umsatz oder Brutto-Gewinn!
+      </div>
+    </div>`;
+  
+  document.getElementById('st-result').innerHTML += hinweiseHTML;
+  
+  document.getElementById('st-netto-brutto').textContent = fmt(gewinn);
+  document.getElementById('st-netto-steuern').textContent = fmt(estFinal + soli + gewst + gkvNachzahlung + Math.max(0, ustSaldo) + ihabeitrag + bgbeitrag);
+  document.getElementById('st-netto-final').textContent = fmt(nettoGewinnFinal);
+  document.getElementById('st-netto-monatlich').textContent = fmt(monatlichNettoLeben);
+  document.getElementById('st-monats-reserve').textContent = fmt(monatlichReserve);
+  document.getElementById('st-jahres-reserve').textContent = fmt(gesamtSteuer);
+
+  toast('✅ Berechnung abgeschlossen!','ok');
+  } catch(e) {
+    console.error('Fehler in stBerechnen:', e);
+    toast('❌ Fehler: '+e.message,'error');
+  }
+}
+
+// ── SZENARIEN-TEST ────────────────────────────────────────────────────────
+function runSzenarien() {
+  const szenarien = [
+    { id:'S01', jr:2025, zvE:12096,  sp:false, k:0, label:'Grundfreibetrag 2025 (exakt)',    desc:'ESt muss 0 € sein.' },
+    { id:'S02', jr:2026, zvE:12348,  sp:false, k:0, label:'Grundfreibetrag 2026 (exakt)',    desc:'ESt muss 0 € sein.' },
+    { id:'S03', jr:2026, zvE:12349,  sp:false, k:0, label:'1 € über Grundfreibetrag 2026',  desc:'Erster steuerpflichtiger Euro.' },
+    { id:'S04', jr:2026, zvE:20000,  sp:false, k:0, label:'KU-typisch 20.000 €',            desc:'Typischer Kleinunternehmer.' },
+    { id:'S05', jr:2026, zvE:24999,  sp:false, k:0, label:'KU-Grenze 24.999 € (ledig)',     desc:'Knapp unter Vorjahres-KU-Grenze.' },
+    { id:'S06', jr:2026, zvE:25001,  sp:false, k:0, label:'KU-Grenze überschritten',        desc:'Folgejahr Regelbesteuerung.' },
+    { id:'S07', jr:2026, zvE:40000,  sp:false, k:0, label:'40.000 € ledig',                 desc:'Mittleres Einkommen.' },
+    { id:'S08', jr:2026, zvE:40000,  sp:true,  k:0, label:'40.000 € Splitting',             desc:'Splittingvorteil erkennbar.' },
+    { id:'S09', jr:2026, zvE:60000,  sp:false, k:0, label:'60.000 € ledig',                 desc:'Progressionszone 42%.' },
+    { id:'S10', jr:2026, zvE:60000,  sp:false, k:2, label:'60.000 € + 2 Kinder',            desc:'Günstigerprüfung Kindergeld/KFB.' },
+    { id:'S11', jr:2026, zvE:70000,  sp:false, k:0, label:'Soli-Grenzbereich 70k',          desc:'Soli-Freigrenze 2026: 20.350 € ESt.' },
+    { id:'S12', jr:2026, zvE:85000,  sp:false, k:0, label:'85.000 € — Soli prüfen',        desc:'Oberhalb Soli-Milderungszone.' },
+    { id:'S13', jr:2026, zvE:100000, sp:false, k:0, label:'Spitzenverdiener 100k',          desc:'42% Spitzensteuersatz.' },
+    { id:'S14', jr:2026, zvE:277825, sp:false, k:0, label:'Reichensteuer-Grenze 277.825 €', desc:'Letzter Euro vor 45%.' },
+    { id:'S15', jr:2026, zvE:277826, sp:false, k:0, label:'Reichensteuer ab 277.826 €',     desc:'45% Reichensteuer aktiv.' },
+    { id:'S16', jr:2026, zvE:150000, sp:true,  k:3, label:'Splitting 150k + 3 Kinder',      desc:'Komplexfall: Splitting + KFB.' },
+  ];
+
+  let html = `<div style="overflow-x:auto;margin-bottom:12px"><table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr style="background:var(--s2);border-bottom:2px solid var(--border2)">
+      <th style="padding:10px 8px;text-align:left;font-size:10px;color:var(--sub);font-weight:600">ID</th>
+      <th style="padding:10px 8px;text-align:left;font-size:10px;color:var(--sub);font-weight:600">Szenario</th>
+      <th style="padding:10px 8px;text-align:center;font-size:10px;color:var(--sub);font-weight:600">Jahr</th>
+      <th style="padding:10px 8px;text-align:right;font-size:10px;color:var(--sub);font-weight:600">zvE</th>
+      <th style="padding:10px 8px;text-align:right;font-size:10px;color:var(--sub);font-weight:600">ESt</th>
+      <th style="padding:10px 8px;text-align:right;font-size:10px;color:var(--sub);font-weight:600">Effsatz</th>
+      <th style="padding:10px 8px;text-align:right;font-size:10px;color:var(--sub);font-weight:600">Soli</th>
+      <th style="padding:10px 8px;text-align:right;font-size:10px;color:var(--sub);font-weight:600">Gesamt</th>
+      <th style="padding:10px 8px;text-align:left;font-size:10px;color:var(--sub);font-weight:600">Beschreibung</th>
+      <th style="padding:10px 8px;text-align:center;font-size:10px;color:var(--sub);font-weight:600">OK</th>
+    </tr></thead><tbody>`;
+
+  szenarien.forEach(sz => {
+    const sw = getSteuerwerte(sz.jr);
+    let zvEFinal = sz.zvE;
+    let kindNote = '';
+    if (sz.k > 0) {
+      const kfb = sz.k * sw.kfreibetrag;
+      const kgeld = sz.k * sw.kindergeld * 12;
+      const estOhne = sz.sp ? estSplitting(sz.zvE, sz.jr) : estGrundtarifY(sz.zvE, sz.jr);
+      const estMit  = sz.sp ? estSplitting(Math.max(0,sz.zvE-kfb), sz.jr) : estGrundtarifY(Math.max(0,sz.zvE-kfb), sz.jr);
+      if ((estOhne - estMit) > kgeld) {
+        zvEFinal = Math.max(0, sz.zvE - kfb);
+        kindNote = `${t('· KFB günstiger')}`;
+      } else {
+        kindNote = ` · Kindergeld ${fmt(kgeld)} günstiger`;
+      }
+    }
+    const est    = sz.sp ? estSplitting(zvEFinal, sz.jr) : estGrundtarifY(zvEFinal, sz.jr);
+    const soli   = calcSoli(est, sz.jr);
+    const gesamt = est + soli;
+    const effsatz = sz.zvE > 0 ? (gesamt/sz.zvE*100).toFixed(1)+'%' : '0,0%';
+    const erwartetNull = sz.zvE <= sw.grundfb;
+    const statusOk = erwartetNull ? est === 0 : est > 0;
+
+    html += `<tr style="border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+      <td style="padding:8px;font-family:var(--mono);font-size:10px;color:var(--sub)">${sz.id}</td>
+      <td style="padding:8px;font-weight:500;font-size:12px">${sz.label}
+        ${sz.sp?`<span style="margin-left:5px;background:var(--pdim);border:1px solid var(--purple);border-radius:4px;padding:1px 5px;font-size:9px;color:var(--purple);font-family:var(--mono)">SPLIT</span>`:''}
+        ${sz.k?`<span style="margin-left:3px;background:var(--cdim);border:1px solid var(--cyan);border-radius:4px;padding:1px 5px;font-size:9px;color:var(--cyan);font-family:var(--mono)">${sz.k}K</span>`:''}
+      </td>
+      <td style="padding:8px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--sub)">${sz.jr}</td>
+      <td style="padding:8px;text-align:right;font-family:var(--mono);font-size:12px">${fmt(sz.zvE)}</td>
+      <td style="padding:8px;text-align:right;font-family:var(--mono);font-size:12px;font-weight:600;color:${est>0?'var(--red)':'var(--green)'}">${fmt(est)}</td>
+      <td style="padding:8px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--sub)">${effsatz}</td>
+      <td style="padding:8px;text-align:right;font-family:var(--mono);font-size:11px;color:${soli>0?'var(--yellow)':'var(--sub)'}">${soli>0?fmt(soli):'—'}</td>
+      <td style="padding:8px;text-align:right;font-family:var(--mono);font-size:12px;font-weight:700">${fmt(gesamt)}</td>
+      <td style="padding:8px;font-size:11px;color:var(--muted)">${sz.desc}${kindNote}</td>
+      <td style="padding:8px;text-align:center;font-size:14px">${statusOk?'✅':'⚠️'}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>
+  <div style="font-size:10px;color:var(--sub);background:var(--s3);padding:10px 14px;border-radius:var(--r);border:1px solid var(--border);line-height:1.6">
+    <strong>Quellen (Stand März 2026):</strong> §32a EStG · Jahressteuergesetz 2024 · BMF · IHK München/Stuttgart · Bundesfinanzministerium.de · Sparkasse.de<br>
+    Grundfreibetrag 2025: <strong>12.096 €</strong> | 2026: <strong>12.348 €</strong> &nbsp;·&nbsp;
+    Soli-Freigrenze 2026: <strong>20.350 € ESt</strong> &nbsp;·&nbsp;
+    Kinderfreibetrag 2026: <strong>6.828 € (3.414 je Elternteil)</strong> + Betreuungsfreibetrag 2.928 € &nbsp;·&nbsp;
+    Kindergeld 2026: <strong>259 €/Monat</strong><br>
+    KU-Grenzen ab 01.01.2025 §19 UStG: Vorjahr <strong>25.000 € netto</strong> + laufendes Jahr <strong>100.000 € netto</strong> (Fallbeil-Effekt) &nbsp;·&nbsp;
+    Gewerbesteuer-Freibetrag: <strong>24.500 €</strong> · Messzahl: <strong>3,5%</strong> × Hebesatz (Gemeinde)
+  </div>`;
+
+  document.getElementById('sz-results').innerHTML = html;
+  toast(''+t('✅ 16 Steuer-Szenarien berechnet')+'','ok');
+}
+
