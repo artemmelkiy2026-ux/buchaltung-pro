@@ -8,405 +8,144 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --blue:    #1a4578;
-    --blue2:   #1e5491;
-    --green:   #5d9d69;
-    --text:    #1a2332;
-    --sub:     #5a6a7e;
-    --muted:   #8496aa;
-    --border:  #dde3ec;
-    --bg:      #f0f4f8;
-    --s1:      #ffffff;
-    --s2:      #f8fafc;
-    --mono:    'JetBrains Mono', monospace;
-    --sans:    'Sora', sans-serif;
+    --blue:   #1a4578;
+    --green:  #5d9d69;
+    --text:   #1a2332;
+    --sub:    #5a6a7e;
+    --muted:  #8496aa;
+    --border: #dde3ec;
+    --bg:     #f0f4f8;
+    --s1:     #ffffff;
+    --s2:     #f8fafc;
+    --mono:   'JetBrains Mono', monospace;
+    --sans:   'Sora', sans-serif;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex;
+    align-items: center; justify-content: center;
+    overflow: hidden; position: relative;
   }
-
-  /* ── Фоновые декоративные элементы ── */
   .bg-grid {
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background-image:
       linear-gradient(rgba(26,69,120,.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(26,69,120,.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
+    background-size: 40px 40px; pointer-events: none;
   }
-
   .bg-blob-1 {
-    position: fixed;
-    width: 600px; height: 600px;
-    border-radius: 50%;
+    position: fixed; width: 600px; height: 600px; border-radius: 50%;
     background: radial-gradient(circle, rgba(26,69,120,.08) 0%, transparent 70%);
-    top: -200px; left: -200px;
-    pointer-events: none;
+    top: -200px; left: -200px; pointer-events: none;
     animation: blobFloat 8s ease-in-out infinite;
   }
   .bg-blob-2 {
-    position: fixed;
-    width: 500px; height: 500px;
-    border-radius: 50%;
+    position: fixed; width: 500px; height: 500px; border-radius: 50%;
     background: radial-gradient(circle, rgba(93,157,105,.06) 0%, transparent 70%);
-    bottom: -150px; right: -100px;
-    pointer-events: none;
+    bottom: -150px; right: -100px; pointer-events: none;
     animation: blobFloat 10s ease-in-out infinite reverse;
   }
-
   @keyframes blobFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(20px, 20px) scale(1.05); }
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(20px,20px) scale(1.05); }
   }
-
-  /* ── Карточка ── */
   .card {
-    position: relative;
-    z-index: 10;
-    background: var(--s1);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    width: 92%;
-    max-width: 600px;
-    box-shadow:
-      0 4px 6px rgba(26,69,120,.04),
-      0 20px 60px rgba(26,69,120,.10),
-      0 0 0 1px rgba(26,69,120,.06);
+    position: relative; z-index: 10;
+    background: var(--s1); border: 1px solid var(--border);
+    border-radius: 20px; width: 92%; max-width: 600px;
+    box-shadow: 0 4px 6px rgba(26,69,120,.04), 0 20px 60px rgba(26,69,120,.10), 0 0 0 1px rgba(26,69,120,.06);
     animation: cardIn .5s cubic-bezier(.22,.68,0,1.2) both;
     overflow: hidden;
   }
-
   @keyframes cardIn {
-    from { opacity: 0; transform: translateY(32px) scale(.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity:0; transform: translateY(32px) scale(.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
   }
-
-  /* ── Шапка карточки ── */
-  .card-header {
-    background: linear-gradient(135deg, var(--blue) 0%, #1e5491 60%, #0f3460 100%);
-    padding: 32px 36px 28px;
-    position: relative;
-    overflow: hidden;
+  .card-body { padding: 28px 36px 24px; }
+  .card-footer {
+    text-align: center; padding: 0 36px 24px;
+    font-family: var(--mono); font-size: 10px;
+    color: var(--muted); letter-spacing: .04em;
   }
+  .card-footer a { color: var(--blue); text-decoration: none; opacity: .7; }
 
-  .card-header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    pointer-events: none;
+  /* Переключатель */
+  .lang-switcher { display: flex; gap: 6px; margin-bottom: 22px; animation: cardIn .5s .15s both; }
+  .lang-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 14px; border-radius: 20px;
+    border: 1.5px solid var(--border); background: transparent;
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    color: var(--muted); cursor: pointer; transition: all .2s; letter-spacing: .04em;
   }
+  .lang-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .lang-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
 
-  .header-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.2);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: rgba(255,255,255,.8);
-    letter-spacing: .08em;
-    margin-bottom: 16px;
-    animation: cardIn .5s .1s both;
+  /* Контент */
+  .lang-content { display: none; }
+  .lang-content.active { display: block; animation: fadeIn .25s ease both; }
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(6px); }
+    to   { opacity:1; transform: translateY(0); }
   }
-
-  .header-badge .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #fbbf24;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: .5; transform: scale(.8); }
-  }
-
-  .logo-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-    animation: cardIn .5s .15s both;
-  }
-
-  .logo-icon {
-    width: 44px; height: 44px;
-    background: rgba(255,255,255,.15);
-    border: 1px solid rgba(255,255,255,.25);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-  }
-
-  .logo-text {
-    font-family: var(--mono);
-    font-size: 22px;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: .04em;
-  }
-
-  .logo-text span {
-    color: rgba(255,255,255,.55);
-    font-weight: 400;
-  }
-
-  .header-subtitle {
-    font-size: 13px;
-    color: rgba(255,255,255,.6);
-    font-weight: 300;
-    animation: cardIn .5s .2s both;
-  }
-
-  /* ── Тело карточки ── */
-  .card-body {
-    padding: 28px 36px 32px;
-  }
-
-  /* ── Блоки с текстом ── */
-  .lang-block {
-    margin-bottom: 18px;
-    animation: cardIn .5s .25s both;
-  }
-
   .lang-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: .1em;
-    color: var(--blue);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    padding: 3px 8px;
-    background: rgba(26,69,120,.07);
-    border-radius: 4px;
-    border-left: 2px solid var(--blue);
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    letter-spacing: .1em; color: var(--blue); text-transform: uppercase;
+    margin-bottom: 10px; padding: 3px 8px;
+    background: rgba(26,69,120,.07); border-radius: 4px; border-left: 2px solid var(--blue);
   }
+  .lang-text { font-size: 12.5px; line-height: 1.75; color: var(--sub); margin-bottom: 12px; }
+  .rules-list { list-style: none; display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
+  .rules-list li { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .rules-list li::before { content: '—'; color: var(--blue); font-family: var(--mono); font-weight: 600; flex-shrink: 0; margin-top: 1px; opacity: .5; }
+  .rules-list li strong { color: var(--text); font-weight: 600; }
 
-  .lang-text {
-    font-size: 12.5px;
-    line-height: 1.75;
-    color: var(--sub);
-  }
-
-  .rules-list {
-    list-style: none;
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-  }
-
-  .rules-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 9px;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .rules-list li::before {
-    content: '—';
-    color: var(--blue);
-    font-family: var(--mono);
-    font-weight: 600;
-    flex-shrink: 0;
-    margin-top: 1px;
-    opacity: .5;
-  }
-
-  .rules-list li strong {
-    color: var(--text);
-    font-weight: 600;
-  }
-
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-    margin: 20px 0;
-  }
-
-  /* ── Чекбокс ── */
+  /* Чекбокс */
   .checkbox-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    cursor: pointer;
-    padding: 14px 16px;
-    border-radius: 10px;
-    border: 1.5px solid var(--border);
-    background: var(--s2);
-    transition: all .2s;
+    display: flex; align-items: flex-start; gap: 12px; cursor: pointer;
+    padding: 14px 16px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: var(--s2); transition: all .2s; margin-bottom: 16px;
     animation: cardIn .5s .35s both;
-    margin-bottom: 16px;
   }
-
-  .checkbox-row:hover {
-    border-color: var(--blue);
-    background: rgba(26,69,120,.03);
-  }
-
-  .checkbox-row.checked {
-    border-color: var(--green);
-    background: rgba(93,157,105,.05);
-  }
-
+  .checkbox-row:hover { border-color: var(--blue); background: rgba(26,69,120,.03); }
+  .checkbox-row.checked { border-color: var(--green); background: rgba(93,157,105,.05); }
   .custom-check {
-    width: 20px; height: 20px;
-    border-radius: 6px;
-    border: 2px solid var(--border);
-    background: var(--s1);
-    flex-shrink: 0;
-    margin-top: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all .2s;
-    position: relative;
+    width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border);
+    background: var(--s1); flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center; transition: all .2s;
   }
-
-  .custom-check svg {
-    width: 12px; height: 12px;
-    opacity: 0;
-    transform: scale(0);
-    transition: all .2s cubic-bezier(.22,.68,0,1.4);
-    color: #fff;
-  }
-
-  input[type="checkbox"] { display: none; }
-
-  input[type="checkbox"]:checked + .checkbox-row .custom-check {
-    background: var(--green);
-    border-color: var(--green);
-  }
-
-  .checkbox-row.checked .custom-check {
-    background: var(--green);
-    border-color: var(--green);
-  }
-
-  .checkbox-row.checked .custom-check svg {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  .check-text {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--sub);
-    padding-top: 1px;
-  }
-
+  .custom-check svg { width: 12px; height: 12px; opacity: 0; transform: scale(0); transition: all .2s cubic-bezier(.22,.68,0,1.4); color: #fff; }
+  .checkbox-row.checked .custom-check { background: var(--green); border-color: var(--green); }
+  .checkbox-row.checked .custom-check svg { opacity: 1; transform: scale(1); }
+  .check-text { font-size: 12px; line-height: 1.6; color: var(--sub); padding-top: 1px; }
   .check-text strong { color: var(--text); }
 
-  /* ── Кнопка ── */
+  /* Кнопка */
   .accept-btn {
-    width: 100%;
-    padding: 14px 24px;
-    border-radius: 10px;
-    border: none;
+    width: 100%; padding: 14px 24px; border-radius: 10px; border: none;
     background: linear-gradient(135deg, var(--blue), #1e5491);
-    color: #fff;
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .25s;
-    opacity: .35;
-    pointer-events: none;
-    position: relative;
-    overflow: hidden;
-    animation: cardIn .5s .4s both;
-    letter-spacing: .02em;
+    color: #fff; font-family: var(--sans); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all .25s; opacity: .35; pointer-events: none;
+    position: relative; overflow: hidden;
+    animation: cardIn .5s .4s both; letter-spacing: .02em;
   }
-
   .accept-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,.1), transparent);
-    pointer-events: none;
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.1), transparent); pointer-events: none;
   }
+  .accept-btn.active { opacity: 1; pointer-events: all; box-shadow: 0 4px 20px rgba(26,69,120,.35); }
+  .accept-btn.active:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(26,69,120,.45); }
+  .accept-btn.active:active { transform: translateY(0); }
+  .btn-inner { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-icon { width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 10px; }
 
-  .accept-btn.active {
-    opacity: 1;
-    pointer-events: all;
-    box-shadow: 0 4px 20px rgba(26,69,120,.35);
-    transform: translateY(0);
-  }
-
-  .accept-btn.active:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(26,69,120,.45);
-  }
-
-  .accept-btn.active:active {
-    transform: translateY(0);
-  }
-
-  .btn-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .btn-icon {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-  }
-
-  /* ── Footer ── */
-  .card-footer {
-    text-align: center;
-    padding: 0 36px 24px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: .04em;
-    animation: cardIn .5s .45s both;
-  }
-
-  .card-footer a {
-    color: var(--blue);
-    text-decoration: none;
-    opacity: .7;
-  }
-
-  /* ── Мобайл ── */
   @media (max-width: 520px) {
     .card { border-radius: 16px; }
-    .card-header { padding: 24px 22px 22px; }
-    .card-body { padding: 20px 22px 24px; }
+    .card-body { padding: 20px 22px 20px; }
     .card-footer { padding: 0 22px 20px; }
-    .logo-text { font-size: 18px; }
   }
 </style>
 </head>
@@ -417,26 +156,17 @@
 <div class="bg-blob-2"></div>
 
 <div class="card">
-
-  <!-- Шапка -->
-  <div class="card-header">
-    <div class="header-badge">
-      <span class="dot"></span>
-      BETA · v14.0
-    </div>
-    <div class="logo-row">
-      <div class="logo-icon">📊</div>
-      <div class="logo-text">Mela<span>Logic</span></div>
-    </div>
-    <div class="header-subtitle">Buchaltung Pro · Kleinunternehmer SaaS</div>
-  </div>
-
-  <!-- Тело -->
   <div class="card-body">
 
+    <!-- Переключатель языка -->
+    <div class="lang-switcher">
+      <button class="lang-btn active" id="btn-de" onclick="setLang('de')">🇩🇪 DE</button>
+      <button class="lang-btn" id="btn-ru" onclick="setLang('ru')">🇷🇺 RU</button>
+    </div>
+
     <!-- DE -->
-    <div class="lang-block">
-      <div class="lang-label">🇩🇪 Deutsch</div>
+    <div class="lang-content active" id="content-de">
+      <div class="lang-label">🇩🇪 Deutsch · Beta-Hinweis</div>
       <div class="lang-text">
         Diese Software befindet sich in der <strong style="color:var(--text)">Beta-Testphase</strong> und wird ausschließlich zu Testzwecken bereitgestellt.
         Sie stellt <strong style="color:var(--text)">keine Steuer-, Rechts- oder Finanzberatung</strong> dar.
@@ -449,15 +179,19 @@
       </ul>
     </div>
 
-    <div class="divider"></div>
-
     <!-- RU -->
-    <div class="lang-block" style="margin-bottom:20px">
-      <div class="lang-label">🇷🇺 Русский</div>
+    <div class="lang-content" id="content-ru">
+      <div class="lang-label">🇷🇺 Русский · Уведомление</div>
       <div class="lang-text">
-        Программа находится в стадии <strong style="color:var(--text)">бета-тестирования</strong>. Не является налоговой или юридической консультацией.
-        Все расчёты <strong style="color:var(--text)">носят ознакомительный характер</strong>. Для налоговых решений обращайтесь к сертифицированному специалисту.
+        Программа находится в стадии <strong style="color:var(--text)">бета-тестирования</strong> и предоставляется исключительно в ознакомительных целях.
+        Не является <strong style="color:var(--text)">налоговой, юридической или финансовой консультацией</strong>.
       </div>
+      <ul class="rules-list">
+        <li>Все расчёты носят <strong>ознакомительный характер</strong> без гарантии точности.</li>
+        <li>Разработчик не несёт <strong>никакой ответственности</strong> за ущерб от использования.</li>
+        <li>Налоговые решения — только с <strong>сертифицированным налоговым консультантом</strong>.</li>
+        <li><strong>Не предназначено для промышленного использования</strong> или официальных деклараций.</li>
+      </ul>
     </div>
 
     <!-- Чекбокс -->
@@ -467,62 +201,75 @@
           <polyline points="2,6 5,9 10,3"/>
         </svg>
       </div>
-      <div class="check-text">
+      <div class="check-text" id="check-txt">
         <strong>Ich habe den Hinweis gelesen und verstanden.</strong><br>
-        Ich nutze diese Software ausschließlich zu Testzwecken. /
-        Я прочитал и понял предупреждение. Использую только в ознакомительных целях.
+        Ich nutze diese Software ausschließlich zu Testzwecken.
       </div>
     </label>
-    <input type="checkbox" id="disc-check">
 
     <!-- Кнопка -->
     <button class="accept-btn" id="accept-btn" onclick="accept()">
       <div class="btn-inner">
         <div class="btn-icon">✓</div>
-        Verstanden & Akzeptiert — Software öffnen
+        <span id="btn-txt">Verstanden &amp; Akzeptiert — Software öffnen</span>
       </div>
     </button>
 
   </div>
 
-  <!-- Footer -->
   <div class="card-footer">
     © 2024–2026 MelaLogic · <a href="#">Datenschutz</a> · <a href="#">Nutzungsbedingungen</a>
   </div>
-
 </div>
 
 <script>
   let checked = false;
+  let lang = 'de';
+
+  const texts = {
+    de: {
+      check: '<strong>Ich habe den Hinweis gelesen und verstanden.</strong><br>Ich nutze diese Software ausschließlich zu Testzwecken.',
+      btn:   'Verstanden &amp; Akzeptiert — Software öffnen',
+      done:  'Wird geöffnet...'
+    },
+    ru: {
+      check: '<strong>Я прочитал и понял предупреждение.</strong><br>Использую исключительно в ознакомительных целях.',
+      btn:   'Понял &amp; Принял — Открыть программу',
+      done:  'Открываем...'
+    }
+  };
+
+  function setLang(l) {
+    lang = l;
+    document.getElementById('content-de').classList.toggle('active', l === 'de');
+    document.getElementById('content-ru').classList.toggle('active', l === 'ru');
+    document.getElementById('btn-de').classList.toggle('active', l === 'de');
+    document.getElementById('btn-ru').classList.toggle('active', l === 'ru');
+    document.getElementById('check-txt').innerHTML = texts[l].check;
+    document.getElementById('btn-txt').innerHTML = texts[l].btn;
+    // Сбрасываем чекбокс при смене языка
+    if (checked) {
+      checked = false;
+      document.getElementById('check-label').classList.remove('checked');
+      document.getElementById('accept-btn').classList.remove('active');
+    }
+  }
 
   function toggleCheck() {
     checked = !checked;
-    const label  = document.getElementById('check-label');
-    const chk    = document.getElementById('custom-check');
-    const btn    = document.getElementById('accept-btn');
-
-    label.classList.toggle('checked', checked);
-    btn.classList.toggle('active', checked);
+    document.getElementById('check-label').classList.toggle('checked', checked);
+    document.getElementById('accept-btn').classList.toggle('active', checked);
   }
 
   function accept() {
     if (!checked) return;
-
-    // Сохраняем в localStorage — больше не показываем
     localStorage.setItem('buch_disclaimer_v2', '1');
-
-    // Анимация кнопки
     const btn = document.getElementById('accept-btn');
-    btn.innerHTML = '<div class="btn-inner"><div class="btn-icon">✓</div>Wird geöffnet...</div>';
+    document.getElementById('btn-txt').textContent = texts[lang].done;
     btn.style.background = 'linear-gradient(135deg, var(--green), #4a8a56)';
-
-    // Редирект в приложение через 600ms
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 600);
+    setTimeout(() => { window.location.href = 'index.html'; }, 600);
   }
 
-  // Если уже принято — сразу в приложение
   if (localStorage.getItem('buch_disclaimer_v2') === '1') {
     window.location.replace('index.html');
   }
