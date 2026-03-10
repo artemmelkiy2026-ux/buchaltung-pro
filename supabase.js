@@ -55,8 +55,6 @@ window.sbSignOut = async function() {
     console.error('SignOut error:', e);
   }
   currentUser = null;
-  localStorage.removeItem('buch_disclaimer_v2');
-  localStorage.removeItem('bp_pin_skipped');
   location.href = 'login.html';
 }
 async function authGoogle() {
@@ -554,63 +552,7 @@ async function offerBiometricSetup() {
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
-// Сессия может прийти до DOMContentLoaded — сохраняем её
-// undefined = ещё не пришло, null = пришло без сессии, object = пришло с сессией
-let _pendingSession = undefined;
-let _domReady = false;
-
-sb.auth.onAuthStateChange(async (event, session) => {
-  console.log('[Auth event]:', event, session?.user?.email);
-
-  if (event === 'SIGNED_OUT') {
-    localStorage.removeItem('buch_disclaimer_v2');
-    localStorage.removeItem('bp_pin_skipped');
-    location.href = 'login.html';
-    return;
-  }
-
-  if (event === 'TOKEN_REFRESHED' && session?.user) {
-    currentUser = session.user;
-    return;
-  }
-
-  if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session?.user) {
-    if (_domReady) {
-      _startAppWhenReady(session.user);
-    } else {
-      _pendingSession = session; // сохраняем до DOMContentLoaded
-    }
-  } else if (event === 'INITIAL_SESSION' && !session) {
-    if (_domReady) {
-      document.getElementById('loading-screen').style.display = 'none';
-      showAuthScreen();
-    } else {
-      _pendingSession = null; // нет сессии, ждём DOM чтобы показать логин
-    }
-  }
-});
-
-function _startAppWhenReady(user) {
-  if (window._appStartCalled) return;
-  window._appStartCalled = true;
-  if (typeof window.startApp === 'function') {
-    window.startApp(user).catch(e => {
-      console.error('[startApp error]:', e);
-      showAuthScreen();
-    });
-  }
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
-  _domReady = true;
-
-  // Глобальный перехват ошибок
-  window.onerror = (msg, src, line, col, err) => {
-    console.error(`[JS ERROR] ${msg} @ ${src}:${line}:${col}`, err);
-  };
-  window.addEventListener('unhandledrejection', e => {
-    console.error('[PROMISE ERROR]', e.reason);
-  });
 
   // Глобальный делегат кликов — ловим кнопку выхода на любом уровне DOM
 
@@ -695,24 +637,47 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   // Если сессия пришла до DOMContentLoaded — обрабатываем сейчас
-  if (_pendingSession && _pendingSession.user) {
-    // SIGNED_IN/INITIAL_SESSION пришёл до DOMContentLoaded — запускаем сейчас
-    console.log('[DOMContentLoaded] pendingSession found, starting app');
-    _startAppWhenReady(_pendingSession.user);
-  } else if (_pendingSession === null) {
-    // INITIAL_SESSION пришёл без сессии — показываем логин
-    console.log('[DOMContentLoaded] no session, show login');
-    document.getElementById('loading-screen').style.display = 'none';
-    showAuthScreen();
-  } else {
-    // _pendingSession === undefined — INITIAL_SESSION ещё не пришёл, ждём
-    console.log('[DOMContentLoaded] waiting for auth event...');
-    setTimeout(() => {
-      if (!window._appStartCalled) {
-        console.log('[DOMContentLoaded] timeout — show login');
+  let authResolved = false;
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    console.log('[Auth event]:', event, session?.user?.email);
+
+    if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !authResolved) {
+      authResolved = true;
+      if (session?.user) {
+        try {
+          await window.startApp(session.user);
+        } catch(e) {
+          console.error('[startApp error]:', e);
+          document.getElementById('loading-screen').style.display = 'none';
+          showAuthScreen();
+        }
+      } else {
         document.getElementById('loading-screen').style.display = 'none';
         showAuthScreen();
       }
-    }, 3000);
-  }
+      return;
+    }
+
+    if (event === 'SIGNED_IN' && session?.user && !appStarted) {
+      await window.startApp(session.user);
+    } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+      currentUser = session.user;
+    } else if (event === 'SIGNED_OUT') {
+      appStarted = false;
+      appDispatched = false;
+      isAppUnlocked = false;
+      window._dataReady = false;
+      location.href = 'login.html';
+    }
+  });
+
+  // Страховка 3 сек
+  setTimeout(() => {
+    if (!authResolved) {
+      authResolved = true;
+      document.getElementById('loading-screen').style.display = 'none';
+      showAuthScreen();
+    }
+  }, 3000);
 });
