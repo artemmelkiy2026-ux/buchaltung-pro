@@ -495,7 +495,10 @@
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
     <div><h1 style="font-size:18px;font-weight:700">🧾 Offene Rechnungen</h1>
     <p style="color:var(--sub);font-size:12px;margin-top:3px">Status: offen · bezahlt · überfällig</p></div>
-    <button class="btn primary" onclick="openRechModal()">Rechnung erstellen</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i> Firmenprofil</button>
+      <button class="btn primary" onclick="openRechModal()">＋ Rechnung erstellen</button>
+    </div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="rech-cards"></div>
   <div class="tbl-wrap">
@@ -787,7 +790,7 @@
       <button class="btn primary" style="flex:1;padding:10px;min-width:120px" onclick="saveRechnung()">💾 Speichern</button>
       <button class="btn success" style="padding:10px 14px" onclick="druckRechnung()" title="Drucken / PDF"><i class="fas fa-print"></i> Drucken</button>
       <button class="btn" style="padding:10px 14px;background:var(--s2)" onclick="emailRechnung()" title="Per E-Mail senden"><i class="fas fa-envelope"></i> E-Mail</button>
-      <button class="btn" style="padding:10px 14px;background:#25d366;color:#fff" onclick="waRechnung()" title="Per WhatsApp senden"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+      <button class="btn" style="padding:10px 16px;background:#25d366;color:#fff" onclick="waRechnung()" title="Per WhatsApp senden"><i class="fab fa-whatsapp" style="font-size:18px"></i></button>
       <button class="btn" style="padding:10px 14px" onclick="closeModal('rech-modal')">Abbrechen</button>
     </div>
     <!-- E-Rechnung Buttons -->
@@ -930,5 +933,60 @@
 </div>
 
 </div><!-- /app-wrapper -->
+
+<!-- ── FIRMA EINSTELLUNGEN MODAL ── -->
+<div class="modal-bg" id="firma-modal">
+  <div class="modal" style="max-width:560px;width:100%">
+    <div class="modal-hdr">
+      <h2>🏢 Firmenprofil</h2>
+      <button class="modal-close" onclick="closeModal('firma-modal')">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--sub);margin-bottom:16px">Diese Daten erscheinen auf allen Rechnungen (PDF, Druck, E-Mail).</p>
+    <!-- Firmenname -->
+    <div class="fg"><label>Firmenname *</label><input type="text" id="firma-name" placeholder="z.B. Autowäsche Berg GmbH"></div>
+    <!-- Adresse -->
+    <div class="fgrow c2">
+      <div class="fg"><label>Straße &amp; Hausnummer</label><input type="text" id="firma-strasse" placeholder="Musterstraße 1"></div>
+      <div class="fgrow c2" style="gap:8px">
+        <div class="fg"><label>PLZ</label><input type="text" id="firma-plz" placeholder="67547"></div>
+        <div class="fg"><label>Ort</label><input type="text" id="firma-ort" placeholder="Worms"></div>
+      </div>
+    </div>
+    <!-- Kontakt -->
+    <div class="fgrow c2">
+      <div class="fg"><label>Telefon</label><input type="tel" id="firma-tel" placeholder="+49 6241 000000"></div>
+      <div class="fg"><label>E-Mail</label><input type="email" id="firma-email" placeholder="info@firma.de"></div>
+    </div>
+    <!-- Bank -->
+    <div style="border-top:1px solid var(--border);margin:14px 0 10px;padding-top:10px">
+      <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Bankverbindung</span>
+    </div>
+    <div class="fgrow c2">
+      <div class="fg"><label>IBAN</label><input type="text" id="firma-iban" placeholder="DE12 3456 7890 1234 5678 90"></div>
+      <div class="fg"><label>BIC</label><input type="text" id="firma-bic" placeholder="SSKMDEMMXXX"></div>
+    </div>
+    <!-- Steuer -->
+    <div style="border-top:1px solid var(--border);margin:14px 0 10px;padding-top:10px">
+      <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Steuerdaten</span>
+    </div>
+    <div class="fgrow c2">
+      <div class="fg"><label>Steuernummer</label><input type="text" id="firma-steuernr" placeholder="12/345/67890"></div>
+      <div class="fg"><label>USt-ID (optional)</label><input type="text" id="firma-ustid" placeholder="DE123456789"></div>
+    </div>
+    <!-- Footer-Text -->
+    <div style="border-top:1px solid var(--border);margin:14px 0 10px;padding-top:10px">
+      <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Zusatztext (Fußzeile Rechnung)</span>
+    </div>
+    <div class="fg"><label>Rechtliche Hinweise / Weitere Infos</label>
+      <textarea id="firma-footer" rows="3" placeholder="z.B.: Kleinunternehmer gem. §19 UStG · Handelsregister HRB 12345 · Amtsgericht Worms"></textarea>
+    </div>
+    <!-- Buttons -->
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn primary" style="flex:1;padding:11px" onclick="saveFirmaData()">💾 Speichern</button>
+      <button class="btn" style="padding:11px 18px" onclick="closeModal('firma-modal')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
