@@ -119,11 +119,26 @@ function wiedToDb(w) {
 }
 
 // ── SAVE / DELETE ──────────────────────────────────────────────────────────
-async function sbSaveEintrag(e) { const {error}=await sb.from('eintraege').upsert(eintragToDb(e),{onConflict:'id'}); if(error) console.error('Save eintrag:',error); }
-async function sbDeleteEintrag(id) { await sb.from('eintraege').delete().eq('id',id).eq('user_id',currentUser.id); }
-async function sbSaveKunde(k) { const {error}=await sb.from('kunden').upsert(kundeToDb(k),{onConflict:'id'}); if(error) console.error('Save kunde:',error); }
-async function sbDeleteKunde(id) { await sb.from('kunden').delete().eq('id',id).eq('user_id',currentUser.id); }
+async function sbSaveEintrag(e) {
+  if (!currentUser) { console.warn('sbSaveEintrag: currentUser is null, skipping save'); return; }
+  const {error}=await sb.from('eintraege').upsert(eintragToDb(e),{onConflict:'id'});
+  if(error) console.error('Save eintrag:',error);
+}
+async function sbDeleteEintrag(id) {
+  if (!currentUser) return;
+  await sb.from('eintraege').delete().eq('id',id).eq('user_id',currentUser.id);
+}
+async function sbSaveKunde(k) {
+  if (!currentUser) { console.warn('sbSaveKunde: currentUser is null, skipping save'); return; }
+  const {error}=await sb.from('kunden').upsert(kundeToDb(k),{onConflict:'id'});
+  if(error) console.error('Save kunde:',error);
+}
+async function sbDeleteKunde(id) {
+  if (!currentUser) return;
+  await sb.from('kunden').delete().eq('id',id).eq('user_id',currentUser.id);
+}
 async function sbSaveRechnung(r) {
+  if (!currentUser) { console.warn('sbSaveRechnung: currentUser is null, skipping save'); return; }
   await sb.from('rechnungen').upsert(rechnungToDb(r),{onConflict:'id'});
   if(r.positionen&&r.positionen.length) {
     await sb.from('rechnungen_pos').delete().eq('rechnung_id',r.id).eq('user_id',currentUser.id);
@@ -131,6 +146,7 @@ async function sbSaveRechnung(r) {
   }
 }
 async function sbDeleteRechnung(id) {
+  if (!currentUser) return;
   await sb.from('rechnungen_pos').delete().eq('rechnung_id',id).eq('user_id',currentUser.id);
   await sb.from('rechnungen').delete().eq('id',id).eq('user_id',currentUser.id);
 }
@@ -629,10 +645,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ).then(() => {}).catch(() => {});
     }
 
-    // Сразу показываем приложение — данные грузим в фоне
-    await launchApp();
-
-    // Загружаем данные и PIN в фоне
+    // Загружаем данные ДО запуска приложения, чтобы supabase-ready получил актуальные данные
     try {
       const [remoteData, remotePin] = await Promise.all([
         sbLoadAll(),
@@ -682,6 +695,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.removeItem('bp_pin_removed_skipped');
       }
 
+      // Показываем приложение с готовыми данными
+      await launchApp();
       // Уведомляем модули что данные готовы
       window.dispatchEvent(new Event('data-ready'));
     } catch(e) {
