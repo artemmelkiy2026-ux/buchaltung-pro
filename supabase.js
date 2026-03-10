@@ -634,48 +634,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     await launchApp();
   };
 
-  // Если сессия пришла до DOMContentLoaded — обрабатываем сейчас
-  let authResolved = false;
-
-  sb.auth.onAuthStateChange(async (event, session) => {
-    console.log('[Auth event]:', event, session?.user?.email);
-
-    if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !authResolved) {
-      authResolved = true;
-      if (session?.user) {
-        try {
-          await window.startApp(session.user);
-        } catch(e) {
-          console.error('[startApp error]:', e);
-          document.getElementById('loading-screen').style.display = 'none';
-          showAuthScreen();
-        }
-      } else {
-        document.getElementById('loading-screen').style.display = 'none';
-        showAuthScreen();
-      }
-      return;
-    }
-
-    if (event === 'SIGNED_IN' && session?.user && !appStarted) {
-      await window.startApp(session.user);
-    } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-      currentUser = session.user;
-    } else if (event === 'SIGNED_OUT') {
+  // Слушаем только SIGNED_OUT и TOKEN_REFRESHED
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT') {
       appStarted = false;
       appDispatched = false;
       isAppUnlocked = false;
       window._dataReady = false;
       location.href = 'login.html';
+    } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+      currentUser = session.user;
     }
   });
 
-  // Страховка 3 сек
-  setTimeout(() => {
-    if (!authResolved) {
-      authResolved = true;
+  // Запускаем через getSession — всегда после загрузки всех скриптов
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    console.log('[getSession]', session?.user?.email ?? 'no session');
+    if (session?.user) {
+      await window.startApp(session.user);
+    } else {
       document.getElementById('loading-screen').style.display = 'none';
       showAuthScreen();
     }
-  }, 3000);
+  } catch(e) {
+    console.error('[getSession error]:', e);
+    document.getElementById('loading-screen').style.display = 'none';
+    showAuthScreen();
+  }
 });
