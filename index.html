@@ -825,7 +825,17 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
       <button class="btn success" style="padding:10px 14px" onclick="druckRechnung()" title="Drucken / PDF"><i class="fas fa-print"></i> Drucken</button>
       <button class="btn" style="padding:10px 14px;background:var(--s2)" onclick="emailRechnung()" title="Per E-Mail senden"><i class="fas fa-envelope"></i> E-Mail</button>
       <button class="btn" style="padding:10px 14px;background:#25d366;color:#fff" onclick="waRechnung()" title="Per WhatsApp senden"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-      <button class="btn" style="padding:10px 18px" onclick="closeModal('rech-modal')">Abbrechen</button>
+      <button class="btn" style="padding:10px 14px" onclick="closeModal('rech-modal')">Abbrechen</button>
+    </div>
+    <!-- E-Rechnung Buttons -->
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--sub);align-self:center;white-space:nowrap">🇩🇪 E-Rechnung (EN 16931):</span>
+      <button class="btn" style="padding:8px 12px;background:#1e3a5f;color:#fff;font-size:12px" onclick="downloadZUGFeRD(null)" title="ZUGFeRD: PDF mit eingebettetem XML">
+        <i class="fas fa-file-pdf"></i> ZUGFeRD
+      </button>
+      <button class="btn" style="padding:8px 12px;background:#0d6b3b;color:#fff;font-size:12px" onclick="downloadXRechnung(null)" title="XRechnung: reines XML für Behörden">
+        <i class="fas fa-file-code"></i> XRechnung
+      </button>
     </div>
   </div>
 </div>
@@ -960,6 +970,14 @@ if(localStorage.getItem('buch_disclaimer_v1')==='1'){
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <script src="ru.js"></script>
-<script src="app.js"></script>
+<!-- MelaLogic Modules -->
+<script src="core.js"></script>
+<script src="dashboard.js"></script>
+<script src="ui.js"></script>
+<script src="reports.js"></script>
+<script src="rechnungen.js"></script>
+<script src="kunden.js"></script>
+<script src="umsatzsteuer.js"></script>
+<script src="helpers.js"></script>
 </body>
 </html>
