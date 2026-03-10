@@ -367,6 +367,42 @@ function offerPinSetup() {
   setTimeout(() => { if (banner.parentNode) banner.remove(); }, 15000);
 }
 
+function offerPinRestore() {
+  if (document.getElementById('pin-offer-banner')) return;
+  if (localStorage.getItem('bp_pin_removed_skipped') === '1') return;
+
+  const banner = document.createElement('div');
+  banner.id = 'pin-offer-banner';
+  banner.style.cssText = `
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:#c0392b;color:#fff;border-radius:16px;padding:18px 24px;
+    display:flex;align-items:center;gap:16px;z-index:99999;
+    box-shadow:0 8px 32px rgba(192,57,43,.4);font-family:sans-serif;
+    max-width:400px;width:calc(100% - 48px);flex-direction:column;
+  `;
+  banner.innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;width:100%">
+      <span style="font-size:28px">⚠️</span>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:14px;margin-bottom:4px">Sicherheit gefährdet!</div>
+        <div style="font-size:12px;opacity:.85">PIN-Schutz ist deaktiviert. Jetzt einrichten?</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button onclick="document.getElementById('pin-offer-banner').remove()"
+          style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer;font-family:sans-serif">Nein</button>
+        <button onclick="document.getElementById('pin-offer-banner').remove();location.href='profile.html'"
+          style="background:#fff;border:none;border-radius:8px;color:#c0392b;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif">Ja ✓</button>
+      </div>
+    </div>
+    <button onclick="document.getElementById('pin-offer-banner').remove();localStorage.setItem('bp_pin_removed_skipped','1')"
+      style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.6);padding:6px 14px;font-size:11px;cursor:pointer;font-family:sans-serif;width:100%">
+      Nicht mehr vorschlagen
+    </button>
+  `;
+  document.body.appendChild(banner);
+  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 15000);
+}
+
 function pinPress(digit) {
   if (pinValue.length >= 4) return;
   pinValue += digit;
@@ -630,8 +666,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Предлагаем настроить PIN если ещё не создан
       // Баннер PIN — показываем если нет пина
-      if (!remotePin && !localStorage.getItem('bp_pin_skipped')) {
-        setTimeout(offerPinSetup, 3500);
+      if (!remotePin) {
+        // PIN никогда не был — предлагаем установить
+        if (!localStorage.getItem('bp_pin_skipped')) {
+          setTimeout(offerPinSetup, 3500);
+        }
+        // PIN был раньше но отключён — предупреждаем об угрозе безопасности
+        if (localStorage.getItem('bp_pin_was_set') === '1') {
+          setTimeout(offerPinRestore, 3500);
+        }
+      } else {
+        // PIN активен — запоминаем что он когда-то был установлен
+        localStorage.setItem('bp_pin_was_set', '1');
+        // Сбрасываем флаг "больше не показывать" (PIN снова активен)
+        localStorage.removeItem('bp_pin_removed_skipped');
       }
 
       // Уведомляем модули что данные готовы
