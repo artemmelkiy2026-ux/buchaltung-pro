@@ -551,6 +551,23 @@ async function offerBiometricSetup() {
 // ── INIT ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
 
+  // Глобальный перехват ошибок
+  window.onerror = (msg, src, line, col, err) => {
+    console.error(`[JS ERROR] ${msg} @ ${src}:${line}:${col}`, err);
+  };
+  window.addEventListener('unhandledrejection', e => {
+    console.error('[PROMISE ERROR]', e.reason);
+  });
+
+  // Кнопка выхода — надёжно через addEventListener
+  const signoutBtn = document.getElementById('signout-btn');
+  if (signoutBtn) {
+    signoutBtn.addEventListener('click', () => {
+      console.log('[signout-btn] clicked');
+      sbSignOut();
+    });
+  }
+
   let appStarted = false;
   let appDispatched = false;
 
@@ -607,7 +624,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // Предлагаем настроить PIN если ещё не создан
-      // bp_pin_skipped сбрасывается каждый раз при входе — баннер показывается при каждой сессии
+      // Баннер PIN — показываем если нет пина
+      console.log('[PIN check] remotePin:', remotePin, 'skipped:', localStorage.getItem('bp_pin_skipped'));
       if (!remotePin) {
         localStorage.removeItem('bp_pin_skipped');
         setTimeout(offerPinSetup, 2000);
