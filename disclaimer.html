@@ -263,7 +263,7 @@
 
   function accept() {
     if (!checked) return;
-    localStorage.setItem('buch_disclaimer_v2', '1');
+    sessionStorage.setItem('buch_disclaimer_v2', '1');
     const btn = document.getElementById('accept-btn');
     document.getElementById('btn-txt').textContent = texts[lang].done;
     btn.style.background = 'linear-gradient(135deg, var(--green), #4a8a56)';
@@ -272,7 +272,7 @@
   }
 
   // Если уже принято — сразу на login.html (он проверит сессию)
-  if (localStorage.getItem('buch_disclaimer_v2') === '1') {
+  if (sessionStorage.getItem('buch_disclaimer_v2') === '1') {
     window.location.replace('login.html');
   }
 </script>
