@@ -14,6 +14,20 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
+<script>
+// Определяем sbSignOut сразу — до загрузки supabase.js
+// Если supabase ещё не готов — ждём и повторяем
+function sbSignOut() {
+  if (window._sbSignOutReady) {
+    window._sbSignOutReady();
+    return;
+  }
+  // supabase ещё не загружен — редиректим напрямую
+  localStorage.removeItem('buch_disclaimer_v2');
+  localStorage.removeItem('bp_pin_skipped');
+  window.location.href = 'login.html';
+}
+</script>
 
 <!-- ── LOADING SCREEN ────────────────────────────────────────────────────── -->
 <div id="loading-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background: #ffffff;">
