@@ -71,21 +71,23 @@ async function authGoogle() {
 async function sbLoadAll() {
   if (!currentUser) return null;
   const uid = currentUser.id;
-  const [ein, kun, rech, rechPos, wied, ustM] = await Promise.all([
+  const [ein, kun, rech, rechPos, wied, ustM, ustE] = await Promise.all([
     sb.from('eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('kunden').select('*').eq('user_id', uid).order('name'),
     sb.from('rechnungen').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('rechnungen_pos').select('*').eq('user_id', uid),
     sb.from('wiederkehrend').select('*').eq('user_id', uid),
     sb.from('ust_mode').select('*').eq('user_id', uid),
+    sb.from('ust_eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
   ]);
   const eintraege = (ein.data || []).map(dbToEintrag);
   const kunden = (kun.data || []).map(dbToKunde);
   const rechnungen = (rech.data || []).map(r => dbToRechnung(r, rechPos.data || []));
   const wiederkehrend = (wied.data || []).map(dbToWied);
+  const ustEintraege = (ustE.data || []).map(dbToUstEintrag);
   const ustModeByYear = {};
   (ustM.data || []).forEach(r => { ustModeByYear[r.jahr] = r.mode; });
-  return { eintraege, kunden, rechnungen, wiederkehrend, ustModeByYear, ustEintraege: [] };
+  return { eintraege, kunden, rechnungen, wiederkehrend, ustModeByYear, ustEintraege };
 }
 
 // ── CONVERTERS ─────────────────────────────────────────────────────────────
@@ -149,6 +151,38 @@ function wiedToDb(w) {
 }
 
 // ── SAVE / DELETE ──────────────────────────────────────────────────────────
+// ── UST EINTRAEGE ─────────────────────────────────────────────────────────
+function ustEintragToDb(e) {
+  return {
+    id:           e.id,
+    user_id:      currentUser.id,
+    datum:        e.datum,
+    typ:          e.typ,
+    betrag:       e.betrag,
+    rate:         e.rate || 0,
+    beschreibung: e.beschreibung || '',
+  };
+}
+function dbToUstEintrag(r) {
+  return {
+    id:           r.id,
+    datum:        r.datum,
+    typ:          r.typ,
+    betrag:       parseFloat(r.betrag) || 0,
+    rate:         parseFloat(r.rate)   || 0,
+    beschreibung: r.beschreibung || '',
+  };
+}
+async function sbSaveUstEintrag(e) {
+  if (!currentUser) return;
+  const { error } = await sb.from('ust_eintraege').upsert(ustEintragToDb(e), { onConflict: 'id' });
+  if (error) console.error('Save ust_eintrag:', error);
+}
+async function sbDeleteUstEintrag(id) {
+  if (!currentUser) return;
+  await sb.from('ust_eintraege').delete().eq('id', id).eq('user_id', currentUser.id);
+}
+
 async function sbSaveEintrag(e) {
   if (!currentUser) { console.warn('sbSaveEintrag: currentUser is null, skipping save'); return; }
   const {error}=await sb.from('eintraege').upsert(eintragToDb(e),{onConflict:'id'});

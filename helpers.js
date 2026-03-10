@@ -860,10 +860,9 @@ function addUstEintrag(){
   if(!datum) return toast('Datum eingeben!','err');
   if(!bet||bet<=0) return toast('Betrag eingeben!','err');
   if(!data.ustEintraege) data.ustEintraege=[];
-  data.ustEintraege.push({
-    id: Date.now()+'',
-    datum, typ, betrag: bet, rate, beschreibung: dsc
-  });
+  const entry = { id: Date.now()+'', datum, typ, betrag: bet, rate, beschreibung: dsc };
+  data.ustEintraege.push(entry);
+  sbSaveUstEintrag(entry);
   renderUst();
   document.getElementById('ust-new-bet').value='';
   document.getElementById('ust-new-dsc').value='';
@@ -873,6 +872,7 @@ function addUstEintrag(){
 function delUstEintrag(id){
   if(!confirm('Eintrag löschen?')) return;
   data.ustEintraege = (data.ustEintraege||[]).filter(e=>e.id!==id);
+  sbDeleteUstEintrag(id);
   renderUst();
   toast('Gelöscht','err');
 }
