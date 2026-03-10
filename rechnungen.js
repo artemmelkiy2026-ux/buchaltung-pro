@@ -359,10 +359,12 @@ function getRechPositionen(){
 
 // ── RECHNUNG DRUCKEN / PDF ────────────────────────────────────────────────
 function buildRechnungHTML(r){
-  const firmaName = 'Autowäsche Berg';
-  const firmaAdresse = 'Musterstraße 1 · 67547 Worms';
-  const firmaKontakt = 'Tel: +49 (0) 6241 000000 · info@autowaesche-berg.de';
-  const firmaBank = 'IBAN: DE12 3456 7890 1234 5678 90 · BIC: SSKMDEMMXXX';
+  const f = getFirmaData();
+  const firmaName    = f.name    || 'Meine Firma';
+  const firmaAdresse = [f.strasse, [f.plz, f.ort].filter(Boolean).join(' ')].filter(Boolean).join(' · ') || '';
+  const firmaKontakt = [f.tel ? 'Tel: '+f.tel : '', f.email].filter(Boolean).join(' · ');
+  const firmaBank    = [f.iban ? 'IBAN: '+f.iban : '', f.bic ? 'BIC: '+f.bic : ''].filter(Boolean).join(' · ');
+  const firmaExtra   = f.rechnung_footer || '';
   const USt = 'Kleinunternehmer gem. § 19 UStG — keine USt ausgewiesen';
   const pos = r.positionen&&r.positionen.length ? r.positionen : [{bez:r.beschreibung||'Leistung',menge:1,preis:r.betrag}];
   const total = pos.reduce((s,p)=>s+(p.menge*p.preis),0);
@@ -456,7 +458,7 @@ function buildRechnungHTML(r){
   </table>
   <p style="font-size:11px;color:#888;margin-bottom:8px">${isKlein?USt:'Umsatzsteuer-Ausweis gem. §14 UStG'}</p>
   ${notiz}
-  <div class="footer">${firmaBank}</div>
+  <div class="footer">${[firmaBank, firmaExtra].filter(Boolean).join('<br>')}</div>
   </body></html>`;
 }
 
@@ -495,7 +497,7 @@ function openRechnungPrint(r){
 // ── RECHNUNG PER E-MAIL ───────────────────────────────────────────────────
 function emailRechnung(){
   const pos=getRechPositionen();
-  const total=pos.reduce((s,p)=>s+p.menge*p.preis,0);
+  const total=pos.reduce((s,p)=>s+p.menge*(p.netto||p.preis||0),0);
   const r={
     nr:document.getElementById('rn-nr').value.trim(),
     datum:document.getElementById('rn-dat').value,
@@ -506,29 +508,139 @@ function emailRechnung(){
     notiz:document.getElementById('rn-notiz').value.trim(),
     positionen:pos, betrag:total
   };
-  if(!r.email){toast('Bitte E-Mail-Adresse eingeben!','err');return;}
-  emailMitPDF(r);
+  showEmailServicePicker(r);
+}
+
+function showEmailServicePicker(r) {
+  // Удаляем старый picker если есть
+  document.getElementById('email-service-picker')?.remove();
+
+  const firma = getFirmaData();
+  const safeNr = (r.nr||'rechnung').replace(/[\/]/g,'-');
+  const subject = encodeURIComponent(`Rechnung Nr. ${r.nr} — ${firma.name||'Rechnung'}`);
+  const body = encodeURIComponent(
+`Sehr geehrte Damen und Herren,${r.kunde?'\n\nSehr geehrte/r '+r.kunde+',':''}
+
+anbei erhalten Sie unsere Rechnung Nr. ${r.nr} über ${fmt(r.betrag)}.${r.faellig?'\nZahlungsziel: '+fd(r.faellig):''}
+
+Bitte hängen Sie die soeben heruntergeladene PDF-Datei an.
+
+Mit freundlichen Grüßen
+${firma.name||''}${firma.tel?'\nTel: '+firma.tel:''}${firma.email?'\n'+firma.email:''}`);
+
+  const services = [
+    { label:'📧 Standard E-Mail', icon:'fa-envelope', url:`mailto:${r.email||''}?subject=${subject}&body=${body}`, color:'var(--blue)' },
+    { label:'Gmail', icon:'fa-envelope', svg:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M2 6l10 7L22 6" stroke="#EA4335" stroke-width="2"/><rect x="2" y="5" width="20" height="14" rx="2" stroke="#EA4335" stroke-width="2" fill="none"/></svg>', url:`https://mail.google.com/mail/?view=cm&to=${r.email||''}&su=${subject}&body=${body}`, color:'#EA4335' },
+    { label:'Outlook', icon:'fa-envelope', svg:'<svg width="18" height="18" viewBox="0 0 24 24" fill="#0072C6"><rect x="2" y="4" width="20" height="16" rx="2" fill="#0072C6"/><path d="M2 8l10 6 10-6" stroke="#fff" stroke-width="1.5" fill="none"/></svg>', url:`https://outlook.live.com/mail/0/deeplink/compose?to=${r.email||''}&subject=${subject}&body=${body}`, color:'#0072C6' },
+    { label:'Yahoo Mail', icon:'fa-envelope', svg:'<svg width="18" height="18" viewBox="0 0 24 24" fill="#720E9E"><rect x="2" y="4" width="20" height="16" rx="2" fill="#720E9E"/><path d="M2 8l10 6 10-6" stroke="#fff" stroke-width="1.5" fill="none"/></svg>', url:`https://compose.mail.yahoo.com/?to=${r.email||''}&subject=${subject}&body=${body}`, color:'#720E9E' },
+  ];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'email-service-picker';
+  overlay.style.cssText = 'position:fixed;inset:0;background:#00000066;z-index:9999;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML = \`
+    <div style="background:var(--s1);border-radius:16px;padding:24px;width:320px;max-width:90vw;box-shadow:0 20px 60px #0004">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <strong style="font-size:15px">E-Mail senden über...</strong>
+        <button onclick="document.getElementById('email-service-picker').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
+      </div>
+      <p style="font-size:12px;color:var(--sub);margin-bottom:14px">PDF wird zuerst gespeichert. Dann bitte anhängen.</p>
+      \${services.map(s=>\`
+        <button onclick="emailPickerChoose('\${encodeURIComponent(s.url)}')" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;color:var(--text);text-align:left">
+          \${s.svg||'<i class=\"fas '+s.icon+'\" style=\"color:'+s.color+'\"></i>'}
+          <span>\${s.label}</span>
+        </button>\`).join('')}
+    </div>\`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+
+  // Скачиваем PDF сразу
+  generateRechnungPDF(r).then(doc => doc.save(\`Rechnung_\${safeNr}.pdf\`)).catch(()=>{});
+}
+
+async function emailPickerChoose(encodedUrl) {
+  document.getElementById('email-service-picker')?.remove();
+  window.open(decodeURIComponent(encodedUrl), '_blank');
 }
 
 // ── RECHNUNG PER WHATSAPP ─────────────────────────────────────────────────
-function waRechnung(){
+async function waRechnung(){
   const wa=document.getElementById('rn-wa').value.trim().replace(/[^0-9+]/g,'');
   const nr=document.getElementById('rn-nr').value.trim()||'—';
   const kunde=document.getElementById('rn-kunde').value.trim();
   const total=parseFloat(document.getElementById('rn-bet').value)||0;
   const faellig=document.getElementById('rn-faellig').value;
+  const firma=getFirmaData();
+  const pos=getRechPositionen();
+  const r={
+    nr, datum:document.getElementById('rn-dat').value,
+    faellig, kunde,
+    adresse:document.getElementById('rn-adresse').value.trim(),
+    email:document.getElementById('rn-email').value.trim(),
+    notiz:document.getElementById('rn-notiz').value.trim(),
+    positionen:pos, betrag:total
+  };
+  // 1. Скачать PDF
+  toast('📎 PDF wird gespeichert...','ok');
+  try {
+    const doc = await generateRechnungPDF(r);
+    const safeNr = nr.replace(/[\/]/g,'-');
+    doc.save(\`Rechnung_\${safeNr}.pdf\`);
+  } catch(e) { console.error(e); }
+  // 2. Открыть WhatsApp с текстом (файл прикрепить вручную)
   const msg=encodeURIComponent(
-`🧾 *Rechnung Nr. ${nr}*
-Autowäsche Berg
+\`🧾 *Rechnung Nr. \${nr}*
+\${firma.name||''}
 
-${kunde?'Kunde: '+kunde+'\n':''}Betrag: *${fmt(total)}*${faellig?'\nFällig bis: '+fd(faellig):''}
+\${kunde?'Kunde: '+kunde+'\n':''}Betrag: *\${fmt(total)}*\${faellig?'\nFällig bis: '+fd(faellig):''}
+\${firma.iban?'\nIBAN: '+firma.iban:''}
 
-Bitte überweisen Sie den Betrag fristgerecht.
-Bei Fragen: +49 (0) 6241 000000`);
-  const url=wa?`https://wa.me/${wa.replace('+','')}?text=${msg}`:`https://wa.me/?text=${msg}`;
-  window.open(url,'_blank');
+Bitte überweisen Sie den Betrag fristgerecht.\${firma.tel?'\nBei Fragen: '+firma.tel:''}\`);
+  const url=wa?`https://wa.me/\${wa.replace('+','')}?text=\${msg}`:`https://wa.me/?text=\${msg}`;
+  setTimeout(()=>{
+    window.open(url,'_blank');
+    toast('✅ PDF gespeichert · WhatsApp geöffnet · Bitte PDF anhängen','ok');
+  },600);
 }
 
+
+
+// ── FIRMA EINSTELLUNGEN ───────────────────────────────────────────────────
+function openFirmaModal() {
+  const p = JSON.parse(localStorage.getItem('bp_firma') || '{}');
+  const fields = ['name','strasse','plz','ort','tel','email','iban','bic','steuernr','ustid'];
+  fields.forEach(k => {
+    const el = document.getElementById('firma-' + k);
+    if (el) el.value = p[k] || '';
+  });
+  const footer = document.getElementById('firma-footer');
+  if (footer) footer.value = p.rechnung_footer || '';
+  openModal('firma-modal');
+}
+
+function saveFirmaData() {
+  const fields = ['name','strasse','plz','ort','tel','email','iban','bic','steuernr','ustid'];
+  const p = {};
+  fields.forEach(k => {
+    const el = document.getElementById('firma-' + k);
+    if (el) p[k] = el.value.trim();
+  });
+  const footer = document.getElementById('firma-footer');
+  if (footer) p.rechnung_footer = footer.value.trim();
+  p.kleinuntern = true; // сохраняем текущий режим из ustModeByYear
+  localStorage.setItem('bp_firma', JSON.stringify(p));
+  // Синхронизируем с Supabase если доступно
+  if (typeof sbSavePin === 'function' && typeof currentUser !== 'undefined' && currentUser) {
+    try {
+      sb.from('user_data').upsert(
+        { user_id: currentUser.id, firma_data: JSON.stringify(p) },
+        { onConflict: 'user_id' }
+      ).catch(() => {});
+    } catch(e) {}
+  }
+  toast('✅ Firmenprofil gespeichert!', 'ok');
+  closeModal('firma-modal');
+}
 
 // ══════════════════════════════════════════════════════════════════════════
 // E-RECHNUNG — XRechnung (XML) + ZUGFeRD (PDF+XML)
