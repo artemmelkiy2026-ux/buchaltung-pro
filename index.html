@@ -34,6 +34,13 @@
 <div id="app-wrapper" style="display:none">
 
 <!-- ══════════════════════════════════════════════════════════ -->
+<script>
+// Последний барьер — если disclaimer не принят, на disclaimer.html
+if (localStorage.getItem('buch_disclaimer_v2') !== '1') {
+  window.location.replace('disclaimer.html');
+}
+</script>
+<!-- ══════════════════════════════════════════════════════════ -->
 
 <!-- BETA TOPBAR -->
 <div id="beta-topbar">
