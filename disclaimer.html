@@ -222,7 +222,6 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   let checked = false;
   let lang = 'de';
@@ -262,42 +261,20 @@
     document.getElementById('accept-btn').classList.toggle('active', checked);
   }
 
-  async function accept() {
+  function accept() {
     if (!checked) return;
     localStorage.setItem('buch_disclaimer_v2', '1');
     const btn = document.getElementById('accept-btn');
     document.getElementById('btn-txt').textContent = texts[lang].done;
     btn.style.background = 'linear-gradient(135deg, var(--green), #4a8a56)';
-
-    // Проверяем есть ли активная сессия
-    setTimeout(async () => {
-      try {
-        const sb = supabase.createClient(
-          'https://dvmhstytoonpacxwdxuj.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bWhzdHl0b29ucGFjeHdkeHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTY2NzQsImV4cCI6MjA4ODQ5MjY3NH0.oZQD0Dp6mB0pF7hwAQdvQ7_OJe__cBq-MFtAEdB7K84'
-        );
-        const { data: { session } } = await sb.auth.getSession();
-        window.location.href = session ? 'index.html' : 'login.html';
-      } catch(e) {
-        window.location.href = 'login.html';
-      }
-    }, 600);
+    // Всегда на login.html — он сам проверит сессию и пустит в приложение
+    setTimeout(() => { window.location.href = 'login.html'; }, 600);
   }
 
-  // Если уже принято — проверяем сессию и редиректим
-  (async () => {
-    if (localStorage.getItem('buch_disclaimer_v2') !== '1') return;
-    try {
-      const sb = supabase.createClient(
-        'https://dvmhstytoonpacxwdxuj.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bWhzdHl0b29ucGFjeHdkeHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MTY2NzQsImV4cCI6MjA4ODQ5MjY3NH0.oZQD0Dp6mB0pF7hwAQdvQ7_OJe__cBq-MFtAEdB7K84'
-      );
-      const { data: { session } } = await sb.auth.getSession();
-      window.location.replace(session ? 'index.html' : 'login.html');
-    } catch(e) {
-      window.location.replace('login.html');
-    }
-  })();
+  // Если уже принято — сразу на login.html (он проверит сессию)
+  if (localStorage.getItem('buch_disclaimer_v2') === '1') {
+    window.location.replace('login.html');
+  }
 </script>
 
 </body>
