@@ -296,9 +296,13 @@ let isLogin = true;
 
 // ── Умный редирект: disclaimer если не принято, иначе index ───────────────
 function goAfterLogin() {
-  if (sessionStorage.getItem('buch_disclaimer_v2') !== '1') {
+  const disc = localStorage.getItem('buch_disclaimer_v2');
+  console.log('[goAfterLogin] buch_disclaimer_v2 =', disc);
+  if (disc !== '1') {
+    console.log('[goAfterLogin] → disclaimer.html');
     location.href = 'disclaimer.html';
   } else {
+    console.log('[goAfterLogin] → index.html');
     location.href = 'index.html';
   }
 }
@@ -538,7 +542,7 @@ function togglePwd(id, btn) {
 }
 
 async function loginGoogle() {
-  const redirectTo = location.href.replace('login.html', 'index.html');
+  const redirectTo = location.href; // возвращаемся на login.html, он сам проверит disclaimer
   await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
 }
 
