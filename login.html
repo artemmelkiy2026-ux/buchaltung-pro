@@ -167,6 +167,59 @@ body {
 }
 .otp-box.filled { border-color: #1a4578; background: #fff; }
 .otp-box.error-box { border-color: #ef4444; background: #fff5f5; }
+
+/* ── Индикатор надёжности пароля ── */
+.pw-strength-wrap {
+  display: none;
+  margin-top: -4px;
+  margin-bottom: 12px;
+}
+.pw-strength-wrap.visible { display: block; }
+
+.pw-bar-track {
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.pw-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .35s ease, background .35s ease;
+  width: 0%;
+}
+
+.pw-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  transition: color .3s;
+}
+
+.pw-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.pw-hint {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: #f1f5f9;
+  color: #94a3b8;
+  transition: all .25s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pw-hint.ok {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.pw-hint.ok::before { content: "✓ "; }
+.pw-hint:not(.ok)::before { content: "· "; }
 </style>
 </head>
 <body>
@@ -212,10 +265,23 @@ body {
 
   <!-- Пароль -->
   <div class="field">
-    <input id="auth-password" type="password" placeholder="Passwort" autocomplete="current-password" class="has-eye">
+    <input id="auth-password" type="password" placeholder="Passwort" autocomplete="current-password" class="has-eye" oninput="checkPwStrength(this.value)">
     <span class="eye" onclick="togglePwd('auth-password',this)">
       <img src="augen.png" alt="show" width="20" height="auto" style="opacity:.3">
     </span>
+  </div>
+
+  <!-- Индикатор надёжности — только при регистрации -->
+  <div class="pw-strength-wrap" id="pw-strength-wrap">
+    <div class="pw-bar-track"><div class="pw-bar-fill" id="pw-bar-fill"></div></div>
+    <div class="pw-label" id="pw-label">Passwort eingeben</div>
+    <div class="pw-hints" id="pw-hints">
+      <span class="pw-hint" id="ph-len">Mind. 8 Zeichen</span>
+      <span class="pw-hint" id="ph-upper">Großbuchstabe</span>
+      <span class="pw-hint" id="ph-lower">Kleinbuchstabe</span>
+      <span class="pw-hint" id="ph-digit">Zahl</span>
+      <span class="pw-hint" id="ph-special">Sonderzeichen</span>
+    </div>
   </div>
 
   <!-- Подтверждение пароля -->
@@ -520,11 +586,61 @@ function setTab(tab) {
   document.getElementById('remember-wrap').style.display = isLogin ? 'flex' : 'none';
   document.getElementById('auth-btn').textContent = isLogin ? 'Anmelden' : 'Registrieren';
   document.getElementById('auth-error').textContent = '';
+  // Индикатор пароля — только при регистрации
+  const pwWrap = document.getElementById('pw-strength-wrap');
+  if (pwWrap) {
+    if (!isLogin) {
+      const val = document.getElementById('auth-password').value;
+      if (val) { pwWrap.classList.add('visible'); checkPwStrength(val); }
+      else pwWrap.classList.add('visible');
+    } else {
+      pwWrap.classList.remove('visible');
+    }
+  }
   // Биометрия только на вкладке входа
   const bioBtn = document.getElementById('bio-login-btn');
   if (bioBtn.dataset.available === 'true') {
     bioBtn.style.display = isLogin ? 'flex' : 'none';
   }
+}
+
+function checkPwStrength(val) {
+  const wrap = document.getElementById('pw-strength-wrap');
+  if (!wrap) return;
+
+  const checks = {
+    len:     val.length >= 8,
+    upper:   /[A-Z]/.test(val),
+    lower:   /[a-z]/.test(val),
+    digit:   /[0-9]/.test(val),
+    special: /[^A-Za-z0-9]/.test(val),
+  };
+
+  // Обновляем подсказки
+  document.getElementById('ph-len').classList.toggle('ok', checks.len);
+  document.getElementById('ph-upper').classList.toggle('ok', checks.upper);
+  document.getElementById('ph-lower').classList.toggle('ok', checks.lower);
+  document.getElementById('ph-digit').classList.toggle('ok', checks.digit);
+  document.getElementById('ph-special').classList.toggle('ok', checks.special);
+
+  const score = Object.values(checks).filter(Boolean).length;
+  const bar   = document.getElementById('pw-bar-fill');
+  const label = document.getElementById('pw-label');
+
+  const levels = [
+    { pct: '0%',   color: '#e2e8f0', text: 'Passwort eingeben' },
+    { pct: '20%',  color: '#ef4444', text: '🔴 Sehr schwach' },
+    { pct: '40%',  color: '#f97316', text: '🟠 Schwach' },
+    { pct: '60%',  color: '#eab308', text: '🟡 Mittel' },
+    { pct: '80%',  color: '#22c55e', text: '🟢 Stark' },
+    { pct: '100%', color: '#16a34a', text: '🟢 Sehr stark' },
+  ];
+
+  const lvl = val.length === 0 ? levels[0] : levels[score];
+  bar.style.width      = lvl.pct;
+  bar.style.background = lvl.color;
+  label.textContent    = lvl.text;
+  label.style.color    = val.length === 0 ? '#94a3b8' : lvl.color;
 }
 
 function togglePwd(id, btn) {
