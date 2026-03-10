@@ -986,5 +986,49 @@
   </div>
 </div>
 
+
+<!-- ── KUNDE RECHNUNGEN MODAL ── -->
+<div class="modal-bg" id="kunde-rech-modal">
+  <div class="modal" style="max-width:680px;width:100%">
+    <div class="modal-hdr">
+      <div>
+        <h2>🧾 Rechnungen</h2>
+        <p id="kunde-rech-name" style="font-size:12px;color:var(--sub);margin-top:2px"></p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn primary" style="padding:8px 14px;font-size:13px" onclick="neueRechnungFuerKundeNow()">＋ Neue Rechnung</button>
+        <button class="modal-close" onclick="closeModal('kunde-rech-modal')">✕</button>
+      </div>
+    </div>
+    <div id="kunde-rech-empty" style="display:none;text-align:center;padding:40px;color:var(--sub)">
+      <div style="font-size:32px;margin-bottom:8px">📄</div>
+      <div>Noch keine Rechnungen für diesen Kunden</div>
+    </div>
+    <div class="tbl-wrap" id="kunde-rech-wrap" style="margin-top:0">
+      <table style="table-layout:fixed;width:100%">
+        <colgroup>
+          <col style="width:110px">
+          <col>
+          <col style="width:80px">
+          <col style="width:90px">
+          <col style="width:90px">
+        </colgroup>
+        <thead><tr>
+          <th>Nr.</th>
+          <th>Beschreibung</th>
+          <th>Datum</th>
+          <th style="text-align:right">Betrag</th>
+          <th style="text-align:center">Status</th>
+        </tr></thead>
+        <tbody id="kunde-rech-tbody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+      <div id="kunde-rech-total" style="font-size:13px;color:var(--sub)"></div>
+      <button class="btn" style="padding:10px 18px" onclick="closeModal('kunde-rech-modal')">Schließen</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

@@ -154,7 +154,7 @@ function renderKunden(){
       <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.plz?k.plz+' ':''} ${k.ort||''}</td>
       <td style="white-space:nowrap">
         <button class="del-btn edit-btn" style="opacity:1" onclick="editKunde('${k.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-        <button class="del-btn edit-btn" style="opacity:1;color:var(--blue)" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnung erstellen"><i class="fas fa-receipt"></i></button>
+        <button class="del-btn edit-btn" style="opacity:1;color:var(--blue)" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen anzeigen"><i class="fas fa-file-invoice"></i></button>
         <button class="del-btn" style="opacity:1" onclick="delKunde('${k.id}')" title="Löschen">✕</button>
       </td>
     </tr>`;
@@ -253,10 +253,85 @@ function selectKunde(id){
   closeModal('kunde-pick-modal');
   toast('✅ Kunde übernommen','ok');
 }
+// Текущий kundeId для модала "Счета клиента"
+let _kundeRechId = null;
+
 function neueRechnungFuerKunde(id){
-  openRechModal();
-  setTimeout(()=>selectKunde(id),50);
-  nav('rechnungen',document.querySelector('[onclick*="rechnungen"]'));
+  // Показываем список счетов клиента
+  showKundeRechnungen(id);
+}
+
+function showKundeRechnungen(id) {
+  _kundeRechId = id;
+  const k = (data.kunden||[]).find(x=>x.id===id);
+  if (!k) return;
+
+  // Заголовок
+  document.getElementById('kunde-rech-name').textContent = k.name + (k.email ? ' · ' + k.email : '');
+
+  // Фильтруем счета по kundeId ИЛИ по имени клиента (для старых данных)
+  const rechs = (data.rechnungen||[]).filter(r =>
+    r.kundeId === id || r.kunde === k.name
+  ).sort((a,b) => b.datum.localeCompare(a.datum));
+
+  const tbody = document.getElementById('kunde-rech-tbody');
+  const empty = document.getElementById('kunde-rech-empty');
+  const wrap  = document.getElementById('kunde-rech-wrap');
+  const total = document.getElementById('kunde-rech-total');
+
+  if (!rechs.length) {
+    empty.style.display = 'block';
+    wrap.style.display  = 'none';
+    total.textContent   = '';
+  } else {
+    empty.style.display = 'none';
+    wrap.style.display  = '';
+    const smap = {
+      offen:        '<span class="rech-status rs-offen">🟡 Offen</span>',
+      ueberfaellig: '<span class="rech-status rs-ueberfaellig">🔴 Überfällig</span>',
+      bezahlt:      '<span class="rech-status rs-bezahlt">🟢 Bezahlt</span>',
+    };
+    tbody.innerHTML = rechs.map(r => `
+      <tr style="cursor:pointer" onclick="openRechFromKunde('${r.id}')">
+        <td style="font-family:var(--mono);font-size:11px;font-weight:600">${r.nr}</td>
+        <td style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.beschreibung||'—'}</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--sub)">${fd(r.datum)}</td>
+        <td style="text-align:right;font-family:var(--mono);font-weight:600;font-size:12px">${fmt(r.betrag)}</td>
+        <td style="text-align:center">${smap[r.status]||r.status}</td>
+      </tr>`).join('');
+    const gesamt = rechs.reduce((s,r)=>s+r.betrag,0);
+    const bezahlt = rechs.filter(r=>r.status==='bezahlt').reduce((s,r)=>s+r.betrag,0);
+    total.innerHTML = `${rechs.length} Rechnung${rechs.length!==1?'en':''} · Gesamt: <strong>${fmt(gesamt)}</strong> · Bezahlt: <strong style="color:var(--green)">${fmt(bezahlt)}</strong>`;
+  }
+
+  openModal('kunde-rech-modal');
+}
+
+function openRechFromKunde(id) {
+  closeModal('kunde-rech-modal');
+  // Переходим в раздел счетов и открываем счёт на редактирование
+  const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
+  if (navEl) nav('rechnungen', navEl);
+  setTimeout(() => editRech(id), 80);
+}
+
+function neueRechnungFuerKundeNow() {
+  const id = _kundeRechId;
+  closeModal('kunde-rech-modal');
+  const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
+  if (navEl) nav('rechnungen', navEl);
+  // Открываем пустой модал счёта и заполняем данные клиента
+  setTimeout(() => {
+    openRechModal();
+    setTimeout(() => {
+      const k = (data.kunden||[]).find(x=>x.id===id);
+      if (!k) return;
+      document.getElementById('rn-kunde').value  = k.name;
+      document.getElementById('rn-adresse').value = [k.strasse, k.plz&&k.ort ? k.plz+' '+k.ort : ''].filter(Boolean).join(', ');
+      document.getElementById('rn-email').value   = k.email||'';
+      document.getElementById('rn-nr').dataset.kundeId = k.id;
+    }, 60);
+  }, 100);
 }
 
 // IBAN Validierung
