@@ -153,24 +153,29 @@ function wiedToDb(w) {
 // ── SAVE / DELETE ──────────────────────────────────────────────────────────
 // ── UST EINTRAEGE ─────────────────────────────────────────────────────────
 function ustEintragToDb(e) {
+  // UI использует 'ust'/'vorsteuer', БД хранит 'Ausgang'/'Vorsteuer'
+  const typMap = { 'ust': 'Ausgang', 'vorsteuer': 'Vorsteuer', 'Ausgang': 'Ausgang', 'Vorsteuer': 'Vorsteuer' };
   return {
     id:           e.id,
     user_id:      currentUser.id,
     datum:        e.datum,
-    typ:          e.typ,
+    typ:          typMap[e.typ] || e.typ,
     betrag:       e.betrag,
     rate:         e.rate || 0,
     beschreibung: e.beschreibung || '',
   };
 }
 function dbToUstEintrag(r) {
+  // БД хранит 'Ausgang'/'Vorsteuer', UI ожидает 'ust'/'vorsteuer'
+  const typMap = { 'Ausgang': 'ust', 'Vorsteuer': 'vorsteuer', 'ust': 'ust', 'vorsteuer': 'vorsteuer' };
   return {
     id:           r.id,
     datum:        r.datum,
-    typ:          r.typ,
+    typ:          typMap[r.typ] || r.typ,
     betrag:       parseFloat(r.betrag) || 0,
     rate:         parseFloat(r.rate)   || 0,
     beschreibung: r.beschreibung || '',
+    quelle:       'Manual',
   };
 }
 async function sbSaveUstEintrag(e) {

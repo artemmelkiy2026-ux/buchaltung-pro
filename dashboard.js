@@ -116,21 +116,17 @@ function addEintrag(){
       entry.mwstBetrag=mwBet;
       entry.nettoBetrag=netBet;
       if(!data.ustEintraege) data.ustEintraege=[];
-      data.ustEintraege.push({
-        id:Date.now()+'_ust',datum,typ:'ust',
-        netto:netBet,rate:mwRate,betrag:mwBet,
-        beschreibung:dsc||kat
-      });
+      const ustAutoE={id:Date.now()+'_ust',datum,typ:'Ausgang',rate:mwRate,betrag:mwBet,beschreibung:dsc||kat};
+      data.ustEintraege.push(ustAutoE);
+      sbSaveUstEintrag(ustAutoE);
     } else {
       entry.vorsteuerRate=mwRate;
       entry.vorsteuerBet=mwBet;
       entry.nettoBetrag=netBet;
       if(!data.ustEintraege) data.ustEintraege=[];
-      data.ustEintraege.push({
-        id:Date.now()+'_vs',datum,typ:'vorsteuer',
-        netto:netBet,rate:mwRate,betrag:mwBet,
-        beschreibung:dsc||kat,lieferant:''
-      });
+      const ustAutoA={id:Date.now()+'_vs',datum,typ:'Vorsteuer',rate:mwRate,betrag:mwBet,beschreibung:dsc||kat};
+      data.ustEintraege.push(ustAutoA);
+      sbSaveUstEintrag(ustAutoA);
     }
   }
   data.eintraege.unshift(entry);
