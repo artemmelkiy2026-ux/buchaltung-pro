@@ -51,6 +51,8 @@ async function sbSignOut() {
   await sb.auth.signOut();
   currentUser = null;
   // PIN не удаляем — он привязан к аккаунту
+  // Сбрасываем disclaimer — при следующем входе покажется снова
+  localStorage.removeItem('buch_disclaimer_v2');
   location.href = 'login.html';
 }
 async function authGoogle() {
