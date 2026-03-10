@@ -617,9 +617,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Предлагаем настроить PIN если ещё не создан
       // Баннер PIN — показываем если нет пина
-      console.log('[PIN check] remotePin:', remotePin, 'skipped:', localStorage.getItem('bp_pin_skipped'));
-      if (!remotePin) {
-        localStorage.removeItem('bp_pin_skipped');
+      if (!remotePin && !localStorage.getItem('bp_pin_skipped')) {
         setTimeout(offerPinSetup, 3500);
       }
 
