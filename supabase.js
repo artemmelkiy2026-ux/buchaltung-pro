@@ -296,7 +296,7 @@ function offerPinRestore() {
       </div>
       <div style="display:flex;gap:8px;flex-shrink:0">
         <button onclick="document.getElementById('pin-offer-banner').remove()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;color:#fff;padding:8px 12px;font-size:12px;cursor:pointer">Nein</button>
-        <button onclick="document.getElementById('pin-offer-banner').remove();location.href='profile.html'" style="background:#fff;border:none;border-radius:8px;color:#c0392b;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Ja ✓</button>
+        <button onclick="document.getElementById('pin-offer-banner').remove();location.href='profile.html'" style="background:#fff;border:none;border-radius:8px;color:#000000;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Ja ✓</button>
       </div>
     </div>
     <button onclick="document.getElementById('pin-offer-banner').remove();localStorage.setItem('bp_pin_removed_skipped','1')" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.6);padding:6px 14px;font-size:11px;cursor:pointer;width:100%">Nicht mehr vorschlagen</button>
