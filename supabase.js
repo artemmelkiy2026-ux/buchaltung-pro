@@ -96,7 +96,23 @@ function dbToKunde(r) {
   return { id:r.id, name:r.name||'', ansprechpartner:r.ansprechpartner||'', email:r.email||'', tel:r.tel||'', strasse:r.strasse||'', plz:r.plz||'', ort:r.ort||'', iban:r.iban||'', ustid:r.ustid||'', notiz:r.notiz||'' };
 }
 function dbToRechnung(r, allPos) {
-  const pos = allPos.filter(p => p.rechnung_id === r.id).map(p => ({ id:p.id, beschreibung:p.beschreibung||'', menge:parseFloat(p.menge)||1, einheit:p.einheit||'Stk.', einzelpreis:parseFloat(p.einzelpreis)||0, mwstRate:parseFloat(p.mwst_rate)||0 }));
+  const pos = allPos.filter(p => p.rechnung_id === r.id).map(p => {
+    const netto = parseFloat(p.einzelpreis) || 0;
+    const rate  = parseFloat(p.mwst_rate)  || 0;
+    return {
+      id:          p.id,
+      beschreibung: p.beschreibung || '',
+      bez:          p.beschreibung || '',        // alias для getRechPositionen / buildRechnungHTML
+      menge:        parseFloat(p.menge) || 1,
+      einheit:      p.einheit || 'Stk.',
+      einzelpreis:  netto,
+      netto:        netto,                       // alias для calcRechTotal
+      preis:        netto,                       // alias для buildRechnungHTML
+      mwstRate:     rate,
+      rate:         rate,                        // alias für calcRechTotal
+      brutto:       netto * (1 + rate / 100),
+    };
+  });
   return { id:r.id, nr:r.nr||'', datum:r.datum||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', betrag:parseFloat(r.betrag)||0, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', positionen:pos };
 }
 function dbToWied(r) {
@@ -112,7 +128,21 @@ function rechnungToDb(r) {
   return { id:r.id, user_id:currentUser.id, nr:r.nr||null, datum:r.datum||null, faellig:r.faellig||null, kunde:r.kunde||null, kunde_id:r.kundeId||null, adresse:r.adresse||null, email:r.email||null, betrag:r.betrag||0, status:r.status||'offen', mwst_mode:r.mwstMode||'§19', notiz:r.notiz||null, wa:r.wa||null };
 }
 function posToDb(pos, rechnungId) {
-  return { id:pos.id, user_id:currentUser.id, rechnung_id:rechnungId, beschreibung:pos.beschreibung||null, menge:pos.menge||1, einheit:pos.einheit||'Stk.', einzelpreis:pos.einzelpreis||0, mwst_rate:pos.mwstRate||0 };
+  // Поддержка обоих форматов:
+  // Из getRechPositionen(): { bez, netto, rate, menge, brutto }
+  // Из dbToRechnung():      { beschreibung, einzelpreis, mwstRate, menge, einheit, id }
+  const beschreibung = pos.beschreibung || pos.bez || null;
+  const einzelpreis  = pos.einzelpreis  !== undefined ? pos.einzelpreis
+                     : pos.netto        !== undefined ? pos.netto
+                     : 0;
+  const mwst_rate    = pos.mwstRate !== undefined ? pos.mwstRate
+                     : pos.rate     !== undefined ? pos.rate
+                     : 0;
+  const einheit      = pos.einheit || 'Stk.';
+  const menge        = pos.menge || 1;
+  // id: у новых позиций нет id — генерируем уникальный
+  const id = pos.id || (Date.now() + '_' + Math.random().toString(36).slice(2, 7));
+  return { id, user_id:currentUser.id, rechnung_id:rechnungId, beschreibung, menge, einheit, einzelpreis, mwst_rate };
 }
 function wiedToDb(w) {
   return { id:w.id, user_id:currentUser.id, typ:w.typ||'Ausgabe', kategorie:w.kategorie||null, beschreibung:w.beschreibung||null, betrag:w.betrag||0, zahlungsart:w.zahlungsart||null, intervall:w.intervall||'monatlich', naechste:w.naechste||null };
@@ -139,10 +169,13 @@ async function sbDeleteKunde(id) {
 }
 async function sbSaveRechnung(r) {
   if (!currentUser) { console.warn('sbSaveRechnung: currentUser is null, skipping save'); return; }
-  await sb.from('rechnungen').upsert(rechnungToDb(r),{onConflict:'id'});
-  if(r.positionen&&r.positionen.length) {
+  const { error: rErr } = await sb.from('rechnungen').upsert(rechnungToDb(r),{onConflict:'id'});
+  if (rErr) { console.error('Save rechnung:', rErr); return; }
+  if (r.positionen && r.positionen.length) {
     await sb.from('rechnungen_pos').delete().eq('rechnung_id',r.id).eq('user_id',currentUser.id);
-    await sb.from('rechnungen_pos').insert(r.positionen.map(p=>posToDb(p,r.id)));
+    const posRows = r.positionen.map(p => posToDb(p, r.id));
+    const { error: pErr } = await sb.from('rechnungen_pos').insert(posRows);
+    if (pErr) console.error('Save rechnungen_pos:', pErr, JSON.stringify(posRows[0]));
   }
 }
 async function sbDeleteRechnung(id) {
