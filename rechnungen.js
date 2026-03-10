@@ -741,9 +741,8 @@ function downloadXRechnungId(id) {
 }
 
 // ── ZUGFeRD: PDF + XML (Factur-X / EN 16931) ────────────────────────────
-// jsPDF 2.5.1 unterstützt kein addEmbeddedFile (nur in jsPDF ≥3.x).
-// Lösung: PDF-Bytes per ArrayBuffer laden, XML manuell als PDF-Attachment
-// einbetten (low-level PDF stream), dann als Blob speichern.
+// jsPDF 2.5.1 unterstützt kein echtes PDF/A-3 Embedding.
+// Wir erzeugen daher: normales PDF (öffnet immer) + separates XML (EN 16931).
 async function downloadZUGFeRD(r) {
   if (!r) {
     const pos = getRechPositionen();
@@ -764,148 +763,38 @@ async function downloadZUGFeRD(r) {
   }
 
   toast('📄 ZUGFeRD wird erstellt...', 'ok');
+  const safeNr = (r.nr || 'rechnung').replace(/[\/]/g, '-');
+
   try {
-    // 1. PDF generieren
+    // 1. Normales PDF erzeugen und sofort speichern
     const doc = await generateRechnungPDF(r);
-    const pdfBytes = doc.output('arraybuffer');
-
-    // 2. XML generieren (UTF-8 bytes)
-    const xmlStr = generateXRechnungXML(r);
-    const xmlBytes = new TextEncoder().encode(xmlStr);
-
-    // 3. XML als Attachment in PDF einbetten (low-level PDF object injection)
-    const pdfWithXml = embedXmlInPdf(pdfBytes, xmlBytes, 'factur-x.xml', r.nr);
-
-    // 4. Blob speichern
-    const safeNr = r.nr.replace(/[\/]/g, '-');
-    const blob = new Blob([pdfWithXml], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ZUGFeRD_${safeNr}.pdf`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-
-    // 5. XML auch separat anbieten
-    setTimeout(() => {
-      const xblob = new Blob([xmlStr], { type: 'application/xml;charset=utf-8' });
-      const xurl = URL.createObjectURL(xblob);
-      const xa = document.createElement('a');
-      xa.href = xurl;
-      xa.download = `factur-x_${safeNr}.xml`;
-      xa.click();
-      setTimeout(() => URL.revokeObjectURL(xurl), 2000);
-    }, 600);
-
-    toast('✅ ZUGFeRD PDF + XML gespeichert!', 'ok');
+    doc.save(`ZUGFeRD_${safeNr}.pdf`);
   } catch(e) {
-    console.error('[ZUGFeRD error]', e);
-    toast('❌ Fehler: ' + e.message, 'err');
-  }
-}
-
-// ── Bettet XML-Datei als EmbeddedFile in bestehende PDF-Bytes ein ─────────
-// Implementiert PDF-Spezifikation §7.11 (Embedded File Streams)
-function embedXmlInPdf(pdfBytes, xmlBytes, filename, invoiceNr) {
-  // PDF als Text dekodieren (Latin-1 safe für binäre streams)
-  const decoder = new TextDecoder('latin1');
-  const encoder = new TextEncoder();
-  let pdfText = decoder.decode(pdfBytes);
-
-  // Letzte Objekt-Nummer finden
-  const objNums = [...pdfText.matchAll(/(\d+)\s+0\s+obj/g)].map(m => parseInt(m[1]));
-  let nextObj = (objNums.length ? Math.max(...objNums) : 10) + 1;
-
-  // XML bytes als Latin-1 String für PDF stream
-  const xmlLatin1 = Array.from(xmlBytes).map(b => String.fromCharCode(b)).join('');
-  const xmlLen = xmlBytes.length;
-
-  // ISO 8601 Timestamp
-  const now = new Date();
-  const ts = now.toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'').replace('T','') + "Z";
-  const pdfDate = `D:${ts.replace('Z', "+00'00'")}`;
-
-  // EmbeddedFile stream object
-  const efObjNum = nextObj++;
-  const afObjNum = nextObj++;
-  const nameObjNum = nextObj++;
-
-  const efStream = `${efObjNum} 0 obj
-<< /Type /EmbeddedFile /Subtype /application#2Fxml /Length ${xmlLen}
-   /Params << /Size ${xmlLen} /CreationDate (${pdfDate}) /ModDate (${pdfDate}) >> >>
-stream
-${xmlLatin1}
-endstream
-endobj
-`;
-
-  const afStream = `${afObjNum} 0 obj
-<< /Type /Filespec /F (${filename}) /UF (${filename})
-   /EF << /F ${efObjNum} 0 R /UF ${efObjNum} 0 R >>
-   /Desc (Factur-X / ZUGFeRD EN 16931 Invoice ${invoiceNr||''}) /AFRelationship /Data >>
-endobj
-`;
-
-  const nameStream = `${nameObjNum} 0 obj
-<< /Names [(${filename}) ${afObjNum} 0 R] >>
-endobj
-`;
-
-  // xref und trailer finden
-  const xrefIdx = pdfText.lastIndexOf('\nxref');
-  if (xrefIdx === -1) {
-    // Fallback: einfach neue Objekte anhängen ohne xref update (Reader tolerant)
-    const newObjs = efStream + afStream + nameStream;
-    const latin1Buf = new Uint8Array(newObjs.length);
-    for (let i=0;i<newObjs.length;i++) latin1Buf[i]=newObjs.charCodeAt(i)&0xff;
-    const result = new Uint8Array(pdfBytes.byteLength + latin1Buf.byteLength);
-    result.set(new Uint8Array(pdfBytes), 0);
-    result.set(latin1Buf, pdfBytes.byteLength);
-    return result.buffer;
+    console.error('[ZUGFeRD PDF error]', e);
+    toast('❌ PDF-Fehler: ' + e.message, 'err');
+    return;
   }
 
-  // Root-Katalog finden und Names + AF eintragen
-  const rootMatch = pdfText.match(/\/Type\s*\/Catalog/);
-  if (rootMatch) {
-    const catStart = pdfText.lastIndexOf('obj', rootMatch.index);
-    const catEnd   = pdfText.indexOf('endobj', catStart) + 6;
-    let catStr = pdfText.slice(catStart, catEnd);
-
-    // Names-Dictionary patchen
-    if (catStr.includes('/Names')) {
-      catStr = catStr.replace('/Names <<', `/Names << /EmbeddedFiles ${nameObjNum} 0 R `);
-    } else {
-      catStr = catStr.replace('<<', `<< /Names << /EmbeddedFiles ${nameObjNum} 0 R >> /AF [${afObjNum} 0 R] `);
-    }
-    pdfText = pdfText.slice(0, catStart) + catStr + pdfText.slice(catEnd);
+  try {
+    // 2. Factur-X / XRechnung XML separat speichern
+    setTimeout(() => {
+      const xmlStr = generateXRechnungXML(r);
+      const blob = new Blob([xmlStr], { type: 'application/xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `factur-x_${safeNr}.xml`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+      toast('✅ PDF + Factur-X XML gespeichert!', 'ok');
+    }, 500);
+  } catch(e) {
+    console.error('[ZUGFeRD XML error]', e);
+    toast('⚠️ PDF gespeichert, XML-Fehler: ' + e.message, 'err');
   }
-
-  // XMP Metadata für ZUGFeRD-Erkennung anhängen (als Kommentar-Stream)
-  const xmpObjNum = nextObj++;
-  const xmpStr = `<?xpacket begin="\xEF\xBB\xBF" id="W5M0MpCehiHzreSzNTczkc9d"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description xmlns:fx="urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#"><fx:DocumentType>INVOICE</fx:DocumentType><fx:DocumentFileName>${filename}</fx:DocumentFileName><fx:Version>1.0</fx:Version><fx:ConformanceLevel>EN 16931</fx:ConformanceLevel></rdf:Description></rdf:RDF></x:xmpmeta><?xpacket end="w"?>`;
-  const xmpObj = `${xmpObjNum} 0 obj
-<< /Type /Metadata /Subtype /XML /Length ${xmpStr.length} >>
-stream
-${xmpStr}
-endstream
-endobj
-`;
-
-  const inject = efStream + afStream + nameStream + xmpObj;
-
-  // Neues PDF zusammenbauen: vor xref einfügen
-  const before = pdfText.slice(0, xrefIdx + 1);
-  const after  = pdfText.slice(xrefIdx + 1);
-  const newPdfText = before + inject + after;
-
-  // Latin-1 → Uint8Array
-  const out = new Uint8Array(newPdfText.length);
-  for (let i = 0; i < newPdfText.length; i++) out[i] = newPdfText.charCodeAt(i) & 0xff;
-  return out.buffer;
 }
 
 function downloadZUGFeRDId(id) {
   const r = data.rechnungen.find(x => x.id === id);
   if (r) downloadZUGFeRD(r);
 }
-
