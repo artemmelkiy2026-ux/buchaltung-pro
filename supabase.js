@@ -47,7 +47,8 @@ async function sbSignUp(email, password) {
   if (error) throw error;
   return data;
 }
-window.sbSignOut = async function sbSignOut() {
+// Регистрируем реальный signOut сразу при загрузке модуля
+window._sbSignOutReady = async function() {
   try {
     await sb.auth.signOut();
   } catch(e) {
@@ -563,16 +564,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('[PROMISE ERROR]', e.reason);
   });
 
-  // Кнопка выхода — вешаем после небольшой задержки чтобы DOM точно был готов
-  setTimeout(() => {
-    const btn = document.getElementById('signout-btn');
+  // Глобальный делегат кликов — ловим кнопку выхода на любом уровне DOM
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('#signout-btn');
     if (btn) {
-      btn.onclick = () => sbSignOut();
-      console.log('[signout-btn] attached');
-    } else {
-      console.warn('[signout-btn] NOT FOUND');
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('[signout] click via delegate');
+      sbSignOut();
     }
-  }, 0);
+  }, true); // true = capture phase — перехватываем раньше всего
+
+
 
   let appStarted = false;
   let appDispatched = false;
@@ -580,6 +583,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function launchApp() {
     // Показываем приложение и запускаем его
     hideAuthScreen();
+    // Привязываем кнопку выхода ПОСЛЕ показа приложения
+    const btn = document.getElementById('signout-btn');
+    if (btn) {
+      btn.onclick = () => sbSignOut();
+      console.log('[signout-btn] attached in launchApp');
+    }
     if (!appDispatched) {
       appDispatched = true;
       window.dispatchEvent(new Event('supabase-ready'));
