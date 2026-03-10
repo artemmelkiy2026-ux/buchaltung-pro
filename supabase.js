@@ -548,6 +548,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (session?.user) {
+      // ── PIN GUARD ──────────────────────────────────────────────────────
+      // Если PIN установлен и сессия не разблокирована (например после таймаута
+      // или перезагрузки страницы) — отправляем на pin.html ДО загрузки данных
+      const storedPin = localStorage.getItem('bp_pin');
+      const pinUnlocked = sessionStorage.getItem('pin_unlocked');
+      if (storedPin && !pinUnlocked) {
+        sessionStorage.setItem('pin_return', 'index.html');
+        location.replace('pin.html');
+        return;
+      }
+      // ──────────────────────────────────────────────────────────────────
       await window.startApp(session.user);
     } else {
       const ls = document.getElementById('loading-screen');
