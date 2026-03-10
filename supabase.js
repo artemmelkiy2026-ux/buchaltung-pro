@@ -468,7 +468,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const uel = document.getElementById('user-email-display');
     if (uel) uel.textContent = currentUser.email;
 
-    sessionStorage.setItem('pin_unlocked', '1');
+    // pin_unlocked устанавливается ТОЛЬКО в pin.html → goToApp()
+    // Здесь мы не трогаем sessionStorage — guard уже прошёл выше
 
     try {
       // ФИХ: параллельная загрузка данных + один запрос user_data
