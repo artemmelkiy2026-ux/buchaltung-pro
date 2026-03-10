@@ -262,7 +262,7 @@ function offerPinSetup() {
   if (document.getElementById('pin-offer-banner')) return;
   const b = document.createElement('div');
   b.id = 'pin-offer-banner';
-  b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a4578;color:#fff;border-radius:16px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;box-shadow:0 8px 32px rgba(26,69,120,.35);font-family:sans-serif;max-width:400px;width:calc(100% - 48px);flex-direction:column';
+  b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgb(56 56 56);color:#fff;border-radius:16px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;font-family:sans-serif;max-width:400px;width:calc(100% - 48px);flex-direction:column';
   b.innerHTML = `
     <div style="display:flex;align-items:center;gap:16px;width:100%">
       <span style="font-size:28px">🔒</span>
