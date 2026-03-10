@@ -562,40 +562,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     const uel = document.getElementById('user-email-display');
     if (uel) uel.textContent = currentUser.email;
 
-    // Загружаем данные и PIN из Supabase
-    const [remoteData, remotePin] = await Promise.all([
-      sbLoadAll(),
-      sbLoadPin(),
-    ]);
-    window._loadedRemoteData = remoteData || null;
-    window._dataReady = true;
-
-    if (remotePin) {
-      localStorage.setItem('bp_pin', remotePin);
-    } else {
-      localStorage.removeItem('bp_pin');
-    }
-
     // При входе считаем что сессия разблокирована
     sessionStorage.setItem('pin_unlocked', '1');
 
+    // Сразу показываем приложение — данные грузим в фоне
     await launchApp();
 
-    // Проверяем не помечен ли аккаунт на удаление
-    const { data: userData } = await sb.from('user_data')
-      .select('deleted_at')
-      .eq('user_id', currentUser.id)
-      .maybeSingle();
+    // Загружаем данные и PIN в фоне
+    try {
+      const [remoteData, remotePin] = await Promise.all([
+        sbLoadAll(),
+        sbLoadPin(),
+      ]);
+      window._loadedRemoteData = remoteData || null;
+      window._dataReady = true;
 
-    if (userData?.deleted_at) {
-      const deleteDate = new Date(new Date(userData.deleted_at).getTime() + 30 * 24 * 60 * 60 * 1000);
-      const daysLeft = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
-      setTimeout(() => showDeletionBanner(daysLeft), 1500);
-    }
+      if (remotePin) {
+        localStorage.setItem('bp_pin', remotePin);
+      } else {
+        localStorage.removeItem('bp_pin');
+      }
 
-    // Предлагаем настроить PIN если ещё не создан
-    if (!remotePin && !localStorage.getItem('bp_pin_skipped')) {
-      setTimeout(offerPinSetup, 2000);
+      // Проверяем не помечен ли аккаунт на удаление
+      const { data: userData } = await sb.from('user_data')
+        .select('deleted_at')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+
+      if (userData?.deleted_at) {
+        const deleteDate = new Date(new Date(userData.deleted_at).getTime() + 30 * 24 * 60 * 60 * 1000);
+        const daysLeft = Math.ceil((deleteDate - new Date()) / (1000 * 60 * 60 * 24));
+        setTimeout(() => showDeletionBanner(daysLeft), 1500);
+      }
+
+      // Предлагаем настроить PIN если ещё не создан
+      if (!remotePin && !localStorage.getItem('bp_pin_skipped')) {
+        setTimeout(offerPinSetup, 2000);
+      }
+
+      // Уведомляем модули что данные готовы
+      window.dispatchEvent(new Event('data-ready'));
+    } catch(e) {
+      console.error('[loadData error]:', e);
     }
   }
 
