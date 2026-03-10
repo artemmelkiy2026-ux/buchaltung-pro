@@ -48,7 +48,7 @@ async function sbSignUp(email, password) {
   return data;
 }
 // Регистрируем реальный signOut сразу при загрузке модуля
-window._sbSignOutReady = async function() {
+window.sbSignOut = async function() {
   try {
     await sb.auth.signOut();
   } catch(e) {
