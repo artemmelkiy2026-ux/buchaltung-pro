@@ -388,7 +388,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   /* ── Header: логотип слева + действия справа ── */
   header {
-    padding: 0 8px;
+    padding: 0 15px;
     height: 52px;
     gap: 0;
     justify-content: space-between;
