@@ -1,5 +1,7 @@
 // ── FILE IO (только экспорт/импорт для резервной копии) ──────────────────
-function persist(){ sbPersist(data); }
+// persist() — в Supabase-архитектуре данные сохраняются автоматически
+// через отдельные sbSave* при каждом действии. Ctrl+S = показать подтверждение.
+function persist(){ if(typeof toast==="function") toast("✅ Daten werden automatisch gespeichert","ok"); }
 function dlJson(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`buchaltung_${new Date().getFullYear()}.json`;a.click();toast('✅ Backup heruntergeladen!','ok');}
 function loadFile(){document.getElementById('fi').click();}
 function onLoad(ev){

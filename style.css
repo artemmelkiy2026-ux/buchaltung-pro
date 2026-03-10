@@ -61,12 +61,6 @@ input[type="date"] {
     box-sizing: border-box;
 }
 
-
-input, select, textarea {
-  font-size: 16px !important;
-  transform: scale(0.875);
-  transform-origin: left center;
-}
 /* ── HEADER ── */
 header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:400}
 .logo{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.06em;white-space:nowrap;color:var(--text)}
@@ -868,4 +862,9 @@ th.sort-desc::after {
     width: 100%;
     padding: 40px 24px;
   }
+}
+
+/* ── iOS: отключить автозум при фокусе на input (font-size < 16px) ── */
+input, select, textarea {
+  font-size: 16px !important;
 }

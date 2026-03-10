@@ -121,6 +121,263 @@ function stRow(label,val,bold=false,color=''){
   </div>`;
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// STEUERBERECHNUNGS-FUNKTIONEN (§32a EStG, GKV, GewSt)
+// ═══════════════════════════════════════════════════════════════════
+const STEUERJAHR_WERTE = {
+  2024: { grundfb: 11784, zone1end: 17005, zone2end: 66760, zone3end: 277826, soli_freigrenze: 18130,
+          kfreibetrag: 9312, kindergeld: 250, ku_vorjahr: 22000, ku_laufend: 50000 },
+  2025: { grundfb: 12096, zone1end: 17430, zone2end: 66760, zone3end: 277825, soli_freigrenze: 19950,
+          kfreibetrag: 9312, kindergeld: 255, ku_vorjahr: 25000, ku_laufend: 100000 },
+  2026: { grundfb: 12348, zone1end: 17799, zone2end: 69878, zone3end: 277825, soli_freigrenze: 20350,
+          kfreibetrag: 9754, kindergeld: 259, ku_vorjahr: 25000, ku_laufend: 100000 }
+  // Kinderfreibetrag 2026: 6.828 € gesamt (3.414 × 2 Elternteile = 6.828 €)
+  // Beachte: Betreuungsfreibetrag 2.928 € unverändert → ges. 9.754 € / Kind bei Zusammenveranlagung
+};
+
+function getSteuerwerte(jahr) {
+  return STEUERJAHR_WERTE[jahr] || STEUERJAHR_WERTE[2026];
+}
+
+function estGrundtarif(zvE, jahr=2026) {
+  const sw = getSteuerwerte(jahr);
+  if (zvE <= 0) return 0;
+  if (zvE <= sw.grundfb) return 0;
+  if (zvE <= sw.zone1end) { const y=(zvE-sw.grundfb)/10000; return Math.round((980*y+1400)*y); }
+  if (zvE <= sw.zone2end) { const z=(zvE-sw.zone1end)/10000; return Math.round((180*z+2397)*z+1025); }
+  if (zvE <= sw.zone3end) return Math.round(zvE*0.42 - Math.round(sw.zone2end*0.42 - (180*(sw.zone2end-sw.zone1end)/10000/10000 + 2397*(sw.zone2end-sw.zone1end)/10000 + 1025)));
+  return Math.round(zvE*0.45 - Math.round(sw.zone3end*0.45 - sw.zone3end*0.42 + Math.round(sw.zone3end*0.42 - (180*(sw.zone2end-sw.zone1end)/10000/10000 + 2397*(sw.zone2end-sw.zone1end)/10000 + 1025))));
+}
+
+// Vereinfachte, akkurate Formel nach §32a EStG
+function calcESt(zvE, jahr=2026) {
+  const sw = getSteuerwerte(jahr);
+  if (zvE <= sw.grundfb) return 0;
+  if (zvE <= sw.zone1end) {
+    const y = (zvE - sw.grundfb) / 10000;
+    return Math.round((980 * y + 1400) * y);
+  }
+  if (zvE <= sw.zone2end) {
+    const z = (zvE - sw.zone1end) / 10000;
+    const grenze1 = calcESt(sw.zone1end, jahr);
+    return Math.round((180 * z + 2397) * z + grenze1);
+  }
+  if (zvE <= sw.zone3end) return Math.round(zvE * 0.42 - (jahr === 2026 ? 10353 : 10436));
+  return Math.round(zvE * 0.45 - (jahr === 2026 ? 18693 : 18772));
+}
+
+function estGrundtarifY(zvE, jahr=2026) { return calcESt(Math.max(0, Math.round(zvE)), jahr); }
+function estSplitting(zvE, jahr=2026) { return estGrundtarifY(Math.round(zvE/2), jahr) * 2; }
+
+function calcSoli(est, jahr=2026) {
+  const sw = getSteuerwerte(jahr);
+  if (est <= sw.soli_freigrenze) return 0;
+  // Milderungszone: nicht sprunghaft
+  const milderung = est * 0.055;
+  const ueberschuss = (est - sw.soli_freigrenze) * 0.119;
+  return Math.round(Math.min(milderung, ueberschuss));
+}
+
+// Aktuell gültige Werte (2026)
+const KFREIBETRAG_2025 = 9754; // 2026: 3.414 × 2 + 2.928 (Betreuung) ≈ 9.756
+const KINDERGELD_MONAT = 259;  // 2026: 259 €/Monat
+
+// Kleinunternehmer-Grenzen ab 2025 (§19 UStG)
+const KU_GRENZE_VORJAHR  = 25000;   // Vorjahresumsatz (netto) — ab 2025
+const KU_GRENZE_LAUFEND  = 100000;  // Laufendes Jahr (HARD LIMIT) — ab 2025
+const KU_GRENZE_ALT      = 22000;   // Bis 2024
+const GEW_FREIBETRAG     = 24500;   // Gewerbesteuer-Freibetrag (unverändert)
+const GEW_MESSZAHL       = 0.035;   // Gewerbesteuer-Messzahl 3,5%
+
+function stInit() {
+  const je=[...new Set(data.eintraege.map(e=>e.datum.substring(0,4)))].sort().reverse();
+  const sel=document.getElementById('st-eur-yr');
+  sel.innerHTML='<option value="Alle">Alle Jahre</option>'+je.map(j=>`<option>${j}</option>`).join('');
+  stSyncJahr();
+  stFamChange(); stKinderChange();
+}
+
+function stSyncJahr() {
+  const jahr = document.getElementById('st-jahr').value;
+  const sel = document.getElementById('st-eur-yr');
+  const opt = [...sel.options].find(o => o.value === jahr);
+  if (opt) sel.value = jahr;
+  else sel.value = 'Alle';
+  stFillEUR();
+}
+
+function stFamChange() {
+  const v=document.getElementById('st-fam').value;
+  const pb=document.getElementById('st-partner-block');
+  pb.style.display=(v==='zusammen'||v==='getrennt')?'':'none';
+}
+
+function stPartnerChange() {
+  const v=document.getElementById('st-partner').value;
+  document.getElementById('st-pein-wrap').style.display=v==='ja'?'':'none';
+}
+
+function stKinderChange() {
+  const n=parseInt(document.getElementById('st-kinder').value)||0;
+  const block=document.getElementById('st-kinder-block');
+  if(!n){block.innerHTML='';return;}
+  block.innerHTML=Array.from({length:n},(_,i)=>`
+    <div class="fg"><label>Kind ${i+1} — Geburtsjahr</label>
+      <input type="number" id="st-kid-${i}" placeholder="${new Date().getFullYear()-5}" min="1990" max="${new Date().getFullYear()}" value="${new Date().getFullYear()-5-i*2}">
+    </div>`).join('');
+}
+
+function stFillEUR() {
+  const yr=document.getElementById('st-eur-yr').value;
+  const ye=yr==='Alle'?data.eintraege:data.eintraege.filter(e=>e.datum.startsWith(yr));
+  const ein=sum(ye,'Einnahme'), aus=sum(ye,'Ausgabe');
+  document.getElementById('st-ein').value=ein.toFixed(2);
+  document.getElementById('st-aus').value=aus.toFixed(2);
+  stCalcGew();
+  toast(`${t('EÜR geladen:')} ${yr}`,'ok');
+}
+
+function stCalcGew() {
+  const ein=parseFloat(document.getElementById('st-ein').value)||0;
+  const aus=parseFloat(document.getElementById('st-aus').value)||0;
+  document.getElementById('st-gew').value=(ein-aus).toFixed(2);
+}
+
+function stCalcWK() {
+  const ho=Math.min(parseInt(document.getElementById('st-ho').value)||0,210);
+  const km=parseFloat(document.getElementById('st-km').value)||0;
+  const arb=parseInt(document.getElementById('st-arbtage').value)||220;
+  const hoPausch=Math.min(ho*6,1260);
+  const fahrt=km*arb*0.30;
+  document.getElementById('st-ho-val').textContent=fmt(hoPausch);
+  document.getElementById('st-fk-val').textContent=fmt(fahrt);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GEWERBESTEUER & GKV FUNKTIONEN
+// ═══════════════════════════════════════════════════════════════════════════
+
+// База городов с Hebesätze
+const HEBESAETZE_DB = {
+  'Worms': 430, 'München': 490, 'Berlin': 410, 'Hamburg': 520, 'Köln': 470,
+  'Frankfurt': 450, 'Stuttgart': 490, 'Düsseldorf': 460, 'Dortmund': 490,
+  'Essen': 500, 'Leipzig': 440, 'Dresden': 460, 'Hannover': 480, 'Nürnberg': 470,
+  'Duisburg': 530, 'Bochum': 510, 'Wuppertal': 510, 'Bielefeld': 500, 'Bonn': 410,
+  'Münster': 460, 'Mannheim': 450, 'Augsburg': 470, 'Wiesbaden': 420, 'Gelsenkirchen': 540,
+  'Mönchengladbach': 500, 'Braunschweig': 490, 'Chemnitz': 440, 'Kiel': 460, 'Aachen': 490,
+  'Lübeck': 470, 'Halle': 430, 'Magdeburg': 420, 'Freiburg': 480, 'Krefeld': 500,
+  'Mainz': 440, 'Rostock': 420, 'Kassel': 460, 'Hagen': 520, 'Saarbrücken': 490
+};
+
+function searchHebesatz() {
+  const stadtInput = document.getElementById('st-stadt').value.trim();
+  if (!stadtInput) return;
+  
+  // Точный поиск
+  for (let stadt in HEBESAETZE_DB) {
+    if (stadt.toLowerCase() === stadtInput.toLowerCase()) {
+      document.getElementById('st-hebesatz').value = HEBESAETZE_DB[stadt];
+      toast('✅ ' + stadt + ': ' + HEBESAETZE_DB[stadt] + '%', 'ok');
+      return;
+    }
+  }
+  
+  // Частичный поиск
+  for (let stadt in HEBESAETZE_DB) {
+    if (stadt.toLowerCase().includes(stadtInput.toLowerCase())) {
+      document.getElementById('st-stadt').value = stadt;
+      document.getElementById('st-hebesatz').value = HEBESAETZE_DB[stadt];
+      toast('✅ Gefunden: ' + stadt + ' (' + HEBESAETZE_DB[stadt] + '%)', 'ok');
+      return;
+    }
+  }
+  
+  toast(t('❌ Stadt nicht in Datenbank. Hebesatz manuell eingeben.'), 'error');
+}
+
+function calcGewerbesteuer(gewinn) {
+  const hebesatz = parseInt(document.getElementById('st-hebesatz').value) || 430;
+  const freibetrag = 24500;
+  const messbasis = Math.max(0, gewinn - freibetrag);
+  const messbetrag = messbasis * 0.035;
+  const gewst = messbetrag * (hebesatz / 100);
+  const verrechenbar = Math.min(gewst, gewinn * 0.40); // Max 40% von Gewinn
+  
+  return { gewst, messbasis, messbetrag, verrechenbar, hebesatz };
+}
+
+function calcGKVNachzahlung(gewinn, gkvGezahlt, isFamilienversichert) {
+  // НОВОЕ: Учитываем Mindestbeitrag
+  // BBG 2026: 5.812,50 €/Monat
+  // KV-Satz: 14,6% + Ø ZB 2,9% = ~17,5%
+  // Mindestbeitrag: ~2.600€/год (если не Familienversicherung)
+  
+  const bbg = 5812.50 * 12; // Jährlich
+  const kvRate = 0.175; // KV + Pflege
+  const mindestbeitrag = 2600; // Mindestbeitrag pro Jahr
+  
+  if (isFamilienversichert) {
+    // Familienversichert = KOSTENLOS
+    return { 
+      gkvSoll: 0, 
+      nachzahlung: Math.max(0, 0 - gkvGezahlt),
+      abzugsfaehig: 0,
+      hasMindestbeitrag: false
+    };
+  }
+  
+  let gkvSoll = 0;
+  let hasMindestbeitrag = false;
+  
+  if (gewinn <= bbg) {
+    // Normalный расчёт: gewinn * Satz
+    const normalCalc = gewinn * kvRate;
+    
+    // Но если это меньше Mindestbeitrag, платим Mindestbeitrag
+    if (normalCalc < mindestbeitrag) {
+      gkvSoll = mindestbeitrag;
+      hasMindestbeitrag = true;
+    } else {
+      gkvSoll = normalCalc;
+    }
+  } else {
+    // Über BBG: max
+    gkvSoll = bbg * kvRate;
+  }
+  
+  const nachzahlung = Math.max(0, gkvSoll - gkvGezahlt);
+  return { 
+    gkvSoll, 
+    nachzahlung, 
+    abzugsfaehig: nachzahlung,
+    hasMindestbeitrag: hasMindestbeitrag
+  };
+}
+
+function updateGKVInfo() {
+  // Обновить информацию о GKV при изменении статуса
+  const isFamilienversichert = document.getElementById('st-gkv-familienvers')?.value === 'ja';
+  if (isFamilienversichert) {
+    document.getElementById('st-gkv-warning-mindest').style.display = 'none';
+  }
+}
+
+function updateKleinunternehmerCalc() {
+  // Пересчитать Netto если выбрана опция Kleinunternehmer
+  // (это будет вызвано при нажатии Berechnen)
+}
+
+function updateGewersteuherDisplay(gewinn) {
+  const result = calcGewerbesteuer(gewinn);
+  document.getElementById('st-gew-display').textContent = fmt(gewinn);
+  document.getElementById('st-messbasis-display').textContent = fmt(result.messbasis);
+  document.getElementById('st-messbetrag-display').textContent = fmt(result.messbetrag);
+  document.getElementById('st-hebesatz-display').textContent = result.hebesatz + '%';
+  document.getElementById('st-gewst-total').textContent = fmt(result.gewst);
+  document.getElementById('st-gewst-verrechenbar').textContent = fmt(result.verrechenbar);
+}
+
+
 function stBerechnen() {
   try {
   // ── Eingaben lesen ──
