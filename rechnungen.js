@@ -466,7 +466,7 @@ function druckRechnung(){
   const nr=document.getElementById('rn-nr').value.trim();
   const datum=document.getElementById('rn-dat').value;
   if(!nr||!datum){toast('Rechnungs-Nr. und Datum erforderlich','err');return;}
-  const total=pos.reduce((s,p)=>s+p.menge*p.preis,0);
+  const total=pos.reduce((s,p)=>s+p.menge*(p.netto||p.preis||0),0);
   const r={
     nr, datum,
     faellig:document.getElementById('rn-faellig').value,
@@ -476,17 +476,20 @@ function druckRechnung(){
     notiz:document.getElementById('rn-notiz').value.trim(),
     positionen:pos, betrag:total
   };
-  downloadRechnungPDF(r);
+  openRechnungPrint(r);
 }
 function druckRechnungId(id){
   const r=data.rechnungen.find(x=>x.id===id);
   if(!r)return;
-  downloadRechnungPDF(r);
+  openRechnungPrint(r);
 }
 function openRechnungPrint(r){
   const win=window.open('','_blank','width=900,height=700');
-  win.document.write(buildRechnungHTML(r));
+  const html = buildRechnungHTML(r);
+  win.document.write(html);
   win.document.close();
+  // Диалог печати открывается автоматически после загрузки страницы
+  win.addEventListener('load', () => { win.focus(); win.print(); });
 }
 
 // ── RECHNUNG PER E-MAIL ───────────────────────────────────────────────────
