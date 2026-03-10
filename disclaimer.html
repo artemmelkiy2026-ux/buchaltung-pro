@@ -267,12 +267,13 @@
     const btn = document.getElementById('accept-btn');
     document.getElementById('btn-txt').textContent = texts[lang].done;
     btn.style.background = 'linear-gradient(135deg, var(--green), #4a8a56)';
-    // Всегда на login.html — он сам проверит сессию и пустит в приложение
     setTimeout(() => { window.location.href = 'index.html'; }, 600);
   }
 
-  // Если уже принято — сразу на login.html (он проверит сессию)
-  // (ключ проверяется в index.html — сюда попадают только если его нет)
+  // Если открыли disclaimer напрямую без входа — на login.html
+  if (localStorage.getItem('buch_disclaimer_v2') === '1') {
+    window.location.replace('index.html');
+  }
 </script>
 
 </body>

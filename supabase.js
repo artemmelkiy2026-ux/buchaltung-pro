@@ -556,6 +556,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (appStarted) return;
     appStarted = true;
     currentUser = user;
+    console.log('[startApp] user:', user.email);
 
     // Показываем email в шапке
     const uel = document.getElementById('user-email-display');
@@ -608,12 +609,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   let authResolved = false;
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    console.log('Auth event:', event);
+    console.log('[Auth event]:', event, session?.user?.email);
 
     if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !authResolved) {
       authResolved = true;
       if (session && session.user) {
-        await startApp(session.user);
+        try {
+          await startApp(session.user);
+        } catch(e) {
+          console.error('[startApp error]:', e);
+          document.getElementById('loading-screen').style.display = 'none';
+          showAuthScreen();
+        }
       } else {
         document.getElementById('loading-screen').style.display = 'none';
         showAuthScreen();
