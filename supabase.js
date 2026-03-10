@@ -602,18 +602,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     await launchApp();
   };
 
-  // Проверяем сессию при загрузке
-  const { data: { session } } = await sb.auth.getSession();
-  if (session && session.user) {
-    await startApp(session.user);
-  } else {
-    document.getElementById('loading-screen').style.display = 'none';
-    showAuthScreen();
-  }
+  // Ждём пока Supabase восстановит сессию через onAuthStateChange (INITIAL_SESSION)
+  let authResolved = false;
 
-  // Следим за изменениями авторизации
   sb.auth.onAuthStateChange(async (event, session) => {
     console.log('Auth event:', event);
+
+    if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !authResolved) {
+      authResolved = true;
+      if (session && session.user) {
+        await startApp(session.user);
+      } else {
+        document.getElementById('loading-screen').style.display = 'none';
+        showAuthScreen();
+      }
+      return;
+    }
+
     if (event === 'SIGNED_IN' && session && session.user && !appStarted) {
       await startApp(session.user);
     } else if (event === 'TOKEN_REFRESHED' && session?.user) {
@@ -626,4 +631,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       location.href = 'login.html';
     }
   });
+
+  // Страховка: если onAuthStateChange не выстрелил за 3 сек — редиректим на логин
+  setTimeout(() => {
+    if (!authResolved) {
+      authResolved = true;
+      document.getElementById('loading-screen').style.display = 'none';
+      showAuthScreen();
+    }
+  }, 3000);
 });
