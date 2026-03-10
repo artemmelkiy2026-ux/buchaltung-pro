@@ -585,6 +585,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // При входе считаем что сессия разблокирована
     sessionStorage.setItem('pin_unlocked', '1');
 
+    // Если disclaimer принят локально — сохраняем в Supabase (чтобы работало после очистки кэша)
+    if (localStorage.getItem('buch_disclaimer_v2') === '1') {
+      sb.from('user_data').upsert(
+        { user_id: currentUser.id, disclaimer_accepted: true },
+        { onConflict: 'user_id' }
+      ).then(() => {}).catch(() => {});
+    }
+
     // Сразу показываем приложение — данные грузим в фоне
     await launchApp();
 
@@ -603,11 +611,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.removeItem('bp_pin');
       }
 
-      // Проверяем не помечен ли аккаунт на удаление
+      // Проверяем user_data: disclaimer и удаление аккаунта
       const { data: userData } = await sb.from('user_data')
-        .select('deleted_at')
+        .select('deleted_at, disclaimer_accepted')
         .eq('user_id', currentUser.id)
         .maybeSingle();
+
+      // Синхронизируем disclaimer с Supabase
+      if (userData?.disclaimer_accepted) {
+        localStorage.setItem('buch_disclaimer_v2', '1');
+      }
 
       if (userData?.deleted_at) {
         const deleteDate = new Date(new Date(userData.deleted_at).getTime() + 30 * 24 * 60 * 60 * 1000);
