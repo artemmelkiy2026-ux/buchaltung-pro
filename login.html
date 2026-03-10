@@ -296,7 +296,7 @@ let isLogin = true;
 
 // ── Умный редирект: disclaimer если не принято, иначе index ───────────────
 function goAfterLogin() {
-  if (localStorage.getItem('buch_disclaimer_v2') !== '1') {
+  if (sessionStorage.getItem('buch_disclaimer_v2') !== '1') {
     location.href = 'disclaimer.html';
   } else {
     location.href = 'index.html';
