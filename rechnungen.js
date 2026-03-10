@@ -54,7 +54,7 @@ function openRechModal(){
   const faellig=new Date();faellig.setDate(faellig.getDate()+14);
   document.getElementById('rn-faellig').value=faellig.toISOString().split('T')[0];
   document.getElementById('rn-bet').value='';
-  ['rn-kunde','rn-adresse','rn-email','rn-wa','rn-notiz'].forEach(id=>document.getElementById(id).value='');
+  ['rn-kunde','rn-adresse','rn-email','rn-notiz'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('rn-status').value='offen';
   editRechId=null;
   updateRechBanner();
@@ -73,7 +73,6 @@ function editRech(id){
   document.getElementById('rn-kunde').value=r.kunde||'';
   document.getElementById('rn-adresse').value=r.adresse||'';
   document.getElementById('rn-email').value=r.email||'';
-  document.getElementById('rn-wa').value=r.wa||'';
   document.getElementById('rn-notiz').value=r.notiz||'';
   updateRechBanner();
   const posData=r.positionen&&r.positionen.length?r.positionen:[{bez:r.beschreibung||'',menge:1,netto:r.netto||r.betrag||'',rate:r.mwstRate||0,brutto:r.betrag||''}];
@@ -106,7 +105,6 @@ function saveRechnung(){
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),
-    wa:document.getElementById('rn-wa').value.trim(),
     notiz:document.getElementById('rn-notiz').value.trim(),
     positionen,
     netto, mwstBetrag:mwst, mwstRate:0, mwstMode:isKleinunternehmer(datum?datum.substring(0,4):new Date().getFullYear()+'')?'§19':'regel'
@@ -573,46 +571,6 @@ function showEmailServicePicker(r) {
   overlay.addEventListener('click', function(e) { if(e.target===overlay) overlay.remove(); });
 
   generateRechnungPDF(r).then(function(doc) { doc.save('Rechnung_' + safeNr + '.pdf'); }).catch(function(){});
-}
-
-// ── RECHNUNG PER WHATSAPP ─────────────────────────────────────────────────
-async function waRechnung(){
-  const wa=document.getElementById('rn-wa').value.trim().replace(/[^0-9+]/g,'');
-  const nr=document.getElementById('rn-nr').value.trim()||'—';
-  const kunde=document.getElementById('rn-kunde').value.trim();
-  const total=parseFloat(document.getElementById('rn-bet').value)||0;
-  const faellig=document.getElementById('rn-faellig').value;
-  const firma=getFirmaData();
-  const pos=getRechPositionen();
-  const r={
-    nr, datum:document.getElementById('rn-dat').value,
-    faellig, kunde,
-    adresse:document.getElementById('rn-adresse').value.trim(),
-    email:document.getElementById('rn-email').value.trim(),
-    notiz:document.getElementById('rn-notiz').value.trim(),
-    positionen:pos, betrag:total
-  };
-  // 1. Скачать PDF
-  toast('📎 PDF wird gespeichert...','ok');
-  try {
-    const doc = await generateRechnungPDF(r);
-    const safeNr = nr.replace(/[\/]/g,'-');
-    doc.save(`Rechnung_\${safeNr}.pdf`);
-  } catch(e) { console.error(e); }
-  // 2. Открыть WhatsApp с текстом (файл прикрепить вручную)
-  const msg=encodeURIComponent(
-`🧾 *Rechnung Nr. \${nr}*
-\${firma.name||''}
-
-\${kunde?'Kunde: '+kunde+'\n':''}Betrag: *\${fmt(total)}*\${faellig?'\nFällig bis: '+fd(faellig):''}
-\${firma.iban?'\nIBAN: '+firma.iban:''}
-
-Bitte überweisen Sie den Betrag fristgerecht.\${firma.tel?'\nBei Fragen: '+firma.tel:''}`);
-  const url=wa?`https://wa.me/\${wa.replace('+','')}?text=\${msg}`:`https://wa.me/?text=\${msg}`;
-  setTimeout(()=>{
-    window.open(url,'_blank');
-    toast('✅ PDF gespeichert · WhatsApp geöffnet · Bitte PDF anhängen','ok');
-  },600);
 }
 
 
