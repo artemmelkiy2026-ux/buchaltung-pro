@@ -7,6 +7,20 @@
 @media (max-width: 768px) {
   .mob-hide { display: none; }
 }
+
+  .csv {
+    background: var(--s2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--text);
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    outline: none;
+    margin-left: 12px;
+    
+  }
+
   
   /* Фоны */
   --bg:#f0f4f8;
