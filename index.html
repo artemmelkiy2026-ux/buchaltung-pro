@@ -55,7 +55,8 @@
     <span id="save-indicator" style="font-size:11px;color:var(--sub);opacity:0;transition:opacity .4s;margin-right:8px"></span>
     <!-- Пользователь -->
     <div style="display:flex;align-items:center;gap:8px">
-      <span id="user-email-display" onclick="location.href='profile.html'" style="font-size:14px;color:var(--sub);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline"></span>
+      <button onclick="location.href='profile.html'" class="btn" title="Profil" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-user" style="font-size:1.3rem"></i></button>
+
       <button id="signout-btn" class="btn" title="Abmelden" onclick="sbSignOut()" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-door-open" style="font-size:1.3rem"></i></button>
     </div>
   </div>
