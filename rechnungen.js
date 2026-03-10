@@ -512,55 +512,67 @@ function emailRechnung(){
 }
 
 function showEmailServicePicker(r) {
-  // Удаляем старый picker если есть
   document.getElementById('email-service-picker')?.remove();
 
   const firma = getFirmaData();
   const safeNr = (r.nr||'rechnung').replace(/[\/]/g,'-');
-  const subject = encodeURIComponent(`Rechnung Nr. ${r.nr} — ${firma.name||'Rechnung'}`);
-  const body = encodeURIComponent(
-`Sehr geehrte Damen und Herren,${r.kunde?'\n\nSehr geehrte/r '+r.kunde+',':''}
-
-anbei erhalten Sie unsere Rechnung Nr. ${r.nr} über ${fmt(r.betrag)}.${r.faellig?'\nZahlungsziel: '+fd(r.faellig):''}
-
-Bitte hängen Sie die soeben heruntergeladene PDF-Datei an.
-
-Mit freundlichen Grüßen
-${firma.name||''}${firma.tel?'\nTel: '+firma.tel:''}${firma.email?'\n'+firma.email:''}`);
+  const subject = encodeURIComponent('Rechnung Nr. ' + r.nr + ' \u2014 ' + (firma.name||'Rechnung'));
+  const bodyText = 'Sehr geehrte Damen und Herren,' +
+    (r.kunde ? '\n\nSehr geehrte/r ' + r.kunde + ',' : '') +
+    '\n\nanbei erhalten Sie unsere Rechnung Nr. ' + r.nr + ' \u00fcber ' + fmt(r.betrag) + '.' +
+    (r.faellig ? '\nZahlungsziel: ' + fd(r.faellig) : '') +
+    '\n\nBitte h\u00e4ngen Sie die soeben heruntergeladene PDF-Datei an.' +
+    '\n\nMit freundlichen Gr\u00fc\u00dfen\n' + (firma.name||'') +
+    (firma.tel ? '\nTel: ' + firma.tel : '') +
+    (firma.email ? '\n' + firma.email : '');
+  const body = encodeURIComponent(bodyText);
+  const to = r.email||'';
 
   const services = [
-    { label:'📧 Standard E-Mail', icon:'fa-envelope', url:`mailto:${r.email||''}?subject=${subject}&body=${body}`, color:'var(--blue)' },
-    { label:'Gmail', icon:'fa-envelope', svg:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M2 6l10 7L22 6" stroke="#EA4335" stroke-width="2"/><rect x="2" y="5" width="20" height="14" rx="2" stroke="#EA4335" stroke-width="2" fill="none"/></svg>', url:`https://mail.google.com/mail/?view=cm&to=${r.email||''}&su=${subject}&body=${body}`, color:'#EA4335' },
-    { label:'Outlook', icon:'fa-envelope', svg:'<svg width="18" height="18" viewBox="0 0 24 24" fill="#0072C6"><rect x="2" y="4" width="20" height="16" rx="2" fill="#0072C6"/><path d="M2 8l10 6 10-6" stroke="#fff" stroke-width="1.5" fill="none"/></svg>', url:`https://outlook.live.com/mail/0/deeplink/compose?to=${r.email||''}&subject=${subject}&body=${body}`, color:'#0072C6' },
-    { label:'Yahoo Mail', icon:'fa-envelope', svg:'<svg width="18" height="18" viewBox="0 0 24 24" fill="#720E9E"><rect x="2" y="4" width="20" height="16" rx="2" fill="#720E9E"/><path d="M2 8l10 6 10-6" stroke="#fff" stroke-width="1.5" fill="none"/></svg>', url:`https://compose.mail.yahoo.com/?to=${r.email||''}&subject=${subject}&body=${body}`, color:'#720E9E' },
+    { label: '\ud83d\udce7 Standard E-Mail', url: 'mailto:' + to + '?subject=' + subject + '&body=' + body },
+    { label: 'Gmail',     url: 'https://mail.google.com/mail/?view=cm&to=' + to + '&su=' + subject + '&body=' + body },
+    { label: 'Outlook',   url: 'https://outlook.live.com/mail/0/deeplink/compose?to=' + to + '&subject=' + subject + '&body=' + body },
+    { label: 'Yahoo Mail',url: 'https://compose.mail.yahoo.com/?to=' + to + '&subject=' + subject + '&body=' + body },
   ];
 
   const overlay = document.createElement('div');
   overlay.id = 'email-service-picker';
   overlay.style.cssText = 'position:fixed;inset:0;background:#00000066;z-index:9999;display:flex;align-items:center;justify-content:center';
-  overlay.innerHTML = `
-    <div style="background:var(--s1);border-radius:16px;padding:24px;width:320px;max-width:90vw;box-shadow:0 20px 60px #0004">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <strong style="font-size:15px">E-Mail senden über...</strong>
-        <button onclick="document.getElementById('email-service-picker').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
-      </div>
-      <p style="font-size:12px;color:var(--sub);margin-bottom:14px">PDF wird zuerst gespeichert. Dann bitte anhängen.</p>
-      \${services.map(s=>`
-        <button onclick="emailPickerChoose('\${encodeURIComponent(s.url)}')" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;color:var(--text);text-align:left">
-          \${s.svg||'<i class=\"fas '+s.icon+'\" style=\"color:'+s.color+'\"></i>'}
-          <span>\${s.label}</span>
-        </button>`).join('')}
-    </div>`;
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--s1);border-radius:16px;padding:24px;width:320px;max-width:90vw;box-shadow:0 20px 60px #0004';
+
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:16px';
+  hdr.innerHTML = '<strong style="font-size:15px">E-Mail senden \u00fcber...</strong>';
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '\u2715';
+  closeBtn.style.cssText = 'background:none;border:none;font-size:20px;cursor:pointer;color:var(--sub)';
+  closeBtn.onclick = function() { overlay.remove(); };
+  hdr.appendChild(closeBtn);
+  box.appendChild(hdr);
+
+  const hint = document.createElement('p');
+  hint.style.cssText = 'font-size:12px;color:var(--sub);margin-bottom:14px';
+  hint.textContent = 'PDF wird zuerst gespeichert. Dann bitte anh\u00e4ngen.';
+  box.appendChild(hint);
+
+  services.forEach(function(s) {
+    const btn = document.createElement('button');
+    btn.style.cssText = 'display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+    btn.textContent = s.label;
+    btn.onclick = function() {
+      overlay.remove();
+      window.open(s.url, '_blank');
+    };
+    box.appendChild(btn);
+  });
+
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
-  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+  overlay.addEventListener('click', function(e) { if(e.target===overlay) overlay.remove(); });
 
-  // Скачиваем PDF сразу
-  generateRechnungPDF(r).then(doc => doc.save(`Rechnung_\${safeNr}.pdf`)).catch(()=>{});
-}
-
-async function emailPickerChoose(encodedUrl) {
-  document.getElementById('email-service-picker')?.remove();
-  window.open(decodeURIComponent(encodedUrl), '_blank');
+  generateRechnungPDF(r).then(function(doc) { doc.save('Rechnung_' + safeNr + '.pdf'); }).catch(function(){});
 }
 
 // ── RECHNUNG PER WHATSAPP ─────────────────────────────────────────────────
@@ -913,4 +925,3 @@ function downloadZUGFeRDId(id) {
   const r = data.rechnungen.find(x => x.id === id);
   if (r) downloadZUGFeRD(r);
 }
-
