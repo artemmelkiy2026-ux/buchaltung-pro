@@ -510,16 +510,25 @@ function showEmailServicePicker(r) {
 
   const firma = getFirmaData();
   const safeNr = (r.nr||'rechnung').replace(/[\/]/g,'-');
-  const subject = encodeURIComponent('Rechnung Nr. ' + r.nr + ' \u2014 ' + (firma.name||'Rechnung'));
-  const bodyText = 'Sehr geehrte Damen und Herren,' +
-    (r.kunde ? '\n\nSehr geehrte/r ' + r.kunde + ',' : '') +
-    '\n\nanbei erhalten Sie unsere Rechnung Nr. ' + r.nr + ' \u00fcber ' + fmt(r.betrag) + '.' +
-    (r.faellig ? '\nZahlungsziel: ' + fd(r.faellig) : '') +
-    '\n\nBitte h\u00e4ngen Sie die soeben heruntergeladene PDF-Datei an.' +
-    '\n\nMit freundlichen Gr\u00fc\u00dfen\n' + (firma.name||'') +
-    (firma.tel ? '\nTel: ' + firma.tel : '') +
-    (firma.email ? '\n' + firma.email : '');
-  const body = encodeURIComponent(bodyText);
+  const tmpl = getEmailTemplate();
+
+  // Подставляем переменные в шаблон
+  function fillTmpl(tpl) {
+    return tpl
+      .replace(/\{\{NR\}\}/g,      r.nr||'')
+      .replace(/\{\{KUNDE\}\}/g,   r.kunde||'')
+      .replace(/\{\{BETRAG\}\}/g,  fmt(r.betrag))
+      .replace(/\{\{FAELLIG\}\}/g, r.faellig ? fd(r.faellig) : '')
+      .replace(/\{\{FIRMA\}\}/g,   firma.name||'')
+      .replace(/\{\{TEL\}\}/g,     firma.tel||'')
+      // Удобные «условные» строки — если пусто убираем всю строку
+      .replace(/\{\{KUNDE_ZEILE\}\}/g,  r.kunde  ? '\n\nSehr geehrte/r ' + r.kunde + ',' : '')
+      .replace(/\{\{FAELLIG_ZEILE\}\}/g,r.faellig? '\nZahlungsziel: ' + fd(r.faellig) : '')
+      .replace(/\{\{TEL_ZEILE\}\}/g,    firma.tel? '\nTel: ' + firma.tel : '');
+  }
+
+  const subject = encodeURIComponent(fillTmpl(tmpl.subject));
+  const body    = encodeURIComponent(fillTmpl(tmpl.body));
   const to = r.email||'';
 
   const services = [
@@ -581,6 +590,12 @@ function openFirmaModal() {
   });
   const footer = document.getElementById('firma-footer');
   if (footer) footer.value = p.rechnung_footer || '';
+  // E-Mail Vorlage
+  const tmpl = getEmailTemplate();
+  const subEl = document.getElementById('email-tmpl-subject');
+  const bodEl = document.getElementById('email-tmpl-body');
+  if (subEl) subEl.value = tmpl.subject;
+  if (bodEl) bodEl.value = tmpl.body;
   openModal('firma-modal');
 }
 
@@ -593,19 +608,48 @@ function saveFirmaData() {
   });
   const footer = document.getElementById('firma-footer');
   if (footer) p.rechnung_footer = footer.value.trim();
-  p.kleinuntern = true; // сохраняем текущий режим из ustModeByYear
+  p.kleinuntern = true;
   localStorage.setItem('bp_firma', JSON.stringify(p));
-  // Синхронизируем с Supabase если доступно
-  if (typeof sbSavePin === 'function' && typeof currentUser !== 'undefined' && currentUser) {
-    try {
-      sb.from('user_data').upsert(
-        { user_id: currentUser.id, firma_data: JSON.stringify(p) },
-        { onConflict: 'user_id' }
-      ).catch(() => {});
-    } catch(e) {}
+  // Сохраняем E-Mail шаблон
+  const subEl = document.getElementById('email-tmpl-subject');
+  const bodEl = document.getElementById('email-tmpl-body');
+  if (subEl || bodEl) {
+    const tmpl = {
+      subject: subEl ? subEl.value.trim() : '',
+      body:    bodEl ? bodEl.value.trim() : '',
+    };
+    localStorage.setItem('bp_email_template', JSON.stringify(tmpl));
   }
-  toast('✅ Firmenprofil gespeichert!', 'ok');
+  toast('✅ Einstellungen gespeichert!', 'ok');
   closeModal('firma-modal');
+}
+
+function getEmailTemplate() {
+  const DEFAULT_SUBJECT = 'Rechnung Nr. {{NR}} — {{FIRMA}}';
+  const DEFAULT_BODY =
+    'Sehr geehrte Damen und Herren,{{KUNDE_ZEILE}}\n\n' +
+    'anbei erhalten Sie unsere Rechnung Nr. {{NR}} über {{BETRAG}}.{{FAELLIG_ZEILE}}\n\n' +
+    'Bitte hängen Sie die soeben heruntergeladene PDF-Datei an diese E-Mail an.\n\n' +
+    'Mit freundlichen Grüßen\n{{FIRMA}}{{TEL_ZEILE}}';
+  try {
+    const saved = JSON.parse(localStorage.getItem('bp_email_template') || '{}');
+    return {
+      subject: saved.subject || DEFAULT_SUBJECT,
+      body:    saved.body    || DEFAULT_BODY,
+    };
+  } catch(e) {
+    return { subject: DEFAULT_SUBJECT, body: DEFAULT_BODY };
+  }
+}
+
+function resetEmailTemplate() {
+  localStorage.removeItem('bp_email_template');
+  const tmpl = getEmailTemplate();
+  const subEl = document.getElementById('email-tmpl-subject');
+  const bodEl = document.getElementById('email-tmpl-body');
+  if (subEl) subEl.value = tmpl.subject;
+  if (bodEl) bodEl.value = tmpl.body;
+  toast('✅ E-Mail Vorlage zurückgesetzt', 'ok');
 }
 
 // ══════════════════════════════════════════════════════════════════════════

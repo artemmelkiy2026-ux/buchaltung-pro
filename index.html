@@ -978,6 +978,22 @@
     <div class="fg"><label>Rechtliche Hinweise / Weitere Infos</label>
       <textarea id="firma-footer" rows="3" placeholder="z.B.: Kleinunternehmer gem. §19 UStG · Handelsregister HRB 12345 · Amtsgericht Worms"></textarea>
     </div>
+    <!-- E-Mail Vorlage -->
+    <div style="border-top:1px solid var(--border);margin:14px 0 10px;padding-top:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">📧 E-Mail Vorlage</span>
+        <button onclick="resetEmailTemplate()" style="background:none;border:none;font-size:11px;color:var(--sub);cursor:pointer;text-decoration:underline">Zurücksetzen</button>
+      </div>
+      <p style="font-size:11px;color:var(--sub);margin:6px 0 10px">Verfügbare Variablen: <code>{{NR}}</code> <code>{{KUNDE}}</code> <code>{{BETRAG}}</code> <code>{{FAELLIG}}</code> <code>{{FIRMA}}</code> <code>{{TEL}}</code></p>
+    </div>
+    <div class="fg">
+      <label>Betreff</label>
+      <input type="text" id="email-tmpl-subject" placeholder="Rechnung Nr. {{NR}} — {{FIRMA}}">
+    </div>
+    <div class="fg">
+      <label>E-Mail Text</label>
+      <textarea id="email-tmpl-body" rows="7" style="font-family:monospace;font-size:12px" placeholder="Sehr geehrte Damen und Herren..."></textarea>
+    </div>
     <!-- Buttons -->
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn primary" style="flex:1;padding:11px" onclick="saveFirmaData()">💾 Speichern</button>
