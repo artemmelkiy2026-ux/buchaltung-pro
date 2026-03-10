@@ -299,7 +299,7 @@ function goAfterLogin() {
   if (localStorage.getItem('buch_disclaimer_v2') !== '1') {
     location.href = 'disclaimer.html';
   } else {
-    goAfterLogin();
+    location.href = 'index.html';
   }
 }
 
@@ -448,7 +448,17 @@ async function loginBiometric() {
   const bioDataStr = localStorage.getItem(BIO_LOGIN_KEY);
   if (!bioDataStr) return;
 
-  const bioData = JSON.parse(bioDataStr);
+  let bioData;
+  try { bioData = JSON.parse(bioDataStr); } catch(e) { localStorage.removeItem(BIO_LOGIN_KEY); return; }
+
+  if (!bioData.credId || !bioData.email || !bioData.encodedPwd) {
+    // Данные неполные — сбрасываем биометрию
+    localStorage.removeItem(BIO_LOGIN_KEY);
+    document.getElementById('bio-login-btn').style.display = 'none';
+    document.getElementById('auth-error').textContent = '⚠️ Bitte neu anmelden und Biometrie neu einrichten.';
+    return;
+  }
+
   const btn = document.getElementById('bio-login-btn');
   btn.disabled = true;
   btn.style.opacity = '0.7';
@@ -470,21 +480,33 @@ async function loginBiometric() {
     // Биометрия прошла — входим с сохранёнными данными
     const password = decodeURIComponent(escape(atob(bioData.encodedPwd)));
     const { error } = await sb.auth.signInWithPassword({ email: bioData.email, password });
+
     if (error) {
       // Пароль изменился — удаляем биометрию
       localStorage.removeItem(BIO_LOGIN_KEY);
       document.getElementById('bio-login-btn').style.display = 'none';
-      document.getElementById('auth-error').textContent = '❌ Bitte neu anmelden und Face ID neu einrichten.';
+      document.getElementById('auth-error').textContent = '❌ Bitte neu anmelden und Biometrie neu einrichten.';
       btn.disabled = false;
       btn.style.opacity = '1';
       return;
     }
+
     goAfterLogin();
 
   } catch(e) {
-    console.log('Bio login error:', e.message);
+    console.log('Bio login error:', e.name, e.message);
     btn.disabled = false;
     btn.style.opacity = '1';
+
+    if (e.name === 'NotAllowedError') {
+      // Пользователь отменил — тихо
+    } else if (e.name === 'InvalidStateError' || e.name === 'NotFoundError') {
+      localStorage.removeItem(BIO_LOGIN_KEY);
+      document.getElementById('bio-login-btn').style.display = 'none';
+      document.getElementById('auth-error').textContent = '⚠️ Biometrie zurückgesetzt — bitte neu anmelden.';
+    } else {
+      document.getElementById('auth-error').textContent = '⚠️ Biometrie fehlgeschlagen — bitte Passwort eingeben.';
+    }
   }
 }
 
@@ -702,13 +724,25 @@ async function forgotPassword() {
 // Инициализация — проверяем есть ли биометрия
 (async () => {
   const hasBio = localStorage.getItem(BIO_LOGIN_KEY);
-  if (hasBio && await isBioAvailable()) {
-    const { iconClass, label } = getBioLabel();
-    document.getElementById('bio-btn-icon').className = iconClass;
-    document.getElementById('bio-btn-label').textContent = label;
-    const bioBtn = document.getElementById('bio-login-btn');
-    bioBtn.style.display = 'flex';
-    bioBtn.dataset.available = 'true';
+  if (!hasBio) return;
+  if (!await isBioAvailable()) return;
+
+  const { iconClass, label } = getBioLabel();
+  const bioBtn = document.getElementById('bio-login-btn');
+  const bioIcon = document.getElementById('bio-btn-icon');
+  const bioLabel = document.getElementById('bio-btn-label');
+
+  if (!bioBtn || !bioIcon || !bioLabel) return;
+
+  bioIcon.className = iconClass + ' bio-btn-icon-el';
+  bioLabel.textContent = label;
+  bioBtn.style.display = 'flex';
+  bioBtn.dataset.available = 'true';
+
+  // Авто-запуск биометрии через 800ms если есть credId
+  const bioData = JSON.parse(hasBio);
+  if (bioData.credId) {
+    setTimeout(() => loginBiometric(), 800);
   }
 })();
 </script>
