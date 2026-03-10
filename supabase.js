@@ -48,10 +48,13 @@ async function sbSignUp(email, password) {
   return data;
 }
 async function sbSignOut() {
-  await sb.auth.signOut();
+  if (!confirm('Abmelden?')) return;
+  try {
+    await sb.auth.signOut();
+  } catch(e) {
+    console.error('SignOut error:', e);
+  }
   currentUser = null;
-  // PIN не удаляем — он привязан к аккаунту
-  // Сбрасываем disclaimer — при следующем входе покажется снова
   localStorage.removeItem('buch_disclaimer_v2');
   location.href = 'login.html';
 }
@@ -201,8 +204,11 @@ function showAuthScreen() {
 }
 
 function hideAuthScreen() {
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('app-wrapper').style.display = 'block';
+  const ls = document.getElementById('loading-screen');
+  const aw = document.getElementById('app-wrapper');
+  console.log('[hideAuthScreen] ls:', !!ls, 'aw:', !!aw);
+  if (ls) ls.style.display = 'none';
+  if (aw) aw.style.display = 'block';
   isAppUnlocked = true;
   startInactivityWatch();
 }
@@ -445,7 +451,7 @@ function pinConfirm() {
 }
 
 function pinLogout() {
-  if (confirm('Abmelden?')) sbSignOut();
+  sbSignOut();
 }
 
 // ── BIOMETRIC ──────────────────────────────────────────────────────────────
