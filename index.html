@@ -55,8 +55,7 @@
     <!-- Пользователь -->
     <div style="display:flex;align-items:center;gap:8px">
       <span id="user-email-display" onclick="location.href='profile.html'" style="font-size:14px;color:var(--sub);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;text-decoration:underline"></span>
-      <button class="btn" onclick="sbSignOut()" title="Abmelden" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-door-open" style="
-    font-size: 1.3rem;"></i></button>
+      <button id="signout-btn" class="btn" title="Abmelden" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-door-open" style="font-size:1.3rem"></i></button>
     </div>
   </div>
   <input type="file" id="fi" accept=".json" style="display:none" onchange="onLoad(event)">
