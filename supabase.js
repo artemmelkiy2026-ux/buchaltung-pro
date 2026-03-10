@@ -254,7 +254,6 @@ function showAuthScreen() {
 function hideAuthScreen() {
   const ls = document.getElementById('loading-screen');
   const aw = document.getElementById('app-wrapper');
-  console.log('[hideAuthScreen] ls:', !!ls, 'aw:', !!aw);
   if (ls) {
     ls.style.display = 'none';
     ls.style.pointerEvents = 'none';
@@ -661,7 +660,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (appStarted) return;
     appStarted = true;
     currentUser = user;
-    console.log('[startApp] user:', user.email);
 
     // Показываем email в шапке
     const uel = document.getElementById('user-email-display');
@@ -759,7 +757,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Запускаем через getSession — всегда после загрузки всех скриптов
   try {
     const { data: { session } } = await sb.auth.getSession();
-    console.log('[getSession]', session?.user?.email ?? 'no session');
     if (session?.user) {
       await window.startApp(session.user);
     } else {
