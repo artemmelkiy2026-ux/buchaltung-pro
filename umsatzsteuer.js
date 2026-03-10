@@ -281,8 +281,10 @@ function stBerechnen() {
   // ─── НОВОЕ: USt SALDO (автоматически из EÜR) ───
   // ВАЖНО: Если Kleinunternehmer, то УСт = 0!
   const isKleinunternehmer = document.getElementById('st-kleinunternehmer-option')?.value === 'ja';
-  let ustEingezogen = isKleinunternehmer ? 0 : ein * 0.19; // 19% от брутто-доходов (или 0 если KU)
-  let ustBezahlt = isKleinunternehmer ? 0 : aus * 0.19;     // 19% от брутто-расходов (или 0 если KU)
+  // Правильная формула: выделяем НДС из брутто-суммы (обратный расчёт)
+  // brutto = netto * 1.19 → MwSt = brutto * 19/119
+  let ustEingezogen = isKleinunternehmer ? 0 : r2(ein * 19 / 119);
+  let ustBezahlt    = isKleinunternehmer ? 0 : r2(aus * 19 / 119);
   const ustSaldo = ustEingezogen - ustBezahlt; // Если положительно - платим государству
   
   // Рекомендация по Kleinunternehmer
@@ -293,7 +295,7 @@ function stBerechnen() {
     document.getElementById('st-klein-recommendation').style.color = 'var(--green)';
   } else if (!isKleinunternehmer && ein >= 25000) {
     document.getElementById('st-klein-recommendation').textContent = 
-      `'+t('⚠️ Umsatz > 25.000€: Sie sind kein Kleinunternehmer mehr (ab nächstem Jahr).')+'`;
+      '⚠️ Umsatz > 25.000€: Sie sind kein Kleinunternehmer mehr (ab nächstem Jahr).';
     document.getElementById('st-klein-recommendation').style.color = 'var(--yellow)';
   } else if (isKleinunternehmer) {
     document.getElementById('st-klein-recommendation').textContent = 
@@ -668,6 +670,6 @@ function runSzenarien() {
   </div>`;
 
   document.getElementById('sz-results').innerHTML = html;
-  toast(''+t('✅ 16 Steuer-Szenarien berechnet')+'','ok');
+  toast('✅ 16 Steuer-Szenarien berechnet','ok');
 }
 

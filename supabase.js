@@ -114,7 +114,7 @@ function dbToRechnung(r, allPos) {
   return { id:r.id, nr:r.nr||'', datum:r.datum||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', betrag:parseFloat(r.betrag)||0, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', positionen:pos };
 }
 function dbToWied(r) {
-  return { id:r.id, typ:r.typ||'Ausgabe', kategorie:r.kategorie||'', beschreibung:r.beschreibung||'', betrag:parseFloat(r.betrag)||0, zahlungsart:r.zahlungsart||'Sonstiges', intervall:r.intervall||'monatlich', naechste:r.naechste||'' };
+  return { id:r.id, typ:r.typ||'Ausgabe', kategorie:r.kategorie||'', bezeichnung:r.bezeichnung||r.beschreibung||'', beschreibung:r.beschreibung||r.bezeichnung||'', betrag:parseFloat(r.betrag)||0, zahlungsart:r.zahlungsart||'Sonstiges', intervall:r.intervall||'monatlich', naechste:r.naechste||'' };
 }
 function dbToUstEintrag(r) {
   const m = { 'Ausgang':'ust', 'Vorsteuer':'vorsteuer', 'ust':'ust', 'vorsteuer':'vorsteuer' };
@@ -137,7 +137,7 @@ function posToDb(pos, rechnungId) {
   return { id, user_id:currentUser.id, rechnung_id:rechnungId, beschreibung, menge:pos.menge||1, einheit:pos.einheit||'Stk.', einzelpreis, mwst_rate };
 }
 function wiedToDb(w) {
-  return { id:w.id, user_id:currentUser.id, typ:w.typ||'Ausgabe', kategorie:w.kategorie||null, beschreibung:w.beschreibung||null, betrag:w.betrag||0, zahlungsart:w.zahlungsart||null, intervall:w.intervall||'monatlich', naechste:w.naechste||null };
+  return { id:w.id, user_id:currentUser.id, typ:w.typ||'Ausgabe', kategorie:w.kategorie||null, bezeichnung:w.bezeichnung||w.beschreibung||null, beschreibung:w.bezeichnung||w.beschreibung||null, betrag:w.betrag||0, zahlungsart:w.zahlungsart||null, intervall:w.intervall||'monatlich', naechste:w.naechste||null };
 }
 function ustEintragToDb(e) {
   const m = { 'ust':'Ausgang', 'vorsteuer':'Vorsteuer', 'Ausgang':'Ausgang', 'Vorsteuer':'Vorsteuer' };
