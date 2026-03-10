@@ -248,7 +248,6 @@ function selectKunde(id){
   document.getElementById('rn-kunde').value=k.name;
   document.getElementById('rn-adresse').value=[k.strasse,k.plz&&k.ort?k.plz+' '+k.ort:''].filter(Boolean).join(', ');
   document.getElementById('rn-email').value=k.email||'';
-  document.getElementById('rn-wa').value=k.tel||'';
   // Сохраняем ссылку на клиента
   document.getElementById('rn-nr').dataset.kundeId=k.id;
   closeModal('kunde-pick-modal');

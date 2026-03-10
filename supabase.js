@@ -213,7 +213,6 @@ async function sbDeletePin() {
 }
 
 function sbPersist() {}
-function persist() {}
 
 // ── Баннер удаления аккаунта ──────────────────────────────────────────────
 function showDeletionBanner(daysLeft) {

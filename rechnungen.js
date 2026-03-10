@@ -57,6 +57,7 @@ function openRechModal(){
   ['rn-kunde','rn-adresse','rn-email','rn-notiz'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('rn-status').value='offen';
   editRechId=null;
+  document.getElementById('rn-nr').dataset.kundeId='';
   updateRechBanner();
   setRechPositionen([{bez:'',menge:1,netto:'',rate:19,brutto:''}]);
   openModal('rech-modal');
@@ -106,6 +107,7 @@ function saveRechnung(){
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),
     notiz:document.getElementById('rn-notiz').value.trim(),
+    kundeId:document.getElementById('rn-nr').dataset.kundeId||'',
     positionen,
     netto, mwstBetrag:mwst, mwstRate:0, mwstMode:isKleinunternehmer(datum?datum.substring(0,4):new Date().getFullYear()+'')?'§19':'regel'
   };
@@ -141,12 +143,6 @@ function delRech(id){if(!confirm('Rechnung löschen?'))return;data.rechnungen=(d
 
 
 // USt-Modus je Jahr
-function getUstModeForYear(yr){
-  if(!yr) yr = document.getElementById('nf-dat')?.value?.substring(0,4) || new Date().getFullYear()+'';
-  return (data.ustModeByYear||{})[yr] || '§19';
-}
-function isKleinunternehmer(yr){ return getUstModeForYear(yr)==='§19'; }
-
 // Обновляем баннер в модале счёта
 function updateRechBanner(){
   const el = document.getElementById('rn-ust-banner');
@@ -632,7 +628,8 @@ function getFirmaData() {
     bic:         p.bic         || 'SSKMDEMMXXX',
     steuernr:    p.steuernr    || '',
     ustid:       p.ustid       || '',
-    kleinuntern: p.kleinuntern !== false, // true по умолчанию
+    kleinuntern:       p.kleinuntern !== false,
+    rechnung_footer:  p.rechnung_footer || '',
   };
 }
 
