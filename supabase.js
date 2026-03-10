@@ -47,7 +47,7 @@ async function sbSignUp(email, password) {
   if (error) throw error;
   return data;
 }
-async function sbSignOut() {
+window.sbSignOut = async function sbSignOut() {
   try {
     await sb.auth.signOut();
   } catch(e) {
@@ -559,14 +559,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('[PROMISE ERROR]', e.reason);
   });
 
-  // Кнопка выхода — надёжно через addEventListener
-  const signoutBtn = document.getElementById('signout-btn');
-  if (signoutBtn) {
-    signoutBtn.addEventListener('click', () => {
-      console.log('[signout-btn] clicked');
-      sbSignOut();
-    });
-  }
+  // Кнопка выхода — вешаем после небольшой задержки чтобы DOM точно был готов
+  setTimeout(() => {
+    const btn = document.getElementById('signout-btn');
+    if (btn) {
+      btn.onclick = () => sbSignOut();
+      console.log('[signout-btn] attached');
+    } else {
+      console.warn('[signout-btn] NOT FOUND');
+    }
+  }, 0);
 
   let appStarted = false;
   let appDispatched = false;
@@ -628,7 +630,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.log('[PIN check] remotePin:', remotePin, 'skipped:', localStorage.getItem('bp_pin_skipped'));
       if (!remotePin) {
         localStorage.removeItem('bp_pin_skipped');
-        setTimeout(offerPinSetup, 2000);
+        setTimeout(offerPinSetup, 3500);
       }
 
       // Уведомляем модули что данные готовы
