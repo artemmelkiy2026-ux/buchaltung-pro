@@ -48,7 +48,6 @@ async function sbSignUp(email, password) {
   return data;
 }
 async function sbSignOut() {
-  if (!confirm('Abmelden?')) return;
   try {
     await sb.auth.signOut();
   } catch(e) {

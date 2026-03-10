@@ -802,7 +802,10 @@ function updatePdDots() {
 }
 async function pdConfirm() {
   const hash = btoa(pdValue + '_bp_salt_2026');
-  if (hash !== localStorage.getItem('bp_pin')) {
+  // Берём актуальный hash из Supabase (не из localStorage — может не загрузиться)
+  const { data } = await sb.from('user_data').select('pin_hash').eq('user_id', currentUser.id).maybeSingle();
+  const storedHash = data?.pin_hash || localStorage.getItem('bp_pin');
+  if (hash !== storedHash) {
     pcPinError('pd'); return;
   }
   // Удаляем PIN
