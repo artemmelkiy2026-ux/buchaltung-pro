@@ -506,10 +506,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (userData.disclaimer_accepted) {
         localStorage.setItem('buch_disclaimer_v2', '1');
       } else if (localStorage.getItem('buch_disclaimer_v2') === '1') {
-        sb.from('user_data').upsert(
+        (async () => { try { await sb.from('user_data').upsert(
           { user_id: currentUser.id, disclaimer_accepted: true },
           { onConflict: 'user_id' }
-        ).catch(() => {});
+        ); } catch(e) {} })();
       }
 
       // Баннер удаления
