@@ -6,7 +6,7 @@ const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 let currentUser = null;
 
 // ── PIN / INACTIVITY ───────────────────────────────────────────────────────
-const PIN_TIMEOUT = 1 * 60 * 1000;
+const PIN_TIMEOUT = 15 * 60 * 1000;
 let inactivityTimer = null;
 let pinValue = '';
 let pinFirstValue = '';
@@ -468,8 +468,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const uel = document.getElementById('user-email-display');
     if (uel) uel.textContent = currentUser.email;
 
-    // pin_unlocked устанавливается ТОЛЬКО в pin.html → goToApp()
-    // Здесь мы не трогаем sessionStorage — guard уже прошёл выше
+    // Если PIN не установлен — сессия считается разблокированной сразу
+    // Если PIN установлен — pin_unlocked был поставлен pin.html при входе
+    if (!localStorage.getItem('bp_pin')) {
+      sessionStorage.setItem('pin_unlocked', '1');
+    }
 
     try {
       // ФИХ: параллельная загрузка данных + один запрос user_data

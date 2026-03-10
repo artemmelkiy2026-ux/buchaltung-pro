@@ -535,38 +535,15 @@ let currentUser = null;
 let currentEmail = '';
 
 // ── Инициализация ──────────────────────────────────────────────────────────
-// ── PIN защита ────────────────────────────────────────────────────────────
-const PIN_TIMEOUT = 1 * 60 * 1000;
-let inactivityTimer = null;
-
+// ── PIN защита — таймаут управляется глобально в supabase.js ──────────────
 function startProfilePinWatch() {
-  const storedPin = localStorage.getItem('bp_pin');
-  if (!storedPin) return;
-  const reset = () => {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-      sessionStorage.removeItem('pin_unlocked');
-      location.replace('pin.html');
-    }, PIN_TIMEOUT);
-  };
-  ['mousemove','keydown','touchstart','click'].forEach(ev =>
-    document.addEventListener(ev, reset)
-  );
-  reset();
+  // Таймаут бездействия уже запущен в supabase.js → startInactivityWatch()
+  // Здесь ничего дополнительного не нужно
 }
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { location.href = 'login.html'; return; }
-
-  // Проверяем PIN — если есть и не разблокирован
-  const storedPin = localStorage.getItem('bp_pin');
-  const pinUnlocked = sessionStorage.getItem('pin_unlocked');
-  if (storedPin && !pinUnlocked) {
-    sessionStorage.setItem('pin_return', 'profile.html');
-    location.replace('pin.html');
-    return;
-  }
 
   startProfilePinWatch();
   currentUser = session.user;
@@ -778,6 +755,8 @@ async function pcConfirm() {
     const hash = await pinToHash(pcValue);
     localStorage.setItem('bp_pin', hash);
     await sb.from('user_data').upsert({ user_id: currentUser.id, pin_hash: hash }, { onConflict: 'user_id' });
+    // Сессия остаётся разблокированной после смены PIN
+    sessionStorage.setItem('pin_unlocked', '1');
     closeModal('modal-pin-change');
     toast('✅ PIN geändert');
   }
@@ -950,6 +929,9 @@ async function psConfirm() {
   localStorage.setItem('bp_pin', hash);
   localStorage.removeItem('bp_pin_skipped');
   await sb.from('user_data').upsert({ user_id: currentUser.id, pin_hash: hash }, { onConflict: 'user_id' });
+  // Помечаем сессию как разблокированную — пользователь только что установил PIN,
+  // не нужно сразу просить его ввести
+  sessionStorage.setItem('pin_unlocked', '1');
   document.getElementById('pin-toggle').checked = true;
   document.getElementById('pin-status-sub').textContent = 'Aktiv';
   document.getElementById('change-pin-row').style.display = 'flex';
