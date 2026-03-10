@@ -162,22 +162,70 @@ function initBio() {
 
 async function pinBiometric() {
   const credIdStr = localStorage.getItem('bp_bio_id');
-  if (!credIdStr) return;
+  const bioLogin  = localStorage.getItem('bp_bio_login');
+
+  // Если нет ни одного биометрического ключа — кнопку скрываем
+  if (!credIdStr && !bioLogin) {
+    document.getElementById('pin-bio-btn').style.display = 'none';
+    return;
+  }
+
+  if (!window.PublicKeyCredential) {
+    document.getElementById('pin-error').textContent = '⚠️ Biometrie wird von diesem Browser nicht unterstützt';
+    setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 2500);
+    return;
+  }
+
   try {
     const challenge = crypto.getRandomValues(new Uint8Array(32));
-    const credIdBytes = Uint8Array.from(atob(credIdStr), c => c.charCodeAt(0));
-    await navigator.credentials.get({
-      publicKey: {
-        challenge, timeout:60000,
-        rpId: location.hostname,
-        userVerification:'required',
-        allowCredentials:[{ type:'public-key', id:credIdBytes, transports:['internal'] }]
-      }
-    });
+
+    let requestOptions;
+
+    if (credIdStr) {
+      // Конкретный ключ зарегистрирован — используем его
+      const credIdBytes = Uint8Array.from(atob(credIdStr), c => c.charCodeAt(0));
+      requestOptions = {
+        publicKey: {
+          challenge, timeout: 60000,
+          rpId: location.hostname,
+          userVerification: 'required',
+          allowCredentials: [{ type: 'public-key', id: credIdBytes, transports: ['internal'] }]
+        }
+      };
+    } else {
+      // bp_bio_login есть, но credId нет — запрос без конкретного ключа (Windows Hello / Face ID)
+      requestOptions = {
+        publicKey: {
+          challenge, timeout: 60000,
+          rpId: location.hostname,
+          userVerification: 'required',
+          allowCredentials: []
+        }
+      };
+    }
+
+    await navigator.credentials.get(requestOptions);
     // Биометрия прошла
     goToApp();
+
   } catch(e) {
-    console.log('Bio error:', e.message);
+    console.log('Bio error:', e.name, e.message);
+    if (e.name === 'NotAllowedError') {
+      // Пользователь отменил — ничего не показываем
+    } else if (e.name === 'SecurityError') {
+      document.getElementById('pin-error').textContent = '⚠️ Biometrie nur über HTTPS verfügbar';
+      setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
+    } else if (e.name === 'InvalidStateError' || e.name === 'NotFoundError') {
+      // Ключ не найден — убираем биометрию, просим PIN
+      localStorage.removeItem('bp_bio_id');
+      localStorage.removeItem('bp_bio_login');
+      document.getElementById('pin-bio-btn').style.display = 'none';
+      document.getElementById('pin-error').textContent = '⚠️ Biometrie zurückgesetzt — bitte PIN eingeben';
+      setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
+    } else {
+      document.getElementById('pin-error').textContent = '⚠️ Biometrie fehlgeschlagen — bitte PIN eingeben';
+      setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 2500);
+    }
   }
 }
 
