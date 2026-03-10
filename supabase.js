@@ -7,7 +7,7 @@ let currentUser = null;
 let saveTimer = null;
 
 // ── PIN / INACTIVITY ───────────────────────────────────────────────────────
-const PIN_TIMEOUT = 1 * 60 * 1000; // 1 минута для теста
+const PIN_TIMEOUT = 15 * 60 * 1000; // 15 Minuten
 let inactivityTimer = null;
 let pinValue = '';
 let pinFirstValue = ''; // для подтверждения при setup

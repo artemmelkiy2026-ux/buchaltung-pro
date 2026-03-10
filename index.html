@@ -645,6 +645,34 @@
   </div>
 
   <!-- §19 Info-Block -->
+  <!-- ── Manueller USt-Eintrag (nur Regelbesteuerung) ── -->
+  <div id="ust-add-section" style="display:none;margin-bottom:20px">
+    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Manuellen Eintrag hinzufügen</div>
+    <div class="form-panel" style="padding:16px">
+      <div class="fgrow c2">
+        <div class="fg" style="margin-bottom:10px"><label>Datum</label><input type="date" id="ust-new-dat" style="width:100%"></div>
+        <div class="fg" style="margin-bottom:10px"><label>Typ</label>
+          <select id="ust-new-typ" style="width:100%">
+            <option value="Ausgang">Ausgangs-USt (Einnahme)</option>
+            <option value="Vorsteuer">Vorsteuer (Ausgabe)</option>
+          </select>
+        </div>
+      </div>
+      <div class="fgrow c2">
+        <div class="fg" style="margin-bottom:10px"><label>Betrag (€)</label><input type="number" id="ust-new-bet" placeholder="0,00" step="0.01" min="0.01" style="width:100%"></div>
+        <div class="fg" style="margin-bottom:10px"><label>USt-Satz (%)</label>
+          <select id="ust-new-rate" style="width:100%">
+            <option value="19">19%</option>
+            <option value="7">7%</option>
+            <option value="0">0%</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:10px"><label>Beschreibung (optional)</label><input type="text" id="ust-new-dsc" placeholder="z.B. Rechnung Nr. 2025-001..." style="width:100%"></div>
+      <button class="btn primary" style="width:100%;padding:10px" onclick="addUstEintrag()">＋ Eintrag hinzufügen</button>
+    </div>
+  </div>
+
   <div id="ust-klein-info" style="display:none;padding:20px 24px;border-radius:var(--r2);background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.25)">
     <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:8px">✅ §19 UStG — kein USt-Ausweis nötig</div>
     <div style="font-size:13px;color:var(--text);line-height:1.6">

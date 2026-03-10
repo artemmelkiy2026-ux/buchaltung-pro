@@ -619,6 +619,8 @@ function renderUst(){
   if(regelCards) regelCards.style.display = isRegel ? 'grid' : 'none';
   if(quartalSec) quartalSec.style.display = isRegel ? (isMob()?'none':'') : 'none';
   if(buchSec)    buchSec.style.display    = isRegel ? '' : 'none';
+  const addSec = document.getElementById('ust-add-section');
+  if(addSec) addSec.style.display = isRegel ? '' : 'none';
 
   // ── §19 — показываем статистику Einnahmen ─────────────────────────────────
   if(!isRegel){
