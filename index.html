@@ -36,47 +36,10 @@
 <!-- ══════════════════════════════════════════════════════════
      DISCLAIMER MODAL — shown on first visit, must be accepted
      ══════════════════════════════════════════════════════════ -->
-<div id="disclaimer-overlay">
-  <div id="disclaimer-box">
-    <h2><span class="disc-icon">⚠️</span> Testversion — Rechtlicher Hinweis / Beta Disclaimer</h2>
-
-    <div class="disc-block">
-      <strong>🇩🇪 Deutsch</strong><br>
-      Diese Software befindet sich in der <strong>Beta-Testphase</strong> und wird ausschließlich zu <strong>Testzwecken</strong> bereitgestellt. Sie stellt <strong>keine Steuer-, Rechts- oder Finanzberatung</strong> dar und ersetzt diese nicht.
-      <ul>
-        <li>Alle Berechnungen sind <strong>unverbindlich und ohne Gewähr</strong> auf Richtigkeit, Vollständigkeit oder Aktualität.</li>
-        <li>Der Entwickler übernimmt <strong>keinerlei Haftung</strong> für Schäden, Verluste oder Nachteile, die durch die Nutzung dieser Software entstehen.</li>
-        <li>Steuerliche Entscheidungen sind <strong>ausschließlich mit einem zugelassenen Steuerberater</strong> (§ 3 StBerG) zu treffen.</li>
-        <li>Diese Version ist <strong>nicht für den produktiven Einsatz</strong> oder für offizielle Steuererklärungen geeignet.</li>
-        <li>Daten werden nur lokal im Browser gespeichert. Es erfolgt <strong>keine Übertragung an Dritte</strong>.</li>
-      </ul>
-    </div>
-
-   
-
-    <label class="disc-checkbox" id="disc-checkbox-label">
-      <input type="checkbox" id="disc-check" onchange="discToggle()">
-      Ich habe den Hinweis gelesen und verstanden. Ich nutze diese Software ausschließlich zu Testzwecken. &nbsp;/&nbsp; I have read and understood the disclaimer and will use this software for testing purposes only.
-    </label>
-
-    <button id="disc-accept-btn" onclick="discAccept()">✓ Verstanden &amp; Akzeptiert — Software öffnen</button>
-  </div>
-</div>
-
 <script>
-// Disclaimer functions must be defined BEFORE the main script
-function discToggle(){
-  const btn=document.getElementById('disc-accept-btn');
-  const chk=document.getElementById('disc-check');
-  if(chk && btn) btn.classList.toggle('active', chk.checked);
-}
-function discAccept(){
-  localStorage.setItem('buch_disclaimer_v1','1');
-  const overlay=document.getElementById('disclaimer-overlay');
-  if(overlay) overlay.style.display='none';
-}
-if(localStorage.getItem('buch_disclaimer_v1')==='1'){
-  document.getElementById('disclaimer-overlay').style.display='none';
+// Если disclaimer ещё не принят — редиректим на disclaimer.html
+if (localStorage.getItem('buch_disclaimer_v2') !== '1') {
+  window.location.replace('disclaimer.html');
 }
 </script>
 

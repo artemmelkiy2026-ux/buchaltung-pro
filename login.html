@@ -294,6 +294,15 @@ const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 let isLogin = true;
 
+// ── Умный редирект: disclaimer если не принято, иначе index ───────────────
+function goAfterLogin() {
+  if (localStorage.getItem('buch_disclaimer_v2') !== '1') {
+    location.href = 'disclaimer.html';
+  } else {
+    goAfterLogin();
+  }
+}
+
 // ── Тост ──────────────────────────────────────────────────────────────────
 function showToast(msg, duration = 2500) {
   const t = document.getElementById('toast');
@@ -304,7 +313,7 @@ function showToast(msg, duration = 2500) {
 
 // ── Если уже залогинен — на главную ───────────────────────────────────────
 sb.auth.getSession().then(({ data: { session } }) => {
-  if (session) location.href = 'index.html';
+  if (session) goAfterLogin();
 });
 
 // ── Биометрия для входа ───────────────────────────────────────────────────
@@ -470,7 +479,7 @@ async function loginBiometric() {
       btn.style.opacity = '1';
       return;
     }
-    location.href = 'index.html';
+    goAfterLogin();
 
   } catch(e) {
     console.log('Bio login error:', e.message);
@@ -540,7 +549,7 @@ async function submit() {
         await registerBioLogin(email, password);
       }
 
-      location.href = 'index.html';
+      goAfterLogin();
     } else {
       const { error } = await sb.auth.signUp({ email, password });
       if (error) throw error;
@@ -652,7 +661,7 @@ async function verifyOtp() {
     }
   }
 
-  location.href = 'index.html';
+  goAfterLogin();
 }
 
 async function resendOtp() {
