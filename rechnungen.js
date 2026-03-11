@@ -50,7 +50,9 @@ function renderRech(){
 function setRechFilter(f,btn){rechFilter=f;document.querySelectorAll('#p-rechnungen .ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderRech();}
 function openRechModal(){
   document.getElementById('rn-nr').value=autoRechNr();
-  document.getElementById('rn-dat').value=new Date().toISOString().split('T')[0];
+  const _rnDatEl=document.getElementById('rn-dat');
+  _rnDatEl.value=new Date().toISOString().split('T')[0];
+  _rnDatEl.oninput=()=>{updateRechBanner();reRenderRechPos();};
   const faellig=new Date();faellig.setDate(faellig.getDate()+14);
   document.getElementById('rn-faellig').value=faellig.toISOString().split('T')[0];
   document.getElementById('rn-bet').value='';
@@ -67,7 +69,9 @@ function editRech(id){
   if(!r)return;
   editRechId=id;
   document.getElementById('rn-nr').value=r.nr;
-  document.getElementById('rn-dat').value=r.datum;
+  const _rnDatEl2=document.getElementById('rn-dat');
+  _rnDatEl2.value=r.datum;
+  _rnDatEl2.oninput=()=>{updateRechBanner();reRenderRechPos();};
   document.getElementById('rn-faellig').value=r.faellig||'';
   document.getElementById('rn-bet').value=r.betrag;
   document.getElementById('rn-status').value=r.status;
@@ -172,6 +176,21 @@ function setRechPositionen(arr){
   updateRechBanner();
   arr.forEach((p,i)=>addRechPosRow(i,p));
   calcRechTotal();
+}
+function reRenderRechPos(){
+  // Перерисовываем позиции с текущим годом (для правильного klein/regel)
+  const rows = Array.from(document.querySelectorAll('.rn-pos-row'));
+  const current = rows.map(row => {
+    const inputs = row.querySelectorAll('input,select');
+    return {
+      bez:    inputs[0].value.trim(),
+      menge:  parseFloat(inputs[1].value)||1,
+      netto:  parseFloat(inputs[2].value)||0,
+      rate:   parseFloat(inputs[3]?.value)||19,
+      brutto: parseFloat(inputs[4]?.value)||0,
+    };
+  });
+  if(current.length) setRechPositionen(current);
 }
 function addRechPos(){
   const rows=document.querySelectorAll('.rn-pos-row');
