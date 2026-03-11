@@ -94,6 +94,7 @@
   <div class="mob-drawer-item" onclick="mobNavDrawer('kategorien')"><span class="ic"><i class="fas fa-chart-bar"></i></span> Kategorien</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('kunden')"><span class="ic"><i class="fas fa-address-book"></i></span> Kunden (CRM)</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('rechnungen')"><span class="ic"><i class="fas fa-receipt"></i></span> Rechnungen</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('journal')"><span class="ic"><i class="fas fa-book"></i></span> Journal (GoBD)</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('wiederkehrend')"><span class="ic"><i class="fas fa-sync-alt"></i></span> Wiederkehrend</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('zahlungen')"><span class="ic"><i class="fas fa-credit-card"></i></span> Zahlungsarten</div>
 
@@ -117,6 +118,7 @@
   <div class="sidebar-section">Hauptmenü</div>
   <div class="nav-item active" onclick="nav('dashboard',this)"><span class="ic"><i class="fas fa-home"></i></span> Dashboard</div>
   <div class="nav-item" onclick="nav('eintraege',this)"><span class="ic"><i class="fas fa-list"></i></span> Einträge</div>
+  <div class="nav-item" onclick="nav('journal',this)"><span class="ic"><i class="fas fa-book"></i></span> Journal</div>
   <div class="nav-item" onclick="nav('bericht',this)"><span class="ic"><i class="fas fa-chart-bar"></i></span> Monatsbericht</div>
   <div class="nav-item" onclick="nav('zahlungen',this)"><span class="ic"><i class="fas fa-credit-card"></i></span> Zahlungsarten</div>
   <div class="nav-divider"></div>
@@ -269,6 +271,40 @@
       <div class="sum-cell" style="text-align:right"><div class="sum-lbl">Einnahmen</div><div class="sum-val" style="color:var(--green)" id="es-ein">0,00 €</div></div>
       <div class="sum-cell" style="text-align:right"><div class="sum-lbl">Ausgaben</div><div class="sum-val" style="color:var(--red)" id="es-aus">0,00 €</div></div>
       <div class="sum-cell" style="text-align:right"><div class="sum-lbl">Gewinn</div><div class="sum-val" id="es-gew">0,00 €</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ── JOURNAL (GoBD) ── -->
+<div class="page" id="p-journal">
+<div class="page-inner">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 style="font-size:20px;font-weight:700">📒 Buchungsjournal</h1>
+      <p style="color:var(--sub);font-size:12px;margin-top:3px">GoBD-konforme Änderungshistorie · nur Storno-Ketten</p>
+    </div>
+    <span id="journal-count" style="font-size:12px;color:var(--sub);font-family:var(--mono)"></span>
+  </div>
+  <div style="background:rgba(26,69,120,.06);border:1px solid rgba(26,69,120,.2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px">
+    <i class="fas fa-info-circle"></i> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
+  </div>
+  <div class="tbl-wrap">
+    <table style="width:100%">
+      <thead><tr>
+        <th>Datum</th>
+        <th>Status</th>
+        <th class="mob-hide">Beschreibung</th>
+        <th class="mob-hide">Typ</th>
+        <th style="text-align:right">Betrag</th>
+        <th class="mob-hide">ID</th>
+      </tr></thead>
+      <tbody id="journal-tbody"></tbody>
+    </table>
+    <div id="journal-empty" class="empty-state" style="display:none">
+      <div class="ei">📒</div>
+      <p>Keine Storno-Buchungen vorhanden</p>
+      <p style="font-size:12px;color:var(--sub);margin-top:6px">Alle Einträge sind unverändert</p>
     </div>
   </div>
 </div>
@@ -1067,6 +1103,7 @@
 <script src="reports.js"></script>
 <script src="rechnungen.js"></script>
 <script src="kunden.js"></script>
+<script src="journal.js"></script>
 <script src="umsatzsteuer.js"></script>
 </body>
 </html>

@@ -158,6 +158,7 @@ function nav(id, el){
   if(id==='bericht') renderRep();
   if(id==='zahlungen') renderZ();
   if(id==='dashboard') renderDash();
+  if(id==='journal') renderJournal();
   if(id==='prognose') renderProg();
   if(id==='kategorien') renderKat();
   if(id==='rechnungen') renderRech();
