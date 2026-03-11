@@ -42,7 +42,6 @@ function renderRech(){
         ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:var(--blue)" onclick="event.stopPropagation();druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>`}
         ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:#1e3a5f" onclick="event.stopPropagation();downloadZUGFeRDId('${r.id}')" title="ZUGFeRD (PDF+XML)"><i class="fas fa-file-pdf"></i></button>`}
         ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:#0d6b3b" onclick="event.stopPropagation();downloadXRechnungId('${r.id}')" title="XRechnung XML"><i class="fas fa-file-code"></i></button>`}
-        ${r.status==='ueberfaellig'?`<button class="del-btn edit-btn" style="opacity:1;color:#dc2626" onclick="event.stopPropagation();sendMahnung('${r.id}')" title="Mahnung senden"><i class="fas fa-bell"></i></button>`:''}
         ${r.status!=='bezahlt'?`<button class="del-btn" style="opacity:1;color:var(--green)" onclick="event.stopPropagation();rechBezahlt('${r.id}')" title="✓">✓</button>`:''}
         <button class="del-btn" style="opacity:1" onclick="event.stopPropagation();delRech('${r.id}')" title="✕">✕</button>
       </td>
@@ -107,6 +106,7 @@ function saveRechnung(){
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),
+    tel:document.getElementById('rn-nr').dataset.kundeTel||'',
     notiz:document.getElementById('rn-notiz').value.trim(),
     kundeId:document.getElementById('rn-nr').dataset.kundeId||'',
     positionen,
@@ -470,6 +470,7 @@ function druckRechnung(){
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),
+    tel:document.getElementById('rn-nr').dataset.kundeTel||'',
     notiz:document.getElementById('rn-notiz').value.trim(),
     positionen:pos, betrag:total
   };
@@ -500,6 +501,7 @@ function emailRechnung(){
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),
+    tel:document.getElementById('rn-nr').dataset.kundeTel||'',
     notiz:document.getElementById('rn-notiz').value.trim(),
     positionen:pos, betrag:total
   };
@@ -841,6 +843,7 @@ function downloadXRechnung(r) {
       kunde:    document.getElementById('rn-kunde').value.trim(),
       adresse:  document.getElementById('rn-adresse').value.trim(),
       email:    document.getElementById('rn-email').value.trim(),
+      tel: document.getElementById('rn-nr').dataset.kundeTel||'',
       notiz:    document.getElementById('rn-notiz').value.trim(),
       positionen: pos,
       betrag: pos.reduce((s, p) => s + p.menge * p.preis, 0)
@@ -883,6 +886,7 @@ async function downloadZUGFeRD(r) {
       kunde:    document.getElementById('rn-kunde').value.trim(),
       adresse:  document.getElementById('rn-adresse').value.trim(),
       email:    document.getElementById('rn-email').value.trim(),
+      tel: document.getElementById('rn-nr').dataset.kundeTel||'',
       notiz:    document.getElementById('rn-notiz').value.trim(),
       positionen: pos,
       betrag: pos.reduce((s, p) => s + (p.menge||1) * (p.netto||p.preis||0), 0)
@@ -924,140 +928,4 @@ async function downloadZUGFeRD(r) {
 function downloadZUGFeRDId(id) {
   const r = data.rechnungen.find(x => x.id === id);
   if (r) downloadZUGFeRD(r);
-}
-
-// ── MAHNWESEN ─────────────────────────────────────────────────────────────
-
-async function sendMahnung(id) {
-  const r = data.rechnungen.find(x => x.id === id);
-  if (!r) return;
-  const firma = getFirmaData();
-
-  // Считаем дни просрочки
-  const today = new Date();
-  const faelligDate = r.faellig ? new Date(r.faellig) : null;
-  const tageFaellig = faelligDate
-    ? Math.ceil((today - faelligDate) / (1000 * 60 * 60 * 24))
-    : 0;
-
-  // Определяем номер Mahnung (1., 2., 3.)
-  const mahnStufe = (r.mahnStufe || 0) + 1;
-  const stufeLabel = mahnStufe === 1 ? '1. Mahnung' : mahnStufe === 2 ? '2. Mahnung' : 'Letzte Mahnung';
-
-  // Генерируем PDF Mahnung
-  toast('📄 Mahnung wird erstellt...', 'ok');
-  try {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const W = 210, pad = 20;
-    let y = 25;
-
-    // Шапка — данные фирмы
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.setTextColor(26, 69, 120);
-    doc.text(firma.name || 'Meine Firma', pad, y); y += 6;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    if (firma.strasse) { doc.text(firma.strasse, pad, y); y += 5; }
-    if (firma.plz || firma.ort) { doc.text([firma.plz, firma.ort].filter(Boolean).join(' '), pad, y); y += 5; }
-    if (firma.tel)   { doc.text('Tel: ' + firma.tel, pad, y); y += 5; }
-    if (firma.email) { doc.text('E-Mail: ' + firma.email, pad, y); y += 5; }
-    y += 5;
-
-    // Данные получателя
-    doc.setTextColor(40, 40, 40);
-    doc.setFontSize(10);
-    if (r.kunde)   { doc.text(r.kunde, pad, y); y += 6; }
-    if (r.adresse) {
-      r.adresse.split('\n').forEach(line => { doc.text(line, pad, y); y += 5; });
-    }
-    y += 10;
-
-    // Дата справа
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    doc.text(today.toLocaleDateString('de-DE'), W - pad, y - 6, { align: 'right' });
-
-    // Заголовок
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(220, 38, 38);
-    doc.text(stufeLabel + ' — Rechnung ' + r.nr, pad, y); y += 8;
-
-    // Горизонтальная линия
-    doc.setDrawColor(220, 38, 38);
-    doc.setLineWidth(0.5);
-    doc.line(pad, y, W - pad, y); y += 8;
-
-    // Основной текст
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(40, 40, 40);
-
-    const faelligStr = faelligDate ? faelligDate.toLocaleDateString('de-DE') : '—';
-    const tageTxt = tageFaellig > 0 ? ` (${tageFaellig} Tage überfällig)` : '';
-
-    const text = [
-      `sehr geehrte Damen und Herren,`,
-      ``,
-      `trotz unserer Leistungserbringung haben wir bis heute keinen Zahlungseingang`,
-      `für die unten aufgeführte Rechnung feststellen können.`,
-      ``,
-      `  Rechnungsnummer:   ${r.nr}`,
-      `  Rechnungsdatum:    ${r.datum ? new Date(r.datum).toLocaleDateString('de-DE') : '—'}`,
-      `  Fälligkeitsdatum:  ${faelligStr}${tageTxt}`,
-      `  Offener Betrag:    ${r.betrag.toLocaleString('de-DE', {minimumFractionDigits:2})} €`,
-      ``,
-      mahnStufe < 3
-        ? `Wir bitten Sie, den ausstehenden Betrag innerhalb von 7 Tagen auf unser Konto`
-        : `Dies ist unsere letzte Mahnung. Bitte begleichen Sie den Betrag sofort,`,
-      mahnStufe < 3
-        ? `zu überweisen.`
-        : `da wir andernfalls rechtliche Schritte einleiten werden.`,
-    ];
-
-    if (firma.iban) {
-      text.push(``, `  IBAN: ${firma.iban}${firma.bic ? '  BIC: ' + firma.bic : ''}`);
-    }
-
-    text.push(``, `Mit freundlichen Grüßen`, ``, firma.name || '');
-
-    text.forEach(line => {
-      doc.text(line, pad, y);
-      y += line === '' ? 4 : 6;
-    });
-
-    const safeNr = r.nr.replace(/\//g, '-');
-    doc.save(`Mahnung_${mahnStufe}_${safeNr}.pdf`);
-
-    // Обновляем mahnStufe в данных
-    r.mahnStufe = mahnStufe;
-    r.letztesMahnung = today.toISOString().split('T')[0];
-    sbSaveRechnung(r);
-    renderRech();
-
-    // Открываем mailto
-    if (r.email) {
-      const subject = encodeURIComponent(`${stufeLabel}: Rechnung ${r.nr} — ${r.betrag.toLocaleString('de-DE', {minimumFractionDigits:2})} €`);
-      const body = encodeURIComponent(
-        `Sehr geehrte Damen und Herren,\n\n` +
-        `anbei erhalten Sie die ${stufeLabel} zu unserer Rechnung ${r.nr} vom ${r.datum ? new Date(r.datum).toLocaleDateString('de-DE') : ''}.\n\n` +
-        `Offener Betrag: ${r.betrag.toLocaleString('de-DE', {minimumFractionDigits:2})} €\n` +
-        `Fällig seit: ${faelligDate ? faelligDate.toLocaleDateString('de-DE') : '—'}${tageTxt}\n\n` +
-        `Bitte überweisen Sie den Betrag auf:\n` +
-        (firma.iban ? `IBAN: ${firma.iban}\n` : '') +
-        `\nMit freundlichen Grüßen\n${firma.name || ''}`
-      );
-      setTimeout(() => { window.location.href = `mailto:${r.email}?subject=${subject}&body=${body}`; }, 800);
-      toast(`✅ Mahnung ${mahnStufe} gespeichert · E-Mail wird geöffnet`, 'ok');
-    } else {
-      toast(`✅ Mahnung ${mahnStufe} PDF gespeichert`, 'ok');
-    }
-
-  } catch(e) {
-    console.error(e);
-    toast('Fehler beim Erstellen der Mahnung', 'err');
-  }
 }
