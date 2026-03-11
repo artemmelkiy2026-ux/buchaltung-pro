@@ -401,7 +401,7 @@ function renderDash(){
   }
   const mob=isMob();
   document.getElementById('d-recent').innerHTML=recent.length?recent.map(e=>`
-    <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''}">
+    <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''};${(e.is_storno||e._storniert)?'opacity:0.45;background:rgba(148,163,184,0.07);':''}">
       <td style="font-family:var(--mono);font-size:11px;color:var(--sub);white-space:nowrap">${mob?fdm(e.datum):fd(e.datum)}</td>
       <td style="white-space:nowrap"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}" style="display:inline-flex;align-items:center;gap:5px">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}${mob?'':'<span style="font-size:11px;font-weight:600">'+(e.typ==='Einnahme'?'Einnahme':'Ausgabe')+'</span>'}</span></td>
       <td class="mob-hide" style="color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.kategorie}">${e.kategorie}</td>
@@ -418,8 +418,22 @@ function getFiltered(){
   const k=document.getElementById('f-kat').value;
   const z=document.getElementById('f-zahl').value;
   const q=document.getElementById('f-q').value.toLowerCase();
+  // Journal-Modus: alle Buchungen inkl. Storno anzeigen
+  if(fTyp==='Journal'){
+    return data.eintraege.filter(e=>{
+      const j=document.getElementById('f-jahr').value;
+      const m=document.getElementById('f-mon').value;
+      const q=document.getElementById('f-q').value.toLowerCase();
+      if(j!=='Alle'&&!e.datum.startsWith(j))return false;
+      if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;
+      if(q&&!e.beschreibung.toLowerCase().includes(q)
+         &&!(e.kategorie||'').toLowerCase().includes(q)
+         &&!e.datum.includes(q))return false;
+      return true;
+    });
+  }
   return data.eintraege.filter(e=>{
-    if(e.is_storno||e._storniert)return false; // GoBD: скрываем сторно-записи
+    if(e.is_storno||e._storniert)return false; // GoBD: скрываем sторно-записи
     if(fTyp!=='Alle'&&e.typ!==fTyp)return false;
     if(j!=='Alle'&&!e.datum.startsWith(j))return false;
     if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;
@@ -502,19 +516,49 @@ function renderEin(){
       const nettoVal = e.typ==='Einnahme'?(e.nettoBetrag||e.betrag):(e.betrag-(e.vorsteuerBet||0));
       const mwstRate = e.mwstRate||e.vorsteuerRate||0;
       return `
-      <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''}">
+      <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''};${(e.is_storno||e._storniert)?'opacity:0.45;background:rgba(148,163,184,0.07);':''}">
         <td style="font-family:var(--mono);font-size:11px;color:var(--sub)">${mob?fdm(e.datum):fd(e.datum)}</td>
         <td><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'} ${mob?'':e.typ}</span></td>
         <td class="mob-hide" style="color:var(--sub);font-size:12px">${e.kategorie}</td>
-        <td class="mob-hide"><span title="${e.notiz||''}">${e.beschreibung}${e.notiz?` <span style="color:var(--sub);font-size:10px"><i class="fas fa-sticky-note"></i></span>`:''}</span></td>
+        <td class="mob-hide"><span title="${e.notiz||''}">
+          ${(()=>{
+            // Sторно-Gegenbuchung: zeige auf welchen Originalbeleg sie sich bezieht
+            if(e.is_storno&&e.storno_of){
+              const orig=data.eintraege.find(x=>x.id===e.storno_of);
+              const ref=orig?('<b>'+fd(orig.datum)+'</b> · '+fmt(orig.betrag)+' ('+orig.beschreibung+')'):'Beleg nicht gefunden';
+              const korr=data.eintraege.find(x=>x.korrektur_von===e.storno_of);
+              const korrRef=korr?' → Korrektur: <b>'+fmt(korr.betrag)+'</b>':'';
+              return '<span style="font-size:9px;font-weight:700;color:#94a3b8;background:rgba(148,163,184,0.15);padding:2px 6px;border-radius:3px;margin-right:4px">↩ Storno-Gegenbuchung</span>'
+                    +'<span style="font-size:10px;color:var(--sub)">hebt auf: '+ref+korrRef+'</span>';
+            }
+            // Stornierter Originalbeleg
+            if(e.is_storno&&!e.storno_of){
+              const stornoRec=data.eintraege.find(x=>x.storno_of===e.id);
+              const korr=data.eintraege.find(x=>x.korrektur_von===e.id);
+              const stornoRef=stornoRec?('<b>'+fd(stornoRec.datum)+'</b>'):'?';
+              const korrRef=korr?' → Korrektur: <b>'+fmt(korr.betrag)+'</b> am '+fd(korr.datum):'';
+              return '<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 6px;border-radius:3px;margin-right:4px">✗ Storniert</span>'
+                    +'<span style="font-size:10px;color:var(--sub)">am '+stornoRef+korrRef+'</span>';
+            }
+            // Korrigierter Beleg: zeige Bezug zum stornierten Original
+            if(e.korrektur_von){
+              const orig=data.eintraege.find(x=>x.id===e.korrektur_von);
+              const ref=orig?('<b>'+fd(orig.datum)+'</b> · '+fmt(orig.betrag)):'?';
+              return '<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 6px;border-radius:3px;margin-right:4px">✎ Korrektur</span>'
+                    +'<span style="font-size:10px;color:var(--sub)">ersetzt: '+ref+'</span> ';
+            }
+            return '';
+          })()}${e.beschreibung}${e.notiz?` <span style="color:var(--sub);font-size:10px"><i class="fas fa-sticky-note"></i></span>`:''}</span></td>
         ${mob?`<td style="font-size:11px;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.beschreibung||'—'}</td>`:''}
         <td class="mob-hide"><span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span></td>
         ${showMwst&&!mob?`<td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:var(--sub)">${hasMwst?fmt(nettoVal):'—'}</td>
         <td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:#f97316">${hasMwst?'+'+fmt(mwstVal)+' ('+mwstRate+'%)':'—'}</td>`:''}
         <td style="text-align:right"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
         <td class="mob-hide" style="white-space:nowrap">
+          ${!(e.is_storno||e._storniert)?`
           <button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,'${e.id}')"><i class="fas fa-edit"></i></button>
           <button class="del-btn" onclick="delE(event,'${e.id}')"><i class="fas fa-times"></i></button>
+          `:'<span style="font-size:10px;color:var(--sub)">GoBD</span>'}
         </td>
       </tr>`;}).join('');
     
@@ -575,8 +619,13 @@ function renderEin(){
     document.getElementById('e-pagination').innerHTML = paginationHTML;
   }
   
-  const ein=sum(entries,'Einnahme'),aus=sum(entries,'Ausgabe'),gew=ein-aus;
-  g('es-cnt',entries.length+'');
+  // Im Journal: nur aktive Buchungen für Summen
+  const activeE = entries.filter(e=>!e.is_storno&&!e._storniert);
+  const stornoE = entries.filter(e=>e.is_storno||e._storniert);
+  const ein=sum(activeE,'Einnahme'),aus=sum(activeE,'Ausgabe'),gew=ein-aus;
+  g('es-cnt', fTyp==='Journal'
+    ? `${activeE.length} aktiv · <span style="color:var(--sub);font-size:11px">${stornoE.length} Storno/Storniert</span>`
+    : entries.length+'');
   g('es-ein',fmt(ein));g('es-aus',fmt(aus));
   g('es-gew',(gew>=0?'+':'')+fmt(gew));
   document.getElementById('es-gew').style.setProperty('color',gew>=0?'var(--green)':'var(--red)','important');

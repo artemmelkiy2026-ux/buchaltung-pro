@@ -61,6 +61,7 @@ async function saveEdit(){
     notiz: document.getElementById('edit-note').value.trim(),
     is_storno: false,
     storno_of: null,
+    korrektur_von: editId,
     _storniert: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
