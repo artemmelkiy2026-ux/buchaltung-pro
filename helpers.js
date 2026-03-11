@@ -488,7 +488,7 @@ function _buildRechnungHTML(r) {
   .meta-row span:last-child { font-weight: 600; }
 
   .invoice-title {
-    font-size: 25px;
+    font-size: 32px;
     font-weight: 800;
     margin-bottom: 30px;
     letter-spacing: -0.5px;
@@ -573,7 +573,7 @@ function _buildRechnungHTML(r) {
     padding-top: 25px;
     border-top: 1px solid var(--border);
     display: grid;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    grid-template-columns: 1.4fr 1fr 1fr;
     gap: 20px;
     font-size: 9px;
     color: var(--text-sub);
@@ -607,7 +607,6 @@ function _buildRechnungHTML(r) {
     <div class="invoice-meta">
       <div class="meta-row"><span>Rechnungs-Nr.</span><span>${r.nr||'—'}</span></div>
       <div class="meta-row"><span>Datum</span><span>${fd(r.datum)}</span></div>
-      <div class="meta-row"><span>Kunden-Nr.</span><span>${r.kundeId?'KD-'+String(r.kundeId).slice(-5):'—'}</span></div>
       <div class="meta-row"><span>Fällig bis</span><span>${r.faellig?fd(r.faellig):'—'}</span></div>
     </div>
   </div>
@@ -661,7 +660,7 @@ function _buildRechnungHTML(r) {
 
   ${r.notiz ? `<div style="margin-top:20px;padding:12px 15px;background:#f2f2f7;border-left:3px solid var(--primary);font-size:11px;line-height:1.6">${r.notiz}</div>` : ''}
   ${isKlein ? '<p style="margin-top:16px;font-size:10px;color:var(--text-sub);font-style:italic">Gemäß §19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmer).</p>' : ''}
-  ${firmaStNr||firmaUstId ? `<p style="margin-top:8px;font-size:10px;color:var(--text-sub)">${[firmaStNr?'Steuernummer: '+firmaStNr:'',firmaUstId?'USt-IdNr.: '+firmaUstId:''].filter(Boolean).join('  ·  ')}</p>` : ''}
+
 
   <div class="footer">
     <div class="footer-col">
@@ -680,11 +679,7 @@ function _buildRechnungHTML(r) {
       ${firmaTel?'Tel: '+firmaTel+'<br>':''}
       ${firmaEmail}
     </div>
-    <div class="footer-col">
-      <strong>Steuerdaten</strong>
-      ${firmaStNr?'Steuernummer: '+firmaStNr+'<br>':''}
-      ${firmaUstId?'USt-IdNr.: '+firmaUstId:''}
-    </div>
+
   </div>
 
 </div>
