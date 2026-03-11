@@ -79,6 +79,7 @@ function editRech(id){
   document.getElementById('rn-adresse').value=r.adresse||'';
   document.getElementById('rn-email').value=r.email||'';
   document.getElementById('rn-notiz').value=r.notiz||'';
+  document.getElementById('rn-nr').dataset.kundeTel=r.tel||'';
   updateRechBanner();
   const posData=r.positionen&&r.positionen.length?r.positionen:[{bez:r.beschreibung||'',menge:1,netto:r.netto||r.betrag||'',rate:r.mwstRate||0,brutto:r.betrag||''}];
   setRechPositionen(posData);
