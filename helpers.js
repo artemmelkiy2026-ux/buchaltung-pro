@@ -347,27 +347,10 @@ function validatePLZ(input){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PDF GENERATION — jsPDF (точный рендер HTML-шаблона)
+// PDF GENERATION — html2canvas → jsPDF (точный рендер HTML-шаблона)
 // ═══════════════════════════════════════════════════════════════
 
-async function generateRechnungPDF(r) {
-  const {jsPDF} = window.jspdf;
-  const doc = new jsPDF({orientation:'portrait', unit:'pt', format:'a4'});
-  // A4 в pt: 595 x 842
-  const PW = 595, PH = 842, ML = 45, MR = 45;
-  const CW = PW - ML - MR;  // ширина контента: 505pt
-  let y = 0;
-
-  // ── цвета ──────────────────────────────────────────────────────
-  const CORP   = [26,  69, 120];   // #1a4578
-  const CORPLG = [235, 241, 250];  // светло-синий фон
-  const WHITE  = [255, 255, 255];
-  const BLACK  = [28,  28,  30];
-  const GRAY   = [99,  99, 102];
-  const LGRAY  = [245, 245, 247];
-  const BORDER = [220, 220, 225];
-
-  // ── данные фирмы ───────────────────────────────────────────────
+function _buildRechnungHTML(r) {
   const f = typeof getFirmaData==='function' ? getFirmaData() : {};
   const firmaName   = f.name        || 'Meine Firma';
   const firmaStr    = f.strasse     || '';
@@ -382,293 +365,286 @@ async function generateRechnungPDF(r) {
   const isKlein     = !r.mwstMode || r.mwstMode === '§19';
   const initials    = firmaName.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
-  // ── хелперы ────────────────────────────────────────────────────
-  const t   = (s,x,yy,o={})  => doc.text(String(s||''), x, yy, o);
-  const fc  = (...c)          => doc.setFillColor(...c);
-  const tc  = (...c)          => doc.setTextColor(...c);
-  const dc  = (...c)          => doc.setDrawColor(...c);
-  const fs  = (n)             => doc.setFontSize(n);
-  const ff  = (f,s='normal')  => doc.setFont('helvetica', s);
-  const lw  = (n)             => doc.setLineWidth(n);
-  const R   = (x,yy,w,h,col) => { fc(...col); doc.rect(x,yy,w,h,'F'); };
-  const RR  = (x,yy,w,h,col,r2=4,mode='F') => { fc(...col); doc.roundedRect(x,yy,w,h,r2,r2,mode); };
-  const L   = (x1,yy,x2,col=BORDER,lwidth=0.5) => { dc(...col); lw(lwidth); doc.line(x1,yy,x2,yy); };
-
-  // ════════════════════════════════════════════════════════════════
-  // HEADER
-  // ════════════════════════════════════════════════════════════════
-  y = 42;
-
-  // Аватар
-  RR(ML, y-16, 40, 40, CORP, 8);
-  tc(...WHITE); ff('helvetica','bold'); fs(14);
-  t(initials, ML+20, y+7, {align:'center'});
-
-  // Название фирмы
-  tc(...BLACK); ff('helvetica','bold'); fs(16);
-  t(firmaName, ML+52, y-2);
-  ff('helvetica','normal'); fs(10); tc(...GRAY);
-  t(firmaEmail||firmaWeb||firmaStr, ML+52, y+12);
-
-  // Адрес справа
-  fs(9.5); tc(...GRAY);
-  const addrR = [firmaStr, firmaPlzOrt, firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean);
-  addrR.forEach((l,i) => t(l, PW-MR, y-8+i*13, {align:'right'}));
-
-  y += 34;
-  L(ML, y, PW-MR, BORDER, 0.5);
-  y += 20;
-
-  // ════════════════════════════════════════════════════════════════
-  // АДРЕС + МЕТА КАРТОЧКА
-  // ════════════════════════════════════════════════════════════════
-
-  // Абсендер-строка
-  fs(8); tc(...GRAY); ff('helvetica','normal');
-  const absStr = [firmaName, firmaStr, firmaPlzOrt].filter(Boolean).join(' · ');
-  t(absStr, ML, y);
-  L(ML, y+3, ML+160, [210,210,215], 0.4);
-  y += 16;
-
-  // Получатель
-  ff('helvetica','bold'); fs(13); tc(...BLACK);
-  t(r.kunde||'—', ML, y);
-  y += 14;
-  ff('helvetica','normal'); fs(11); tc(...BLACK);
-  const addrLines = (r.adresse||'').split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
-  addrLines.forEach(l => { t(l, ML, y); y += 13; });
-
-  // Мета-карточка
-  const metaW=175, metaH=130, metaX=PW-MR-metaW;
-  const metaTopY = y - 14 - addrLines.length*13 - 14;
-  RR(metaX, metaTopY, metaW, metaH, CORPLG, 6);
-  dc(...BORDER); lw(0.5); doc.roundedRect(metaX, metaTopY, metaW, metaH, 6, 6, 'S');
-
-  // Заголовок карточки
-  RR(metaX, metaTopY, metaW, 24, CORP, 6);
-  R(metaX, metaTopY+18, metaW, 6, CORP);
-  ff('helvetica','bold'); fs(8.5); tc(...WHITE);
-  t('RECHNUNGSDETAILS', metaX+metaW/2, metaTopY+15, {align:'center'});
-
-  const metaRows = [
-    ['Rechnungs-Nr.', r.nr||'—'],
-    ['Datum',         fd(r.datum)],
-    ['Kunden-Nr.',    r.kundeId?'KD-'+String(r.kundeId).slice(-5):'—'],
-    ['Fällig bis',    r.faellig?fd(r.faellig):'—'],
-  ];
-  metaRows.forEach(([lbl,val],i) => {
-    const ry = metaTopY + 36 + i*23;
-    ff('helvetica','normal'); fs(8.5); tc(...GRAY);
-    t(lbl, metaX+10, ry);
-    ff('helvetica','bold'); fs(9.5); tc(...BLACK);
-    t(val, metaX+metaW-10, ry, {align:'right'});
-    if(i<3){ L(metaX+10, ry+5, metaX+metaW-10, BORDER, 0.3); }
-  });
-
-  y = Math.max(y, metaTopY+metaH) + 24;
-
-  // ════════════════════════════════════════════════════════════════
-  // TITEL
-  // ════════════════════════════════════════════════════════════════
-  ff('helvetica','bold'); fs(32); tc(...CORP);
-  t('Rechnung', ML, y);
-  y += 14;
-
-  ff('helvetica','normal'); fs(10); tc(...GRAY);
-  const introTxt = 'Sehr geehrte Damen und Herren, für unsere erbrachten Leistungen erlauben wir uns folgende Rechnung zu stellen:';
-  const introLines = doc.splitTextToSize(introTxt, CW);
-  introLines.forEach(l => { t(l, ML, y); y += 14; });
-  y += 10;
-
-  // ════════════════════════════════════════════════════════════════
-  // POSITIONS-TABELLE
-  // ════════════════════════════════════════════════════════════════
-  const TH = 22;  // высота строки
-  const cPos = ML;
-  const cBez = ML+30;
-  const cMen = ML+30+215;
-  const cEin = ML+30+215+80;
-  const cGes = ML+CW;
-
-  // Шапка
-  R(ML, y, CW, TH, CORP);
-  tc(...WHITE); ff('helvetica','bold'); fs(8.5);
-  t('Pos.',            cPos+4,    y+14);
-  t('Leistung / Beschreibung', cBez, y+14);
-  t('Menge',           cMen,      y+14, {align:'right'});
-  t('Einzelpreis',     cEin,      y+14, {align:'right'});
-  t('Gesamt',          cGes,      y+14, {align:'right'});
-  y += TH;
-
-  // Строки позиций
   const pos = r.positionen && r.positionen.length
     ? r.positionen
     : [{bez:r.beschreibung||'Leistung', menge:1, einheit:'Stk.', preis:r.betrag, netto:r.betrag, mwstRate:0}];
 
   let totNetto=0, totMwst=0;
-
-  pos.forEach((p,i) => {
-    if(y > 700){ doc.addPage(); y = 40; }
-
+  const posRows = pos.map((p,i) => {
     const netto = p.netto!==undefined ? p.netto : (p.preis||0);
     const rate  = isKlein ? 0 : (p.mwstRate||p.rate||0);
     const lineN = r2((p.menge||1)*netto);
     const lineM = r2(lineN*rate/100);
     totNetto += lineN; totMwst += lineM;
-
-    const rowH = TH;
-    R(ML, y, CW, rowH, i%2===0 ? LGRAY : WHITE);
-
-    // Номер
-    fs(9); tc(...GRAY); ff('helvetica','normal');
-    t(String(i+1)+'.', cPos+4, y+14);
-
-    // Название позиции
-    ff('helvetica','bold'); fs(10); tc(...BLACK);
-    const bezStr = doc.splitTextToSize(p.bez||p.beschreibung||'—', 210)[0];
-    t(bezStr, cBez, y+14);
-
-    // Мenge
-    ff('helvetica','normal'); fs(9.5); tc(...GRAY);
-    t(String(p.menge||1)+' '+(p.einheit||'Stk.'), cMen, y+14, {align:'right'});
-
-    // Цены
-    tc(...BLACK);
-    t(fmt(netto), cEin, y+14, {align:'right'});
-    ff('helvetica','bold');
-    t(fmt(lineN), cGes, y+14, {align:'right'});
-    ff('helvetica','normal');
-
-    L(ML, y+rowH, ML+CW, BORDER, 0.3);
-    y += rowH;
-  });
-
-  y += 18;
-
-  // ════════════════════════════════════════════════════════════════
-  // НИЖНИЙ БЛОК: QR-виджет + Итоги
-  // ════════════════════════════════════════════════════════════════
+    return `<tr>
+      <td>${i+1}</td>
+      <td>
+        <strong>${p.bez||p.beschreibung||'—'}</strong>
+        ${p.desc ? `<div class="pos-desc">${p.desc}</div>` : ''}
+      </td>
+      <td class="tr">${p.menge||1} ${p.einheit||'Stk.'}</td>
+      <td class="tr">${fmt(netto)}</td>
+      <td class="tr"><strong>${fmt(lineN)}</strong></td>
+    </tr>`;
+  }).join('');
   const totBrutto = r2(totNetto+totMwst);
-  const blockH = 90;
-  const qrW = CW*0.52;
-  const sumX = ML + qrW + 14;
-  const sumW = CW - qrW - 14;
+  const addrLines = (r.adresse||'').split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
+  const giroData  = `BCD\n002\n1\nSCT\n${firmaBic}\n${firmaName}\n${firmaIban}\nEUR${totBrutto}\n\nRechnung ${r.nr}`;
 
-  // QR фон
-  RR(ML, y, qrW, blockH, CORPLG, 8);
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',Arial,sans-serif;background:#fff;color:#1c1c1e;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:794px;background:#fff;padding:38px 45px 30px;display:flex;flex-direction:column;gap:0}
 
-  // QR плашки
-  const qbSz = 60;
-  RR(ML+8, y+15, qbSz, qbSz, WHITE, 5);
-  RR(ML+qrW-qbSz-8, y+15, qbSz, qbSz, WHITE, 5);
+/* HEADER */
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
+.logo-block{display:flex;align-items:center;gap:14px}
+.avatar{width:52px;height:52px;background:#1a4578;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;flex-shrink:0}
+.firma-name{font-size:17px;font-weight:700;color:#1c1c1e;line-height:1.2}
+.firma-sub{font-size:11px;color:#636366;margin-top:3px}
+.sender-right{text-align:right;font-size:10px;color:#636366;line-height:1.9}
+hr{border:none;border-top:1px solid #e5e5ea;margin:0 0 22px}
 
-  // Лейблы QR
-  ff('helvetica','bold'); fs(7.5); tc(...GRAY);
-  t('GiroCode', ML+8+qbSz/2,  y+blockH-6, {align:'center'});
-  t('PayPal',   ML+qrW-8-qbSz/2, y+blockH-6, {align:'center'});
+/* ADDRESS */
+.addr-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;gap:24px}
+.abs-zeile{font-size:9px;color:#636366;border-bottom:1px solid #e5e5ea;padding-bottom:3px;margin-bottom:10px;display:inline-block}
+.recipient{font-size:13px;line-height:1.7}
 
-  // Центральный текст
-  const qCX = ML+8+qbSz + (qrW-16-qbSz*2)/2;
-  ff('helvetica','bold'); fs(10); tc(...BLACK);
-  t('Schnell bezahlen', qCX, y+28, {align:'center'});
-  ff('helvetica','normal'); fs(8.5); tc(...GRAY);
-  const qLines = doc.splitTextToSize('Scannen Sie den GiroCode mit Ihrer Banking-App. Alle Daten werden automatisch übernommen.', qrW-16-qbSz*2-10);
-  qLines.forEach((l,i) => t(l, qCX, y+42+i*12, {align:'center'}));
+/* META CARD */
+.meta-card{min-width:210px;background:#fafafa;border:1px solid #e5e5ea;border-radius:10px;overflow:hidden;flex-shrink:0}
+.meta-head{background:#1a4578;color:#fff;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:7px 14px}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;border-bottom:1px solid #f0f0f0;font-size:11px}
+.mrow:last-child{border-bottom:none}
+.ml{color:#636366}.mv{font-weight:700;color:#1c1c1e}
 
-  // Итоги
-  let sy = y + 4;
+/* TITLE */
+.invoice-title{font-size:38px;font-weight:800;color:#1a4578;letter-spacing:-0.5px;margin-bottom:8px}
+.invoice-intro{font-size:11px;color:#636366;line-height:1.6;margin-bottom:22px}
 
-  ff('helvetica','normal'); fs(11); tc(...GRAY);
-  t('Netto-Gesamt', sumX, sy+12);
-  tc(...BLACK);
-  t(fmt(totNetto), ML+CW, sy+12, {align:'right'});
-  sy += 20;
+/* TABLE */
+table{width:100%;border-collapse:collapse;margin-bottom:22px}
+thead tr{background:#1a4578}
+thead th{color:#fff;padding:9px 11px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left}
+thead th.tr{text-align:right}
+tbody tr{border-bottom:1px solid #f0f0f0}
+tbody tr:nth-child(even){background:#f8f9fa}
+tbody td{padding:10px 11px;font-size:12px;vertical-align:top}
+tbody td.tr{text-align:right;font-size:11px;white-space:nowrap}
+.pos-desc{font-size:10px;color:#636366;margin-top:3px}
 
-  if(!isKlein && totMwst>0){
-    tc(...GRAY);
-    t('MwSt 19%', sumX, sy+12);
-    tc(...BLACK);
-    t(fmt(totMwst), ML+CW, sy+12, {align:'right'});
-    sy += 20;
+/* BOTTOM ROW */
+.bot{display:flex;justify-content:space-between;align-items:stretch;gap:20px;margin-bottom:22px}
+
+/* QR WIDGET */
+.qr-widget{flex:1;background:#f2f2f7;border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:82px 1fr 82px;gap:12px;align-items:center}
+.qr-box{text-align:center}
+.qr-img{width:82px;height:82px;background:#fff;border-radius:8px;border:1px solid #e5e5ea;display:flex;align-items:center;justify-content:center;margin-bottom:5px;overflow:hidden}
+.qr-img img{width:72px;height:72px;display:block}
+.qr-lbl{font-size:8px;font-weight:700;text-transform:uppercase;color:#636366;margin-top:2px}
+.qr-center{text-align:center}
+.qr-center h4{font-size:11px;font-weight:700;color:#1c1c1e;margin-bottom:6px}
+.qr-center p{font-size:9.5px;color:#636366;line-height:1.5}
+
+/* TOTALS */
+.totals{width:230px;display:flex;flex-direction:column;justify-content:flex-end}
+.trow{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
+.trow .tl{color:#636366}
+.grand{border-top:2px solid #1c1c1e;margin-top:8px;padding:10px 14px;background:#1a4578;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+.grand .gl{color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+.grand .gv{color:#fff;font-weight:800;font-size:18px}
+
+/* CLOSING */
+.closing{margin-bottom:16px}
+.thanks{font-weight:700;font-size:12px;color:#1c1c1e;margin-bottom:5px}
+.terms{font-size:11px;color:#636366;line-height:1.6}
+
+/* NOTIZ */
+.notiz{background:#ebf1fa;border-left:3px solid #1a4578;padding:10px 14px;border-radius:0 6px 6px 0;font-size:11px;color:#1a3a5c;line-height:1.6;margin-bottom:14px}
+
+/* HINWEIS */
+.hinweis{font-size:10px;color:#636366;font-style:italic;margin-bottom:8px}
+.st-info{font-size:10px;color:#636366;margin-bottom:14px}
+
+/* FOOTER */
+.footer{margin-top:28px;padding-top:18px;border-top:1px solid #e5e5ea;display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:16px}
+.fc strong{font-size:8.5px;color:#1a4578;text-transform:uppercase;letter-spacing:.4px;font-weight:700;display:block;margin-bottom:5px}
+.fc{font-size:9px;color:#636366;line-height:1.9}
+</style>
+</head>
+<body><div class="page">
+
+<div class="header">
+  <div class="logo-block">
+    <div class="avatar">${initials}</div>
+    <div>
+      <div class="firma-name">${firmaName}</div>
+      <div class="firma-sub">${firmaEmail||firmaWeb||firmaStr}</div>
+    </div>
+  </div>
+  <div class="sender-right">
+    ${firmaStr}<br>
+    ${firmaPlzOrt}<br>
+    ${firmaTel ? 'Tel: '+firmaTel+'<br>' : ''}
+    ${firmaEmail}
+  </div>
+</div>
+
+<hr>
+
+<div class="addr-row">
+  <div>
+    <div class="abs-zeile">${[firmaName,firmaStr,firmaPlzOrt].filter(Boolean).join(' · ')}</div>
+    <div class="recipient">
+      <strong>${r.kunde||'—'}</strong><br>
+      ${addrLines.join('<br>')}
+    </div>
+  </div>
+  <div class="meta-card">
+    <div class="meta-head">Rechnungsdetails</div>
+    <div class="mrow"><span class="ml">Rechnungs-Nr.</span><span class="mv">${r.nr||'—'}</span></div>
+    <div class="mrow"><span class="ml">Datum</span><span class="mv">${fd(r.datum)}</span></div>
+    <div class="mrow"><span class="ml">Kunden-Nr.</span><span class="mv">${r.kundeId?'KD-'+String(r.kundeId).slice(-5):'—'}</span></div>
+    <div class="mrow"><span class="ml">Fällig bis</span><span class="mv">${r.faellig?fd(r.faellig):'—'}</span></div>
+  </div>
+</div>
+
+<div class="invoice-title">Rechnung</div>
+<div class="invoice-intro">Sehr geehrte Damen und Herren, für unsere erbrachten Leistungen erlauben wir uns folgende Rechnung zu stellen:</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:30px">Pos</th>
+      <th>Leistung / Beschreibung</th>
+      <th class="tr" style="width:80px">Menge</th>
+      <th class="tr" style="width:90px">Einzelpreis</th>
+      <th class="tr" style="width:90px">Gesamt</th>
+    </tr>
+  </thead>
+  <tbody>${posRows}</tbody>
+</table>
+
+<div class="bot">
+  <div class="qr-widget">
+    <div class="qr-box">
+      <div class="qr-img"><img src="https://api.qrserver.com/v1/create-qr-code/?size=144x144&data=${encodeURIComponent(giroData)}" alt="GiroCode" crossorigin="anonymous"></div>
+      <div class="qr-lbl">GiroCode</div>
+    </div>
+    <div class="qr-center">
+      <h4>Schnell &amp; Sicher bezahlen</h4>
+      <p>Scannen Sie den GiroCode mit Ihrer Banking-App. Alle Daten werden automatisch übernommen.</p>
+    </div>
+    <div class="qr-box">
+      <div class="qr-img"><img src="https://api.qrserver.com/v1/create-qr-code/?size=144x144&data=${encodeURIComponent('PayPal:'+firmaEmail)}" alt="PayPal" crossorigin="anonymous"></div>
+      <div class="qr-lbl">PayPal</div>
+    </div>
+  </div>
+  <div class="totals">
+    <div class="trow"><span class="tl">Netto-Gesamt</span><span>${fmt(totNetto)}</span></div>
+    ${!isKlein && totMwst>0 ? `<div class="trow"><span class="tl">MwSt 19%</span><span>${fmt(totMwst)}</span></div>` : ''}
+    <div class="grand"><span class="gl">Gesamtbetrag</span><span class="gv">${fmt(totBrutto)}</span></div>
+  </div>
+</div>
+
+<div class="closing">
+  <div class="thanks">Vielen Dank für Ihr Vertrauen und die angenehme Zusammenarbeit!</div>
+  <div class="terms">Bitte überweisen Sie den Rechnungsbetrag innerhalb von 14 Tagen${r.faellig?' (bis zum '+fd(r.faellig)+')':''} ohne Abzug auf unser unten genanntes Konto.</div>
+</div>
+
+${r.notiz ? `<div class="notiz">${r.notiz}</div>` : ''}
+${isKlein ? '<div class="hinweis">Gemäß §19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmer).</div>' : ''}
+${firmaStNr||firmaUstId ? `<div class="st-info">${[firmaStNr?'Steuernummer: '+firmaStNr:'',firmaUstId?'USt-IdNr.: '+firmaUstId:''].filter(Boolean).join('  ·  ')}</div>` : ''}
+
+<div class="footer">
+  <div class="fc"><strong>Absender</strong>${firmaName}<br>${firmaStr}<br>${firmaPlzOrt}</div>
+  <div class="fc"><strong>Bankverbindung</strong>${firmaIban?'IBAN: '+firmaIban:'—'}<br>${firmaBic?'BIC: '+firmaBic:''}</div>
+  <div class="fc"><strong>Kontakt</strong>${firmaTel?'Tel: '+firmaTel+'<br>':''}${firmaEmail}</div>
+  <div class="fc"><strong>Steuerdaten</strong>${firmaStNr?'StNr: '+firmaStNr+'<br>':''}${firmaUstId?'USt-ID: '+firmaUstId:''}</div>
+</div>
+
+</div></body></html>`;
+}
+
+async function generateRechnungPDF(r) {
+  const {jsPDF} = window.jspdf;
+
+  // Создаём скрытый iframe — изолированный контекст, нет конфликтов со стилями приложения
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;height:1200px;border:none;visibility:hidden';
+  document.body.appendChild(iframe);
+
+  try {
+    // Записываем HTML в iframe
+    const html = _buildRechnungHTML(r);
+    iframe.contentDocument.open();
+    iframe.contentDocument.write(html);
+    iframe.contentDocument.close();
+
+    // Ждём шрифты + QR-картинки
+    await new Promise(res => {
+      iframe.onload = res;
+      setTimeout(res, 1200); // fallback
+    });
+    await iframe.contentDocument.fonts.ready;
+    await new Promise(res => setTimeout(res, 400));
+
+    const pageEl = iframe.contentDocument.querySelector('.page');
+
+    const canvas = await html2canvas(pageEl, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: '#ffffff',
+      width: 794,
+      windowWidth: 794,
+      logging: false,
+      foreignObjectRendering: false,
+    });
+
+    if(!canvas || canvas.width === 0 || canvas.height === 0) {
+      throw new Error('html2canvas lieferte leeres Canvas');
+    }
+
+    // jsPDF в mm — addImage принимает точные mm без float
+    const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    const PW = 210, PH = 297;
+    const imgW = canvas.width;
+    const imgH = canvas.height;
+    // Масштаб: 794px = 210mm  →  1px = 210/794 mm
+    const scale = PW / imgW;
+    const renderedH = Math.floor(imgH * scale * 10) / 10; // округление вниз до 1 знака
+
+    if(renderedH <= PH) {
+      // Всё на одной странице
+      pdf.addImage(canvas, 'JPEG', 0, 0, PW, renderedH, '', 'FAST');
+    } else {
+      // Разбиваем на страницы
+      const pageHeightPx = Math.floor(imgW * (PH / PW));
+      let offsetY = 0;
+      while(offsetY < imgH) {
+        const sliceH = Math.min(pageHeightPx, imgH - offsetY);
+        if(sliceH <= 0) break;
+        const sc = document.createElement('canvas');
+        sc.width  = imgW;
+        sc.height = sliceH;
+        sc.getContext('2d').drawImage(canvas, 0, -offsetY);
+        const slicePdfH = Math.floor(sliceH * scale * 10) / 10;
+        if(offsetY > 0) pdf.addPage();
+        pdf.addImage(sc, 'JPEG', 0, 0, PW, slicePdfH, '', 'FAST');
+        offsetY += pageHeightPx;
+      }
+    }
+
+    return pdf;
+
+  } finally {
+    document.body.removeChild(iframe);
   }
-
-  L(sumX, sy+4, ML+CW, BLACK, 1);
-  sy += 10;
-
-  // Gesamtbetrag плашка
-  RR(sumX, sy, sumW, 32, CORP, 6);
-  tc(...WHITE);
-  ff('helvetica','bold'); fs(10);
-  t('Gesamtbetrag', sumX+10, sy+20);
-  fs(14);
-  t(fmt(totBrutto), ML+CW, sy+20, {align:'right'});
-
-  y += blockH + 22;
-
-  // ════════════════════════════════════════════════════════════════
-  // ABSCHLUSSTEXT
-  // ════════════════════════════════════════════════════════════════
-  if(y > 680){ doc.addPage(); y = 40; }
-
-  ff('helvetica','bold'); fs(11); tc(...BLACK);
-  t('Vielen Dank für Ihr Vertrauen und die angenehme Zusammenarbeit!', ML, y);
-  y += 16;
-
-  ff('helvetica','normal'); fs(10); tc(...GRAY);
-  const zahlTxt = r.faellig
-    ? `Bitte überweisen Sie den Rechnungsbetrag innerhalb von 14 Tagen (bis zum ${fd(r.faellig)}) ohne Abzug auf unser unten genanntes Konto.`
-    : 'Bitte überweisen Sie den Rechnungsbetrag innerhalb von 14 Tagen ohne Abzug auf unser unten genanntes Konto.';
-  doc.splitTextToSize(zahlTxt, CW).forEach(l => { t(l, ML, y); y += 13; });
-  y += 8;
-
-  // Notiz
-  if(r.notiz){
-    const nLines = doc.splitTextToSize(r.notiz, CW-20);
-    RR(ML, y, CW, nLines.length*13+18, CORPLG, 4);
-    dc(...CORP); lw(2); doc.line(ML, y, ML, y+nLines.length*13+18);
-    ff('helvetica','normal'); fs(10); tc(...CORP);
-    nLines.forEach((l,i) => t(l, ML+12, y+14+i*13));
-    y += nLines.length*13+26;
-  }
-
-  // §19
-  if(isKlein){
-    ff('helvetica','italic'); fs(9); tc(...GRAY);
-    t('Gemäß §19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmer).', ML, y);
-    y += 14;
-  }
-
-  // Steuernummer
-  if(firmaStNr||firmaUstId){
-    ff('helvetica','normal'); fs(9); tc(...GRAY);
-    const stl = [firmaStNr?'Steuernummer: '+firmaStNr:'', firmaUstId?'USt-IdNr.: '+firmaUstId:''].filter(Boolean).join('  ·  ');
-    t(stl, ML, y);
-    y += 12;
-  }
-
-  // ════════════════════════════════════════════════════════════════
-  // FOOTER — 4 колонки (закреплён внизу)
-  // ════════════════════════════════════════════════════════════════
-  const FY = PH - 68;
-  R(0, FY, PW, 68, LGRAY);
-  L(0, FY, PW, BORDER, 0.5);
-
-  const fCols = [ML, ML+CW*0.26, ML+CW*0.52, ML+CW*0.76];
-  const fLabels = ['Absender','Bankverbindung','Kontakt','Steuerdaten'];
-  const fData = [
-    [firmaName, firmaStr, firmaPlzOrt].filter(Boolean),
-    [firmaIban?'IBAN: '+firmaIban:'—', firmaBic?'BIC: '+firmaBic:''].filter(Boolean),
-    [firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean),
-    [firmaStNr?'StNr: '+firmaStNr:'', firmaUstId?'USt-ID: '+firmaUstId:''].filter(Boolean),
-  ];
-  fCols.forEach((cx,ci) => {
-    ff('helvetica','bold'); fs(7.5); tc(...CORP);
-    t(fLabels[ci].toUpperCase(), cx, FY+14);
-    ff('helvetica','normal'); fs(8.5); tc(...GRAY);
-    fData[ci].forEach((l,li) => t(l, cx, FY+24+li*11));
-  });
-
-  return doc;
 }
 
 // Скачать PDF
