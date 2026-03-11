@@ -79,7 +79,7 @@ input[type="date"] {
 
 /* ── HEADER ── */
 header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:400}
-.logo{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.06em;white-space:nowrap;color:var(--text)}
+.logo{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.06em;white-space:nowrap;color:var(--text);display:flex;align-items:center;}
 .logo em{color:var(--blue);font-style:normal}
 .hd{flex:1;display:flex;align-items:center;justify-content:center;gap:8px}
 
