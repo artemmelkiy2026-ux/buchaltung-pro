@@ -561,7 +561,7 @@ function renderUst(){
       const m = getUstModeForYear(y);
       const isK = m==='§19';
       const active = y===yr;
-      const einY = data.eintraege.filter(e=>e.datum.startsWith(y)&&e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
+      const einY = activeEintraege().filter(e=>e.datum.startsWith(y)&&e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
       return `<div onclick="document.getElementById('ust-yr').value='${y}';renderUst()"
         style="cursor:pointer;padding:12px 18px;border-radius:var(--r);border:2px solid ${active?(isK?'var(--green)':'var(--blue)'):'var(--border)'};
         background:${active?(isK?'rgba(34,197,94,.08)':'rgba(59,130,246,.08)'):'var(--s2)'};
@@ -626,8 +626,8 @@ function renderUst(){
   if(!isRegel){
     const kleinStats = document.getElementById('ust-klein-stats');
     if(kleinStats){
-      const einY  = data.eintraege.filter(e=>e.datum.startsWith(yr)&&e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
-      const ausY  = data.eintraege.filter(e=>e.datum.startsWith(yr)&&e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
+      const einY  = activeEintraege().filter(e=>e.datum.startsWith(yr)&&e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
+      const ausY  = activeEintraege().filter(e=>e.datum.startsWith(yr)&&e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
       const limit = 22000;
       const pct   = Math.min(100, Math.round(einY/limit*100));
       const over  = einY > limit;
@@ -672,7 +672,7 @@ function renderUst(){
     }));
 
   // Все записи года — если MwSt не сохранён явно, считаем из betrag по 19%
-  const eintrMwst = data.eintraege
+  const eintrMwst = activeEintraege()
     .filter(e => e.datum.startsWith(yr))
     .map(e => {
       const isEin = e.typ==='Einnahme';

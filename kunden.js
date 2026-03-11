@@ -343,7 +343,7 @@ async function exportPDF() {
 
 function exportRepCSV(){
   const yr=document.getElementById('rep-yr')?.value||new Date().getFullYear()+'';
-  const ye=data.eintraege.filter(e=>e.datum.startsWith(yr));
+  const ye=activeEintraege().filter(e=>e.datum.startsWith(yr));
   const rows=[['Monat','Einnahmen (EUR)','Ausgaben (EUR)','Gewinn (EUR)',t('Kumuliert (EUR)'),'Einträge']];
   let c=0;
   for(let i=0;i<12;i++){
@@ -362,7 +362,7 @@ function exportRepCSV(){
 let _monEntries=[], _monLabel='';
 
 function openMonatDetail(yr, mi){
-  const entries = data.eintraege
+  const entries = activeEintraege()
     .filter(e=>e.datum.startsWith(yr) && e.datum.substring(5,7)===mi)
     .sort((a,b)=>a.datum.localeCompare(b.datum));
   _monEntries = entries;

@@ -143,6 +143,11 @@ function buildYearFilters(){
 
 function renderAll(){ buildYearFilters(); renderDash(); renderEin(); renderZ(); }
 
+// Все записи без сторно — используется во всех расчётах
+function activeEintraege() {
+  return (data.eintraege || []).filter(e => !e.is_storno && !e._storniert);
+}
+
 // ── NAV ───────────────────────────────────────────────────────────────────
 function nav(id, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));

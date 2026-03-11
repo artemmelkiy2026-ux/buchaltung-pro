@@ -199,7 +199,7 @@ function renderDash(){
   buildYearFilters();
   const yr=document.getElementById('dash-yr').value;
   document.getElementById('dash-yr-lbl').textContent=yr==='Alle'?'Alle Jahre':yr;
-  const ye=yr==='Alle'?data.eintraege:data.eintraege.filter(e=>e.datum.startsWith(yr));
+  const ye=(yr==='Alle'?activeEintraege():activeEintraege().filter(e=>e.datum.startsWith(yr)));
   const ein=sum(ye,'Einnahme'),aus=sum(ye,'Ausgabe'),gew=ein-aus;
   // MwSt Dashboard-Berechnung
   const mwstTotal = ye.filter(e=>e.mwstBetrag>0).reduce((s,e)=>s+e.mwstBetrag,0);
@@ -237,7 +237,7 @@ function renderDash(){
   // Chart - CHART.JS (профессиональный график)
   const chartYr=yr==='Alle'?new Date().getFullYear()+'':yr;
   const ea=Array(12).fill(0),aa=Array(12).fill(0);
-  data.eintraege.forEach(e=>{if(!e.datum.startsWith(chartYr))return;const m=parseInt(e.datum.substring(5,7))-1;if(e.typ==='Einnahme')ea[m]+=e.betrag;else aa[m]+=e.betrag;});
+  activeEintraege().forEach(e=>{if(!e.datum.startsWith(chartYr))return;const m=parseInt(e.datum.substring(5,7))-1;if(e.typ==='Einnahme')ea[m]+=e.betrag;else aa[m]+=e.betrag;});
   const ga=ea.map((e,i)=>e-aa[i]); // Gewinn pro Monat
   
   // Уничтожаем старый график если есть
@@ -587,7 +587,7 @@ function renderRep(){
   buildYearFilters();
   const repYr=document.getElementById('rep-yr');
   const yr=repYr.value||new Date().getFullYear()+'';
-  const ye=data.eintraege.filter(e=>e.datum.startsWith(yr));
+  const ye=activeEintraege().filter(e=>e.datum.startsWith(yr));
 
   const repJahr=document.getElementById('rep-yr')?.value||new Date().getFullYear()+'';
   const isRegel=!isKleinunternehmer(repJahr);
@@ -710,7 +710,7 @@ function renderRep(){
 function renderZ(){
   buildYearFilters();
   const yr=document.getElementById('z-yr').value;
-  const ye=yr==='Alle'?data.eintraege:data.eintraege.filter(e=>e.datum.startsWith(yr));
+  const ye=(yr==='Alle'?activeEintraege():activeEintraege().filter(e=>e.datum.startsWith(yr)));
   const mob=isMob();
 
   const zkStats={};
