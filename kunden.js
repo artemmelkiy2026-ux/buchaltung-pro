@@ -94,14 +94,253 @@ function delWied(id){if(!confirm('Vorlage löschen?'))return;data.wiederkehrend=
 
 
 
-function exportCSV(){
-  const entries=getFiltered();
-  if(!entries.length)return toast('Keine Daten','err');
-  const rows=[['Datum','Typ','Kategorie','Beschreibung','Zahlungsart','Notiz','Betrag (EUR)']];
-  entries.forEach(e=>rows.push([e.datum,e.typ,e.kategorie,e.beschreibung,e.zahlungsart||'',e.notiz||'',r2(e.betrag)]));
-  dl('\uFEFF'+rows.map(r=>r.join(';')).join('\n'),`buchaltung_${new Date().toISOString().split('T')[0]}.csv`);
-  toast('CSV exportiert!','ok');
+// ── Имя файла по выбранному периоду фильтра ───────────────────────────────
+function _getPeriodLabel() {
+  const j = document.getElementById('f-jahr')?.value || 'Alle';
+  const m = document.getElementById('f-mon')?.value  || 'Alle';
+  if (j === 'Alle') return 'Gesamt';
+  if (m === 'Alle') return j;
+  return `${j}-${m.padStart(2,'0')}`;
 }
+
+// ── CSV: выбор формата ────────────────────────────────────────────────────
+function exportCSV() {
+  const entries = getFiltered();
+  if (!entries.length) return toast('Keine Daten', 'err');
+  if (document.getElementById('csv-fmt-popup')) return;
+  const popup = document.createElement('div');
+  popup.id = 'csv-fmt-popup';
+  popup.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.2);font-family:inherit;min-width:280px';
+  popup.innerHTML = `
+    <div style="font-weight:600;font-size:13px;margin-bottom:12px;color:var(--text)">&#128229; CSV-Format w&#228;hlen</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button onclick="exportCSVFormat('datev')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit">
+        <strong>DATEV-kompatibel</strong><br>
+        <span style="opacity:.8;font-size:11px">Semikolon &middot; Komma als Dezimal &middot; TT.MM.JJJJ &middot; f&#252;r Steuerberater</span>
+      </button>
+      <button onclick="exportCSVFormat('universal')" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit">
+        <strong>Universal (RFC 4180)</strong><br>
+        <span style="opacity:.8;font-size:11px">Semikolon &middot; Punkt als Dezimal &middot; JJJJ-MM-TT &middot; f&#252;r Excel / Google Sheets</span>
+      </button>
+      <button onclick="document.getElementById('csv-fmt-popup').remove()" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;color:var(--sub);font-family:inherit">Abbrechen</button>
+    </div>`;
+  document.body.appendChild(popup);
+  setTimeout(() => { if (popup.parentNode) popup.remove(); }, 15000);
+}
+
+function exportCSVFormat(fmt) {
+  document.getElementById('csv-fmt-popup')?.remove();
+  const entries = getFiltered();
+  if (!entries.length) return toast('Keine Daten', 'err');
+
+  const period  = _getPeriodLabel();
+  const ein     = sum(entries, 'Einnahme');
+  const aus     = sum(entries, 'Ausgabe');
+  const gew     = ein - aus;
+  const mwstSum = entries.reduce((s,e) => s + (e.mwstBetrag||0), 0);
+
+  const byCat = {};
+  entries.forEach(e => {
+    if (!byCat[e.kategorie]) byCat[e.kategorie] = {ein:0, aus:0};
+    if (e.typ==='Einnahme') byCat[e.kategorie].ein += e.betrag;
+    else                    byCat[e.kategorie].aus += e.betrag;
+  });
+
+  const isDatev = fmt === 'datev';
+  const fmtNum  = n => isDatev ? String(r2(n)).replace('.',',') : r2(n).toFixed(2);
+  const fmtDate = d => isDatev ? (d ? d.split('-').reverse().join('.') : '') : (d||'');
+  const sep = ';';
+  const qv = v => {
+    const s = String(v).replace(/"/g,'""');
+    return isDatev ? s.replace(/;/g,'|') : `"${s}"`;
+  };
+
+  const rows = [];
+  rows.push([qv('Buchaltung Pro'), qv('Zeitraum: '+period), '', '', '', '', '', ''].join(sep));
+  rows.push([qv('Erstellt: '+new Date().toLocaleDateString('de-DE')), '', '', '', '', '', '', ''].join(sep));
+  rows.push(['','','','','','','',''].join(sep));
+
+  rows.push([
+    isDatev?'Datum':'Datum',
+    isDatev?'Belegtyp':'Typ',
+    'Kategorie','Beschreibung','Zahlungsart','Notiz',
+    'Betrag (EUR)','MwSt (EUR)'
+  ].map(qv).join(sep));
+
+  entries.forEach(e => {
+    rows.push([
+      fmtDate(e.datum), qv(e.typ), qv(e.kategorie), qv(e.beschreibung||''),
+      qv(e.zahlungsart||''), qv(e.notiz||''),
+      fmtNum(e.typ==='Einnahme' ? e.betrag : -e.betrag),
+      fmtNum(e.mwstBetrag||0)
+    ].join(sep));
+  });
+
+  rows.push(['','','','','','','',''].join(sep));
+  rows.push([qv('GESAMT'),'','','','','','',''].join(sep));
+  rows.push([qv('Einnahmen'),'','','','','',fmtNum(ein),''].join(sep));
+  rows.push([qv('Ausgaben'),'','','','','',fmtNum(-aus),''].join(sep));
+  rows.push([qv('Gewinn/Verlust'),'','','','','',fmtNum(gew),''].join(sep));
+  rows.push([qv('MwSt gesamt'),'','','','','','',fmtNum(mwstSum)].join(sep));
+
+  rows.push(['','','','','','','',''].join(sep));
+  rows.push([qv('KATEGORIEN'),'','','','','','',''].join(sep));
+  Object.entries(byCat).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([cat,v]) => {
+    rows.push([qv(cat),'','','','','',fmtNum(v.ein - v.aus),''].join(sep));
+  });
+
+  const suffix = isDatev ? 'DATEV' : 'Universal';
+  dl('\uFEFF' + rows.join('\n'), `Buchaltung_${period}_${suffix}.csv`);
+  toast('CSV (' + suffix + ') exportiert!', 'ok');
+}
+
+// ── PDF Eintraege mit Zusammenfassung ─────────────────────────────────────
+async function exportPDF() {
+  const entries = getFiltered();
+  if (!entries.length) return toast('Keine Daten', 'err');
+  toast('PDF wird erstellt...', 'ok');
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+    const period  = _getPeriodLabel();
+    const ein     = sum(entries, 'Einnahme');
+    const aus     = sum(entries, 'Ausgabe');
+    const gew     = ein - aus;
+    const mwstSum = entries.reduce((s,e) => s + (e.mwstBetrag||0), 0);
+    const W = 297, pad = 14;
+
+    // Header
+    doc.setFillColor(26,69,120);
+    doc.rect(0,0,W,20,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text('Buchaltung Pro \u2014 Eintr\u00e4ge', pad, 13);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.text('Zeitraum: ' + period + '   Erstellt: ' + new Date().toLocaleDateString('de-DE'), W-pad, 13, {align:'right'});
+
+    // KPI блоки
+    let y = 28;
+    const kpis = [
+      {label:'EINNAHMEN', val:fmt(ein), r:22, g:163, b:74},
+      {label:'AUSGABEN',  val:fmt(aus), r:220,g:38, b:38},
+      {label:'GEWINN/VERLUST', val:(gew>=0?'+':'')+fmt(gew), r:gew>=0?22:220, g:gew>=0?163:38, b:gew>=0?74:38},
+      {label:'MWST GESAMT', val:fmt(mwstSum), r:180, g:120, b:0},
+    ];
+    const bw = (W - pad*2 - 9) / 4;
+    kpis.forEach((k,i) => {
+      const x = pad + i*(bw+3);
+      doc.setFillColor(k.r,k.g,k.b);
+      doc.roundedRect(x,y,bw,14,2,2,'F');
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7);
+      doc.text(k.label, x+3, y+5);
+      doc.setFont('helvetica','bold'); doc.setFontSize(9);
+      doc.text(k.val, x+3, y+11);
+    });
+    y += 20;
+
+    // Разбивка по категориям
+    const byCat = {};
+    entries.forEach(e => {
+      if (!byCat[e.kategorie]) byCat[e.kategorie] = {ein:0,aus:0};
+      if (e.typ==='Einnahme') byCat[e.kategorie].ein += e.betrag;
+      else                    byCat[e.kategorie].aus += e.betrag;
+    });
+    doc.setTextColor(80,80,80); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.text('Kategorien:', pad, y); y += 5;
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    let cx = pad;
+    Object.entries(byCat).sort((a,b)=>(b[1].ein+b[1].aus)-(a[1].ein+a[1].aus)).forEach(([cat,v]) => {
+      const g = v.ein - v.aus;
+      const label = cat + ': ' + (g>=0?'+':'') + fmt(g);
+      const tw = doc.getTextWidth(label) + 8;
+      if (cx + tw > W - pad) { cx = pad; y += 5; }
+      doc.setFillColor(240,244,248); doc.setDrawColor(180,200,220);
+      doc.roundedRect(cx,y-3.5,tw,5,1.5,1.5,'FD');
+      doc.setTextColor(g>=0?16:160, g>=0?100:20, g>=0?60:20);
+      doc.text(label, cx+4, y); cx += tw + 3;
+    });
+    y += 8;
+
+    // Разбивка по месяцам
+    const j = document.getElementById('f-jahr')?.value;
+    if (j && j !== 'Alle') {
+      const months = [...new Set(entries.map(e=>e.datum.substring(5,7)))].sort();
+      if (months.length > 1) {
+        doc.setTextColor(80,80,80); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+        doc.text('Monatsverlauf:', pad, y); y += 5;
+        doc.setFont('helvetica','normal'); doc.setFontSize(7);
+        let mx = pad;
+        months.forEach(mi => {
+          const me = entries.filter(e=>e.datum.substring(5,7)===mi);
+          const mg = sum(me,'Einnahme') - sum(me,'Ausgabe');
+          const mname = (typeof MN !== 'undefined' ? MN[parseInt(mi)-1] : mi).slice(0,3);
+          const label = mname + ': ' + (mg>=0?'+':'') + fmt(mg);
+          const tw = doc.getTextWidth(label) + 8;
+          if (mx + tw > W - pad) { mx = pad; y += 5; }
+          doc.setFillColor(mg>=0?235:255, mg>=0?248:235, mg>=0?235:235);
+          doc.setDrawColor(mg>=0?22:180, mg>=0?163:30, mg>=0?74:30);
+          doc.roundedRect(mx,y-3.5,tw,5,1.5,1.5,'FD');
+          doc.setTextColor(mg>=0?16:160, mg>=0?100:20, mg>=0?60:20);
+          doc.text(label, mx+4, y); mx += tw + 3;
+        });
+        y += 8;
+      }
+    }
+
+    // Разделитель
+    doc.setDrawColor(200,210,220); doc.line(pad,y,W-pad,y); y += 2;
+
+    // Заголовок таблицы
+    const cols = ['Datum','Typ','Kategorie','Beschreibung','Zahlungsart','MwSt','Brutto'];
+    const cw   = [22,     20,   38,          80,            28,           22,    28];
+    doc.setFillColor(241,245,249);
+    doc.rect(pad,y,W-pad*2,6,'F');
+    doc.setTextColor(80,80,80); doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+    let cx2 = pad;
+    cols.forEach((c,i) => { doc.text(c, cx2+1, y+4.2); cx2 += cw[i]; });
+    y += 7;
+
+    // Строки записей
+    doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    entries.forEach((e,idx) => {
+      if (y > 185) { doc.addPage(); y = 14; }
+      if (idx%2===0) { doc.setFillColor(249,250,251); doc.rect(pad,y-1,W-pad*2,6,'F'); }
+      const isEin = e.typ==='Einnahme';
+      cx2 = pad;
+      const vals = [
+        e.datum ? e.datum.split('-').reverse().join('.') : '',
+        e.typ, e.kategorie,
+        (e.beschreibung||'').substring(0,42),
+        e.zahlungsart||'\u2014',
+        fmt(e.mwstBetrag||0),
+        (isEin?'+':'\u2212')+fmt(e.betrag)
+      ];
+      vals.forEach((v,i) => {
+        doc.setTextColor(i===6 ? (isEin?22:180) : 60, i===6 ? (isEin?120:30) : 60, i===6 ? (isEin?70:30) : 60);
+        doc.text(String(v), cx2+1, y+3.5);
+        cx2 += cw[i];
+      });
+      y += 6;
+    });
+
+    // Итоговая строка
+    doc.setDrawColor(26,69,120); doc.line(pad,y,W-pad,y); y += 1;
+    doc.setFillColor(26,69,120); doc.rect(pad,y,W-pad*2,7,'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.text('Einnahmen: '+fmt(ein), pad+2, y+5);
+    doc.text('Ausgaben: '+fmt(aus), pad+60, y+5);
+    doc.text('Gewinn/Verlust: '+(gew>=0?'+':'')+fmt(gew), pad+120, y+5);
+    doc.text('MwSt: '+fmt(mwstSum), pad+200, y+5);
+
+    doc.save('Buchaltung_' + period + '.pdf');
+    toast('PDF gespeichert!', 'ok');
+  } catch(e) {
+    console.error(e); toast('Fehler beim PDF-Erstellen', 'err');
+  }
+}
+
+
 function exportRepCSV(){
   const yr=document.getElementById('rep-yr')?.value||new Date().getFullYear()+'';
   const ye=data.eintraege.filter(e=>e.datum.startsWith(yr));
@@ -167,11 +406,63 @@ function openMonatDetail(yr, mi){
 
 function exportMonatCSV(){
   if(!_monEntries.length) return toast('Keine Daten','err');
-  const rows=[['Datum','Typ','Kategorie','Beschreibung','Zahlungsart','Notiz','Betrag (EUR)']];
-  _monEntries.forEach(e=>rows.push([e.datum,e.typ,e.kategorie,e.beschreibung,e.zahlungsart||'',e.notiz||'',r2(e.betrag)]));
-  dl('\uFEFF'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n'),
-    `buchaltung_${_monLabel.replace(' ','_')}.csv`);
-  toast(`📤 CSV — ${_monLabel} exportiert`,'ok');
+  if(document.getElementById('csv-fmt-popup')) return;
+  const popup = document.createElement('div');
+  popup.id = 'csv-fmt-popup';
+  popup.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.2);font-family:inherit;min-width:280px';
+  popup.innerHTML = `
+    <div style="font-weight:600;font-size:13px;margin-bottom:12px">&#128229; CSV-Format</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button onclick="exportMonatCSVFormat('datev')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit"><strong>DATEV-kompatibel</strong><br><span style="opacity:.8;font-size:11px">f&#252;r Steuerberater</span></button>
+      <button onclick="exportMonatCSVFormat('universal')" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit"><strong>Universal (RFC 4180)</strong><br><span style="opacity:.8;font-size:11px">f&#252;r Excel / Google Sheets</span></button>
+      <button onclick="document.getElementById('csv-fmt-popup').remove()" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;color:var(--sub);font-family:inherit">Abbrechen</button>
+    </div>`;
+  document.body.appendChild(popup);
+  setTimeout(()=>{if(popup.parentNode)popup.remove();},15000);
+}
+
+function exportMonatCSVFormat(fmt){
+  document.getElementById('csv-fmt-popup')?.remove();
+  if(!_monEntries.length) return toast('Keine Daten','err');
+  const ein=sum(_monEntries,'Einnahme'), aus=sum(_monEntries,'Ausgabe'), gew=ein-aus;
+  const mwst=_monEntries.reduce((s,e)=>s+(e.mwstBetrag||0),0);
+  const byCat={};
+  _monEntries.forEach(e=>{
+    if(!byCat[e.kategorie])byCat[e.kategorie]={ein:0,aus:0};
+    if(e.typ==='Einnahme')byCat[e.kategorie].ein+=e.betrag;
+    else byCat[e.kategorie].aus+=e.betrag;
+  });
+  const isDatev=fmt==='datev';
+  const fmtNum=n=>isDatev?String(r2(n)).replace('.',','):r2(n).toFixed(2);
+  const fmtDate=d=>isDatev?(d?d.split('-').reverse().join('.'):''):(d||'');
+  const qv=v=>{const s=String(v).replace(/"/g,'""');return isDatev?s.replace(/;/g,'|'):`"${s}"`;};
+  const sep=';';
+  const rows=[];
+  rows.push([qv('Buchaltung Pro'),qv('Zeitraum: '+_monLabel),'','','','','',''].join(sep));
+  rows.push([qv('Erstellt: '+new Date().toLocaleDateString('de-DE')),'','','','','','',''].join(sep));
+  rows.push(['','','','','','','',''].join(sep));
+  rows.push(['Datum','Typ','Kategorie','Beschreibung','Zahlungsart','Notiz','Betrag (EUR)','MwSt (EUR)'].map(qv).join(sep));
+  _monEntries.forEach(e=>rows.push([
+    fmtDate(e.datum),qv(e.typ),qv(e.kategorie),qv(e.beschreibung||''),
+    qv(e.zahlungsart||''),qv(e.notiz||''),
+    fmtNum(e.typ==='Einnahme'?e.betrag:-e.betrag),
+    fmtNum(e.mwstBetrag||0)
+  ].join(sep)));
+  rows.push(['','','','','','','',''].join(sep));
+  rows.push([qv('GESAMT'),'','','','','','',''].join(sep));
+  rows.push([qv('Einnahmen'),'','','','','',fmtNum(ein),''].join(sep));
+  rows.push([qv('Ausgaben'),'','','','','',fmtNum(-aus),''].join(sep));
+  rows.push([qv('Gewinn/Verlust'),'','','','','',fmtNum(gew),''].join(sep));
+  rows.push([qv('MwSt gesamt'),'','','','','','',fmtNum(mwst)].join(sep));
+  rows.push(['','','','','','','',''].join(sep));
+  rows.push([qv('KATEGORIEN'),'','','','','','',''].join(sep));
+  Object.entries(byCat).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([cat,v])=>{
+    rows.push([qv(cat),'','','','','',fmtNum(v.ein-v.aus),''].join(sep));
+  });
+  const suffix=isDatev?'DATEV':'Universal';
+  const fname=_monLabel.replace(' ','_');
+  dl('\uFEFF'+rows.join('\n'),`Buchaltung_${fname}_${suffix}.csv`);
+  toast('CSV ('+suffix+') exportiert!','ok');
 }
 
 function exportMonatXLS(){
