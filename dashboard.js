@@ -419,6 +419,7 @@ function getFiltered(){
   const z=document.getElementById('f-zahl').value;
   const q=document.getElementById('f-q').value.toLowerCase();
   return data.eintraege.filter(e=>{
+    if(e.is_storno||e._storniert)return false; // GoBD: скрываем сторно-записи
     if(fTyp!=='Alle'&&e.typ!==fTyp)return false;
     if(j!=='Alle'&&!e.datum.startsWith(j))return false;
     if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;

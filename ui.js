@@ -1,9 +1,17 @@
 // ── ACTIONS ───────────────────────────────────────────────────────────────
-function delE(e,id){
-  e.stopPropagation();if(!confirm('Eintrag löschen?'))return;
-  data.eintraege=data.eintraege.filter(x=>x.id!==id);
-  sbDeleteEintrag(id);
-  renderAll();toast('Gelöscht','err');
+async function delE(e,id){
+  e.stopPropagation();
+  if(!confirm('Eintrag stornieren? (GoBD: Einträge können nicht gelöscht werden — es wird eine Storno-Gegenbuchung erstellt)'))return;
+  const storno = await sbStornoEintrag(id);
+  if (!storno) return toast('Fehler beim Stornieren','err');
+  // Markieren original als storniert in lokalen Daten
+  const orig = data.eintraege.find(x => x.id === id);
+  if (orig) orig._storniert = true;
+  // Sторно-запись добавляем локально
+  storno.is_storno = true;
+  data.eintraege.push(storno);
+  renderAll();
+  toast('↩️ Storno-Gegenbuchung erstellt','ok');
 }
 function selR(tr){document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('sel'));tr.classList.add('sel');}
 
@@ -33,22 +41,39 @@ function setEditTyp(t, skipKat=false){
   const opts=[...document.getElementById('edit-kat').options].map(o=>o.value);
   if(opts.includes(prev)) document.getElementById('edit-kat').value=prev;
 }
-function saveEdit(){
+async function saveEdit(){
   const datum=document.getElementById('edit-dat').value;
   const betrag=parseFloat(document.getElementById('edit-bet').value);
   if(!datum||!betrag||betrag<=0)return toast('Datum und Betrag prüfen!','err');
   const i=data.eintraege.findIndex(x=>x.id===editId);
   if(i<0)return;
-  data.eintraege[i]={...data.eintraege[i],
+  // GoBD: нельзя редактировать — сторнируем оригинал и создаём новую запись
+  const origEntry = {...data.eintraege[i]}; // сохраняем копию ДО любых push операций
+  const storno = await sbStornoEintrag(editId);
+  if (!storno) return toast('Fehler beim Stornieren','err');
+  // Помечаем оригинал локально
+  if (data.eintraege[i]) data.eintraege[i]._storniert = true;
+  storno.is_storno = true;
+  data.eintraege.push(storno);
+  // Создаём новую исправленную запись
+  const newId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+  const newEntry = {...origEntry,
+    id: newId,
     datum, betrag,
-    typ:editTyp,
-    kategorie:normKat(document.getElementById('edit-kat').value),
-    zahlungsart:normZahl(document.getElementById('edit-zahl').value),
-    beschreibung:document.getElementById('edit-dsc').value.trim()||normKat(document.getElementById('edit-kat').value),
-    notiz:document.getElementById('edit-note').value.trim()
+    typ: editTyp,
+    kategorie: normKat(document.getElementById('edit-kat').value),
+    zahlungsart: normZahl(document.getElementById('edit-zahl').value),
+    beschreibung: document.getElementById('edit-dsc').value.trim()||normKat(document.getElementById('edit-kat').value),
+    notiz: document.getElementById('edit-note').value.trim(),
+    is_storno: false,
+    storno_of: null,
+    _storniert: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   };
-  sbSaveEintrag(data.eintraege[i]);
-  renderAll(); closeModal('edit-modal'); toast('✅ Gespeichert!','ok');
+  data.eintraege.push(newEntry);
+  sbSaveEintrag(newEntry);
+  renderAll(); closeModal('edit-modal'); toast('✅ Korrektur gespeichert (GoBD-konform)','ok');
 }
 
 // ── MODAL HELPERS ────────────────────────────────────────────────────────
