@@ -4,11 +4,7 @@ async function delE(e,id){
   if(!confirm('Eintrag stornieren? (GoBD: Einträge können nicht gelöscht werden — es wird eine Storno-Gegenbuchung erstellt)'))return;
   const storno = await sbStornoEintrag(id);
   if (!storno) return toast('Fehler beim Stornieren','err');
-  // Markieren original als storniert in lokalen Daten
-  const orig = data.eintraege.find(x => x.id === id);
-  if (orig) orig._storniert = true;
-  // Sторно-запись добавляем локально
-  storno.is_storno = true;
+  // sbStornoEintrag уже пометил оригинал и сторно-запись локально
   data.eintraege.push(storno);
   renderAll();
   toast('↩️ Storno-Gegenbuchung erstellt','ok');
@@ -51,9 +47,7 @@ async function saveEdit(){
   const origEntry = {...data.eintraege[i]}; // сохраняем копию ДО любых push операций
   const storno = await sbStornoEintrag(editId);
   if (!storno) return toast('Fehler beim Stornieren','err');
-  // Помечаем оригинал локально
-  if (data.eintraege[i]) data.eintraege[i]._storniert = true;
-  storno.is_storno = true;
+  // sbStornoEintrag уже пометил оригинал локально
   data.eintraege.push(storno);
   // Создаём новую исправленную запись
   const newId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);

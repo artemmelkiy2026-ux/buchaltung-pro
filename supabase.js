@@ -175,8 +175,11 @@ async function sbStornoEintrag(id) {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
-  // Помечаем оригинал как сторнированный
-  await sb.from('eintraege').update({ is_storno: false, storno_of: null }).eq('id', id).eq('user_id', currentUser.id);
+  // Помечаем оригинал как сторнированный (скрывается из расчётов)
+  await sb.from('eintraege').update({ is_storno: true }).eq('id', id).eq('user_id', currentUser.id);
+  // Помечаем локально
+  const origLocal = data.eintraege.find(x => x.id === id);
+  if (origLocal) { origLocal.is_storno = true; origLocal._storniert = true; }
   // Сохраняем сторно-запись
   const { error } = await sb.from('eintraege').insert(eintragToDb(storno));
   if (error) { console.error('Storno error:', error); return null; }
