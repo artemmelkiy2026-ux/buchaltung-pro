@@ -18,7 +18,11 @@ function renderProg(){
 
   const istEin=einM.slice(0,curM+1).reduce((s,v)=>s+v,0);
   const istAus=ausM.slice(0,curM+1).reduce((s,v)=>s+v,0);
-  const avgEin=curM>=0?istEin/(curM+1):0, avgAus=curM>=0?istAus/(curM+1):0;
+  // Среднее только по месяцам с данными (не делим на пустые месяцы)
+  const aktMonate=einM.slice(0,curM+1).filter(v=>v>0).length||1;
+  const aktMonateAus=ausM.slice(0,curM+1).filter(v=>v>0).length||1;
+  const avgEin=istEin/aktMonate, avgAus=istAus/aktMonateAus;
+  // Прогноз: факт + среднее × оставшиеся месяцы
   const progEin=Math.round((istEin+avgEin*(11-curM))*100)/100;
   const progAus=Math.round((istAus+avgAus*(11-curM))*100)/100;
   const prevEin=einP.reduce((s,v)=>s+v,0), prevAus=ausP.reduce((s,v)=>s+v,0);
@@ -27,8 +31,8 @@ function renderProg(){
   // Cards
   const c=(cls,lbl,val,sub)=>`<div class="sc ${cls}" style="cursor:default"><div class="sc-lbl">${lbl}</div><div class="sc-val">${val}</div><div class="sc-sub">${sub}</div></div>`;
   document.getElementById('prog-cards').innerHTML=
-    c('b','Ist Einnahmen',fmt(istEin),`${curM+1} Monate`)+
-    c('g','Prognose Einnahmen Jahr',fmt(progEin),`Hochrechnung bis Dez.`)+
+    c('b','Ist Einnahmen',fmt(istEin),`${aktMonate} aktive Monate (${curM+1} vergangen)`)+
+    c('g','Prognose Einnahmen Jahr',fmt(progEin),`Ø ${fmt(avgEin)}/Monat × ${11-curM} Monate`)+
     c('r','Prognose Ausgaben Jahr',fmt(progAus),`Ø ${fmt(avgAus)}/Monat`)+
     c(progEin-progAus>=0?'g':'r','Progn. Gewinn',fmt(progEin-progAus),`vs. Vorjahr: ${fmt(prevEin-prevAus)}`);
 
