@@ -250,6 +250,7 @@ function selectKunde(id){
   document.getElementById('rn-email').value=k.email||'';
   // Сохраняем ссылку на клиента
   document.getElementById('rn-nr').dataset.kundeId=k.id;
+  document.getElementById('rn-tel').value=k.tel||'';
   document.getElementById('rn-nr').dataset.kundeTel=k.tel||'';
   closeModal('kunde-pick-modal');
   toast('✅ Kunde übernommen','ok');
@@ -331,7 +332,6 @@ function neueRechnungFuerKundeNow() {
       document.getElementById('rn-adresse').value = [k.strasse, k.plz&&k.ort ? k.plz+' '+k.ort : ''].filter(Boolean).join(', ');
       document.getElementById('rn-email').value   = k.email||'';
       document.getElementById('rn-nr').dataset.kundeId = k.id;
-      document.getElementById('rn-nr').dataset.kundeTel = k.tel||'';
     }, 60);
   }, 100);
 }
@@ -349,7 +349,7 @@ function validatePLZ(input){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PDF GENERATION — html2canvas → jsPDF (точный рендер HTML-шаблона)
+// PDF GENERATION — html2canvas → jsPDF
 // ═══════════════════════════════════════════════════════════════
 
 function _buildRechnungHTML(r) {
@@ -362,24 +362,26 @@ function _buildRechnungHTML(r) {
   const firmaWeb    = f.web         || '';
   const firmaIban   = f.iban        || '';
   const firmaBic    = f.bic         || '';
-  const firmaStNr   = f.steuernr    || '';
-  const firmaUstId  = f.ustid       || '';
-  const rJahr       = r.datum ? r.datum.substring(0,4) : new Date().getFullYear()+'';
-  const resolvedMode= r.mwstMode || (typeof getUstModeForYear==='function' ? getUstModeForYear(rJahr) : '§19');
-  const isKlein     = resolvedMode === '§19';
+  const firmaStNr   = f.steuernummer|| '';
+  const firmaUstId  = f.ust_id      || '';
+  // mwstMode из счёта, или из настроек USt по году счёта
+  const rJahr = r.datum ? r.datum.substring(0,4) : new Date().getFullYear()+'';
+  const resolvedMode = r.mwstMode || (typeof getUstModeForYear==='function' ? getUstModeForYear(rJahr) : '§19');
+  const isKlein = resolvedMode === '§19';
   const initials    = firmaName.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
   const pos = r.positionen && r.positionen.length
     ? r.positionen
-    : [{bez:r.beschreibung||'Leistung', menge:1, einheit:'Stk.', preis:r.betrag, netto:r.betrag, rate:0}];
+    : [{bez:r.beschreibung||'Leistung', menge:1, einheit:'Stk.', preis:r.betrag, netto:r.betrag, mwstRate:0}];
 
   let totNetto=0, totMwst=0;
   const posRows = pos.map((p,i) => {
-    const netto     = p.netto!==undefined ? p.netto : (p.preis||0);
+    const netto = p.netto!==undefined ? p.netto : (p.preis||0);
+    // Если regel-Besteuerung но rate не сохранён — берём 19% по умолчанию
     const savedRate = p.mwstRate!==undefined ? p.mwstRate : (p.rate!==undefined ? p.rate : 19);
-    const rate      = isKlein ? 0 : (savedRate || 19);
-    const lineN     = r2((p.menge||1)*netto);
-    const lineM     = r2(lineN*rate/100);
+    const rate  = isKlein ? 0 : (savedRate || 19);
+    const lineN = r2((p.menge||1)*netto);
+    const lineM = r2(lineN*rate/100);
     totNetto += lineN; totMwst += lineM;
     return `<tr>
       <td>${i+1}</td>
@@ -394,13 +396,14 @@ function _buildRechnungHTML(r) {
   }).join('');
   const totBrutto = r2(totNetto+totMwst);
   const addrLines = (r.adresse||'').split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
-  const kundeTel  = r.tel || '';
   const giroData  = encodeURIComponent(`BCD\n002\n1\nSCT\n${firmaBic}\n${firmaName}\n${firmaIban}\nEUR${totBrutto}\n\nRechnung ${r.nr}`);
 
   return `<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rechnung</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -410,40 +413,180 @@ function _buildRechnungHTML(r) {
     --border: #e5e5ea;
     --bg-qr: #f2f2f7;
   }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #fff; font-family: 'Inter', sans-serif; color: var(--text-main); }
-  .page { width: 210mm; min-height: 297mm; background: #fff; padding: 15mm 15mm 10mm; position: relative; display: flex; flex-direction: column; }
-  .header { display: flex; justify-content: space-between; margin-bottom: 45px; }
-  .logo-placeholder { width: 64px; height: 64px; background: var(--primary); border-radius: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; font-weight: 700; }
-  .sender-info-top { text-align: right; font-size: 11px; color: var(--text-sub); line-height: 1.6; }
-  .address-section { display: flex; justify-content: space-between; margin-bottom: 50px; }
-  .absender-zeile { font-size: 9px; color: var(--text-sub); border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 12px; display: inline-block; }
-  .recipient-details { font-size: 14px; line-height: 1.5; }
-  .invoice-meta { width: 220px; background: #fafafa; padding: 15px; border-radius: 0; }
-  .meta-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; }
+
+  body {
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    padding: 15mm 15mm 10mm;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 45px;
+  }
+
+  .logo-placeholder {
+    width: 64px;
+    height: 64px;
+    background: var(--primary);
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .sender-info-top {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
+  .address-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+  }
+
+  .absender-zeile {
+    font-size: 9px;
+    color: var(--text-sub);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+
+  .recipient-details {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .invoice-meta {
+    width: 220px;
+    background: #fafafa;
+    padding: 15px;
+    border-radius: 0;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
   .meta-row span:last-child { font-weight: 600; }
-  .invoice-title { font-size: 32px; font-weight: 800; margin-bottom: 30px; letter-spacing: -0.5px; }
-  .pos-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-  .pos-table th { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--text-main); font-size: 10px; text-transform: uppercase; }
-  .pos-table td { padding: 15px 10px; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+
+  .invoice-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+  }
+
+  .pos-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+  }
+
+  .pos-table th {
+    text-align: left;
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--text-main);
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  .pos-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    vertical-align: top;
+  }
+
   .pos-desc { color: var(--text-sub); font-size: 10.5px; margin-top: 4px; line-height: 1.4; }
   .text-right { text-align: right; }
-  .bottom-row-wrapper { display: flex; justify-content: space-between; align-items: stretch; gap: 20px; margin-top: 10px; }
-  .qr-symmetric-widget { flex: 1; display: grid; grid-template-columns: 85px 1fr 85px; background: var(--bg-qr); padding: 15px; border-radius: 0; gap: 15px; align-items: center; }
+
+  .bottom-row-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 20px;
+    margin-top: 10px;
+  }
+
+  .qr-symmetric-widget {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 85px 1fr 85px;
+    background: var(--bg-qr);
+    padding: 15px;
+    border-radius: 0;
+    gap: 15px;
+    align-items: center;
+  }
+
   .qr-code-box { text-align: center; }
-  .qr-img { width: 85px; height: 85px; background: #fff; padding: 5px; border-radius: 0; border: 1px solid #e5e5e5; margin-bottom: 5px; }
+
+  .qr-img {
+    width: 85px;
+    height: 85px;
+    background: #fff;
+    padding: 5px;
+    border-radius: 0;
+    border: 1px solid #e5e5e5;
+    margin-bottom: 5px;
+  }
+
   .qr-img img { width: 100%; height: 100%; display: block; }
   .qr-mini-label { font-size: 8px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); }
   .qr-center-text { text-align: center; padding: 0 5px; }
   .qr-center-text h4 { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
   .qr-center-text p { font-size: 10px; color: var(--text-sub); line-height: 1.4; }
+
   .totals-area { width: 240px; display: flex; flex-direction: column; justify-content: flex-end; }
   .total-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
-  .grand-total { border-top: 2px solid var(--text-main); margin-top: 10px; padding: 12px 0; font-weight: 800; font-size: 16px; color: #fff); }
-  .closing-text { margin-top: 35px; font-size: 12px; line-height: 1.6; }
+  .grand-total { border-top: 2px solid var(--text-main); margin-top: 10px; padding: 12px 0; font-weight: 800; font-size: 20px; color: var(--primary); }
+
+  .closing-text {
+    margin-top: 35px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
   .closing-text .thanks { font-weight: 600; margin-bottom: 4px; display: block; }
   .closing-text .payment-terms { color: var(--text-main); }
-  .footer { margin-top: auto; padding-top: 25px; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 20px; font-size: 9px; color: var(--text-sub); line-height: 1.6; }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 25px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 20px;
+    font-size: 9px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
   .footer-col strong { color: var(--text-main); font-size: 10px; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
 </style>
 </head>
@@ -466,7 +609,7 @@ function _buildRechnungHTML(r) {
       <div class="recipient-details">
         <strong>${r.kunde||'—'}</strong><br>
         ${addrLines.join('<br>')}
-        ${kundeTel ? '<br>Tel: '+kundeTel : ''}
+        ${r.tel ? '<br>Tel: '+r.tel : ''}
       </div>
     </div>
     <div class="invoice-meta">
@@ -526,19 +669,25 @@ function _buildRechnungHTML(r) {
   ${r.notiz ? `<div style="margin-top:20px;padding:12px 15px;background:#f2f2f7;border-left:3px solid var(--primary);font-size:11px;line-height:1.6">${r.notiz}</div>` : ''}
   ${isKlein ? '<p style="margin-top:16px;font-size:10px;color:var(--text-sub);font-style:italic">Gemäß §19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmer).</p>' : ''}
 
+
   <div class="footer">
     <div class="footer-col">
       <strong>Absender</strong>
-      ${firmaName}<br>${firmaStr}<br>${firmaPlzOrt}
+      ${firmaName}<br>
+      ${firmaStr}<br>
+      ${firmaPlzOrt}
     </div>
     <div class="footer-col">
       <strong>Bankverbindung</strong>
-      ${firmaIban?'IBAN: '+firmaIban:'—'}<br>${firmaBic?'BIC: '+firmaBic:''}
+      ${firmaIban?'IBAN: '+firmaIban:'—'}<br>
+      ${firmaBic?'BIC: '+firmaBic:''}
     </div>
     <div class="footer-col">
       <strong>Kontakt</strong>
-      ${firmaTel?'Tel: '+firmaTel+'<br>':''}${firmaEmail}
+      ${firmaTel?'Tel: '+firmaTel+'<br>':''}
+      ${firmaEmail}
     </div>
+
   </div>
 
 </div>
@@ -563,6 +712,7 @@ async function generateRechnungPDF(r) {
     await new Promise(res => setTimeout(res, 500));
 
     const pageEl = iframe.contentDocument.querySelector('.page');
+
     const canvas = await html2canvas(pageEl, {
       scale: 2,
       useCORS: true,
@@ -590,7 +740,8 @@ async function generateRechnungPDF(r) {
         const sliceH = Math.min(pageHeightPx, canvas.height - offsetY);
         if(sliceH <= 0) break;
         const sc = document.createElement('canvas');
-        sc.width = canvas.width; sc.height = sliceH;
+        sc.width = canvas.width;
+        sc.height = sliceH;
         sc.getContext('2d').drawImage(canvas, 0, -offsetY);
         const slicePdfH = Math.floor(sliceH * scale * 10) / 10;
         if(offsetY > 0) pdf.addPage();
@@ -598,7 +749,9 @@ async function generateRechnungPDF(r) {
         offsetY += pageHeightPx;
       }
     }
+
     return pdf;
+
   } finally {
     document.body.removeChild(iframe);
   }
@@ -639,6 +792,7 @@ ${f2.email||''}`);
     toast('✅ PDF gespeichert · E-Mail wird geöffnet','ok');
   }catch(e){console.error(e);toast('Fehler: '+e.message,'err');}
 }
+
 
 
 // ═══════════════════════════════════════════════════════════════

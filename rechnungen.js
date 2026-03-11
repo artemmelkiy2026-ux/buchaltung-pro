@@ -56,7 +56,7 @@ function openRechModal(){
   const faellig=new Date();faellig.setDate(faellig.getDate()+14);
   document.getElementById('rn-faellig').value=faellig.toISOString().split('T')[0];
   document.getElementById('rn-bet').value='';
-  ['rn-kunde','rn-adresse','rn-email','rn-notiz'].forEach(id=>document.getElementById(id).value='');
+  ['rn-kunde','rn-adresse','rn-email','rn-tel','rn-notiz'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('rn-status').value='offen';
   editRechId=null;
   document.getElementById('rn-nr').dataset.kundeId='';
@@ -78,6 +78,7 @@ function editRech(id){
   document.getElementById('rn-kunde').value=r.kunde||'';
   document.getElementById('rn-adresse').value=r.adresse||'';
   document.getElementById('rn-email').value=r.email||'';
+  document.getElementById('rn-tel').value=r.tel||'';
   document.getElementById('rn-notiz').value=r.notiz||'';
   document.getElementById('rn-nr').dataset.kundeTel=r.tel||'';
   updateRechBanner();
@@ -111,7 +112,7 @@ function saveRechnung(){
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),
-    tel:document.getElementById('rn-nr').dataset.kundeTel||'',
+    tel:document.getElementById('rn-tel').value.trim()||document.getElementById('rn-nr').dataset.kundeTel||'',
     notiz:document.getElementById('rn-notiz').value.trim(),
     kundeId:document.getElementById('rn-nr').dataset.kundeId||'',
     positionen,
@@ -490,7 +491,7 @@ function druckRechnung(){
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),
-    tel:document.getElementById('rn-nr').dataset.kundeTel||'',
+    tel:document.getElementById('rn-tel').value.trim()||document.getElementById('rn-nr').dataset.kundeTel||'',
     notiz:document.getElementById('rn-notiz').value.trim(),
     positionen:pos, betrag:total
   };
@@ -521,7 +522,7 @@ function emailRechnung(){
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),
-    tel:document.getElementById('rn-nr').dataset.kundeTel||'',
+    tel:document.getElementById('rn-tel').value.trim()||document.getElementById('rn-nr').dataset.kundeTel||'',
     notiz:document.getElementById('rn-notiz').value.trim(),
     positionen:pos, betrag:total
   };
@@ -863,7 +864,7 @@ function downloadXRechnung(r) {
       kunde:    document.getElementById('rn-kunde').value.trim(),
       adresse:  document.getElementById('rn-adresse').value.trim(),
       email:    document.getElementById('rn-email').value.trim(),
-      tel: document.getElementById('rn-nr').dataset.kundeTel||'',
+      tel:document.getElementById('rn-tel').value.trim()||document.getElementById('rn-nr').dataset.kundeTel||'',
       notiz:    document.getElementById('rn-notiz').value.trim(),
       positionen: pos,
       betrag: pos.reduce((s, p) => s + p.menge * p.preis, 0)
@@ -906,7 +907,7 @@ async function downloadZUGFeRD(r) {
       kunde:    document.getElementById('rn-kunde').value.trim(),
       adresse:  document.getElementById('rn-adresse').value.trim(),
       email:    document.getElementById('rn-email').value.trim(),
-      tel: document.getElementById('rn-nr').dataset.kundeTel||'',
+      tel:document.getElementById('rn-tel').value.trim()||document.getElementById('rn-nr').dataset.kundeTel||'',
       notiz:    document.getElementById('rn-notiz').value.trim(),
       positionen: pos,
       betrag: pos.reduce((s, p) => s + (p.menge||1) * (p.netto||p.preis||0), 0)
