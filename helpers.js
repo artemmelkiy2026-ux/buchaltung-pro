@@ -564,7 +564,7 @@ function _buildRechnungHTML(r) {
 
   .totals-area { width: 240px; display: flex; flex-direction: column; justify-content: flex-end; }
   .total-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
-  .grand-total { border-top: 2px solid var(--text-main); margin-top: 10px; padding: 12px 0; font-weight: 800; font-size: 20px; color: var(--primary); }
+  .grand-total { border-top: 2px solid var(--text-main); margin-top: 10px; padding: 12px 0; font-weight: 800; font-size: 15px; color: #000; }
 
   .closing-text {
     margin-top: 35px;
