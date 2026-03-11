@@ -896,7 +896,7 @@ input, select, textarea {
   width: 100%;
   table-layout: fixed;
 }
-#rech-table th:nth-child(1) { width: 120px; }  /* Nr.      */
+#rech-table th:nth-child(1) { width: 80px; }  /* Nr.      */
 #rech-table th:nth-child(2) { width: 100px;   }  /* Kunde    — nimmt Rest */
 #rech-table th:nth-child(3) { width: 90px;   }  /* Datum    */
 #rech-table th:nth-child(4) { width: 50px;   }  /* Fällig   */
