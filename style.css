@@ -885,3 +885,30 @@ th.sort-desc::after {
 input, select, textarea {
   font-size: 16px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   RECHNUNGEN TABELLE — Spaltenbreiten
+   Desktop und Mobile getrennt einstellbar
+   ═══════════════════════════════════════════════════════════════ */
+
+/* DESKTOP — Spaltenbreiten hier anpassen */
+#rech-table {
+  width: 100%;
+  table-layout: fixed;
+}
+#rech-table th:nth-child(1) { width: 120px; }  /* Nr.      */
+#rech-table th:nth-child(2) { width: auto;   }  /* Kunde    — nimmt Rest */
+#rech-table th:nth-child(3) { width: 90px;   }  /* Datum    */
+#rech-table th:nth-child(4) { width: 90px;   }  /* Fällig   */
+#rech-table th:nth-child(5) { width: 100px;  }  /* Betrag   */
+#rech-table th:nth-child(6) { width: 90px;   }  /* Status   */
+#rech-table th:nth-child(7) { width: 140px;  }  /* Aktionen */
+
+/* MOBILE — Spaltenbreiten hier anpassen */
+@media (max-width: 768px) {
+  #rech-table th:nth-child(1) { width: 90px;  }  /* Nr.      */
+  #rech-table th:nth-child(2) { width: auto;  }  /* mob-hide, aber falls sichtbar */
+  #rech-table th:nth-child(5) { width: 80px;  }  /* Betrag   */
+  #rech-table th:nth-child(6) { width: 36px;  }  /* Status = nur Emoji */
+  #rech-table th:nth-child(7) { width: 44px;  }  /* Aktionen = nur ✓ ✕ */
+}
