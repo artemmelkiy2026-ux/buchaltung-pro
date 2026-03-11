@@ -435,7 +435,7 @@ function _buildRechnungHTML(r) {
     width: 64px;
     height: 64px;
     background: var(--primary);
-    border-radius: 14px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -475,7 +475,7 @@ function _buildRechnungHTML(r) {
     width: 220px;
     background: #fafafa;
     padding: 15px;
-    border-radius: 10px;
+    border-radius: 0;
   }
 
   .meta-row {
@@ -488,7 +488,7 @@ function _buildRechnungHTML(r) {
   .meta-row span:last-child { font-weight: 600; }
 
   .invoice-title {
-    font-size: 32px;
+    font-size: 25px;
     font-weight: 800;
     margin-bottom: 30px;
     letter-spacing: -0.5px;
@@ -532,7 +532,7 @@ function _buildRechnungHTML(r) {
     grid-template-columns: 85px 1fr 85px;
     background: var(--bg-qr);
     padding: 15px;
-    border-radius: 14px;
+    border-radius: 0;
     gap: 15px;
     align-items: center;
   }
@@ -544,7 +544,7 @@ function _buildRechnungHTML(r) {
     height: 85px;
     background: #fff;
     padding: 5px;
-    border-radius: 8px;
+    border-radius: 0;
     border: 1px solid #e5e5e5;
     margin-bottom: 5px;
   }
