@@ -222,7 +222,7 @@ function addRechPosRow(i,p){
         <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:18px;padding:0;line-height:1">✕</button>
       </div>
       <input type="text" placeholder="Bezeichnung / Leistung" value="${p.bez||''}" oninput="calcRechTotal()" style="${INP};font-size:14px;width:100%;box-sizing:border-box;margin-bottom:8px">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px;gap:6px;align-items:end">
+      <div style="display:grid;grid-template-columns:1fr 1fr 80px 1fr;gap:6px;align-items:end">
         <div>
           <div style="font-size:10px;color:var(--sub);margin-bottom:2px">Menge</div>
           <input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:center;width:100%;box-sizing:border-box">
@@ -232,16 +232,16 @@ function addRechPosRow(i,p){
           <input type="number" placeholder="0.00" value="${nettoVal}" min="0" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:right;width:100%;box-sizing:border-box">
         </div>
         <div>
-          <div style="font-size:10px;color:var(--sub);margin-bottom:2px">Brutto/St.</div>
-          <input type="number" placeholder="0.00" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue);width:100%;box-sizing:border-box">
-        </div>
-        <div>
           <div style="font-size:10px;color:var(--sub);margin-bottom:2px">USt %</div>
           <select onchange="posRateChanged(this)" style="${INP};padding:7px 4px;width:100%;box-sizing:border-box;${klein?'opacity:.4;pointer-events:none':''}">
             <option value="0"  ${rateVal==0 ?'selected':''}>0%</option>
             <option value="7"  ${rateVal==7 ?'selected':''}>7%</option>
             <option value="19" ${rateVal==19?'selected':''}>19%</option>
           </select>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--sub);margin-bottom:2px">Brutto/St.</div>
+          <input type="number" placeholder="0.00" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue);width:100%;box-sizing:border-box">
         </div>
       </div>`;
   } else {
