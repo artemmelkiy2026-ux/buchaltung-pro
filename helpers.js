@@ -439,7 +439,7 @@ function _buildRechnungHTML(r) {
   .qr-center-text p { font-size: 10px; color: var(--text-sub); line-height: 1.4; }
   .totals-area { width: 240px; display: flex; flex-direction: column; justify-content: flex-end; }
   .total-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
-  .grand-total { border-top: 2px solid var(--text-main); margin-top: 10px; padding: 12px 0; font-weight: 800; font-size: 20px; color: var(--primary); }
+  .grand-total { border-top: 2px solid var(--text-main); margin-top: 10px; padding: 12px 0; font-weight: 800; font-size: 16px; color: #fff); }
   .closing-text { margin-top: 35px; font-size: 12px; line-height: 1.6; }
   .closing-text .thanks { font-weight: 600; margin-bottom: 4px; display: block; }
   .closing-text .payment-terms { color: var(--text-main); }
