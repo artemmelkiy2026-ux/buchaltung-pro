@@ -363,7 +363,10 @@ function _buildRechnungHTML(r) {
   const firmaBic    = f.bic         || '';
   const firmaStNr   = f.steuernummer|| '';
   const firmaUstId  = f.ust_id      || '';
-  const isKlein     = !r.mwstMode || r.mwstMode === '§19';
+  // mwstMode из счёта, или из настроек USt по году счёта
+  const rJahr = r.datum ? r.datum.substring(0,4) : new Date().getFullYear()+'';
+  const resolvedMode = r.mwstMode || (typeof getUstModeForYear==='function' ? getUstModeForYear(rJahr) : '§19');
+  const isKlein = resolvedMode === '§19';
   const initials    = firmaName.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
   const pos = r.positionen && r.positionen.length
@@ -373,7 +376,9 @@ function _buildRechnungHTML(r) {
   let totNetto=0, totMwst=0;
   const posRows = pos.map((p,i) => {
     const netto = p.netto!==undefined ? p.netto : (p.preis||0);
-    const rate  = isKlein ? 0 : (p.mwstRate||p.rate||0);
+    // Если regel-Besteuerung но rate не сохранён — берём 19% по умолчанию
+    const savedRate = p.mwstRate!==undefined ? p.mwstRate : (p.rate!==undefined ? p.rate : 19);
+    const rate  = isKlein ? 0 : (savedRate || 19);
     const lineN = r2((p.menge||1)*netto);
     const lineM = r2(lineN*rate/100);
     totNetto += lineN; totMwst += lineM;
