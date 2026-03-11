@@ -73,6 +73,9 @@ async function sbLoadAll() {
     sb.from('ust_eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
   ]);
   const eintraege     = (ein.data  || []).map(dbToEintrag);
+  // GoBD: восстанавливаем _storniert для оригиналов после перезагрузки
+  const stornoOfIds = new Set(eintraege.filter(e => e.is_storno && e.storno_of).map(e => e.storno_of));
+  eintraege.forEach(e => { if (stornoOfIds.has(e.id)) e._storniert = true; });
   const kunden        = (kun.data  || []).map(dbToKunde);
   const rechnungen    = (rech.data || []).map(r => dbToRechnung(r, rechPos.data || []));
   const wiederkehrend = (wied.data || []).map(dbToWied);
@@ -176,10 +179,12 @@ async function sbStornoEintrag(id) {
     updated_at: new Date().toISOString(),
   };
   // Помечаем оригинал как сторнированный (скрывается из расчётов)
-  await sb.from('eintraege').update({ is_storno: true }).eq('id', id).eq('user_id', currentUser.id);
+  // Оригинал помечаем через notiz — is_storno остаётся false (is_storno=true только у Gegenbuchung)
+  // Для Journal достаточно что сторно-запись ссылается на оригинал через storno_of
+  await sb.from('eintraege').update({ is_storno: false }).eq('id', id).eq('user_id', currentUser.id);
   // Помечаем локально
   const origLocal = data.eintraege.find(x => x.id === id);
-  if (origLocal) { origLocal.is_storno = true; origLocal._storniert = true; }
+  if (origLocal) { origLocal._storniert = true; } // is_storno остаётся false — только Gegenbuchung имеет is_storno=true
   // Сохраняем сторно-запись
   const { error } = await sb.from('eintraege').insert(eintragToDb(storno));
   if (error) { console.error('Storno error:', error); return null; }
