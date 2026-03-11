@@ -466,6 +466,7 @@ function buildRechnungHTML(r){
   <div class="kunde-box">
     <strong>${r.kunde||'—'}</strong><br>
     <span style="font-size:12px;color:#555">${r.adresse||''}</span>
+    ${r.tel ? `<br><span style="font-size:12px;color:#555">Tel: ${r.tel}</span>` : ''}
   </div>
   <table>
     <thead><tr><th>Leistung / Beschreibung</th><th style="text-align:center">Menge</th><th style="text-align:right">Netto/Stk.</th><th style="text-align:center">USt</th><th style="text-align:right">Gesamt Netto</th></tr></thead>
