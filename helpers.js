@@ -347,7 +347,7 @@ function validatePLZ(input){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PDF GENERATION — jsPDF
+// PDF GENERATION — jsPDF (LexOffice-style redesign)
 // ═══════════════════════════════════════════════════════════════
 async function generateRechnungPDF(r){
   const {jsPDF} = window.jspdf;
@@ -355,84 +355,139 @@ async function generateRechnungPDF(r){
   const W=210, M=20;
   let y=0;
 
-  // ── Цвета ────────────────────────────────────────────────────────────────
-  const BLUE   = [30,58,95];
-  const BLUE2  = [44,82,130];    // чуть светлее для акцентов
+  // ── Палитра ──────────────────────────────────────────────────
+  const DARK   = [30, 40, 60];        // тёмно-синий (шапка, заголовки таблицы)
+  const ACCENT = [52, 73, 110];       // чуть светлее — мета-строка
   const WHITE  = [255,255,255];
-  const BLACK  = [17,24,39];
-  const GRAY   = [100,116,139];
+  const BLACK  = [17, 24, 39];
+  const GRAY   = [107,114,128];
   const LGRAY  = [248,250,252];
   const BORDER = [226,232,240];
   const GREEN  = [22,163,74];
+  const LGREEN = [220,252,231];
+  const RED    = [220,38,38];
 
-  // ── Данные фирмы ─────────────────────────────────────────────────────────
+  // ── Данные фирмы ─────────────────────────────────────────────
   const f = typeof getFirmaData==='function' ? getFirmaData() : {};
-  const firmaName    = f.name    || 'Meine Firma';
-  const firmaStr     = f.strasse || '';
-  const firmaPlzOrt  = [f.plz, f.ort].filter(Boolean).join(' ');
-  const firmaTel     = f.tel     || '';
-  const firmaEmail   = f.email   || '';
-  const firmaIban    = f.iban    || '';
-  const firmaBic     = f.bic     || '';
-  const firmaStNr    = f.steuernummer || '';
-  const firmaUstId   = f.ust_id  || '';
-  const firmaInhaber = f.inhaber || '';
-  const isKlein      = !r.mwstMode || r.mwstMode === '§19';
+  const firmaName   = f.name      || 'Meine Firma';
+  const firmaStr    = f.strasse   || '';
+  const firmaPlz    = f.plz       || '';
+  const firmaOrt    = f.ort       || '';
+  const firmaPlzOrt = [firmaPlz, firmaOrt].filter(Boolean).join(' ');
+  const firmaTel    = f.tel       || '';
+  const firmaEmail  = f.email     || '';
+  const firmaIban   = f.iban      || '';
+  const firmaBic    = f.bic       || '';
+  const firmaStNr   = f.steuernummer || '';
+  const firmaUstId  = f.ust_id    || '';
+  const firmaInhaber= f.inhaber   || '';
+  const isKlein     = !r.mwstMode || r.mwstMode === '§19';
 
-  // ── Хелперы ──────────────────────────────────────────────────────────────
-  function line(x1,yy,x2,color=[226,232,240],lw=0.3){
-    doc.setDrawColor(...color); doc.setLineWidth(lw);
-    doc.line(x1,yy,x2,yy);
+  const r2=n=>Math.round(n*100)/100;
+
+  // ── Хелперы ──────────────────────────────────────────────────
+  function ln(x1,yy,x2,col,lw=0.3){
+    doc.setDrawColor(...col); doc.setLineWidth(lw); doc.line(x1,yy,x2,yy);
+  }
+  function rect(x,yy,w,h,col,type='F'){
+    doc.setFillColor(...col); doc.rect(x,yy,w,h,type);
   }
   function txt(t,x,yy,opts={}){
     doc.text(String(t||''),x,yy,opts);
   }
+  function fd(d){
+    if(!d)return'—';
+    const[yy,mm,dd]=d.split('-');
+    return`${dd}.${mm}.${yy}`;
+  }
+  function fmtN(n){
+    return n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  }
 
-  // ════════════════════════════════════════════════════════════════════════
-  // ШАПКА — тёмно-синяя полоса на всю ширину
-  // ════════════════════════════════════════════════════════════════════════
-  doc.setFillColor(...BLUE);
-  doc.rect(0,0,W,32,'F');
+  // ════════════════════════════════════════════════════════════════
+  // 1. ШАПКА — тёмная полоса с монограммой и адресом фирмы
+  // ════════════════════════════════════════════════════════════════
+  const HDR_H = 36;
+  rect(0, 0, W, HDR_H, DARK);
 
-  // Название фирмы — левый блок
+  // Монограмма — круглый аватар с инициалами
+  const initials = firmaName.split(/\s+/).map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const AV_X=M+11, AV_Y=HDR_H/2;
+  doc.setFillColor(255,255,255,0.15);
+  doc.setDrawColor(...WHITE);
+  doc.setLineWidth(0.5);
+  doc.circle(AV_X, AV_Y, 10, 'FD');
+  doc.setTextColor(...DARK);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(initials.length>1?10:13);
+  txt(initials, AV_X, AV_Y+3.5, {align:'center'});
+
+  // Название фирмы и подзаголовок
   doc.setTextColor(...WHITE);
   doc.setFont('helvetica','bold');
-  doc.setFontSize(17);
-  txt(firmaName, M, 13);
+  doc.setFontSize(15);
+  txt(firmaName, AV_X+14, AV_Y-2);
 
-  // Адрес и контакты под названием
+  const subLine = [firmaStr, firmaPlzOrt].filter(Boolean).join(', ');
+  const contactLine = [firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean).join('  ·  ');
   doc.setFont('helvetica','normal');
-  doc.setFontSize(8.5);
-  const hdrParts = [firmaStr, firmaPlzOrt, firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean);
-  txt(hdrParts.join('  ·  '), M, 21);
-
-  // Правый блок — адрес фирмы столбцом
   doc.setFontSize(8);
-  doc.setTextColor(200,215,235);
-  const addrLines = [firmaName, firmaStr, firmaPlzOrt, firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean);
-  addrLines.forEach((l,i) => txt(l, W-M, 7+i*5, {align:'right'}));
+  doc.setTextColor(190,205,225);
+  if(subLine) txt(subLine, AV_X+14, AV_Y+5);
+  if(contactLine) txt(contactLine, AV_X+14, AV_Y+(subLine?12:5));
 
-  y = 42;
+  // Адрес фирмы — правая колонка (DIN 5008 стиль)
+  const addrLines = [firmaName, firmaStr, firmaPlzOrt,
+    firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean);
+  doc.setFontSize(7.5);
+  doc.setTextColor(175,195,220);
+  addrLines.forEach((l,i) => txt(l, W-M, 7+i*5.5, {align:'right'}));
 
-  // ════════════════════════════════════════════════════════════════════════
-  // ЗАГОЛОВОК + МЕТАДАННЫЕ
-  // ════════════════════════════════════════════════════════════════════════
-  // «RECHNUNG» слева
-  doc.setTextColor(...BLUE);
+  y = HDR_H + 10;
+
+  // ════════════════════════════════════════════════════════════════
+  // 2. DOCUMENT HEADER — «RECHNUNG» + мета-блок + бейдж
+  // ════════════════════════════════════════════════════════════════
+  // Заголовок документа
+  doc.setTextColor(...DARK);
   doc.setFont('helvetica','bold');
-  doc.setFontSize(22);
-  txt('RECHNUNG', M, y);
+  doc.setFontSize(24);
+  txt('RECHNUNG', M, y+8);
 
-  // Метаблок справа — таблица из 2 колонок
-  const metaX = W - M - 70;
-  const metaData = [
+  // Бейдж «Kleinunternehmer» или «E-Rechnung» — справа от заголовка
+  const badgeX = 90, badgeY = y+1;
+  if(isKlein){
+    doc.setFillColor(...LGREEN);
+    doc.setDrawColor(...GREEN);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(badgeX, badgeY, 38, 10, 2, 2, 'FD');
+    doc.setTextColor(...GREEN);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    txt('§19 Kleinunternehmer', badgeX+19, badgeY+6.5, {align:'center'});
+  } else {
+    doc.setFillColor(219,234,254);
+    doc.setDrawColor(59,130,246);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(badgeX, badgeY, 28, 10, 2, 2, 'FD');
+    doc.setTextColor(29,78,216);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    txt('E-Rechnung', badgeX+14, badgeY+6.5, {align:'center'});
+  }
+
+  // Мета-блок — правая сторона, 4 строки
+  const metaX = W-M-72;
+  const metaRows = [
     ['Rechnungsnummer', r.nr||'—'],
     ['Datum',           fd(r.datum)],
     ['Fällig bis',      r.faellig ? fd(r.faellig) : '—'],
   ];
+  if(r.kundennr) metaRows.splice(1,0,['Kundennummer', r.kundennr]);
+
   doc.setFontSize(8.5);
-  metaData.forEach((row, i) => {
-    const ry = y - 10 + i * 7;
+  metaRows.forEach((row,i) => {
+    const ry = y + i*7;
     doc.setFont('helvetica','normal');
     doc.setTextColor(...GRAY);
     txt(row[0], metaX, ry);
@@ -441,155 +496,197 @@ async function generateRechnungPDF(r){
     txt(row[1], W-M, ry, {align:'right'});
   });
 
-  y += 10;
-  line(M, y, W-M, BORDER, 0.4);
-  y += 10;
+  y += Math.max(22, metaRows.length*7+4);
+  ln(M, y, W-M, BORDER, 0.5);
+  y += 9;
 
-  // ════════════════════════════════════════════════════════════════════════
-  // АДРЕСА — левый: «Von», правый: «An»
-  // ════════════════════════════════════════════════════════════════════════
-  const colL = M, colR = W/2 + 5;
-
-  // Метка «Von»
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(7.5);
+  // ════════════════════════════════════════════════════════════════
+  // 3. АДРЕСНЫЙ БЛОК — DIN 5008 (маленький адрес отправителя + получатель)
+  // ════════════════════════════════════════════════════════════════
+  // Маленькая строка отправителя над адресом получателя (DIN 5008)
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7);
   doc.setTextColor(...GRAY);
-  txt('VON', colL, y);
-  txt('AN', colR, y);
-  y += 5;
+  const senderShort = [firmaName, firmaStr, firmaPlzOrt].filter(Boolean).join(', ');
+  txt(senderShort, M, y);
+  ln(M, y+2, M+85, [200,210,220], 0.2);
+  y += 6;
 
-  // Фирма — отправитель
+  // Имя и адрес получателя
   doc.setFont('helvetica','bold');
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setTextColor(...BLACK);
-  txt(firmaName, colL, y);
-
-  // Клиент — получатель
-  txt(r.kunde||'—', colR, y);
+  txt(r.kunde||'—', M, y);
   y += 6;
 
   doc.setFont('helvetica','normal');
-  doc.setFontSize(9);
+  doc.setFontSize(9.5);
   doc.setTextColor(...GRAY);
-
-  const senderLines = [firmaStr, firmaPlzOrt, firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean);
-  senderLines.forEach(l => { txt(l, colL, y); y += 5; });
-
-  // Адрес клиента — рядом с именем
-  let ky = y - senderLines.length*5;
   const recipLines = (r.adresse||'').split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
-  recipLines.forEach(l => { txt(l, colR, ky); ky += 5; });
+  recipLines.forEach(l => { txt(l, M, y); y += 5.5; });
+  if(r.email){
+    doc.setFontSize(8.5);
+    txt(r.email, M, y);
+    y += 5;
+  }
 
-  y = Math.max(y, ky) + 8;
-  line(M, y, W-M, BORDER, 0.4);
+  y += 8;
+  ln(M, y, W-M, BORDER, 0.5);
+  y += 9;
+
+  // ════════════════════════════════════════════════════════════════
+  // 4. ВВОДНЫЙ ТЕКСТ
+  // ════════════════════════════════════════════════════════════════
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(...BLACK);
+  const intro = r.notiz && r.notiz.length < 120
+    ? r.notiz
+    : 'Unsere Lieferungen / Leistungen stellen wir Ihnen wie folgt in Rechnung.';
+  txt(intro, M, y);
   y += 10;
 
-  // ════════════════════════════════════════════════════════════════════════
-  // ТАБЛИЦА ПОЗИЦИЙ
-  // ════════════════════════════════════════════════════════════════════════
-  const COL = { pos:M, bez:M+10, menge:W-M-60, einh:W-M-46, einzel:W-M-28, gesamt:W-M };
-  const ROW_H = 8;
+  // ════════════════════════════════════════════════════════════════
+  // 5. ТАБЛИЦА ПОЗИЦИЙ
+  // ════════════════════════════════════════════════════════════════
+  // Колонки: Pos | Bezeichnung | Menge | Einheit | Einzel € | Gesamt €
+  const C = {
+    pos:   M,
+    bez:   M+10,
+    menge: W-M-58,
+    einh:  W-M-44,
+    einzel:W-M-26,
+    ges:   W-M
+  };
+  const ROW=8;
 
-  // Шапка таблицы
-  doc.setFillColor(...BLUE);
-  doc.rect(M, y, W-2*M, ROW_H+2, 'F');
+  // Заголовок таблицы
+  rect(M, y, W-2*M, ROW+2, DARK);
   doc.setTextColor(...WHITE);
   doc.setFont('helvetica','bold');
-  doc.setFontSize(8.5);
-  txt('Pos.',      COL.pos,    y+6);
-  txt('Bezeichnung / Beschreibung', COL.bez, y+6);
-  txt('Menge',     COL.menge,  y+6, {align:'right'});
-  txt('Einheit',   COL.einh,   y+6, {align:'right'});
-  txt('Einzel €',  COL.einzel, y+6, {align:'right'});
-  txt('Gesamt €',  COL.gesamt, y+6, {align:'right'});
-  y += ROW_H + 2;
+  doc.setFontSize(8);
+  txt('Pos.',         C.pos,    y+6);
+  txt('Bezeichnung',  C.bez,    y+6);
+  txt('Menge',        C.menge,  y+6, {align:'right'});
+  txt('Einheit',      C.einh,   y+6, {align:'right'});
+  txt('Einzel €',     C.einzel, y+6, {align:'right'});
+  txt('Gesamt €',     C.ges,    y+6, {align:'right'});
+  y += ROW+2;
 
-  // Строки позиций
-  const pos = r.positionen&&r.positionen.length ? r.positionen : [{bez:r.beschreibung||'Leistung', menge:1, einheit:'Stk.', preis:r.betrag, netto:r.betrag}];
+  // Позиции
+  const pos = r.positionen&&r.positionen.length
+    ? r.positionen
+    : [{bez:r.beschreibung||'Leistung', menge:1, einheit:'Stk.', preis:r.betrag||0, netto:r.betrag||0}];
+
+  let totNetto=0, totMwst=0;
   doc.setFont('helvetica','normal');
   doc.setFontSize(9);
-  let totNetto=0, totMwst=0;
 
   pos.forEach((p,i) => {
-    if(y > 245){ doc.addPage(); y=20; }
-    const netto  = p.netto !== undefined ? p.netto : (p.preis||0);
-    const rate   = isKlein ? 0 : (p.mwstRate||p.rate||0);
-    const lineN  = Math.round((p.menge||1)*netto*100)/100;
-    const lineM  = Math.round(lineN*rate/100*100)/100;
+    if(y > 240){ doc.addPage(); y=20; }
+    const netto  = parseFloat(p.netto !== undefined ? p.netto : (p.preis||0));
+    const rate   = isKlein ? 0 : parseFloat(p.mwstRate||p.rate||0);
+    const menge  = parseFloat(p.menge||1);
+    const lineN  = r2(menge*netto);
+    const lineM  = r2(lineN*rate/100);
     totNetto += lineN; totMwst += lineM;
 
-    // Чередование строк
-    if(i%2===0){ doc.setFillColor(...LGRAY); doc.rect(M,y,W-2*M,ROW_H,'F'); }
+    // Чередование фона
+    if(i%2===0){ rect(M, y, W-2*M, ROW, LGRAY); }
     doc.setTextColor(...BLACK);
-    txt(String(i+1)+'.',   COL.pos,    y+5.5);
-    // Длинное описание — обрезаем
-    const bezStr = doc.splitTextToSize(p.bez||p.beschreibung||'', 70)[0];
-    txt(bezStr,            COL.bez,    y+5.5);
-    txt(String(p.menge||1),COL.menge,  y+5.5, {align:'right'});
-    txt(p.einheit||'Stk.', COL.einh,   y+5.5, {align:'right'});
-    txt(fmt(netto),        COL.einzel, y+5.5, {align:'right'});
+    txt(String(i+1)+'.', C.pos, y+5.5);
+
+    // Описание — с переносом если длинное
+    const bezText = doc.splitTextToSize(p.bez||p.beschreibung||'Leistung', 68);
+    txt(bezText[0], C.bez, y+5.5);
+    // Если строка длиннее — вторая строка
+    if(bezText.length>1){
+      const extraH = (bezText.length-1)*4.5;
+      if(i%2===0){ rect(M, y+ROW, W-2*M, extraH, LGRAY); }
+      bezText.slice(1).forEach((l,li)=>{
+        txt(l, C.bez, y+ROW+4+li*4.5);
+      });
+      // Остальные колонки — первая строка
+    }
+
+    txt(String(menge%1===0?menge.toFixed(0):menge.toFixed(2)), C.menge, y+5.5, {align:'right'});
+    txt(p.einheit||'Stk.', C.einh, y+5.5, {align:'right'});
+
+    doc.setTextColor(...GRAY);
+    txt(fmtN(netto), C.einzel, y+5.5, {align:'right'});
+
     doc.setFont('helvetica','bold');
-    txt(fmt(lineN),        COL.gesamt, y+5.5, {align:'right'});
+    doc.setTextColor(...BLACK);
+    txt(fmtN(lineN), C.ges, y+5.5, {align:'right'});
     doc.setFont('helvetica','normal');
-    // Разделитель строки
-    line(M, y+ROW_H, W-M, BORDER, 0.2);
-    y += ROW_H;
+
+    ln(M, y+ROW, W-M, BORDER, 0.2);
+    y += ROW + (bezText.length>1?(bezText.length-1)*4.5:0);
   });
 
-  y += 4;
+  y += 5;
 
-  // ════════════════════════════════════════════════════════════════════════
-  // ИТОГИ
-  // ════════════════════════════════════════════════════════════════════════
-  const totBrutto = Math.round((totNetto+totMwst)*100)/100;
-  const sumX = W - M - 80;
+  // ════════════════════════════════════════════════════════════════
+  // 6. ИТОГИ — Zwischensumme / USt / Gesamtbetrag
+  // ════════════════════════════════════════════════════════════════
+  const totBrutto = r2(totNetto+totMwst);
+  const sumX = W-M-75;
 
-  // Zwischensumme (netto)
+  // Разделитель
+  ln(M, y, W-M, BORDER, 0.5);
+  y += 7;
+
+  // Zwischensumme
   doc.setFont('helvetica','normal');
   doc.setFontSize(9);
   doc.setTextColor(...GRAY);
   txt('Zwischensumme (netto)', sumX, y);
   doc.setTextColor(...BLACK);
-  txt(fmt(totNetto), W-M, y, {align:'right'});
-  y += 6;
+  txt(fmtN(totNetto), W-M, y, {align:'right'});
+  y += 7;
 
-  if(!isKlein && totMwst > 0){
+  if(!isKlein && totMwst>0){
     doc.setTextColor(...GRAY);
-    txt('Umsatzsteuer', sumX, y);
+    txt('Umsatzsteuer '+((pos[0].mwstRate||pos[0].rate||19))+'%', sumX, y);
     doc.setTextColor(...BLACK);
-    txt(fmt(totMwst), W-M, y, {align:'right'});
-    y += 6;
+    txt(fmtN(totMwst), W-M, y, {align:'right'});
+    y += 7;
   }
 
-  line(sumX, y, W-M, BLUE, 0.5);
-  y += 5;
+  // Линия перед Gesamtbetrag
+  ln(sumX, y, W-M, DARK, 0.6);
+  y += 2;
 
-  // Gesamtbetrag — жирный
-  doc.setFillColor(...BLUE);
-  doc.rect(sumX-2, y-1, W-M-sumX+4, 10, 'F');
+  // Gesamtbetrag — заливка тёмным блоком
+  rect(sumX-3, y, W-M-sumX+5, 12, DARK);
   doc.setTextColor(...WHITE);
   doc.setFont('helvetica','bold');
   doc.setFontSize(11);
-  txt('Gesamtbetrag', sumX+2, y+6.5);
-  txt(fmt(totBrutto), W-M, y+6.5, {align:'right'});
+  txt('Gesamtbetrag', sumX+2, y+8);
+  txt(fmtN(totBrutto), W-M, y+8, {align:'right'});
   y += 18;
 
-  // ════════════════════════════════════════════════════════════════════════
-  // ЗАМЕЧАНИЯ / NOTIZ
-  // ════════════════════════════════════════════════════════════════════════
+  // ════════════════════════════════════════════════════════════════
+  // 7. ЗАМЕТКИ / ZAHLUNGSBEDINGUNGEN
+  // ════════════════════════════════════════════════════════════════
   doc.setFont('helvetica','normal');
   doc.setFontSize(9);
   doc.setTextColor(...BLACK);
   txt('Zahlbar innerhalb von 14 Tagen ohne Abzug.', M, y);
   y += 7;
 
-  if(r.notiz){
-    doc.setFillColor(240,245,255);
-    const notizLines = doc.splitTextToSize(r.notiz, W-2*M-8);
-    doc.rect(M, y-3, W-2*M, notizLines.length*5+6, 'F');
-    doc.setTextColor(...BLUE2);
-    notizLines.forEach(l => { txt(l, M+4, y+2); y+=5; });
-    y += 6;
+  if(r.notiz && r.notiz.length >= 120){
+    doc.setFillColor(243,247,255);
+    doc.setDrawColor(196,210,235);
+    doc.setLineWidth(0.3);
+    const notizLines = doc.splitTextToSize(r.notiz, W-2*M-10);
+    const notizH = notizLines.length*5.5+8;
+    doc.roundedRect(M, y-2, W-2*M, notizH, 2, 2, 'FD');
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(50,70,110);
+    notizLines.forEach((l,i) => txt(l, M+5, y+4+i*5.5));
+    y += notizH+5;
   }
 
   // §19 Hinweis
@@ -601,39 +698,51 @@ async function generateRechnungPDF(r){
     y += 6;
   }
 
-  // Steuernummer / USt-ID
-  if(firmaStNr || firmaUstId){
+  // StNr / USt-ID
+  if(firmaStNr||firmaUstId){
     doc.setFont('helvetica','normal');
     doc.setFontSize(8);
     doc.setTextColor(...GRAY);
-    const stLines = [firmaStNr?'Steuernummer: '+firmaStNr:'', firmaUstId?'USt-IdNr.: '+firmaUstId:''].filter(Boolean);
-    txt(stLines.join('  ·  '), M, y);
+    const stParts=[firmaStNr?'Steuernummer: '+firmaStNr:'',firmaUstId?'USt-IdNr.: '+firmaUstId:''].filter(Boolean);
+    txt(stParts.join('  ·  '), M, y);
     y += 6;
   }
 
-  // ════════════════════════════════════════════════════════════════════════
-  // FOOTER — светло-серая полоса внизу
-  // ════════════════════════════════════════════════════════════════════════
-  const FY = 274;
-  doc.setFillColor(...LGRAY);
-  doc.rect(0, FY, W, 23, 'F');
-  line(0, FY, W, BORDER, 0.4);
+  // Vielen Dank
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...GRAY);
+  txt('Vielen Dank für Ihren Auftrag!', M, y);
+
+  // ════════════════════════════════════════════════════════════════
+  // 8. FOOTER — 3-колоночный, тёмно-серый фон
+  // ════════════════════════════════════════════════════════════════
+  const FY=274;
+  rect(0, FY, W, 23, [240,243,247]);
+  ln(0, FY, W, BORDER, 0.5);
 
   doc.setFont('helvetica','normal');
   doc.setFontSize(7.5);
   doc.setTextColor(...GRAY);
 
-  // 3 колонки footer
-  const bankLine  = [firmaIban?'IBAN: '+firmaIban:'', firmaBic?'BIC: '+firmaBic:''].filter(Boolean).join('  ·  ');
-  const firmaLine = [firmaInhaber?'Inhaber: '+firmaInhaber:'', firmaStr, firmaPlzOrt].filter(Boolean).join('  ·  ');
-  const stLine    = [firmaStNr?'StNr: '+firmaStNr:'', firmaUstId?'USt-ID: '+firmaUstId:''].filter(Boolean).join('  ·  ');
+  // Колонка 1 — Фирма
+  const col1=[firmaName, firmaInhaber?'Inhaber: '+firmaInhaber:'', firmaStr, firmaPlzOrt].filter(Boolean);
+  col1.slice(0,3).forEach((l,i)=>txt(l, M, FY+6+i*5.5));
 
-  txt(firmaName,  M,     FY+7,  {});
-  txt(firmaLine,  M,     FY+13, {});
-  txt(bankLine,   W/2,   FY+7,  {align:'center'});
-  txt(stLine,     W/2,   FY+13, {align:'center'});
-  txt(firmaEmail, W-M,   FY+7,  {align:'right'});
-  txt(firmaTel?'Tel: '+firmaTel:'', W-M, FY+13, {align:'right'});
+  // Колонка 2 — Банк (центр)
+  const col2 = [];
+  if(firmaIban) col2.push('IBAN: '+firmaIban);
+  if(firmaBic)  col2.push('BIC: '+firmaBic);
+  if(f.bank)    col2.push(f.bank);
+  col2.forEach((l,i)=>txt(l, W/2, FY+6+i*5.5, {align:'center'}));
+
+  // Колонка 3 — Steuer + Kontakt (право)
+  const col3=[];
+  if(firmaStNr)  col3.push('StNr: '+firmaStNr);
+  if(firmaUstId) col3.push('USt-ID: '+firmaUstId);
+  if(firmaEmail) col3.push(firmaEmail);
+  if(firmaTel)   col3.push('Tel: '+firmaTel);
+  col3.slice(0,3).forEach((l,i)=>txt(l, W-M, FY+6+i*5.5, {align:'right'}));
 
   return doc;
 }
@@ -654,23 +763,13 @@ async function emailMitPDF(r){
   toast('📄 PDF wird erstellt...','ok');
   try{
     const doc=await generateRechnungPDF(r);
-    // Скачиваем PDF
     doc.save(`Rechnung_${r.nr.replace(/\//g,'-')}.pdf`);
-    // Открываем почтовый клиент
-    const subject=encodeURIComponent(`Rechnung Nr. ${r.nr} — Autowäsche Berg`);
-    const body=encodeURIComponent(
-`Sehr geehrte Damen und Herren,${r.kunde?'\n\nSehr geehrte/r '+r.kunde+',':''}
-
-anbei erhalten Sie unsere Rechnung Nr. ${r.nr} über ${fmt(r.betrag)}.
-${r.faellig?'\nZahlungsziel: '+fd(r.faellig):''}
-
-Bitte hängen Sie die soeben heruntergeladene PDF-Datei an diese E-Mail an.
-
-Mit freundlichen Grüßen
-Autowäsche Berg
-Tel: +49 (0) 6241 000000
-info@autowaesche-berg.de`);
-    setTimeout(()=>window.open(`mailto:${r.email}?subject=${subject}&body=${body}`),500);
+    const tmpl = typeof getEmailTemplate==='function' ? getEmailTemplate() : null;
+    const subject = tmpl ? tmpl.subject.replace('{{NR}}',r.nr) : `Rechnung Nr. ${r.nr}`;
+    const body = tmpl
+      ? tmpl.body.replace('{{NR}}',r.nr).replace('{{KUNDE}}',r.kunde||'').replace('{{BETRAG}}',r.betrag?.toLocaleString('de-DE',{minimumFractionDigits:2})+' €').replace('{{FAELLIG}}',fd(r.faellig)||'')
+      : `Sehr geehrte Damen und Herren,\n\nanbei finden Sie unsere Rechnung Nr. ${r.nr}.\n\nMit freundlichen Grüßen\n${typeof getFirmaData==='function'?getFirmaData().name||'':''}`;
+    setTimeout(()=>window.open(`mailto:${r.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`),500);
     toast('✅ PDF gespeichert · E-Mail wird geöffnet','ok');
   }catch(e){console.error(e);toast('Fehler: '+e.message,'err');}
 }
