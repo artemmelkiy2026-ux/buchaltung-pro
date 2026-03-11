@@ -347,7 +347,7 @@ function validatePLZ(input){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PDF GENERATION — html2canvas → jsPDF (точный рендер HTML-шаблона)
+// PDF GENERATION — html2canvas → jsPDF
 // ═══════════════════════════════════════════════════════════════
 
 function _buildRechnungHTML(r) {
@@ -382,216 +382,331 @@ function _buildRechnungHTML(r) {
         <strong>${p.bez||p.beschreibung||'—'}</strong>
         ${p.desc ? `<div class="pos-desc">${p.desc}</div>` : ''}
       </td>
-      <td class="tr">${p.menge||1} ${p.einheit||'Stk.'}</td>
-      <td class="tr">${fmt(netto)}</td>
-      <td class="tr"><strong>${fmt(lineN)}</strong></td>
+      <td class="text-right">${p.menge||1} ${p.einheit||'Stk.'}</td>
+      <td class="text-right">${fmt(netto)}</td>
+      <td class="text-right">${fmt(lineN)}</td>
     </tr>`;
   }).join('');
   const totBrutto = r2(totNetto+totMwst);
   const addrLines = (r.adresse||'').split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
-  const giroData  = `BCD\n002\n1\nSCT\n${firmaBic}\n${firmaName}\n${firmaIban}\nEUR${totBrutto}\n\nRechnung ${r.nr}`;
+  const giroData  = encodeURIComponent(`BCD\n002\n1\nSCT\n${firmaBic}\n${firmaName}\n${firmaIban}\nEUR${totBrutto}\n\nRechnung ${r.nr}`);
 
   return `<!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
 <meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rechnung</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',Arial,sans-serif;background:#fff;color:#1c1c1e;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.page{width:794px;background:#fff;padding:38px 45px 30px;display:flex;flex-direction:column;gap:0}
+  :root {
+    --primary: #0052cc;
+    --text-main: #1c1c1e;
+    --text-sub: #636366;
+    --border: #e5e5ea;
+    --bg-qr: #f2f2f7;
+  }
 
-/* HEADER */
-.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
-.logo-block{display:flex;align-items:center;gap:14px}
-.avatar{width:52px;height:52px;background:#1a4578;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;flex-shrink:0}
-.firma-name{font-size:17px;font-weight:700;color:#1c1c1e;line-height:1.2}
-.firma-sub{font-size:11px;color:#636366;margin-top:3px}
-.sender-right{text-align:right;font-size:10px;color:#636366;line-height:1.9}
-hr{border:none;border-top:1px solid #e5e5ea;margin:0 0 22px}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ADDRESS */
-.addr-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;gap:24px}
-.abs-zeile{font-size:9px;color:#636366;border-bottom:1px solid #e5e5ea;padding-bottom:3px;margin-bottom:10px;display:inline-block}
-.recipient{font-size:13px;line-height:1.7}
+  body {
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+  }
 
-/* META CARD */
-.meta-card{min-width:210px;background:#fafafa;border:1px solid #e5e5ea;border-radius:10px;overflow:hidden;flex-shrink:0}
-.meta-head{background:#1a4578;color:#fff;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:7px 14px}
-.mrow{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;border-bottom:1px solid #f0f0f0;font-size:11px}
-.mrow:last-child{border-bottom:none}
-.ml{color:#636366}.mv{font-weight:700;color:#1c1c1e}
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    padding: 15mm 15mm 10mm;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* TITLE */
-.invoice-title{font-size:38px;font-weight:800;color:#1a4578;letter-spacing:-0.5px;margin-bottom:8px}
-.invoice-intro{font-size:11px;color:#636366;line-height:1.6;margin-bottom:22px}
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 45px;
+  }
 
-/* TABLE */
-table{width:100%;border-collapse:collapse;margin-bottom:22px}
-thead tr{background:#1a4578}
-thead th{color:#fff;padding:9px 11px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left}
-thead th.tr{text-align:right}
-tbody tr{border-bottom:1px solid #f0f0f0}
-tbody tr:nth-child(even){background:#f8f9fa}
-tbody td{padding:10px 11px;font-size:12px;vertical-align:top}
-tbody td.tr{text-align:right;font-size:11px;white-space:nowrap}
-.pos-desc{font-size:10px;color:#636366;margin-top:3px}
+  .logo-placeholder {
+    width: 64px;
+    height: 64px;
+    background: var(--primary);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+  }
 
-/* BOTTOM ROW */
-.bot{display:flex;justify-content:space-between;align-items:stretch;gap:20px;margin-bottom:22px}
+  .sender-info-top {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
 
-/* QR WIDGET */
-.qr-widget{flex:1;background:#f2f2f7;border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:82px 1fr 82px;gap:12px;align-items:center}
-.qr-box{text-align:center}
-.qr-img{width:82px;height:82px;background:#fff;border-radius:8px;border:1px solid #e5e5ea;display:flex;align-items:center;justify-content:center;margin-bottom:5px;overflow:hidden}
-.qr-img img{width:72px;height:72px;display:block}
-.qr-lbl{font-size:8px;font-weight:700;text-transform:uppercase;color:#636366;margin-top:2px}
-.qr-center{text-align:center}
-.qr-center h4{font-size:11px;font-weight:700;color:#1c1c1e;margin-bottom:6px}
-.qr-center p{font-size:9.5px;color:#636366;line-height:1.5}
+  .address-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+  }
 
-/* TOTALS */
-.totals{width:230px;display:flex;flex-direction:column;justify-content:flex-end}
-.trow{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
-.trow .tl{color:#636366}
-.grand{border-top:2px solid #1c1c1e;margin-top:8px;padding:10px 14px;background:#1a4578;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
-.grand .gl{color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
-.grand .gv{color:#fff;font-weight:800;font-size:18px}
+  .absender-zeile {
+    font-size: 9px;
+    color: var(--text-sub);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
 
-/* CLOSING */
-.closing{margin-bottom:16px}
-.thanks{font-weight:700;font-size:12px;color:#1c1c1e;margin-bottom:5px}
-.terms{font-size:11px;color:#636366;line-height:1.6}
+  .recipient-details {
+    font-size: 14px;
+    line-height: 1.5;
+  }
 
-/* NOTIZ */
-.notiz{background:#ebf1fa;border-left:3px solid #1a4578;padding:10px 14px;border-radius:0 6px 6px 0;font-size:11px;color:#1a3a5c;line-height:1.6;margin-bottom:14px}
+  .invoice-meta {
+    width: 220px;
+    background: #fafafa;
+    padding: 15px;
+    border-radius: 10px;
+  }
 
-/* HINWEIS */
-.hinweis{font-size:10px;color:#636366;font-style:italic;margin-bottom:8px}
-.st-info{font-size:10px;color:#636366;margin-bottom:14px}
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
 
-/* FOOTER */
-.footer{margin-top:28px;padding-top:18px;border-top:1px solid #e5e5ea;display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:16px}
-.fc strong{font-size:8.5px;color:#1a4578;text-transform:uppercase;letter-spacing:.4px;font-weight:700;display:block;margin-bottom:5px}
-.fc{font-size:9px;color:#636366;line-height:1.9}
+  .meta-row span:last-child { font-weight: 600; }
+
+  .invoice-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+  }
+
+  .pos-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+  }
+
+  .pos-table th {
+    text-align: left;
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--text-main);
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  .pos-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    vertical-align: top;
+  }
+
+  .pos-desc { color: var(--text-sub); font-size: 10.5px; margin-top: 4px; line-height: 1.4; }
+  .text-right { text-align: right; }
+
+  .bottom-row-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 20px;
+    margin-top: 10px;
+  }
+
+  .qr-symmetric-widget {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 85px 1fr 85px;
+    background: var(--bg-qr);
+    padding: 15px;
+    border-radius: 14px;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .qr-code-box { text-align: center; }
+
+  .qr-img {
+    width: 85px;
+    height: 85px;
+    background: #fff;
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+    margin-bottom: 5px;
+  }
+
+  .qr-img img { width: 100%; height: 100%; display: block; }
+  .qr-mini-label { font-size: 8px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); }
+  .qr-center-text { text-align: center; padding: 0 5px; }
+  .qr-center-text h4 { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .qr-center-text p { font-size: 10px; color: var(--text-sub); line-height: 1.4; }
+
+  .totals-area { width: 240px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .total-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+  .grand-total { border-top: 2px solid var(--text-main); margin-top: 10px; padding: 12px 0; font-weight: 800; font-size: 20px; color: var(--primary); }
+
+  .closing-text {
+    margin-top: 35px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .closing-text .thanks { font-weight: 600; margin-bottom: 4px; display: block; }
+  .closing-text .payment-terms { color: var(--text-main); }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 25px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    gap: 20px;
+    font-size: 9px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
+  .footer-col strong { color: var(--text-main); font-size: 10px; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
 </style>
 </head>
-<body><div class="page">
+<body>
+<div class="page">
 
-<div class="header">
-  <div class="logo-block">
-    <div class="avatar">${initials}</div>
-    <div>
-      <div class="firma-name">${firmaName}</div>
-      <div class="firma-sub">${firmaEmail||firmaWeb||firmaStr}</div>
+  <div class="header">
+    <div class="logo-placeholder">${initials}</div>
+    <div class="sender-info-top">
+      <strong>${firmaName}</strong><br>
+      ${firmaStr}${firmaStr && firmaPlzOrt ? ', ' : ''}${firmaPlzOrt}<br>
+      ${firmaTel ? 'Tel: '+firmaTel+'<br>' : ''}
+      ${firmaEmail}${firmaWeb ? '<br>'+firmaWeb : ''}
     </div>
   </div>
-  <div class="sender-right">
-    ${firmaStr}<br>
-    ${firmaPlzOrt}<br>
-    ${firmaTel ? 'Tel: '+firmaTel+'<br>' : ''}
-    ${firmaEmail}
-  </div>
-</div>
 
-<hr>
-
-<div class="addr-row">
-  <div>
-    <div class="abs-zeile">${[firmaName,firmaStr,firmaPlzOrt].filter(Boolean).join(' · ')}</div>
-    <div class="recipient">
-      <strong>${r.kunde||'—'}</strong><br>
-      ${addrLines.join('<br>')}
+  <div class="address-section">
+    <div class="recipient-box">
+      <div class="absender-zeile">${[firmaName, firmaStr, firmaPlzOrt].filter(Boolean).join(' · ')}</div>
+      <div class="recipient-details">
+        <strong>${r.kunde||'—'}</strong><br>
+        ${addrLines.join('<br>')}
+      </div>
+    </div>
+    <div class="invoice-meta">
+      <div class="meta-row"><span>Rechnungs-Nr.</span><span>${r.nr||'—'}</span></div>
+      <div class="meta-row"><span>Datum</span><span>${fd(r.datum)}</span></div>
+      <div class="meta-row"><span>Kunden-Nr.</span><span>${r.kundeId?'KD-'+String(r.kundeId).slice(-5):'—'}</span></div>
+      <div class="meta-row"><span>Fällig bis</span><span>${r.faellig?fd(r.faellig):'—'}</span></div>
     </div>
   </div>
-  <div class="meta-card">
-    <div class="meta-head">Rechnungsdetails</div>
-    <div class="mrow"><span class="ml">Rechnungs-Nr.</span><span class="mv">${r.nr||'—'}</span></div>
-    <div class="mrow"><span class="ml">Datum</span><span class="mv">${fd(r.datum)}</span></div>
-    <div class="mrow"><span class="ml">Kunden-Nr.</span><span class="mv">${r.kundeId?'KD-'+String(r.kundeId).slice(-5):'—'}</span></div>
-    <div class="mrow"><span class="ml">Fällig bis</span><span class="mv">${r.faellig?fd(r.faellig):'—'}</span></div>
-  </div>
-</div>
 
-<div class="invoice-title">Rechnung</div>
-<div class="invoice-intro">Sehr geehrte Damen und Herren, für unsere erbrachten Leistungen erlauben wir uns folgende Rechnung zu stellen:</div>
+  <h1 class="invoice-title">Rechnung</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th style="width:30px">Pos</th>
-      <th>Leistung / Beschreibung</th>
-      <th class="tr" style="width:80px">Menge</th>
-      <th class="tr" style="width:90px">Einzelpreis</th>
-      <th class="tr" style="width:90px">Gesamt</th>
-    </tr>
-  </thead>
-  <tbody>${posRows}</tbody>
-</table>
+  <table class="pos-table">
+    <thead>
+      <tr>
+        <th style="width: 8%">Pos</th>
+        <th style="width: 50%">Leistung</th>
+        <th style="width: 12%" class="text-right">Menge</th>
+        <th style="width: 15%" class="text-right">Einzel</th>
+        <th style="width: 15%" class="text-right">Gesamt</th>
+      </tr>
+    </thead>
+    <tbody>${posRows}</tbody>
+  </table>
 
-<div class="bot">
-  <div class="qr-widget">
-    <div class="qr-box">
-      <div class="qr-img"><img src="https://api.qrserver.com/v1/create-qr-code/?size=144x144&data=${encodeURIComponent(giroData)}" alt="GiroCode" crossorigin="anonymous"></div>
-      <div class="qr-lbl">GiroCode</div>
+  <div class="bottom-row-wrapper">
+    <div class="qr-symmetric-widget">
+      <div class="qr-code-box">
+        <div class="qr-img">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${giroData}" alt="GiroCode" crossorigin="anonymous">
+        </div>
+        <div class="qr-mini-label">GiroCode</div>
+      </div>
+      <div class="qr-center-text">
+        <h4>Schnell &amp; Sicher bezahlen</h4>
+        <p>Scannen Sie den GiroCode mit Ihrer Banking-App. Alle Daten werden automatisch übernommen – keine Tippfehler, kein Stress.</p>
+      </div>
+      <div class="qr-code-box">
+        <div class="qr-img">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent('PayPal:'+firmaEmail)}" alt="PayPal" crossorigin="anonymous">
+        </div>
+        <div class="qr-mini-label">PayPal Pay</div>
+      </div>
     </div>
-    <div class="qr-center">
-      <h4>Schnell &amp; Sicher bezahlen</h4>
-      <p>Scannen Sie den GiroCode mit Ihrer Banking-App. Alle Daten werden automatisch übernommen.</p>
-    </div>
-    <div class="qr-box">
-      <div class="qr-img"><img src="https://api.qrserver.com/v1/create-qr-code/?size=144x144&data=${encodeURIComponent('PayPal:'+firmaEmail)}" alt="PayPal" crossorigin="anonymous"></div>
-      <div class="qr-lbl">PayPal</div>
+
+    <div class="totals-area">
+      <div class="total-row"><span>Netto-Gesamt</span><span>${fmt(totNetto)}</span></div>
+      ${!isKlein && totMwst>0 ? `<div class="total-row"><span>MwSt 19%</span><span>${fmt(totMwst)}</span></div>` : ''}
+      <div class="total-row grand-total"><span>Gesamtbetrag</span><span>${fmt(totBrutto)}</span></div>
     </div>
   </div>
-  <div class="totals">
-    <div class="trow"><span class="tl">Netto-Gesamt</span><span>${fmt(totNetto)}</span></div>
-    ${!isKlein && totMwst>0 ? `<div class="trow"><span class="tl">MwSt 19%</span><span>${fmt(totMwst)}</span></div>` : ''}
-    <div class="grand"><span class="gl">Gesamtbetrag</span><span class="gv">${fmt(totBrutto)}</span></div>
+
+  <div class="closing-text">
+    <span class="thanks">Vielen Dank für Ihr Vertrauen und die angenehme Zusammenarbeit!</span>
+    <p class="payment-terms">Bitte überweisen Sie den Rechnungsbetrag innerhalb von <strong>14 Tagen</strong>${r.faellig?' (bis zum '+fd(r.faellig)+')':''} ohne Abzug auf unser unten genanntes Konto.</p>
   </div>
+
+  ${r.notiz ? `<div style="margin-top:20px;padding:12px 15px;background:#f2f2f7;border-left:3px solid var(--primary);font-size:11px;line-height:1.6">${r.notiz}</div>` : ''}
+  ${isKlein ? '<p style="margin-top:16px;font-size:10px;color:var(--text-sub);font-style:italic">Gemäß §19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmer).</p>' : ''}
+  ${firmaStNr||firmaUstId ? `<p style="margin-top:8px;font-size:10px;color:var(--text-sub)">${[firmaStNr?'Steuernummer: '+firmaStNr:'',firmaUstId?'USt-IdNr.: '+firmaUstId:''].filter(Boolean).join('  ·  ')}</p>` : ''}
+
+  <div class="footer">
+    <div class="footer-col">
+      <strong>Absender</strong>
+      ${firmaName}<br>
+      ${firmaStr}<br>
+      ${firmaPlzOrt}
+    </div>
+    <div class="footer-col">
+      <strong>Bankverbindung</strong>
+      ${firmaIban?'IBAN: '+firmaIban:'—'}<br>
+      ${firmaBic?'BIC: '+firmaBic:''}
+    </div>
+    <div class="footer-col">
+      <strong>Kontakt</strong>
+      ${firmaTel?'Tel: '+firmaTel+'<br>':''}
+      ${firmaEmail}
+    </div>
+    <div class="footer-col">
+      <strong>Steuerdaten</strong>
+      ${firmaStNr?'Steuernummer: '+firmaStNr+'<br>':''}
+      ${firmaUstId?'USt-IdNr.: '+firmaUstId:''}
+    </div>
+  </div>
+
 </div>
-
-<div class="closing">
-  <div class="thanks">Vielen Dank für Ihr Vertrauen und die angenehme Zusammenarbeit!</div>
-  <div class="terms">Bitte überweisen Sie den Rechnungsbetrag innerhalb von 14 Tagen${r.faellig?' (bis zum '+fd(r.faellig)+')':''} ohne Abzug auf unser unten genanntes Konto.</div>
-</div>
-
-${r.notiz ? `<div class="notiz">${r.notiz}</div>` : ''}
-${isKlein ? '<div class="hinweis">Gemäß §19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmer).</div>' : ''}
-${firmaStNr||firmaUstId ? `<div class="st-info">${[firmaStNr?'Steuernummer: '+firmaStNr:'',firmaUstId?'USt-IdNr.: '+firmaUstId:''].filter(Boolean).join('  ·  ')}</div>` : ''}
-
-<div class="footer">
-  <div class="fc"><strong>Absender</strong>${firmaName}<br>${firmaStr}<br>${firmaPlzOrt}</div>
-  <div class="fc"><strong>Bankverbindung</strong>${firmaIban?'IBAN: '+firmaIban:'—'}<br>${firmaBic?'BIC: '+firmaBic:''}</div>
-  <div class="fc"><strong>Kontakt</strong>${firmaTel?'Tel: '+firmaTel+'<br>':''}${firmaEmail}</div>
-  <div class="fc"><strong>Steuerdaten</strong>${firmaStNr?'StNr: '+firmaStNr+'<br>':''}${firmaUstId?'USt-ID: '+firmaUstId:''}</div>
-</div>
-
-</div></body></html>`;
+</body>
+</html>`;
 }
 
 async function generateRechnungPDF(r) {
   const {jsPDF} = window.jspdf;
 
-  // Создаём скрытый iframe — изолированный контекст, нет конфликтов со стилями приложения
   const iframe = document.createElement('iframe');
   iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;height:1200px;border:none;visibility:hidden';
   document.body.appendChild(iframe);
 
   try {
-    // Записываем HTML в iframe
-    const html = _buildRechnungHTML(r);
     iframe.contentDocument.open();
-    iframe.contentDocument.write(html);
+    iframe.contentDocument.write(_buildRechnungHTML(r));
     iframe.contentDocument.close();
 
-    // Ждём шрифты + QR-картинки
-    await new Promise(res => {
-      iframe.onload = res;
-      setTimeout(res, 1200); // fallback
-    });
+    await new Promise(res => { iframe.onload = res; setTimeout(res, 1200); });
     await iframe.contentDocument.fonts.ready;
-    await new Promise(res => setTimeout(res, 400));
+    await new Promise(res => setTimeout(res, 500));
 
     const pageEl = iframe.contentDocument.querySelector('.page');
 
@@ -603,34 +718,26 @@ async function generateRechnungPDF(r) {
       width: 794,
       windowWidth: 794,
       logging: false,
-      foreignObjectRendering: false,
     });
 
-    if(!canvas || canvas.width === 0 || canvas.height === 0) {
+    if(!canvas || canvas.width === 0 || canvas.height === 0)
       throw new Error('html2canvas lieferte leeres Canvas');
-    }
 
-    // jsPDF в mm — addImage принимает точные mm без float
     const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
     const PW = 210, PH = 297;
-    const imgW = canvas.width;
-    const imgH = canvas.height;
-    // Масштаб: 794px = 210mm  →  1px = 210/794 mm
-    const scale = PW / imgW;
-    const renderedH = Math.floor(imgH * scale * 10) / 10; // округление вниз до 1 знака
+    const scale = PW / canvas.width;
+    const renderedH = Math.floor(canvas.height * scale * 10) / 10;
 
     if(renderedH <= PH) {
-      // Всё на одной странице
       pdf.addImage(canvas, 'JPEG', 0, 0, PW, renderedH, '', 'FAST');
     } else {
-      // Разбиваем на страницы
-      const pageHeightPx = Math.floor(imgW * (PH / PW));
+      const pageHeightPx = Math.floor(canvas.width * (PH / PW));
       let offsetY = 0;
-      while(offsetY < imgH) {
-        const sliceH = Math.min(pageHeightPx, imgH - offsetY);
+      while(offsetY < canvas.height) {
+        const sliceH = Math.min(pageHeightPx, canvas.height - offsetY);
         if(sliceH <= 0) break;
         const sc = document.createElement('canvas');
-        sc.width  = imgW;
+        sc.width = canvas.width;
         sc.height = sliceH;
         sc.getContext('2d').drawImage(canvas, 0, -offsetY);
         const slicePdfH = Math.floor(sliceH * scale * 10) / 10;
