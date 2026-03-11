@@ -250,6 +250,7 @@ function selectKunde(id){
   document.getElementById('rn-email').value=k.email||'';
   // Сохраняем ссылку на клиента
   document.getElementById('rn-nr').dataset.kundeId=k.id;
+  document.getElementById('rn-nr').dataset.kundeTel=k.tel||'';
   closeModal('kunde-pick-modal');
   toast('✅ Kunde übernommen','ok');
 }
@@ -602,6 +603,7 @@ function _buildRechnungHTML(r) {
       <div class="recipient-details">
         <strong>${r.kunde||'—'}</strong><br>
         ${addrLines.join('<br>')}
+        ${r.tel ? '<br>Tel: '+r.tel : ''}
       </div>
     </div>
     <div class="invoice-meta">
