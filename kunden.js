@@ -110,7 +110,7 @@ function exportCSV() {
   if (document.getElementById('csv-fmt-popup')) return;
   const popup = document.createElement('div');
   popup.id = 'csv-fmt-popup';
-  popup.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.2);font-family:inherit;min-width:280px';
+  popup.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.2);font-family:inherit;min-width:280px';
   popup.innerHTML = `
     <div style="font-weight:600;font-size:13px;margin-bottom:12px;color:var(--text)">&#128229; CSV-Format w&#228;hlen</div>
     <div style="display:flex;flex-direction:column;gap:8px">
