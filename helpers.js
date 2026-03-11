@@ -352,110 +352,105 @@ function validatePLZ(input){
 async function generateRechnungPDF(r){
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
-  const W=210, M=15;
+  const W=210, M=18;
   let y=0;
 
-  // ── Цвета ──────────────────────────────────────────────────────
-  const BLUE    = [0, 82, 204];
-  const BLUEDARK= [0, 60, 160];
-  const WHITE   = [255,255,255];
-  const BLACK   = [28, 28, 30];
-  const GRAY    = [99, 99, 102];
-  const LGRAY   = [242,242,247];
-  const BORDER  = [229,229,234];
-  const BGMETA  = [250,250,250];
+  // ── Корпоративные цвета MelaLogic ──────────────────────────────
+  const CORP    = [26, 69, 120];      // #1a4578 — основной синий
+  const CORPDK  = [18, 50, 90];       // тёмнее для плашек
+  const CORPLG  = [235, 241, 250];    // очень светлый синий фон
+  const WHITE   = [255, 255, 255];
+  const BLACK   = [28,  28,  30];
+  const GRAY    = [99,  99, 102];
+  const LGRAY   = [245, 245, 247];
+  const BORDER  = [220, 220, 225];
 
   // ── Данные фирмы ────────────────────────────────────────────────
   const f = typeof getFirmaData==='function' ? getFirmaData() : {};
-  const firmaName   = f.name     || 'Meine Firma';
-  const firmaStr    = f.strasse  || '';
+  const firmaName   = f.name        || 'Meine Firma';
+  const firmaStr    = f.strasse     || '';
   const firmaPlzOrt = [f.plz, f.ort].filter(Boolean).join(' ');
-  const firmaTel    = f.tel      || '';
-  const firmaEmail  = f.email    || '';
-  const firmaIban   = f.iban     || '';
-  const firmaBic    = f.bic      || '';
-  const firmaStNr   = f.steuernummer || '';
-  const firmaUstId  = f.ust_id   || '';
+  const firmaTel    = f.tel         || '';
+  const firmaEmail  = f.email       || '';
+  const firmaIban   = f.iban        || '';
+  const firmaBic    = f.bic         || '';
+  const firmaStNr   = f.steuernummer|| '';
+  const firmaUstId  = f.ust_id      || '';
   const isKlein     = !r.mwstMode || r.mwstMode === '§19';
 
   // ── Хелперы ─────────────────────────────────────────────────────
-  function txt(t, x, yy, opts={}){ doc.text(String(t||''), x, yy, opts); }
-  function ln(x1,yy,x2,col=BORDER,lw=0.3){
+  const txt  = (t,x,yy,o={}) => doc.text(String(t||''),x,yy,o);
+  const ln   = (x1,yy,x2,col=BORDER,lw=0.3) => {
     doc.setDrawColor(...col); doc.setLineWidth(lw); doc.line(x1,yy,x2,yy);
-  }
-  function rnd(x,yy,w,h,col,fill='F'){
-    doc.setFillColor(...col); doc.roundedRect(x,yy,w,h,2,2,fill);
-  }
-  function rect(x,yy,w,h,col,fill='F'){
-    doc.setFillColor(...col); doc.rect(x,yy,w,h,fill);
-  }
+  };
+  const box  = (x,yy,w,h,col) => { doc.setFillColor(...col); doc.rect(x,yy,w,h,'F'); };
+  const rbox = (x,yy,w,h,col,mode='F') => { doc.setFillColor(...col); doc.roundedRect(x,yy,w,h,2,2,mode); };
+  const sbox = (x,yy,w,h,col) => {          // outlined box
+    doc.setDrawColor(...col); doc.setLineWidth(0.3); doc.roundedRect(x,yy,w,h,2,2,'S');
+  };
 
   // ════════════════════════════════════════════════════════════════
-  // HEADER — логотип слева, адрес справа
+  // HEADER
   // ════════════════════════════════════════════════════════════════
-  y = 15;
+  y = 16;
 
-  // Аватар (квадрат с закруглением)
-  const initials = firmaName.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  rnd(M, y-5, 16, 16, BLUE);
+  // Аватар с инициалами
+  const initials = firmaName.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  rbox(M, y-6, 14, 14, CORP);
   doc.setTextColor(...WHITE);
   doc.setFont('helvetica','bold');
-  doc.setFontSize(7);
-  txt(initials, M+8, y+4.5, {align:'center'});
+  doc.setFontSize(6);
+  txt(initials, M+7, y+2.5, {align:'center'});
 
-  // Название фирмы
+  // Название и email
   doc.setTextColor(...BLACK);
   doc.setFont('helvetica','bold');
-  doc.setFontSize(14);
-  txt(firmaName, M+20, y+3);
-
-  // Подзаголовок фирмы
+  doc.setFontSize(13);
+  txt(firmaName, M+18, y+1);
   doc.setFont('helvetica','normal');
   doc.setFontSize(8.5);
   doc.setTextColor(...GRAY);
-  txt(firmaEmail || firmaStr, M+20, y+9);
+  txt(firmaEmail || '', M+18, y+7);
 
-  // Адрес справа
-  doc.setFontSize(9);
+  // Адрес справа (выровнен по правому краю)
+  doc.setFontSize(8.5);
   doc.setTextColor(...GRAY);
-  const addrRight = [firmaStr, firmaPlzOrt, firmaTel ? 'Tel: '+firmaTel : '', firmaEmail].filter(Boolean);
-  addrRight.forEach((l,i) => txt(l, W-M, y-2+i*5, {align:'right'}));
+  const addrR = [firmaStr, firmaPlzOrt, firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean);
+  addrR.forEach((l,i) => txt(l, W-M, y-4+i*5, {align:'right'}));
 
-  y += 22;
+  y += 14;
   ln(M, y, W-M, BORDER, 0.4);
   y += 10;
 
   // ════════════════════════════════════════════════════════════════
-  // АДРЕС СЕКЦИЯ — получатель слева, мета справа
+  // АДРЕС + МЕТА
   // ════════════════════════════════════════════════════════════════
 
   // Абсендер-строка
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(...GRAY);
-  const absLines = [firmaName, firmaStr, firmaPlzOrt].filter(Boolean).join(' · ');
-  txt(absLines, M, y);
-  ln(M, y+2, M+80, [200,200,200], 0.3);
-  y += 8;
+  txt([firmaName, firmaStr, firmaPlzOrt].filter(Boolean).join(' · '), M, y);
+  ln(M, y+2, M+78, [210,210,215], 0.3);
+  y += 9;
 
   // Получатель
   doc.setFont('helvetica','bold');
   doc.setFontSize(11);
   doc.setTextColor(...BLACK);
   txt(r.kunde||'—', M, y);
-  y += 6;
-
+  y += 5.5;
   doc.setFont('helvetica','normal');
   doc.setFontSize(9.5);
   doc.setTextColor(...BLACK);
   const addrLines = (r.adresse||'').split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
   addrLines.forEach(l => { txt(l, M, y); y += 5; });
 
-  // Мета-блок справа (карточка)
-  const metaX = W - M - 60;
-  const metaY = y - 6 - addrLines.length*5 - 6;
-  rnd(metaX, metaY-2, 62, 36, BGMETA, 'F');
-  doc.setDrawColor(...BORDER); doc.setLineWidth(0.3);
-  doc.roundedRect(metaX, metaY-2, 62, 36, 2, 2, 'S');
+  // Мета-карточка справа
+  const metaW = 65, metaH = 4*9 + 8;
+  const metaX = W - M - metaW;
+  const metaTopY = y - 5.5 - addrLines.length*5 - 9;
+  rbox(metaX, metaTopY, metaW, metaH, LGRAY);
+  sbox(metaX, metaTopY, metaW, metaH, BORDER);
 
   const metaRows = [
     ['Rechnungs-Nr.', r.nr||'—'],
@@ -464,176 +459,200 @@ async function generateRechnungPDF(r){
     ['Fällig bis',    r.faellig ? fd(r.faellig) : '—'],
   ];
   metaRows.forEach(([lbl,val],i) => {
-    const ry = metaY + 5 + i*7.5;
+    const ry = metaTopY + 7 + i*9;
     doc.setFont('helvetica','normal');
     doc.setFontSize(8);
     doc.setTextColor(...GRAY);
-    txt(lbl, metaX+3, ry);
+    txt(lbl, metaX+4, ry);
     doc.setFont('helvetica','bold');
     doc.setFontSize(8.5);
     doc.setTextColor(...BLACK);
-    txt(val, metaX+61, ry, {align:'right'});
+    txt(val, metaX+metaW-4, ry, {align:'right'});
+    if(i < 3){ ln(metaX+4, ry+3, metaX+metaW-4, [235,235,238], 0.2); }
   });
 
-  y = Math.max(y, metaY + 40);
-  y += 8;
+  y = Math.max(y, metaTopY + metaH) + 10;
 
   // ════════════════════════════════════════════════════════════════
-  // TITEL
+  // TITEL "Rechnung"
   // ════════════════════════════════════════════════════════════════
   doc.setFont('helvetica','bold');
-  doc.setFontSize(26);
-  doc.setTextColor(...BLUE);
+  doc.setFontSize(28);
+  doc.setTextColor(...CORP);
   txt('Rechnung', M, y);
-  y += 8;
+  y += 9;
 
   doc.setFont('helvetica','normal');
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setTextColor(...GRAY);
-  txt('Sehr geehrte Damen und Herren, für unsere erbrachten Leistungen erlauben wir uns folgende Rechnung zu stellen:', M, y);
-  y += 10;
+  const introLines = doc.splitTextToSize(
+    'Sehr geehrte Damen und Herren, für unsere erbrachten Leistungen erlauben wir uns folgende Rechnung zu stellen:',
+    W - 2*M
+  );
+  introLines.forEach(l => { txt(l, M, y); y += 5; });
+  y += 6;
 
   // ════════════════════════════════════════════════════════════════
   // POSITIONS-TABELLE
   // ════════════════════════════════════════════════════════════════
-  const COL = {
-    pos:    M,
-    bez:    M+10,
-    menge:  W-M-55,
-    einzel: W-M-28,
-    gesamt: W-M
-  };
-  const ROW_H = 9;
+  // Колонки — подобраны так чтобы таблица не выходила за поля
+  const tW    = W - 2*M;           // ширина таблицы = 174mm
+  const cPos  = M;                 // Pos  (10mm)
+  const cBez  = M + 10;            // Bezeichnung (80mm)
+  const cMen  = M + 10 + 80;       // Menge right (25mm)
+  const cEin  = M + 10 + 80 + 30;  // Einzel right (30mm)
+  const cGes  = M + tW;            // Gesamt right
 
-  // Шапка таблицы
-  rect(M, y, W-2*M, ROW_H, BLUE);
+  const ROW_H = 8.5;
+
+  // Шапка
+  box(M, y, tW, ROW_H, CORP);
   doc.setTextColor(...WHITE);
   doc.setFont('helvetica','bold');
-  doc.setFontSize(8.5);
-  txt('Pos.',         COL.pos+1,   y+6);
-  txt('Leistung / Beschreibung', COL.bez, y+6);
-  txt('Menge',        COL.menge,   y+6, {align:'right'});
-  txt('Einzelpreis',  COL.einzel,  y+6, {align:'right'});
-  txt('Gesamt',       COL.gesamt,  y+6, {align:'right'});
+  doc.setFontSize(8);
+  txt('Pos.',           cPos+1,   y+5.5);
+  txt('Leistung / Beschreibung', cBez, y+5.5);
+  txt('Menge',          cMen,     y+5.5, {align:'right'});
+  txt('Einzelpreis',    cEin,     y+5.5, {align:'right'});
+  txt('Gesamt',         cGes,     y+5.5, {align:'right'});
   y += ROW_H;
 
-  // Строки позиций
+  // Строки
   const pos = r.positionen && r.positionen.length
     ? r.positionen
-    : [{bez: r.beschreibung||'Leistung', menge:1, einheit:'Stk.', preis: r.betrag, netto: r.betrag, mwstRate:0}];
+    : [{bez:r.beschreibung||'Leistung', menge:1, einheit:'Stk.', preis:r.betrag, netto:r.betrag, mwstRate:0}];
 
   doc.setFont('helvetica','normal');
-  doc.setFontSize(9);
   let totNetto = 0, totMwst = 0;
 
   pos.forEach((p, i) => {
     if(y > 230){ doc.addPage(); y = 20; }
 
-    const netto   = p.netto !== undefined ? p.netto : (p.preis||0);
-    const rate    = isKlein ? 0 : (p.mwstRate || p.rate || 0);
-    const lineN   = r2((p.menge||1) * netto);
-    const lineM   = r2(lineN * rate / 100);
+    const netto  = p.netto !== undefined ? p.netto : (p.preis||0);
+    const rate   = isKlein ? 0 : (p.mwstRate||p.rate||0);
+    const lineN  = r2((p.menge||1) * netto);
+    const lineM  = r2(lineN * rate / 100);
     totNetto += lineN;
     totMwst  += lineM;
 
-    const rowH2 = ROW_H;
-    if(i%2===0){ rect(M, y, W-2*M, rowH2, LGRAY); }
-    else { rect(M, y, W-2*M, rowH2, WHITE); }
+    // Чередование фона строк
+    if(i%2===0) box(M, y, tW, ROW_H, LGRAY);
+    else        box(M, y, tW, ROW_H, WHITE);
 
-    doc.setTextColor(...GRAY);
+    // Номер
     doc.setFontSize(8.5);
-    txt(String(i+1)+'.', COL.pos+1, y+6);
+    doc.setTextColor(...GRAY);
+    txt(String(i+1)+'.', cPos+1, y+5.5);
 
+    // Описание позиции
     doc.setTextColor(...BLACK);
     doc.setFont('helvetica','bold');
     doc.setFontSize(9);
-    const bezStr = doc.splitTextToSize(p.bez||p.beschreibung||'', 75)[0];
-    txt(bezStr, COL.bez, y+6);
+    const bezStr = doc.splitTextToSize(p.bez||p.beschreibung||'', 76)[0];
+    txt(bezStr, cBez, y+5.5);
 
+    // Мелкое описание (если есть)
     doc.setFont('helvetica','normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(7.5);
     doc.setTextColor(...GRAY);
-    txt(String(p.menge||1)+' '+(p.einheit||'Stk.'), COL.menge, y+6, {align:'right'});
+    txt(String(p.menge||1)+' '+(p.einheit||'Stk.'), cMen, y+5.5, {align:'right'});
 
+    // Цены
+    doc.setFontSize(9);
     doc.setTextColor(...BLACK);
-    txt(fmt(netto),  COL.einzel, y+6, {align:'right'});
+    txt(fmt(netto),  cEin, y+5.5, {align:'right'});
     doc.setFont('helvetica','bold');
-    txt(fmt(lineN),  COL.gesamt, y+6, {align:'right'});
+    txt(fmt(lineN),  cGes, y+5.5, {align:'right'});
     doc.setFont('helvetica','normal');
 
-    ln(M, y+rowH2, W-M, BORDER, 0.2);
-    y += rowH2;
+    ln(M, y+ROW_H, M+tW, BORDER, 0.2);
+    y += ROW_H;
   });
 
-  y += 6;
+  y += 8;
 
   // ════════════════════════════════════════════════════════════════
-  // НИЖНЯЯ СЕКЦИЯ: QR + ИТОГИ
+  // НИЖНИЙ БЛОК: QR-виджет (слева) + Итоги (справа)
+  // Оба блока одинаковой высоты, выровнены по вертикали
   // ════════════════════════════════════════════════════════════════
   const totBrutto = r2(totNetto + totMwst);
 
-  // QR-блок (слева) + итоги (справа) — как в шаблоне
-  const qrSectionY = y;
-  const qrW = 90, qrH = 32;
+  // Высота блока итогов
+  const sumLines = isKlein || totMwst <= 0 ? 1 : 2;
+  const sumBlockH = sumLines * 8 + 6 + 14;  // строки + линия + Gesamtbetrag-плашка
+  const blockH = Math.max(32, sumBlockH);
 
-  // QR фон
-  rnd(M, qrSectionY, qrW, qrH, LGRAY);
+  // ── QR-виджет ──
+  const qrW = W*0.48 - M - 4;  // ~86mm
+  rbox(M, y, qrW, blockH, CORPLG);
 
-  // GiroCode QR
-  const qrSize = 22;
-  rnd(M+3, qrSectionY+5, qrSize, qrSize, WHITE);
-  doc.setTextColor(...GRAY);
-  doc.setFontSize(6.5);
+  const qrBoxSz = blockH - 8;
+  // Левый QR
+  rbox(M+4, y+4, qrBoxSz, qrBoxSz, WHITE);
   doc.setFont('helvetica','bold');
-  txt('GiroCode', M+3+qrSize/2, qrSectionY+qrH-2, {align:'center'});
+  doc.setFontSize(6.5);
+  doc.setTextColor(...GRAY);
+  txt('GiroCode', M+4+qrBoxSz/2, y+blockH-1, {align:'center'});
 
-  // Текст по центру
+  // Правый QR
+  const qrR = M + qrW - 4 - qrBoxSz;
+  rbox(qrR, y+4, qrBoxSz, qrBoxSz, WHITE);
+  txt('PayPal', qrR+qrBoxSz/2, y+blockH-1, {align:'center'});
+
+  // Центральный текст
+  const qrCX = M + 4 + qrBoxSz + (qrR - M - 4 - qrBoxSz)/2;
   doc.setFont('helvetica','bold');
   doc.setFontSize(8.5);
   doc.setTextColor(...BLACK);
-  txt('Schnell bezahlen', M+qrW/2, qrSectionY+10, {align:'center'});
+  txt('Schnell bezahlen', qrCX, y+10, {align:'center'});
   doc.setFont('helvetica','normal');
   doc.setFontSize(7.5);
   doc.setTextColor(...GRAY);
-  const qrText = doc.splitTextToSize('Scannen Sie den GiroCode mit Ihrer Banking-App. Alle Daten werden automatisch übernommen.', 42);
-  qrText.forEach((l,i) => txt(l, M+qrW/2, qrSectionY+16+i*4, {align:'center'}));
+  const qrTxt = doc.splitTextToSize(
+    'Scannen Sie den GiroCode mit Ihrer Banking-App. Alle Daten werden automatisch übernommen.', 
+    qrR - M - 4 - qrBoxSz - 6
+  );
+  qrTxt.forEach((l,i) => txt(l, qrCX, y+16+i*4.5, {align:'center'}));
 
-  // PayPal QR справа в блоке
-  rnd(M+qrW-qrSize-3, qrSectionY+5, qrSize, qrSize, WHITE);
-  txt('PayPal', M+qrW-3-qrSize/2, qrSectionY+qrH-2, {align:'center'});
+  // ── Итоги — выровнены с QR блоком ──
+  const sumX  = W*0.48 + 4;
+  const sumRW = W - M - sumX;
 
-  // ── ИТОГИ справа ──
-  const sumX = W - M - 68;
-  const sumW = 68;
+  let sy = y + 4;
 
-  // Zwischensumme
+  // Netto
   doc.setFont('helvetica','normal');
   doc.setFontSize(9.5);
   doc.setTextColor(...GRAY);
-  txt('Netto-Gesamt', sumX, qrSectionY+8);
+  txt('Netto-Gesamt', sumX, sy+4);
   doc.setTextColor(...BLACK);
-  txt(fmt(totNetto), W-M, qrSectionY+8, {align:'right'});
+  txt(fmt(totNetto), W-M, sy+4, {align:'right'});
+  sy += 9;
 
+  // MwSt (только Regelbesteuerung)
   if(!isKlein && totMwst > 0){
     doc.setTextColor(...GRAY);
-    txt('MwSt 19%', sumX, qrSectionY+16);
+    txt('MwSt 19%', sumX, sy+4);
     doc.setTextColor(...BLACK);
-    txt(fmt(totMwst), W-M, qrSectionY+16, {align:'right'});
+    txt(fmt(totMwst), W-M, sy+4, {align:'right'});
+    sy += 9;
   }
 
-  // Линия перед итогом
-  ln(sumX, qrSectionY+20, W-M, BLACK, 0.5);
+  // Линия
+  ln(sumX, sy+2, W-M, BLACK, 0.5);
+  sy += 6;
 
-  // Gesamtbetrag — синяя плашка
-  rnd(sumX-2, qrSectionY+22, sumW+2, 12, BLUE);
+  // Gesamtbetrag — корпоративная синяя плашка
+  const gpH = 12;
+  rbox(sumX, sy, sumRW, gpH, CORP);
   doc.setTextColor(...WHITE);
   doc.setFont('helvetica','bold');
   doc.setFontSize(9);
-  txt('Gesamtbetrag', sumX+2, qrSectionY+30);
+  txt('Gesamtbetrag', sumX+4, sy+8);
   doc.setFontSize(12);
-  txt(fmt(totBrutto), W-M, qrSectionY+30, {align:'right'});
+  txt(fmt(totBrutto), W-M, sy+8, {align:'right'});
 
-  y = qrSectionY + qrH + 10;
+  y += blockH + 10;
 
   // ════════════════════════════════════════════════════════════════
   // ABSCHLUSSTEXT
@@ -650,22 +669,19 @@ async function generateRechnungPDF(r){
   const zahlText = r.faellig
     ? `Bitte überweisen Sie den Rechnungsbetrag innerhalb von 14 Tagen (bis zum ${fd(r.faellig)}) ohne Abzug auf unser unten genanntes Konto.`
     : 'Bitte überweisen Sie den Rechnungsbetrag innerhalb von 14 Tagen ohne Abzug auf unser unten genanntes Konto.';
-  const zahlLines = doc.splitTextToSize(zahlText, W-2*M);
-  zahlLines.forEach(l => { txt(l, M, y); y += 5; });
+  doc.splitTextToSize(zahlText, W-2*M).forEach(l => { txt(l, M, y); y += 5; });
   y += 4;
 
   // Notiz
   if(r.notiz){
-    rnd(M, y, W-2*M, 2, LGRAY); // placeholder высота пересчитается
-    doc.setFillColor(...LGRAY);
     const nLines = doc.splitTextToSize(r.notiz, W-2*M-10);
-    doc.roundedRect(M, y, W-2*M, nLines.length*5+8, 2, 2, 'F');
-    doc.setDrawColor(...[0,82,204]); doc.setLineWidth(0.8);
-    doc.line(M, y, M, y + nLines.length*5+8);
+    rbox(M, y, W-2*M, nLines.length*5+8, CORPLG);
+    doc.setDrawColor(...CORP); doc.setLineWidth(1);
+    doc.line(M, y, M, y+nLines.length*5+8);
     doc.setFont('helvetica','normal');
     doc.setFontSize(9);
-    doc.setTextColor(...[0,60,160]);
-    nLines.forEach((l,i) => txt(l, M+5, y+5+i*5));
+    doc.setTextColor(...[18,50,90]);
+    nLines.forEach((l,i) => txt(l, M+5, y+6+i*5));
     y += nLines.length*5+12;
   }
 
@@ -685,34 +701,34 @@ async function generateRechnungPDF(r){
     doc.setTextColor(...GRAY);
     const stLine = [firmaStNr?'Steuernummer: '+firmaStNr:'', firmaUstId?'USt-IdNr.: '+firmaUstId:''].filter(Boolean).join('  ·  ');
     txt(stLine, M, y);
-    y += 6;
+    y += 5;
   }
 
   // ════════════════════════════════════════════════════════════════
-  // FOOTER — 4 колонки
+  // FOOTER — 4 колонки, закреплён внизу страницы
   // ════════════════════════════════════════════════════════════════
   const FY = 272;
-  rect(0, FY, W, 25, LGRAY);
+  box(0, FY, W, 25, LGRAY);
   ln(0, FY, W, BORDER, 0.4);
 
-  const cols4 = [M, W*0.28, W*0.52, W*0.76];
-  const labels4 = ['Absender','Bankverbindung','Kontakt','Steuerdaten'];
-  const data4 = [
-    [firmaName, firmaStr, firmaPlzOrt, 'Deutschland'].filter(Boolean),
-    [firmaIban ? 'IBAN: '+firmaIban : '', firmaBic ? 'BIC: '+firmaBic : ''].filter(Boolean),
-    [firmaTel ? 'Tel: '+firmaTel : '', firmaEmail].filter(Boolean),
-    [firmaStNr ? 'StNr: '+firmaStNr : '', firmaUstId ? 'USt-ID: '+firmaUstId : ''].filter(Boolean),
+  const footCols = [M, M+(W-2*M)*0.27, M+(W-2*M)*0.52, M+(W-2*M)*0.76];
+  const footLabels = ['Absender','Bankverbindung','Kontakt','Steuerdaten'];
+  const footData = [
+    [firmaName, firmaStr, firmaPlzOrt].filter(Boolean),
+    [firmaIban?'IBAN: '+firmaIban:'', firmaBic?'BIC: '+firmaBic:''].filter(Boolean),
+    [firmaTel?'Tel: '+firmaTel:'', firmaEmail].filter(Boolean),
+    [firmaStNr?'StNr: '+firmaStNr:'', firmaUstId?'USt-ID: '+firmaUstId:''].filter(Boolean),
   ];
 
-  cols4.forEach((cx, ci) => {
+  footCols.forEach((cx, ci) => {
     doc.setFont('helvetica','bold');
-    doc.setFontSize(7.5);
-    doc.setTextColor(...BLACK);
-    txt(labels4[ci].toUpperCase(), cx, FY+6);
+    doc.setFontSize(7);
+    doc.setTextColor(...CORP);
+    txt(footLabels[ci].toUpperCase(), cx, FY+5);
     doc.setFont('helvetica','normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...GRAY);
-    data4[ci].forEach((l,li) => txt(l, cx, FY+11+li*4.5));
+    footData[ci].forEach((l,li) => txt(l, cx, FY+10+li*4.5));
   });
 
   return doc;
