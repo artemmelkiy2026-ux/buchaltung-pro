@@ -745,7 +745,7 @@ async function pcConfirm() {
     updatePcDots();
   } else {
     if (pcValue !== pcNewValue) {
-      document.getElementById('pc-msg').textContent = '<i class="fas fa-times-circle" style="color:var(--red)"></i> PINs stimmen nicht überein';
+      document.getElementById('pc-msg').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> PINs stimmen nicht überein';
       pcValue = ''; pcStep = 'new1'; pcNewValue = '';
       document.getElementById('pc-subtitle').textContent = 'Neuen PIN festlegen (1/2)';
       setTimeout(() => { updatePcDots(); document.getElementById('pc-msg').textContent=''; }, 1000);
@@ -814,7 +814,7 @@ function pcPinError(prefix) {
   else { pdValue = ''; updatePdDots(); }
   if (navigator.vibrate) navigator.vibrate([100,50,100]);
   for(let i=0;i<4;i++) document.getElementById(`${prefix}-dot-${i}`).classList.add('error');
-  document.getElementById(`${prefix}-msg`).textContent = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falscher PIN';
+  document.getElementById(`${prefix}-msg`).innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falscher PIN';
   setTimeout(() => {
     if (prefix==='pc') updatePcDots(); else updatePdDots();
     document.getElementById(`${prefix}-msg`).textContent = '';
@@ -913,7 +913,7 @@ async function psConfirm() {
     return;
   }
   if (psValue !== psFirst) {
-    document.getElementById('ps-msg').textContent = '<i class="fas fa-times-circle" style="color:var(--red)"></i> PINs stimmen nicht überein';
+    document.getElementById('ps-msg').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> PINs stimmen nicht überein';
     if (navigator.vibrate) navigator.vibrate([100,50,100]);
     for(let i=0;i<4;i++) document.getElementById('ps-dot-'+i).classList.add('error');
     psValue = ''; psFirst = ''; psStep = 1;

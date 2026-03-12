@@ -369,7 +369,7 @@ function openMonatDetail(yr, mi){
   const monName = MN[parseInt(mi)-1];
   _monLabel = `${monName} ${yr}`;
 
-  document.getElementById('mon-modal-title').textContent = `<i class="fas fa-calendar-alt"></i> ${_monLabel}`;
+  document.getElementById('mon-modal-title').innerHTML = `<i class="fas fa-calendar-alt"></i> ${_monLabel}`;
 
   const ein=sum(entries,'Einnahme'), aus=sum(entries,'Ausgabe'), gew=ein-aus;
   document.getElementById('mon-modal-stats').innerHTML=`
