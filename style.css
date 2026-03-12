@@ -157,11 +157,7 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .sc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;position:relative;overflow:hidden;transition:all .2s;cursor:default}
 .sc:hover{border-color:var(--border2);transform:translateY(-1px)}
 .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.sc.g::before{background:#143263}
-.sc.r::before{background:#143263}
-.sc.b::before{background:#143263}
-.sc.y::before{background:#143263}
-.sc.p::before{background:#143263}
+
 
 .sc-lbl{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .sc-val{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1}
