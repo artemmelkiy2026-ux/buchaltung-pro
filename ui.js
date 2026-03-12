@@ -68,7 +68,7 @@ async function saveEdit(){
   };
   data.eintraege.push(newEntry);
   sbSaveEintrag(newEntry);
-  renderAll(); closeModal('edit-modal'); toast('✅ Korrektur gespeichert (GoBD-konform)','ok');
+  renderAll(); closeModal('edit-modal'); toast('✓ Korrektur gespeichert (GoBD-konform)','ok');
 }
 
 // ── MODAL HELPERS ────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape') document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));
-  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();persist();toast('✅ Gespeichert!','ok');}
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();persist();toast('✓ Gespeichert!','ok');}
 });
 document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');}));
 

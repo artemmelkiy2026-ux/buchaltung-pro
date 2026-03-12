@@ -258,7 +258,7 @@ async function cancelDeletionFromApp() {
   if (!currentUser) return;
   await sb.from('user_data').upsert({ user_id:currentUser.id, deleted_at:null }, { onConflict:'user_id' });
   document.getElementById('deletion-banner')?.remove();
-  if (typeof toast === 'function') toast('✅ Kontolöschung widerrufen');
+  if (typeof toast === 'function') toast('✓ Kontolöschung widerrufen');
 }
 
 // ── SCREENS ────────────────────────────────────────────────────────────────
@@ -325,7 +325,7 @@ function offerPinRestore() {
   b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgb(40 40 40);color:#fff;border-radius:16px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;font-family:sans-serif;max-width:400px;width:calc(100% - 48px);flex-direction:column';
   b.innerHTML = `
     <div style="display:flex;align-items:center;gap:16px;width:100%">
-      <span style="font-size:28px">⚠️</span>
+      <span style="font-size:28px">⚠</span>
       <div style="flex:1">
         <div style="font-weight:600;font-size:14px;margin-bottom:4px">Sicherheit gefährdet!</div>
         <div style="font-size:12px;opacity:.85">PIN-Schutz ist deaktiviert. Jetzt einrichten?</div>
@@ -380,7 +380,7 @@ async function pinConfirm() {
     if (pinValue !== pinFirstValue) {
       pinValue = ''; pinFirstValue = ''; pinSetupStep = 1;
       const err = document.getElementById('pin-error');
-      if (err) err.textContent = '❌ PINs stimmen nicht überein';
+      if (err) err.textContent = '✗ PINs stimmen nicht überein';
       if (navigator.vibrate) navigator.vibrate([100,50,100]);
       for (let i=0;i<4;i++) { const d=document.getElementById('pin-dot-'+i); if(d) d.classList.add('error'); }
       setTimeout(() => {
@@ -392,7 +392,7 @@ async function pinConfirm() {
     }
     const hash = await pinToHash(pinValue);
     localStorage.setItem('bp_pin', hash);
-    sbSavePin(hash).then(() => { if (typeof toast==='function') toast('✅ PIN gesetzt!','ok'); });
+    sbSavePin(hash).then(() => { if (typeof toast==='function') toast('✓ PIN gesetzt!','ok'); });
     pinValue=''; pinFirstValue=''; pinSetupStep=1; updatePinDots();
     const aw = document.getElementById('app-wrapper'); if(aw) aw.style.display='block';
     isAppUnlocked = true;
@@ -403,7 +403,7 @@ async function pinConfirm() {
       pinUnlockSuccess();
     } else {
       pinValue = '';
-      const err = document.getElementById('pin-error'); if(err) err.textContent='❌ Falscher PIN';
+      const err = document.getElementById('pin-error'); if(err) err.textContent='✗ Falscher PIN';
       if (navigator.vibrate) navigator.vibrate([100,50,100]);
       for (let i=0;i<4;i++) { const d=document.getElementById('pin-dot-'+i); if(d) d.classList.add('error'); }
       setTimeout(() => { updatePinDots(); const e2=document.getElementById('pin-error'); if(e2) e2.textContent=''; }, 900);
@@ -450,7 +450,7 @@ async function pinBiometric() {
       allowCredentials:[{type:'public-key',id:credIdBytes,transports:['internal']}],
     }});
     pinUnlockSuccess();
-    if (typeof toast==='function') toast('✅ Entsperrt','ok');
+    if (typeof toast==='function') toast('✓ Entsperrt','ok');
   } catch(e) { console.log('Biometric verify:', e.message); }
 }
 async function offerBiometricSetup() {
@@ -477,7 +477,7 @@ async function offerBiometricSetup() {
   document.getElementById('bio-setup-btn').addEventListener('click', async () => {
     b.remove();
     const ok = await registerBiometric();
-    if (typeof toast==='function') toast(ok ? '✅ Biometrie aktiviert!' : '❌ Nicht verfügbar', ok ? 'ok' : 'err');
+    if (typeof toast==='function') toast(ok ? '✓ Biometrie aktiviert!' : '✗ Nicht verfügbar', ok ? 'ok' : 'err');
   });
   setTimeout(() => { if (b.parentNode) b.remove(); }, 15000);
 }

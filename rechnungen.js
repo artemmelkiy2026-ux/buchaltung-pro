@@ -19,8 +19,8 @@ function renderRech(){
   const tb=document.getElementById('rech-tbody'),em=document.getElementById('rech-empty');
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  const smap={offen:'rs-offen 🟡 '+'Offen',ueberfaellig:'rs-ueberfaellig 🔴 '+'Überfällig',bezahlt:'rs-bezahlt 🟢 '+'Bezahlt'};
-  const smapMob={offen:'🟡',ueberfaellig:'🔴',bezahlt:'🟢'};
+  const smap={offen:'rs-offen ● '+'Offen',ueberfaellig:'rs-ueberfaellig ● '+'Überfällig',bezahlt:'rs-bezahlt ● '+'Bezahlt'};
+  const smapMob={offen:'●',ueberfaellig:'●',bezahlt:'●'};
   const mob=isMob();
   tb.innerHTML=filtered.sort((a,b)=>b.datum.localeCompare(a.datum)).map(r=>`
     <tr onclick="editRech('${r.id}')" style="cursor:pointer">
@@ -34,7 +34,7 @@ function renderRech(){
       <td style="text-align:right;font-family:var(--mono);font-weight:600;font-size:12px;white-space:nowrap">${fmt(r.betrag)}</td>
       <td style="text-align:center">
         ${mob
-          ? `<span style="font-size:15px">${smapMob[r.status]||'❔'}</span>`
+          ? `<span style="font-size:15px">${smapMob[r.status]||'<i class="fas fa-question-circle" style="color:var(--sub)"></i>'}</span>`
           : `<span class="rech-status ${smap[r.status].split(' ')[0]}">${smap[r.status].split(' ').slice(1).join(' ')}</span>`}
       </td>
       <td style="white-space:nowrap;text-align:right">
@@ -127,7 +127,7 @@ function saveRechnung(){
     data.rechnungen.push(newR);
     sbSaveRechnung(newR);
   }
-  renderRech();closeModal('rech-modal');toast('✅ Rechnung gespeichert!','ok');
+  renderRech();closeModal('rech-modal');toast('✓ Rechnung gespeichert!','ok');
 }
 function rechBezahlt(id){
   const r=data.rechnungen.find(x=>x.id===id);if(!r)return;
@@ -136,11 +136,11 @@ function rechBezahlt(id){
     const newE={id:Date.now()+'',datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:'Dienstleistung',zahlungsart:'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag};
     data.eintraege.unshift(newE);
     sbSaveRechnung(r); sbSaveEintrag(newE);
-    renderAll();toast(`✅ Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');
+    renderAll();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');
   } else if(confirm(`Nur als bezahlt markieren (ohne Einnahme buchen)?`)){
     r.status='bezahlt';
     sbSaveRechnung(r);
-    renderRech();toast(`✅ Rechnung ${r.nr} als bezahlt markiert`,'ok');
+    renderRech();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
 }
 function delRech(id){if(!confirm('Rechnung löschen?'))return;data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);sbDeleteRechnung(id);renderRech();toast('Gelöscht','err');}
@@ -160,13 +160,13 @@ function updateRechBanner(){
     el.style.background='rgba(34,197,94,.08)';
     el.style.border='1px solid var(--green)';
     el.style.color='var(--green)';
-    el.innerHTML='✅ §19 UStG Kleinunternehmer — alle Positionen ohne USt. <a href="#" onclick="nav(\'ust\',null);closeModal(\'rech-modal\')" style="color:var(--green);text-decoration:underline;font-size:11px">Ändern im USt-Bereich</a>';
+    el.innerHTML='✓ §19 UStG Kleinunternehmer — alle Positionen ohne USt. <a href="#" onclick="nav(\'ust\',null);closeModal(\'rech-modal\')" style="color:var(--green);text-decoration:underline;font-size:11px">Ändern im USt-Bereich</a>';
   } else {
     el.style.display='';
     el.style.background='rgba(59,130,246,.08)';
     el.style.border='1px solid var(--blue)';
     el.style.color='var(--blue)';
-    el.innerHTML='📊 MwSt — USt wird pro Position berechnet.';
+    el.innerHTML=' MwSt — USt wird pro Position berechnet.';
   }
 }
 
@@ -448,7 +448,7 @@ function buildRechnungHTML(r){
     .btn-close{padding:10px 20px;background:#e5e7eb;border:none;border-radius:6px;cursor:pointer;font-size:13px}
   </style></head><body>
   <div class="btn-bar">
-    <button class="btn-print" onclick="window.print()">🖨️ Drucken / Als PDF speichern</button>
+    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i>️ Drucken / Als PDF speichern</button>
     <button class="btn-close" onclick="window.close()">✕ Schließen</button>
   </div>
   <div class="header">
@@ -641,7 +641,7 @@ function openFirmaModal() {
 function compressLogo(file, maxW=300, maxH=150, maxKB=80) {
   return new Promise((resolve) => {
     if (!file || !file.type.startsWith('image/')) return resolve(null);
-    if (file.size > 5 * 1024 * 1024) { toast('❌ Bild zu groß (max. 5 MB)', 'err'); return resolve(null); }
+    if (file.size > 5 * 1024 * 1024) { toast('✗ Bild zu groß (max. 5 MB)', 'err'); return resolve(null); }
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
@@ -679,7 +679,7 @@ async function onLogoChange(input) {
   // Сохраняем во временный атрибут — применится при Speichern
   input.dataset.b64 = b64;
   const kb = Math.round(b64.length * 0.75 / 1024);
-  toast(`✅ Logo geladen (${kb} KB)`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Logo geladen (${kb} KB)`, 'ok');
 }
 
 // Удалить логотип
@@ -699,7 +699,7 @@ function deleteFirmaLogo() {
   if (currentUser) {
     sb.from('user_data').upsert({ user_id: currentUser.id, logo: null }, { onConflict: 'user_id' }).then(()=>{}).catch(()=>{});
   }
-  toast('🗑️ Logo entfernt', 'ok');
+  toast('️ Logo entfernt', 'ok');
 }
 
 async function saveFirmaData() {
@@ -738,7 +738,7 @@ async function saveFirmaData() {
         logo:          p.logo            || null,
       }, { onConflict: 'user_id' });
       if (error) throw error;
-    } catch(e) { console.warn('[firma save]', e); toast('⚠️ Supabase-Fehler beim Speichern', 'err'); return; }
+    } catch(e) { console.warn('[firma save]', e); toast('⚠ Supabase-Fehler beim Speichern', 'err'); return; }
   }
   // Сохраняем E-Mail шаблон
   const subEl = document.getElementById('email-tmpl-subject');
@@ -750,7 +750,7 @@ async function saveFirmaData() {
     };
     localStorage.setItem('bp_email_template', JSON.stringify(tmpl));
   }
-  toast('✅ Firmendaten gespeichert!', 'ok');
+  toast('✓ Firmendaten gespeichert!', 'ok');
   closeModal('firma-modal');
 }
 
@@ -779,7 +779,7 @@ function resetEmailTemplate() {
   const bodEl = document.getElementById('email-tmpl-body');
   if (subEl) subEl.value = tmpl.subject;
   if (bodEl) bodEl.value = tmpl.body;
-  toast('✅ E-Mail Vorlage zurückgesetzt', 'ok');
+  toast('✓ E-Mail Vorlage zurückgesetzt', 'ok');
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -986,7 +986,7 @@ function downloadXRechnung(r) {
     a.download = `XRechnung_${r.nr.replace(/\//g, '-')}.xml`;
     a.click();
     URL.revokeObjectURL(url);
-    toast('✅ XRechnung XML gespeichert!', 'ok');
+    toast('✓ XRechnung XML gespeichert!', 'ok');
   } catch(e) {
     console.error(e);
     toast('Fehler beim XML-Erstellen: ' + e.message, 'err');
@@ -1021,7 +1021,7 @@ async function downloadZUGFeRD(r) {
     };
   }
 
-  toast('📄 ZUGFeRD wird erstellt...', 'ok');
+  toast('[PDF] ZUGFeRD wird erstellt...', 'ok');
   const safeNr = (r.nr || 'rechnung').replace(/[\/]/g, '-');
 
   try {
@@ -1030,7 +1030,7 @@ async function downloadZUGFeRD(r) {
     doc.save(`ZUGFeRD_${safeNr}.pdf`);
   } catch(e) {
     console.error('[ZUGFeRD PDF error]', e);
-    toast('❌ PDF-Fehler: ' + e.message, 'err');
+    toast('✗ PDF-Fehler: ' + e.message, 'err');
     return;
   }
 
@@ -1045,11 +1045,11 @@ async function downloadZUGFeRD(r) {
       a.download = `factur-x_${safeNr}.xml`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 3000);
-      toast('✅ PDF + Factur-X XML gespeichert!', 'ok');
+      toast('✓ PDF + Factur-X XML gespeichert!', 'ok');
     }, 500);
   } catch(e) {
     console.error('[ZUGFeRD XML error]', e);
-    toast('⚠️ PDF gespeichert, XML-Fehler: ' + e.message, 'err');
+    toast('⚠ PDF gespeichert, XML-Fehler: ' + e.message, 'err');
   }
 }
 

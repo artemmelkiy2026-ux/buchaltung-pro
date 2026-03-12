@@ -1,8 +1,8 @@
 // ── FILE IO (только экспорт/импорт для резервной копии) ──────────────────
 // persist() — в Supabase-архитектуре данные сохраняются автоматически
 // через отдельные sbSave* при каждом действии. Ctrl+S = показать подтверждение.
-function persist(){ if(typeof toast==="function") toast("✅ Daten werden automatisch gespeichert","ok"); }
-function dlJson(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`buchaltung_${new Date().getFullYear()}.json`;a.click();toast('✅ Backup heruntergeladen!','ok');}
+function persist(){ if(typeof toast==="function") toast("✓ Daten werden automatisch gespeichert","ok"); }
+function dlJson(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`buchaltung_${new Date().getFullYear()}.json`;a.click();toast('✓ Backup heruntergeladen!','ok');}
 function loadFile(){document.getElementById('fi').click();}
 function onLoad(ev){
   const f=ev.target.files[0];if(!f)return;
@@ -20,9 +20,9 @@ function onLoad(ev){
     });
     renderAll();
     renderDash();
-    toast(`✅ Загружено ${data.eintraege.length} записей`,'ok');
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Загружено ${data.eintraege.length} записей`,'ok');
   }catch{
-    toast('❌ Неверный файл','err');
+    toast('✗ Неверный файл','err');
   }};
   r.readAsText(f);ev.target.value='';
 }
@@ -53,7 +53,7 @@ function updateMwstFormVisibility(){
     mwRow.style.background='rgba(249,115,22,.07)';
     mwRow.style.border='1px solid rgba(249,115,22,.3)';
     const title=document.getElementById('nf-mwst-title');
-    if(title){title.textContent='🟠 Umsatzsteuer auf diese Einnahme';title.style.color='#f97316';}
+    if(title){title.textContent='● Umsatzsteuer auf diese Einnahme';title.style.color='#f97316';}
     const betLbl=document.getElementById('nf-mwst-bet-lbl');
     if(betLbl) betLbl.textContent='USt-Betrag (€)';
     const betEl=document.getElementById('nf-mwst-bet');
@@ -64,7 +64,7 @@ function updateMwstFormVisibility(){
     mwRow.style.background='rgba(59,130,246,.07)';
     mwRow.style.border='1px solid rgba(59,130,246,.3)';
     const title=document.getElementById('nf-mwst-title');
-    if(title){title.textContent='🔵 Vorsteuer aus dieser Ausgabe';title.style.color='var(--blue)';}
+    if(title){title.textContent='● Vorsteuer aus dieser Ausgabe';title.style.color='var(--blue)';}
     const betLbl=document.getElementById('nf-mwst-bet-lbl');
     if(betLbl) betLbl.textContent='Vorsteuer (€)';
     const betEl=document.getElementById('nf-mwst-bet');
@@ -188,7 +188,7 @@ function calcNfMwst(){
 
 // ── DASHBOARD SORTING ─────────────────────────────────────────────────────
 function sortDash(col){
-  // ✅ Для ВСЕХ колонок - можно менять порядок (↑↓)
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Для ВСЕХ колонок - можно менять порядок (↑↓)
   dashSortAsc = dashSortCol === col ? !dashSortAsc : false;
   dashSortCol = col;
   renderDash();
@@ -221,7 +221,7 @@ function renderDash(){
   g('d-aus',fmt(aus));g('d-aus-c',ye.filter(e=>e.typ==='Ausgabe').length+' Einträge');
   g('d-gew',fmt(gew));document.getElementById('d-gew').style.color=gew>=0?'var(--green)':'var(--red)';
   document.getElementById('d-gew').style.setProperty('color',gew>=0?'var(--green)':'var(--red)','important');
-  // ✅ Меняем класс карточки для изменения цвета верхней полоски
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Меняем класс карточки для изменения цвета верхней полоски
   const gewCard = document.getElementById('d-gew').closest('.sc');
   if(gewCard) {
     gewCard.classList.remove('g','r','b','y','p');
@@ -361,7 +361,7 @@ function renderDash(){
     });
   }
 
-  // ✅ Обновляем визуальные индикаторы сортировки
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Обновляем визуальные индикаторы сортировки
   const thHeaders = document.querySelectorAll('#d-recent-tbl th');
   thHeaders.forEach(th => {
     th.classList.remove('sort-asc', 'sort-desc');
@@ -379,11 +379,11 @@ function renderDash(){
   });
   
   // Recent 10 — показываем последние 10 ПО ВЫБРАННОМУ ГОДУ
-  let recent=[...ye]  // ✅ Используем ye (отфильтрованные по году данные)
-    .sort((a,b)=>b.datum.localeCompare(a.datum))  // ✅ Сначала сортируем по дате (новые сверху)
-    .slice(0,10);                                   // ✅ Берём первые 10 (последние по дате)
+  let recent=[...ye]  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Используем ye (отфильтрованные по году данные)
+    .sort((a,b)=>b.datum.localeCompare(a.datum))  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Сначала сортируем по дате (новые сверху)
+    .slice(0,10);                                   // <i class="fas fa-check-circle" style="color:var(--green)"></i> Берём первые 10 (последние по дате)
   
-  // ✅ Потом сортируем эти 10 по выбранной колонке
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Потом сортируем эти 10 по выбранной колонке
   if(dashSortCol !== 'datum') {
     recent.sort((a,b)=>{
       let va=a[dashSortCol], vb=b[dashSortCol];
@@ -466,7 +466,7 @@ function renderEin(){
   const entries=getFiltered().sort((a,b)=>{
     let va=a[sortCol],vb=b[sortCol];
     if(sortCol==='betrag'){va=+va;vb=+vb;}
-    // ✅ Для дат: sortAsc=false означает новые сверху (убывающий порядок)
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Для дат: sortAsc=false означает новые сверху (убывающий порядок)
     if(sortCol==='datum') {
       return sortAsc ? (va.localeCompare(vb)) : (vb.localeCompare(va)); // DESC по умолчанию
     }
@@ -499,7 +499,7 @@ function renderEin(){
   } else {
     em.style.display='none';
     
-    // ✅ ПАГИНАЦИЯ: показываем только 50 записей на странице
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> ПАГИНАЦИЯ: показываем только 50 записей на странице
     const totalPages = Math.ceil(entries.length / einPerPage);
     if(einPage > totalPages) einPage = totalPages; // Если страница потеряна
     
@@ -562,7 +562,7 @@ function renderEin(){
         </td>
       </tr>`;}).join('');
     
-    // ✅ Пагинация навигация
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
     let paginationHTML = '';
     if(totalPages > 1) {
       paginationHTML += `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap">`;
@@ -701,7 +701,7 @@ function renderRep(){
     tot.ein+=m.ein;tot.aus+=m.aus;tot.cnt+=m.count;cumul+=m.gew;
     const gc=m.gew>=0?'var(--green)':'var(--red)';
     const cc=cumul>=0?'var(--green)':'var(--red)';
-    // ✅ Мобильная версия - более компактная
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Мобильная версия - более компактная
     if(mob) {
       return `<tr style="cursor:pointer" onclick="openMonatDetail('${yr}','${m.mi}')" title="Klicken für Details">
         <td style="font-weight:${m.count?'500':'400'};color:${m.count?'var(--text)':'var(--sub)'}">
@@ -726,7 +726,7 @@ function renderRep(){
     }
   }).join('');
   const tg=tot.ein-tot.aus;
-  // ✅ Footer также адаптивен
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Footer также адаптивен
   if(mob) {
     document.getElementById('rep-tfoot').innerHTML=`<tr>
       <td style="font-weight:600">
@@ -788,7 +788,7 @@ function renderZ(){
       <div class="zk-body">
         <div class="zk-header">
           <div class="zk-icon-wrap" style="background:${iconBgCol};color:${col}">
-            ${ZICONS[z]||'<i class="fas fa-euro-sign"></i>'}
+            ${ZICONS[z]||'€'}
           </div>
           <div>
             <div class="zk-name">${z}</div>
@@ -817,7 +817,7 @@ function renderZ(){
   } else {
     zem.style.display='none';
     
-    // ✅ ПАГИНАЦИЯ: показываем только 50 записей на странице
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> ПАГИНАЦИЯ: показываем только 50 записей на странице
     const totalPages = Math.ceil(sorted.length / zPerPage);
     if(zPage > totalPages) zPage = totalPages;
     
@@ -836,7 +836,7 @@ function renderZ(){
       </tr>`;
     }).join('');
     
-    // ✅ Пагинация навигация
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
     let paginationHTML = '';
     if(totalPages > 1) {
       paginationHTML += `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap">`;

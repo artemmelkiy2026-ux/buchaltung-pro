@@ -108,7 +108,7 @@ function renderProg(){
       </div>
     </div>
     <div style="margin-bottom:4px;font-size:11px;color:var(--sub);display:flex;justify-content:space-between">
-      <span>${'📊 Vorjahresgrenze-Prognose (25.000 €)'}</span><span style="font-family:var(--mono)">${pctProg}%</span>
+      <span>${' Vorjahresgrenze-Prognose (25.000 €)'}</span><span style="font-family:var(--mono)">${pctProg}%</span>
     </div>
     <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:12px">
       <div style="height:100%;width:${pctProg}%;background:${pctProg>90?'var(--red)':pctProg>70?'var(--yellow)':'var(--green)'};border-radius:6px;transition:width .6s"></div>
@@ -119,9 +119,9 @@ function renderProg(){
     <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:10px">
       <div style="height:100%;width:${pct100}%;background:${pct100>80?'var(--red)':pct100>50?'var(--yellow)':'var(--blue)'};border-radius:6px;transition:width .6s"></div>
     </div>
-    ${pct100>=100?`<div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r);padding:10px;font-size:12px;color:var(--red)">🚨 <strong>100.000 € überschritten!</strong> Ab diesem Moment gilt Regelbesteuerung — sofortige USt-Pflicht! (§19 UStG Fallbeil-Effekt)</div>`
-    :pctProg>80?`<div style="color:var(--yellow);font-size:12px">${'⚠️ Vorjahresgrenze in Sicht — bei Überschreitung 25.000 € entfällt §19 UStG im Folgejahr!'}</div>`
-    :'<div style="color:var(--green);font-size:12px">✅ Kleinunternehmer-Status (§19 UStG) voraussichtlich sicher</div>'}
+    ${pct100>=100?`<div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r);padding:10px;font-size:12px;color:var(--red)">⚠ <strong>100.000 € überschritten!</strong> Ab diesem Moment gilt Regelbesteuerung — sofortige USt-Pflicht! (§19 UStG Fallbeil-Effekt)</div>`
+    :pctProg>80?`<div style="color:var(--yellow);font-size:12px">${'⚠ Vorjahresgrenze in Sicht — bei Überschreitung 25.000 € entfällt §19 UStG im Folgejahr!'}</div>`
+    :'<div style="color:var(--green);font-size:12px">✓ Kleinunternehmer-Status (§19 UStG) voraussichtlich sicher</div>'}
     <div style="margin-top:10px;font-size:10px;color:var(--sub);background:var(--s3);padding:8px 10px;border-radius:var(--r);border:1px solid var(--border)">
       ${'ℹ️ Neu ab 01.01.2025 (JStG 2024): Vorjahresgrenze 25.000 € (netto) + laufendes Jahr max. 100.000 € (harte Grenze, sofort wirksam bei Überschreitung).'}
     </div>`;

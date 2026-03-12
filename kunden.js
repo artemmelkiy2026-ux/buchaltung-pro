@@ -57,7 +57,7 @@ function saveWied(){
   };
   data.wiederkehrend.push(newW);
   sbSaveWied(newW);
-  renderWied();closeModal('wied-modal');toast('✅ Vorlage gespeichert!','ok');
+  renderWied();closeModal('wied-modal');toast('✓ Vorlage gespeichert!','ok');
 }
 function wBuchen(id){
   const w=data.wiederkehrend.find(x=>x.id===id); if(!w) return;
@@ -75,7 +75,7 @@ function wBuchen(id){
   w.naechste=d.toISOString().split('T')[0];
   sbSaveWied(w);
   renderAll(); renderWied();
-  toast(`✅ ${w.bezeichnung} ${'gebucht!'}`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${w.bezeichnung} ${'gebucht!'}`, 'ok');
 }
 
 function wBuchenAlle(){
@@ -88,7 +88,7 @@ function wBuchenAlle(){
   faellig.forEach(w=>wBuchen(w.id));
 
   // ИСПРАВЛЕНИЕ ТУТ: Переводим сообщение об успехе
-  toast(`✅ ${faellig.length} ${'Zahlungen gebucht!'}`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} ${'Zahlungen gebucht!'}`, 'ok');
 }
 function delWied(id){if(!confirm('Vorlage löschen?'))return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
 
@@ -355,7 +355,7 @@ function exportRepCSV(){
   const ein=sum(ye,'Einnahme'),aus=sum(ye,'Ausgabe');
   rows.push(['GESAMT',r2(ein),r2(aus),r2(ein-aus),'',ye.length]);
   dl('\uFEFF'+rows.map(r=>r.join(';')).join('\n'),`monatsbericht_${yr}.csv`);
-  toast('📤 Jahresbericht exportiert!','ok');
+  toast(' Jahresbericht exportiert!','ok');
 }
 
 // ── MONATSDETAIL ─────────────────────────────────────────────────────────
@@ -369,7 +369,7 @@ function openMonatDetail(yr, mi){
   const monName = MN[parseInt(mi)-1];
   _monLabel = `${monName} ${yr}`;
 
-  document.getElementById('mon-modal-title').textContent = `📅 ${_monLabel}`;
+  document.getElementById('mon-modal-title').textContent = `<i class="fas fa-calendar-alt"></i> ${_monLabel}`;
 
   const ein=sum(entries,'Einnahme'), aus=sum(entries,'Ausgabe'), gew=ein-aus;
   document.getElementById('mon-modal-stats').innerHTML=`
@@ -396,7 +396,7 @@ function openMonatDetail(yr, mi){
         <td style="padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--sub)">${fdm(e.datum)}</td>
         <td style="padding:8px 12px"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}</span></td>
         <td class="mob-hide" style="padding:8px 12px;font-size:12px;color:var(--sub)">${e.kategorie}</td>
-        <td class="mob-hide" style="padding:8px 12px;font-size:12px">${e.beschreibung}${e.notiz?` <span title="${e.notiz}" style="color:var(--sub);font-size:10px">📝</span>`:''}</td>
+        <td class="mob-hide" style="padding:8px 12px;font-size:12px">${e.beschreibung}${e.notiz?` <span title="${e.notiz}" style="color:var(--sub);font-size:10px">[PDF]</span>`:''}</td>
         <td class="mob-hide" style="padding:8px 12px"><span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span></td>
         <td style="padding:8px 12px;text-align:right;font-family:var(--mono);font-weight:600;color:${e.typ==='Einnahme'?'var(--green)':'var(--red)'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</td>
       </tr>`).join('');
@@ -542,6 +542,6 @@ ${rows}
   a.href=URL.createObjectURL(blob);
   a.download=`buchaltung_${_monLabel.replace(' ','_')}.xls`;
   a.click();
-  toast(`📊 Excel — ${_monLabel} exportiert`,'ok');
+  toast(`<i class="fas fa-chart-bar"></i> Excel — ${_monLabel} exportiert`,'ok');
 }
 

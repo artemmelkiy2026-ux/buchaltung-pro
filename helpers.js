@@ -50,7 +50,7 @@ function showMobDetail(entry){
   `;
   document.getElementById('mdm-btns').innerHTML=`
     <button class="btn primary" style="flex:1" onclick="closeMobDetail();editE(event,'${entry.id}')"><i class="fas fa-edit"></i> Bearbeiten</button>
-    <button class="btn" style="color:var(--red);border-color:var(--red)" onclick="closeMobDetail();delE(event,'${entry.id}')"><i class="fas fa-trash"></i> Löschen</button>
+    <button class="btn" style="color:var(--red);border-color:var(--red)" onclick="closeMobDetail();delE(event,'${entry.id}')"> Löschen</button>
   `;
   modal.classList.remove('hidden');
   document.body.style.overflow='hidden';
@@ -216,7 +216,7 @@ function saveKunde(){
     sbSaveKunde(newK);
   }
   renderKunden(); closeModal('kunde-modal');
-  toast('✅ Kunde gespeichert!','ok');
+  toast('✓ Kunde gespeichert!','ok');
 }
 
 function delKunde(id){
@@ -253,7 +253,7 @@ function selectKunde(id){
   document.getElementById('rn-tel').value=k.tel||'';
   document.getElementById('rn-nr').dataset.kundeTel=k.tel||'';
   closeModal('kunde-pick-modal');
-  toast('✅ Kunde übernommen','ok');
+  toast('✓ Kunde übernommen','ok');
 }
 // Текущий kundeId для модала "Счета клиента"
 let _kundeRechId = null;
@@ -289,9 +289,9 @@ function showKundeRechnungen(id) {
     empty.style.display = 'none';
     wrap.style.display  = '';
     const smap = {
-      offen:        '<span class="rech-status rs-offen">🟡 Offen</span>',
-      ueberfaellig: '<span class="rech-status rs-ueberfaellig">🔴 Überfällig</span>',
-      bezahlt:      '<span class="rech-status rs-bezahlt">🟢 Bezahlt</span>',
+      offen:        '<span class="rech-status rs-offen">● Offen</span>',
+      ueberfaellig: '<span class="rech-status rs-ueberfaellig">● Überfällig</span>',
+      bezahlt:      '<span class="rech-status rs-bezahlt">● Bezahlt</span>',
     };
     tbody.innerHTML = rechs.map(r => `
       <tr style="cursor:pointer" onclick="openRechFromKunde('${r.id}')">
@@ -771,18 +771,18 @@ async function generateRechnungPDF(r) {
 
 // Скачать PDF
 async function downloadRechnungPDF(r){
-  toast('📄 PDF wird erstellt...','ok');
+  toast('[PDF] PDF wird erstellt...','ok');
   try{
     const doc = await generateRechnungPDF(r);
     doc.save(`Rechnung_${r.nr.replace(/\//g,'-')}.pdf`);
-    toast('✅ PDF gespeichert!','ok');
+    toast('✓ PDF gespeichert!','ok');
   }catch(e){console.error(e);toast('Fehler beim PDF-Erstellen','err');}
 }
 
 // Email mit PDF
 async function emailMitPDF(r){
   if(!r.email){toast('Keine E-Mail-Adresse vorhanden','err');return;}
-  toast('📄 PDF wird erstellt...','ok');
+  toast('[PDF] PDF wird erstellt...','ok');
   try{
     const doc = await generateRechnungPDF(r);
     doc.save(`Rechnung_${r.nr.replace(/\//g,'-')}.pdf`);
@@ -801,7 +801,7 @@ ${f2.name||''}
 ${f2.tel?'Tel: '+f2.tel:''}
 ${f2.email||''}`);
     setTimeout(()=>window.open(`mailto:${r.email}?subject=${subject}&body=${body}`),500);
-    toast('✅ PDF gespeichert · E-Mail wird geöffnet','ok');
+    toast('✓ PDF gespeichert · E-Mail wird geöffnet','ok');
   }catch(e){console.error(e);toast('Fehler: '+e.message,'err');}
 }
 
@@ -825,8 +825,8 @@ function saveUstMode(){
   renderUst();
   _ustSaving = false;
   toast(sel.value==='§19'
-    ? `✅ ${yr}: §19 Kleinunternehmer gesetzt`
-    : `📊 ${yr}: MwSt gesetzt`, 'ok');
+    ? `<i class="fas fa-check-circle" style="color:var(--green)"></i> ${yr}: §19 Kleinunternehmer gesetzt`
+    : `<i class="fas fa-chart-bar"></i> ${yr}: MwSt gesetzt`, 'ok');
 }
 
 
@@ -906,8 +906,8 @@ function renderUst(){
 
   const hint = document.getElementById('ust-mode-hint');
   if(hint) hint.innerHTML = isRegel
-    ? '<span style="color:var(--blue);font-size:12px">📊 USt 19%/7% wird auf Einnahmen erhoben. Vorsteuer aus Ausgaben wird gegengerechnet. Monatliche oder quartalsweise Voranmeldung beim Finanzamt erforderlich.</span>'
-    : '<span style="color:var(--green);font-size:12px">✅ Keine Umsatzsteuer auf Rechnungen. Keine Voranmeldung nötig. Hinweis auf §19 UStG in jede Rechnung aufnehmen.</span>';
+    ? '<span style="color:var(--blue);font-size:12px"> USt 19%/7% wird auf Einnahmen erhoben. Vorsteuer aus Ausgaben wird gegengerechnet. Monatliche oder quartalsweise Voranmeldung beim Finanzamt erforderlich.</span>'
+    : '<span style="color:var(--green);font-size:12px">✓ Keine Umsatzsteuer auf Rechnungen. Keine Voranmeldung nötig. Hinweis auf §19 UStG in jede Rechnung aufnehmen.</span>';
 
   // ── Показываем нужный контент ─────────────────────────────────────────────
   const kleinInfo  = document.getElementById('ust-klein-info');
@@ -950,7 +950,7 @@ function renderUst(){
             <div style="height:8px;border-radius:4px;width:${pct}%;background:${over?'var(--red)':'var(--green)'};transition:width .4s"></div>
           </div>
           <div style="font-size:11px;margin-top:4px;color:${over?'var(--red)':'var(--sub)'}">
-            ${pct}% genutzt ${over?'⚠️ Grenze überschritten!':''}
+            ${pct}% genutzt ${over?'⚠ Grenze überschritten!':''}
           </div>
         </div>`;
     }
@@ -1120,7 +1120,7 @@ function renderUst(){
         return sep+`<tr>
           <td style="font-size:12px;color:var(--sub);font-family:var(--mono);white-space:nowrap">${shortDat}</td>
           <td class="mob-hide" style="text-align:center">
-            <span class="badge ${isUst?'b-aus':'b-ein'}" style="font-size:10px">${isUst?'🟠 USt':'🔵 Vorst.'}</span>
+            <span class="badge ${isUst?'b-aus':'b-ein'}" style="font-size:10px">${isUst?'● USt':'● Vorst.'}</span>
           </td>
           <td style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--sub)">${e.netto>0?fmt(e.netto):'—'}</td>
           <td style="text-align:right;font-size:11px;color:var(--sub)">${e.rate}%</td>
@@ -1166,7 +1166,7 @@ function addUstEintrag(){
   renderUst();
   document.getElementById('ust-new-bet').value='';
   document.getElementById('ust-new-dsc').value='';
-  toast('✅ USt-Eintrag gespeichert','ok');
+  toast('✓ USt-Eintrag gespeichert','ok');
 }
 
 function delUstEintrag(id){

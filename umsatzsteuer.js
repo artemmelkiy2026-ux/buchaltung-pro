@@ -277,7 +277,7 @@ function searchHebesatz() {
   for (let stadt in HEBESAETZE_DB) {
     if (stadt.toLowerCase() === stadtInput.toLowerCase()) {
       document.getElementById('st-hebesatz').value = HEBESAETZE_DB[stadt];
-      toast('✅ ' + stadt + ': ' + HEBESAETZE_DB[stadt] + '%', 'ok');
+      toast('✓ ' + stadt + ': ' + HEBESAETZE_DB[stadt] + '%', 'ok');
       return;
     }
   }
@@ -287,12 +287,12 @@ function searchHebesatz() {
     if (stadt.toLowerCase().includes(stadtInput.toLowerCase())) {
       document.getElementById('st-stadt').value = stadt;
       document.getElementById('st-hebesatz').value = HEBESAETZE_DB[stadt];
-      toast('✅ Gefunden: ' + stadt + ' (' + HEBESAETZE_DB[stadt] + '%)', 'ok');
+      toast('✓ Gefunden: ' + stadt + ' (' + HEBESAETZE_DB[stadt] + '%)', 'ok');
       return;
     }
   }
   
-  toast('❌ Stadt nicht in Datenbank. Hebesatz manuell eingeben.', 'error');
+  toast('✗ Stadt nicht in Datenbank. Hebesatz manuell eingeben.', 'error');
 }
 
 function calcGewerbesteuer(gewinn) {
@@ -548,15 +548,15 @@ function stBerechnen() {
   const ustPercent = ein > 0 ? ((ustEingezogen / ein) * 100) : 0;
   if (!isKleinunternehmer && ein < 25000 && ustSaldo > 100) {
     document.getElementById('st-klein-recommendation').textContent = 
-      `✅ EMPFOHLEN: Sie zahlen ${fmt(ustSaldo)} USt. Als Kleinunternehmer sparen Sie diese Summe!`;
+      `<i class="fas fa-check-circle" style="color:var(--green)"></i> EMPFOHLEN: Sie zahlen ${fmt(ustSaldo)} USt. Als Kleinunternehmer sparen Sie diese Summe!`;
     document.getElementById('st-klein-recommendation').style.color = 'var(--green)';
   } else if (!isKleinunternehmer && ein >= 25000) {
     document.getElementById('st-klein-recommendation').textContent = 
-      '⚠️ Umsatz > 25.000€: Sie sind kein Kleinunternehmer mehr (ab nächstem Jahr).';
+      '⚠ Umsatz > 25.000€: Sie sind kein Kleinunternehmer mehr (ab nächstem Jahr).';
     document.getElementById('st-klein-recommendation').style.color = 'var(--yellow)';
   } else if (isKleinunternehmer) {
     document.getElementById('st-klein-recommendation').textContent = 
-      `✅ Kleinunternehmer aktiv — Sie zahlen KEINE Umsatzsteuer!`;
+      `<i class="fas fa-check-circle" style="color:var(--green)"></i> Kleinunternehmer aktiv — Sie zahlen KEINE Umsatzsteuer!`;
     document.getElementById('st-klein-recommendation').style.color = 'var(--cyan)';
   }
 
@@ -591,7 +591,7 @@ function stBerechnen() {
 
   // Left breakdown: Einkommensberechnung
   document.getElementById('st-bl').innerHTML = `
-    <h3 style="margin-bottom:12px">📐 Einkommensberechnung</h3>
+    <h3 style="margin-bottom:12px"> Einkommensberechnung</h3>
     ${stRow('Betriebseinnahmen', '+'+fmt(ein))}
     ${stRow('Betriebsausgaben', '−'+fmt(aus))}
     ${stRow('Gewinn (EÜR)', fmt(gewinn), true, 'var(--green)')}
@@ -621,7 +621,7 @@ function stBerechnen() {
 
   // Right breakdown: Steuerberechnung
   document.getElementById('st-br').innerHTML = `
-    <h3 style="margin-bottom:12px">🧮 Steuerberechnung</h3>
+    <h3 style="margin-bottom:12px"> Steuerberechnung</h3>
     ${stRow('Tarif', isSplitting?'Splittingtarif §32a (2)':'Grundtarif §32a (1)')}
     ${stRow('Einkommensteuer', fmt(estFinal), true, 'var(--red)')}
     ${stRow('Solidaritätszuschlag (5,5%)', fmt(soli))}
@@ -637,7 +637,7 @@ function stBerechnen() {
 
   // Freibeträge block
   document.getElementById('st-fb').innerHTML = `
-    <h3 style="margin-bottom:12px">📋 Angewandte Freibeträge & Hinweise</h3>
+    <h3 style="margin-bottom:12px"> Angewandte Freibeträge & Hinweise</h3>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px">
       <div style="background:var(--s2);border-radius:var(--r);padding:10px">
         <div style="color:var(--sub);margin-bottom:4px">Grundfreibetrag ${jahr}</div>
@@ -685,7 +685,7 @@ function stBerechnen() {
     
     <!-- ═══ KRITISCH: NETTO-GEWINN ═══ -->
     <div style="background:var(--gdim);border:3px solid var(--green);border-radius:var(--r2);padding:20px;margin:20px 0">
-      <h3 style="color:var(--green);margin-bottom:16px;font-size:18px">💰 KRITISCH: Netto-Gewinn nach ALLEM</h3>
+      <h3 style="color:var(--green);margin-bottom:16px;font-size:18px">€ KRITISCH: Netto-Gewinn nach ALLEM</h3>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
         <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
           <div style="font-size:10px;color:var(--sub);margin-bottom:4px">BRUTTO Gewinn</div>
@@ -721,7 +721,7 @@ function stBerechnen() {
         </div>
       </div>
       <div style="background:var(--gdim);border:2px solid var(--green);border-radius:var(--r2);padding:16px;text-align:center">
-        <div style="font-size:12px;color:var(--sub);margin-bottom:8px">🎯 <strong>NETTO ZUM LEBEN — Ваш реальный доход:</strong></div>
+        <div style="font-size:12px;color:var(--sub);margin-bottom:8px">◎ <strong>NETTO ZUM LEBEN — Ваш реальный доход:</strong></div>
         <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--green)">${fmt(Math.max(0, netoGewinnKriterion))}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:8px">Это деньги для Их жизни, семьи, рентабельности, инвестиций</div>
       </div>
@@ -729,7 +729,7 @@ function stBerechnen() {
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
       <div style="background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:14px">
-        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${'📊 Umsatzsteuer (USt) Saldo'}</h3>
+        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${' Umsatzsteuer (USt) Saldo'}</h3>
         <div style="background:var(--s2);padding:10px;border-radius:var(--r);margin-bottom:10px">
           <div style="font-size:10px;color:var(--sub);margin-bottom:3px">USt eingezogen (19% × Einnahmen)</div>
           <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green)">${fmt(ustEingezogen)}</div>
@@ -745,7 +745,7 @@ function stBerechnen() {
       </div>
 
       <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:14px">
-        <h3 style="color:var(--yellow);margin-bottom:12px;font-size:14px">🏦 Steuerrücklage (Empfehlung)</h3>
+        <h3 style="color:var(--yellow);margin-bottom:12px;font-size:14px"> Steuerrücklage (Empfehlung)</h3>
         <div style="background:var(--s2);padding:10px;border-radius:var(--r);margin-bottom:10px">
           <div style="font-size:10px;color:var(--sub);margin-bottom:3px">Gesamtsteuer</div>
           <div style="font-family:var(--mono);font-size:13px;font-weight:600">${fmt(gesamtSteuer)}</div>
@@ -753,14 +753,14 @@ function stBerechnen() {
         <div style="background:var(--s3);padding:10px;border-radius:var(--r);border:1px solid var(--yellow)">
           <div style="font-size:10px;color:var(--sub);margin-bottom:3px">30% Reserve</div>
           <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--yellow)">${fmt(steuerRuecklage)}</div>
-          <div style="font-size:10px;color:var(--sub);margin-top:6px">⚠️ На отдельный счёт для налогов!</div>
+          <div style="font-size:10px;color:var(--sub);margin-top:6px">⚠ На отдельный счёт для налогов!</div>
         </div>
       </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
       <div style="background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:14px">
-        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${'📊 Umsatzsteuer (USt) Saldo'}</h3>
+        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${' Umsatzsteuer (USt) Saldo'}</h3>
         ${stRow('USt eingezogen (19%)', fmt(ustEingezogen), false, 'var(--green)')}
         ${stRow('USt bezahlt (19%)', fmt(ustBezahlt), false, 'var(--red)')}
         <div style="border-top:1px solid var(--green);padding-top:8px;margin-top:8px">
@@ -771,7 +771,7 @@ function stBerechnen() {
         </div>
       </div>
       <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:14px">
-        <h3 style="color:var(--yellow);margin-bottom:12px;font-size:14px">🏦 Steuerrücklage (Empfehlung)</h3>
+        <h3 style="color:var(--yellow);margin-bottom:12px;font-size:14px"> Steuerrücklage (Empfehlung)</h3>
         <div style="background:var(--s2);padding:10px;border-radius:var(--r);margin-bottom:10px">
           <div style="font-size:10px;color:var(--sub);margin-bottom:3px">Gesamtsteuer</div>
           <div style="font-family:var(--mono);font-size:14px;font-weight:600">${fmt(gesamtSteuer)}</div>
@@ -779,7 +779,7 @@ function stBerechnen() {
         <div style="background:var(--s3);padding:10px;border-radius:var(--r)">
           <div style="font-size:10px;color:var(--sub);margin-bottom:3px">30% Reserve empfohlen</div>
           <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--yellow)">${fmt(steuerRuecklage)}</div>
-          <div style="font-size:10px;color:var(--sub);margin-top:6px">⚠️ Halten Sie diesen Betrag auf separatem Konto für Steuerzahlungen!</div>
+          <div style="font-size:10px;color:var(--sub);margin-top:6px">⚠ Halten Sie diesen Betrag auf separatem Konto für Steuerzahlungen!</div>
         </div>
       </div>
     </div>`;
@@ -792,7 +792,7 @@ function stBerechnen() {
   // Финальный блок предупреждений и советов
   const hinweiseHTML = `
     <div style="background:var(--ydim);border:2px solid var(--yellow);border-radius:var(--r2);padding:16px;margin-top:20px">
-      <h3 style="color:var(--yellow);margin-bottom:12px">⚠️ WICHTIGE HINWEISE & MASSNAHMEN FÜR 2025/2026</h3>
+      <h3 style="color:var(--yellow);margin-bottom:12px">⚠ WICHTIGE HINWEISE & MASSNAHMEN FÜR 2025/2026</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div style="background:var(--s2);padding:12px;border-radius:var(--r)">
           <div style="font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600">1️⃣ GKV NACHZAHLUNG</div>
@@ -820,7 +820,7 @@ function stBerechnen() {
         </div>
       </div>
       <div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r);padding:10px;margin-top:12px;font-size:11px;color:var(--muted)">
-        <strong style="color:var(--red)">🔴 KRITISCH:</strong> Diese Zahl (${fmt(nettoGewinnFinal)}/Jahr oder ${fmt(monatlichNettoLeben)}/Monat) ist Ihr reales verfügbares Einkommen NACH allen Steuern. Nicht verwechseln mit Umsatz oder Brutto-Gewinn!
+        <strong style="color:var(--red)">● KRITISCH:</strong> Diese Zahl (${fmt(nettoGewinnFinal)}/Jahr oder ${fmt(monatlichNettoLeben)}/Monat) ist Ihr reales verfügbares Einkommen NACH allen Steuern. Nicht verwechseln mit Umsatz oder Brutto-Gewinn!
       </div>
     </div>`;
   
@@ -833,10 +833,10 @@ function stBerechnen() {
   document.getElementById('st-monats-reserve').textContent = fmt(monatlichReserve);
   document.getElementById('st-jahres-reserve').textContent = fmt(gesamtSteuer);
 
-  toast('✅ Berechnung abgeschlossen!','ok');
+  toast('✓ Berechnung abgeschlossen!','ok');
   } catch(e) {
     console.error('Fehler in stBerechnen:', e);
-    toast('❌ Fehler: '+e.message,'error');
+    toast('✗ Fehler: '+e.message,'error');
   }
 }
 
@@ -911,7 +911,7 @@ function runSzenarien() {
       <td style="padding:8px;text-align:right;font-family:var(--mono);font-size:11px;color:${soli>0?'var(--yellow)':'var(--sub)'}">${soli>0?fmt(soli):'—'}</td>
       <td style="padding:8px;text-align:right;font-family:var(--mono);font-size:12px;font-weight:700">${fmt(gesamt)}</td>
       <td style="padding:8px;font-size:11px;color:var(--muted)">${sz.desc}${kindNote}</td>
-      <td style="padding:8px;text-align:center;font-size:14px">${statusOk?'✅':'⚠️'}</td>
+      <td style="padding:8px;text-align:center;font-size:14px">${statusOk?'✓':'⚠'}</td>
     </tr>`;
   });
 
@@ -927,6 +927,6 @@ function runSzenarien() {
   </div>`;
 
   document.getElementById('sz-results').innerHTML = html;
-  toast('✅ 16 Steuer-Szenarien berechnet','ok');
+  toast('✓ 16 Steuer-Szenarien berechnet','ok');
 }
 

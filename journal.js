@@ -56,7 +56,7 @@ function renderJournal() {
 
       if (!e.is_storno && !e.korrektur_von && involved.has(e.id)) {
         // Оригинал который был сторнирован
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">🟠 Storniert</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
         rowStyle = 'opacity:0.6;';
         rowBg = 'background:rgba(224,140,26,.04);';
       } else if (e.is_storno) {
