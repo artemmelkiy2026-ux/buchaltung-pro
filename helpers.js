@@ -604,9 +604,9 @@ function _buildRechnungHTML(r) {
 <div class="page">
 
   <div class="header">
-    \${f.logo
-      ? \`<img class="logo-img" src="\${f.logo}" alt="Logo">\`
-      : \`<div class="logo-placeholder">\${initials}</div>\`}
+    ${f.logo
+      ? `<img class="logo-img" src="${f.logo}" alt="Logo">`
+      : `<div class="logo-placeholder">${initials}</div>`}
     <div class="sender-info-top">
       <strong>${firmaName}</strong><br>
       ${firmaStr}${firmaStr && firmaPlzOrt ? ', ' : ''}${firmaPlzOrt}<br>
