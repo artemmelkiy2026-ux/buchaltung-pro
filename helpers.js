@@ -354,6 +354,7 @@ function validatePLZ(input){
 
 function _buildRechnungHTML(r) {
   const f = typeof getFirmaData==='function' ? getFirmaData() : {};
+  const firmaLogo   = f.logo || null;
   const firmaName   = f.name        || 'Meine Firma';
   const firmaStr    = f.strasse     || '';
   const firmaPlzOrt = [f.plz, f.ort].filter(Boolean).join(' ');
@@ -449,6 +450,15 @@ function _buildRechnungHTML(r) {
     color: #fff;
     font-size: 22px;
     font-weight: 700;
+  }
+
+  .logo-img {
+    max-width: 160px;
+    max-height: 64px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
   }
 
   .sender-info-top {
@@ -594,7 +604,9 @@ function _buildRechnungHTML(r) {
 <div class="page">
 
   <div class="header">
-    <div class="logo-placeholder">${initials}</div>
+    \${f.logo
+      ? \`<img class="logo-img" src="\${f.logo}" alt="Logo">\`
+      : \`<div class="logo-placeholder">\${initials}</div>\`}
     <div class="sender-info-top">
       <strong>${firmaName}</strong><br>
       ${firmaStr}${firmaStr && firmaPlzOrt ? ', ' : ''}${firmaPlzOrt}<br>

@@ -89,7 +89,7 @@ async function sbLoadAll() {
 async function sbLoadUserData() {
   if (!currentUser) return { pin_hash: null, deleted_at: null, disclaimer_accepted: false };
   const { data } = await sb.from('user_data')
-    .select('pin_hash, deleted_at, disclaimer_accepted, client_id')
+    .select('pin_hash, deleted_at, disclaimer_accepted, client_id, logo')
     .eq('user_id', currentUser.id)
     .maybeSingle();
   return data || { pin_hash: null, deleted_at: null, disclaimer_accepted: false };
@@ -531,6 +531,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       window._dataReady = true;
 
       const remotePin = userData.pin_hash || null;
+      // Синхронизируем логотип из Supabase в localStorage
+      if (userData.logo) {
+        try {
+          const bp = JSON.parse(localStorage.getItem('bp_firma') || '{}');
+          if (!bp.logo) { bp.logo = userData.logo; localStorage.setItem('bp_firma', JSON.stringify(bp)); }
+        } catch(e) {}
+      }
 
       if (remotePin) {
         localStorage.setItem('bp_pin', remotePin);

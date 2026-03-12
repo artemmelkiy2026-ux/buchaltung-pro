@@ -985,6 +985,35 @@
       <button class="modal-close" onclick="closeModal('firma-modal')">✕</button>
     </div>
     <p style="font-size:12px;color:var(--sub);margin-bottom:16px">Diese Daten erscheinen auf allen Rechnungen (PDF, Druck, E-Mail).</p>
+
+    <!-- Logo Upload -->
+    <div style="margin-bottom:18px;padding:14px 16px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">🖼️ Firmenlogo</span>
+        <span style="font-size:11px;color:var(--sub)">Max. 5 MB · wird auf 80 KB komprimiert</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <!-- Превью -->
+        <div style="width:90px;height:60px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--s1);overflow:hidden;flex-shrink:0">
+          <img id="firma-logo-preview" src="" alt="Logo" style="display:none;max-width:86px;max-height:56px;object-fit:contain">
+          <span id="firma-logo-placeholder-icon" style="font-size:22px;color:var(--sub)">🏢</span>
+        </div>
+        <!-- Кнопки -->
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:var(--blue);color:#fff;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500">
+            <i class="fas fa-upload"></i> Logo hochladen
+            <input type="file" id="firma-logo-input" accept="image/*" style="display:none" onchange="onLogoChange(this)">
+          </label>
+          <button id="firma-logo-delete" onclick="deleteFirmaLogo()" style="display:none;align-items:center;gap:6px;padding:7px 14px;background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;color:var(--sub)">
+            <i class="fas fa-trash"></i> Entfernen
+          </button>
+        </div>
+        <div style="font-size:11px;color:var(--sub);line-height:1.5">
+          Erscheint oben links<br>auf der Rechnung.<br>PNG, JPG, SVG
+        </div>
+      </div>
+    </div>
+
     <!-- Firmenname -->
     <div class="fg"><label>Firmenname *</label><input type="text" id="firma-name" placeholder="z.B. Autowäsche Berg GmbH"></div>
     <!-- Adresse -->

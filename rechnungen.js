@@ -615,6 +615,19 @@ function openFirmaModal() {
   });
   const footer = document.getElementById('firma-footer');
   if (footer) footer.value = p.rechnung_footer || '';
+  // Логотип — показываем превью если есть
+  const prev  = document.getElementById('firma-logo-preview');
+  const del   = document.getElementById('firma-logo-delete');
+  const phIco = document.getElementById('firma-logo-placeholder-icon');
+  if (p.logo) {
+    if (prev)  { prev.src = p.logo; prev.style.display = 'block'; }
+    if (phIco) { phIco.style.display = 'none'; }
+    if (del)   { del.style.display = 'inline-flex'; }
+  } else {
+    if (prev)  { prev.style.display = 'none'; }
+    if (phIco) { phIco.style.display = 'block'; }
+    if (del)   { del.style.display = 'none'; }
+  }
   // E-Mail Vorlage
   const tmpl = getEmailTemplate();
   const subEl = document.getElementById('email-tmpl-subject');
@@ -624,9 +637,74 @@ function openFirmaModal() {
   openModal('firma-modal');
 }
 
-function saveFirmaData() {
+// Сжимаем изображение до maxW×maxH и maxKB — возвращает base64 или null
+function compressLogo(file, maxW=300, maxH=150, maxKB=80) {
+  return new Promise((resolve) => {
+    if (!file || !file.type.startsWith('image/')) return resolve(null);
+    if (file.size > 5 * 1024 * 1024) { toast('❌ Bild zu groß (max. 5 MB)', 'err'); return resolve(null); }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        // Масштабируем сохраняя пропорции
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        // Сжимаем качество пока размер не вписывается
+        let q = 0.85, b64;
+        do { b64 = canvas.toDataURL('image/jpeg', q); q -= 0.05; }
+        while (b64.length > maxKB * 1024 * 1.37 && q > 0.3);
+        resolve(b64);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Обработка выбора файла логотипа
+async function onLogoChange(input) {
+  const file = input.files[0];
+  if (!file) return;
+  toast('⏳ Logo wird verarbeitet...', 'ok');
+  const b64 = await compressLogo(file);
+  if (!b64) return;
+  const prev = document.getElementById('firma-logo-preview');
+  const del  = document.getElementById('firma-logo-delete');
+  if (prev) { prev.src = b64; prev.style.display = 'block'; }
+  if (del)  { del.style.display = 'inline-flex'; }
+  // Сохраняем во временный атрибут — применится при Speichern
+  input.dataset.b64 = b64;
+  const kb = Math.round(b64.length * 0.75 / 1024);
+  toast(`✅ Logo geladen (${kb} KB)`, 'ok');
+}
+
+// Удалить логотип
+function deleteFirmaLogo() {
+  const prev  = document.getElementById('firma-logo-preview');
+  const del   = document.getElementById('firma-logo-delete');
+  const phIco = document.getElementById('firma-logo-placeholder-icon');
+  const input = document.getElementById('firma-logo-input');
+  if (prev)  { prev.src = ''; prev.style.display = 'none'; }
+  if (del)   { del.style.display = 'none'; }
+  if (phIco) { phIco.style.display = 'block'; }
+  if (input) { input.value = ''; delete input.dataset.b64; }
+  const p = JSON.parse(localStorage.getItem('bp_firma') || '{}');
+  delete p.logo;
+  localStorage.setItem('bp_firma', JSON.stringify(p));
+  // Удаляем из Supabase
+  if (currentUser) {
+    sb.from('user_data').upsert({ user_id: currentUser.id, logo: null }, { onConflict: 'user_id' }).catch(()=>{});
+  }
+  toast('🗑️ Logo entfernt', 'ok');
+}
+
+async function saveFirmaData() {
   const fields = ['name','strasse','plz','ort','tel','email','iban','bic','steuernr','ustid'];
-  const p = {};
+  const p = JSON.parse(localStorage.getItem('bp_firma') || '{}');
   fields.forEach(k => {
     const el = document.getElementById('firma-' + k);
     if (el) p[k] = el.value.trim();
@@ -634,7 +712,21 @@ function saveFirmaData() {
   const footer = document.getElementById('firma-footer');
   if (footer) p.rechnung_footer = footer.value.trim();
   p.kleinuntern = true;
+  // Логотип — берём из dataset если был загружен новый
+  const logoInput = document.getElementById('firma-logo-input');
+  if (logoInput && logoInput.dataset.b64) {
+    p.logo = logoInput.dataset.b64;
+  }
   localStorage.setItem('bp_firma', JSON.stringify(p));
+  // Сохраняем логотип в Supabase user_data (синхронизация между устройствами)
+  if (currentUser) {
+    try {
+      await sb.from('user_data').upsert({
+        user_id: currentUser.id,
+        logo: p.logo || null,
+      }, { onConflict: 'user_id' });
+    } catch(e) { console.warn('[logo sync]', e); }
+  }
   // Сохраняем E-Mail шаблон
   const subEl = document.getElementById('email-tmpl-subject');
   const bodEl = document.getElementById('email-tmpl-body');
@@ -683,22 +775,23 @@ function resetEmailTemplate() {
 // ══════════════════════════════════════════════════════════════════════════
 
 function getFirmaData() {
-  // Данные фирмы — сначала из localStorage (profile), затем дефолт
   const p = JSON.parse(localStorage.getItem('bp_firma') || '{}');
   return {
-    name:        p.name        || 'Autowäsche Berg',
-    strasse:     p.strasse     || 'Musterstraße 1',
-    plz:         p.plz         || '67547',
-    ort:         p.ort         || 'Worms',
-    land:        p.land        || 'DE',
-    email:       p.email       || 'info@autowaesche-berg.de',
-    tel:         p.tel         || '+49 6241 000000',
-    iban:        p.iban        || 'DE12345678901234567890',
-    bic:         p.bic         || 'SSKMDEMMXXX',
-    steuernr:    p.steuernr    || '',
-    ustid:       p.ustid       || '',
-    kleinuntern:       p.kleinuntern !== false,
-    rechnung_footer:  p.rechnung_footer || '',
+    name:            p.name            || '',
+    strasse:         p.strasse         || '',
+    plz:             p.plz             || '',
+    ort:             p.ort             || '',
+    land:            p.land            || 'DE',
+    email:           p.email           || '',
+    tel:             p.tel             || '',
+    iban:            p.iban            || '',
+    bic:             p.bic             || '',
+    steuernr:        p.steuernr        || '',
+    ustid:           p.ustid           || '',
+    inhaber:         p.inhaber         || '',
+    kleinuntern:     p.kleinuntern !== false,
+    rechnung_footer: p.rechnung_footer || '',
+    logo:            p.logo            || null,
   };
 }
 
