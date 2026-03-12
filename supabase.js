@@ -301,7 +301,7 @@ function offerPinSetup() {
   b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a4578;color:#fff;border-radius:16px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;font-family:sans-serif;max-width:400px;width:calc(100% - 48px);flex-direction:column';
   b.innerHTML = `
     <div style="display:flex;align-items:center;gap:16px;width:100%">
-      <span style="font-size:28px">🔒</span>
+      <span style="font-size:28px"><i class="fa-solid fa-lock"></i></span>
       <div style="flex:1">
         <div style="font-weight:600;font-size:14px;margin-bottom:4px">PIN-Code einrichten?</div>
         <div style="font-size:12px;opacity:.8">Schneller Zugang mit 4-stelligem PIN</div>
