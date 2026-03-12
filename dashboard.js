@@ -144,7 +144,7 @@ function addEintrag(){
   clearForm();
   calcNfMwst(); // reset summary
   const mwLabel = !isKleinunternehmer(datum.substring(0,4))&&mwBet>0 ? ` (Netto: ${netBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €, MwSt: ${mwBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €)` : '';
-  toast(`${t(curTyp)} ${'gespeichert'}: ${fmt(betrag)}${mwLabel}`, 'ok');
+  toast(`${curTyp} gespeichert: ${fmt(betrag)}${mwLabel}`, 'ok');
 }
 
 function calcNfVorsteuer(){
