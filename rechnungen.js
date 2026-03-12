@@ -423,7 +423,7 @@ function buildRechnungHTML(r){
              <td style="padding:4px 12px;text-align:right;font-size:12px;color:#666">USt ${rate}%: +${fmt(g.mwst)}</td></tr>`;
   }).join('');
   return `<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>Rechnung ${r.nr}</title>
+  <title style="font-size: 18px">Rechnung ${r.nr}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:40px;max-width:800px;margin:0 auto}
