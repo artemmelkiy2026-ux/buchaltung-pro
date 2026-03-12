@@ -720,9 +720,10 @@ async function saveFirmaData() {
   // Сохраняем в localStorage (быстрый доступ)
   localStorage.setItem('bp_firma', JSON.stringify(p));
   // Сохраняем ВСЁ в Supabase user_data (основное хранилище)
+  console.log('[firma] currentUser:', currentUser ? currentUser.id : 'NULL — не залогинен!');
   if (currentUser) {
     try {
-      await sb.from('user_data').upsert({
+      const payload = {
         user_id:       currentUser.id,
         firma_name:    p.name            || null,
         firma_strasse: p.strasse         || null,
@@ -736,8 +737,18 @@ async function saveFirmaData() {
         firma_ustid:   p.ustid           || null,
         firma_footer:  p.rechnung_footer || null,
         logo:          p.logo            || null,
-      }, { onConflict: 'user_id' });
-    } catch(e) { console.warn('[firma save]', e); toast('⚠️ Supabase-Fehler beim Speichern', 'err'); return; }
+      };
+      console.log('[firma] upsert payload:', payload);
+      const { error } = await sb.from('user_data').upsert(payload, { onConflict: 'user_id' });
+      if (error) {
+        console.error('[firma] Supabase error:', error);
+        toast('⚠️ Fehler: ' + error.message, 'err');
+        return;
+      }
+      console.log('[firma] ✅ Supabase upsert erfolgreich');
+    } catch(e) { console.error('[firma save exception]', e); toast('⚠️ Supabase-Fehler beim Speichern', 'err'); return; }
+  } else {
+    console.warn('[firma] currentUser ist null — Supabase-Speicherung übersprungen');
   }
   // Сохраняем E-Mail шаблон
   const subEl = document.getElementById('email-tmpl-subject');
