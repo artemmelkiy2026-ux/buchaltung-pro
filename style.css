@@ -157,7 +157,11 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .sc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;position:relative;overflow:hidden;transition:all .2s;cursor:default}
 .sc:hover{border-color:var(--border2);transform:translateY(-1px)}
 .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-
+.sc.g::before{background:#143263}
+.sc.r::before{background:#143263}
+.sc.b::before{background:#143263}
+.sc.y::before{background:#143263}
+.sc.p::before{background:#143263}
 
 .sc-lbl{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .sc-val{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1}
@@ -284,7 +288,7 @@ tr:hover .del-btn{opacity:1}
 /* ── MODAL ── */
 .modal-bg{position:fixed;inset:0;background:#00000088;z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-bg.open{opacity:1;pointer-events:all; padding:10px;}
-.modal{background:var(--s1);border:1px solid var(--border2);border-radius:var(--r2);padding:24px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:translateY(12px);transition:transform .2s}
+.modal{position:relative;background:var(--s1);border:1px solid var(--border2);border-radius:var(--r2);padding:24px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:translateY(12px);transition:transform .25s ease}
 .modal-bg.open .modal{transform:translateY(0)}
 .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .modal-hdr h2{font-size:16px;font-weight:700}
@@ -572,12 +576,39 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   /* ── Donut ── */
   .donut-wrap { flex-direction: column; gap: 10px; }
 
-  /* ── Modal ── */
-  .modal { width: 95vw; padding: 16px; }
+  /* ── Modal — bottom sheet на мобильных ── */
+  .modal-bg {
+    align-items: flex-end;
+    padding: 0 !important;
+  }
+  .modal {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    max-height: 90dvh;
+    max-height: 90vh; /* fallback для старых Safari */
+    padding: 20px 16px 24px;
+    border-radius: 18px 18px 0 0 !important;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    transform: translateY(40px);
+    /* Ручка-индикатор сверху */
+    padding-top: 28px;
+  }
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 4px;
+    background: var(--border2);
+    border-radius: 2px;
+  }
+  .modal-bg.open .modal { transform: translateY(0); }
   .modal-hdr h2 { font-size: 14px; }
 
   /* ── Rechnung Modal mobile ── */
-  #rech-modal .modal { max-width: 100vw !important; width: 95vw !important; }
+  #rech-modal .modal { max-width: 100vw !important; width: 100vw !important; }
   #rn-pos-header { display: none !important; }
   /* На очень маленьких экранах fgrow c2 в Rechnung тоже в 1 колонку */
   #rech-modal .fgrow.c2 { grid-template-columns: 1fr 1fr; }
