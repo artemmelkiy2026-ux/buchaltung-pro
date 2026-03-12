@@ -60,7 +60,7 @@ function renderProg(){
   // Vorjahresvergleich
   const hasVorjahr=pe.length>0;
   if(!hasVorjahr){
-    document.getElementById('prog-vergleich').innerHTML='<p style="color:var(--sub);font-size:12px">'+t('Keine Vorjahresdaten für ')+prevYr+t(' vorhanden.')+'</p>';
+    document.getElementById('prog-vergleich').innerHTML='<p style="color:var(--sub);font-size:12px">'+'Keine Vorjahresdaten für '+prevYr+' vorhanden.'+'</p>';
   } else {
     document.getElementById('prog-vergleich').innerHTML=`
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
@@ -69,8 +69,8 @@ function renderProg(){
           return`<div style="background:var(--s2);border-radius:var(--r);padding:12px">
             <div style="font-size:10px;color:var(--sub);margin-bottom:5px">${lbl}</div>
             <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:${col}">${fmt(cur)}</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:3px">${t('Vj:')} ${fmt(prev)}</div>
-            <div style="font-size:11px;font-weight:600;margin-top:4px;color:${d>=0?'var(--green)':'var(--red)'}">${d>=0?'+':''}${d}% ${t('ggü.')} ${prevYr}</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:3px">${'Vj:'} ${fmt(prev)}</div>
+            <div style="font-size:11px;font-weight:600;margin-top:4px;color:${d>=0?'var(--green)':'var(--red)'}">${d>=0?'+':''}${d}% ${'ggü.'} ${prevYr}</div>
           </div>`;
         }).join('')}
       </div>
@@ -79,7 +79,7 @@ function renderProg(){
         return`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px">
           <span style="color:var(--sub);width:28px;font-family:var(--mono)">${m}</span>
           <span style="font-family:var(--mono);width:80px">${einM[i]>0?fmt(einM[i]):'—'}</span>
-          <span style="color:var(--sub);width:80px;font-size:10px">${t('Vj:')} ${einP[i]>0?fmt(einP[i]):'—'}</span>
+          <span style="color:var(--sub);width:80px;font-size:10px">${'Vj:'} ${einP[i]>0?fmt(einP[i]):'—'}</span>
           <span style="font-weight:600;color:${dE>=0?'var(--green)':'var(--red)'}">${einM[i]||einP[i]?(dE>=0?'+':'')+dE+'%':'—'}</span>
         </div>`;
       }).join('')}`;
@@ -108,22 +108,22 @@ function renderProg(){
       </div>
     </div>
     <div style="margin-bottom:4px;font-size:11px;color:var(--sub);display:flex;justify-content:space-between">
-      <span>${t('📊 Vorjahresgrenze-Prognose (25.000 €)')}</span><span style="font-family:var(--mono)">${pctProg}%</span>
+      <span>${'📊 Vorjahresgrenze-Prognose (25.000 €)'}</span><span style="font-family:var(--mono)">${pctProg}%</span>
     </div>
     <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:12px">
       <div style="height:100%;width:${pctProg}%;background:${pctProg>90?'var(--red)':pctProg>70?'var(--yellow)':'var(--green)'};border-radius:6px;transition:width .6s"></div>
     </div>
     <div style="margin-bottom:4px;font-size:11px;color:var(--sub);display:flex;justify-content:space-between">
-      <span>${t('⚡ Laufendes Jahr — HARD LIMIT (100.000 €) Fallbeil-Effekt!')}</span><span style="font-family:var(--mono)">${pct100}%</span>
+      <span>${'⚡ Laufendes Jahr — HARD LIMIT (100.000 €) Fallbeil-Effekt!'}</span><span style="font-family:var(--mono)">${pct100}%</span>
     </div>
     <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:10px">
       <div style="height:100%;width:${pct100}%;background:${pct100>80?'var(--red)':pct100>50?'var(--yellow)':'var(--blue)'};border-radius:6px;transition:width .6s"></div>
     </div>
     ${pct100>=100?`<div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r);padding:10px;font-size:12px;color:var(--red)">🚨 <strong>100.000 € überschritten!</strong> Ab diesem Moment gilt Regelbesteuerung — sofortige USt-Pflicht! (§19 UStG Fallbeil-Effekt)</div>`
-    :pctProg>80?`<div style="color:var(--yellow);font-size:12px">${t('⚠️ Vorjahresgrenze in Sicht — bei Überschreitung 25.000 € entfällt §19 UStG im Folgejahr!')}</div>`
+    :pctProg>80?`<div style="color:var(--yellow);font-size:12px">${'⚠️ Vorjahresgrenze in Sicht — bei Überschreitung 25.000 € entfällt §19 UStG im Folgejahr!'}</div>`
     :'<div style="color:var(--green);font-size:12px">✅ Kleinunternehmer-Status (§19 UStG) voraussichtlich sicher</div>'}
     <div style="margin-top:10px;font-size:10px;color:var(--sub);background:var(--s3);padding:8px 10px;border-radius:var(--r);border:1px solid var(--border)">
-      ${t('ℹ️ Neu ab 01.01.2025 (JStG 2024): Vorjahresgrenze 25.000 € (netto) + laufendes Jahr max. 100.000 € (harte Grenze, sofort wirksam bei Überschreitung).')}
+      ${'ℹ️ Neu ab 01.01.2025 (JStG 2024): Vorjahresgrenze 25.000 € (netto) + laufendes Jahr max. 100.000 € (harte Grenze, sofort wirksam bei Überschreitung).'}
     </div>`;
 }
 

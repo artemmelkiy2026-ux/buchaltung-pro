@@ -234,7 +234,7 @@ function stFillEUR() {
   document.getElementById('st-ein').value=ein.toFixed(2);
   document.getElementById('st-aus').value=aus.toFixed(2);
   stCalcGew();
-  toast(`${t('EÜR geladen:')} ${yr}`,'ok');
+  toast(`${'EÜR geladen:'} ${yr}`,'ok');
 }
 
 function stCalcGew() {
@@ -292,7 +292,7 @@ function searchHebesatz() {
     }
   }
   
-  toast(t('❌ Stadt nicht in Datenbank. Hebesatz manuell eingeben.'), 'error');
+  toast('❌ Stadt nicht in Datenbank. Hebesatz manuell eingeben.', 'error');
 }
 
 function calcGewerbesteuer(gewinn) {
@@ -587,7 +587,7 @@ function stBerechnen() {
     stCard('b','Zu verst. Einkommen', fmt(zveEndgueltig), `Splitting: ${isSplitting?'Ja':'Nein'}`) +
     stCard('y','Einkommensteuer', fmt(estFinal), isSplitting?'Splittingtarif':'Grundtarif') +
     stCard('p','Gesamtsteuer', fmt(gesamtSteuer), `inkl. GewSt, Soli${kirche>0?', Kirche':''}`) +
-    stCard(cardColor, diff>0?t('Nachzahlung'):t('Erstattung'), fmt(Math.abs(diff)), diff>0?t('zu zahlen an Finanzamt'):t('vom Finanzamt zurück'));
+    stCard(cardColor, diff>0?'Nachzahlung':'Erstattung', fmt(Math.abs(diff)), diff>0?'zu zahlen an Finanzamt':'vom Finanzamt zurück');
 
   // Left breakdown: Einkommensberechnung
   document.getElementById('st-bl').innerHTML = `
@@ -675,7 +675,7 @@ function stBerechnen() {
       1. Daten in <strong>ELSTER Online</strong> (elster.de) eingeben — kostenlos und offiziell<br>
       2. Anlage <strong>S</strong> (Selbstständige) + Anlage <strong>EÜR</strong> ausfüllen<br>
       ${isSplitting?'3. Anlage <strong>U</strong> für Zusammenveranlagung<br>':''}
-      ${nKinder>0?`${isSplitting?'4':'3'}. ${t('Anlage')} <strong>${t('Kind')}</strong> ${t('für')} ${nKinder} ${t('Kind')}${nKinder>1?t('er'):''}<br>`:''}
+      ${nKinder>0?`${isSplitting?'4':'3'}. ${'Anlage'} <strong>${'Kind'}</strong> ${'für'} ${nKinder} ${'Kind'}${nKinder>1?'er':''}<br>`:''}
       <strong style="color:var(--yellow)">Abgabefrist:</strong> 31. Juli des Folgejahres (mit Steuerberater: 28. Februar übernächstes Jahr)
     </div>`;
 
@@ -729,7 +729,7 @@ function stBerechnen() {
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
       <div style="background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:14px">
-        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${t('📊 Umsatzsteuer (USt) Saldo')}</h3>
+        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${'📊 Umsatzsteuer (USt) Saldo'}</h3>
         <div style="background:var(--s2);padding:10px;border-radius:var(--r);margin-bottom:10px">
           <div style="font-size:10px;color:var(--sub);margin-bottom:3px">USt eingezogen (19% × Einnahmen)</div>
           <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green)">${fmt(ustEingezogen)}</div>
@@ -760,7 +760,7 @@ function stBerechnen() {
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
       <div style="background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:14px">
-        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${t('📊 Umsatzsteuer (USt) Saldo')}</h3>
+        <h3 style="color:var(--green);margin-bottom:12px;font-size:14px">${'📊 Umsatzsteuer (USt) Saldo'}</h3>
         ${stRow('USt eingezogen (19%)', fmt(ustEingezogen), false, 'var(--green)')}
         ${stRow('USt bezahlt (19%)', fmt(ustBezahlt), false, 'var(--red)')}
         <div style="border-top:1px solid var(--green);padding-top:8px;margin-top:8px">
@@ -886,7 +886,7 @@ function runSzenarien() {
       const estMit  = sz.sp ? estSplitting(Math.max(0,sz.zvE-kfb), sz.jr) : estGrundtarifY(Math.max(0,sz.zvE-kfb), sz.jr);
       if ((estOhne - estMit) > kgeld) {
         zvEFinal = Math.max(0, sz.zvE - kfb);
-        kindNote = `${t('· KFB günstiger')}`;
+        kindNote = `${'· KFB günstiger'}`;
       } else {
         kindNote = ` · Kindergeld ${fmt(kgeld)} günstiger`;
       }

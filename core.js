@@ -1,7 +1,4 @@
 // ── CONFIG ────────────────────────────────────────────────────────────────
-// ✅ Защита: если t() не определена (ru.js не загружен), используем дефолт
-if(typeof window.t !== 'function') window.t = k => k;
-
 const SK='buch_pro_v1';
 const KE=['Dienstleistung','Honorar','Warenverkauf','Miete (Einnahme)','Zinsen/Dividenden','Erstattung','Sonstiges Einnahme'];
 const KA=['Büromaterial','Software / IT','Telefon / Internet','Fahrtkosten','Miete / Büro','Marketing / Werbung','Fortbildung','Versicherung','Bankgebühren','Steuern / Abgaben','Hardware','Fremdleistungen','Bewirtung','Sonstiges Ausgabe'];
@@ -118,7 +115,7 @@ function appInit(){
   setTimeout(()=>{
     const today=new Date().toISOString().split('T')[0];
     const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
-    if(due.length) toast(`🔁 ${due.length} ${t('wiederkehrende Zahlung')}${due.length>1?t('en'):''} ${t('fällig!')}`, 'ok');
+    if(due.length) toast(`🔁 ${due.length} ${'wiederkehrende Zahlung'}${due.length>1?'en':''} ${'fällig!'}`, 'ok');
   },800);
 }
 

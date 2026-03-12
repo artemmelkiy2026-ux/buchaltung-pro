@@ -8,7 +8,7 @@ function renderWied(){
   const today=new Date().toISOString().split('T')[0];
   const faelligCount=wied.filter(w=>w.naechste<=today).length;
   const hint=document.getElementById('wied-hint');
-  if(faelligCount>0){hint.style.display='';hint.innerHTML=`⚡ <strong>${faelligCount} ${t('fällige Zahlung')}${faelligCount>1?t('en'):''}`;}
+  if(faelligCount>0){hint.style.display='';hint.innerHTML=`⚡ <strong>${faelligCount} ${'fällige Zahlung'}${faelligCount>1?'en':''}`;}
   else hint.style.display='none';
 
   tb.innerHTML=wied.map(w=>{
@@ -18,7 +18,7 @@ function renderWied(){
       <td class="mob-hide"><span class="badge ${w.typ==='Einnahme'?'b-ein':'b-aus'}">${w.typ==='Einnahme'?'▲':'▼'} ${w.typ}</span></td>
       <td class="mob-hide" style="color:var(--sub);font-size:12px">${w.kategorie}</td>
       <td style="font-family:var(--mono);font-weight:600;color:${w.typ==='Einnahme'?'var(--green)':'var(--red)'}">${fmt(w.betrag)}</td>
-      <td class="mob-hide" style="color:var(--sub);font-size:12px">${{monatlich:t('Monatlich'),quartalsweise:t('Quartalsweise'),jaehrlich:t('Jährlich')}[w.intervall]}</td>
+      <td class="mob-hide" style="color:var(--sub);font-size:12px">${{monatlich:'Monatlich',quartalsweise:'Quartalsweise',jaehrlich:'Jährlich'}[w.intervall]}</td>
       <td style="font-family:var(--mono);font-size:11px;color:${isFaellig?'var(--yellow)':'var(--sub)'}">${fdm(w.naechste)}</td>
       <td class="mob-hide"><span class="badge ${ZBADGE[w.zahlungsart]||''}">${w.zahlungsart}</span></td>
       <td style="white-space:nowrap">
@@ -75,7 +75,7 @@ function wBuchen(id){
   w.naechste=d.toISOString().split('T')[0];
   sbSaveWied(w);
   renderAll(); renderWied();
-  toast(`✅ ${w.bezeichnung} ${t('gebucht!')}`, 'ok');
+  toast(`✅ ${w.bezeichnung} ${'gebucht!'}`, 'ok');
 }
 
 function wBuchenAlle(){
@@ -83,12 +83,12 @@ function wBuchenAlle(){
   const faellig=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
 
   // ИСПРАВЛЕНИЕ ТУТ: Переводим ошибку
-  if(!faellig.length) return toast(t('Keine fälligen Zahlungen'), 'err');
+  if(!faellig.length) return toast('Keine fälligen Zahlungen', 'err');
 
   faellig.forEach(w=>wBuchen(w.id));
 
   // ИСПРАВЛЕНИЕ ТУТ: Переводим сообщение об успехе
-  toast(`✅ ${faellig.length} ${t('Zahlungen gebucht!')}`, 'ok');
+  toast(`✅ ${faellig.length} ${'Zahlungen gebucht!'}`, 'ok');
 }
 function delWied(id){if(!confirm('Vorlage löschen?'))return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
 
@@ -344,7 +344,7 @@ async function exportPDF() {
 function exportRepCSV(){
   const yr=document.getElementById('rep-yr')?.value||new Date().getFullYear()+'';
   const ye=activeEintraege().filter(e=>e.datum.startsWith(yr));
-  const rows=[['Monat','Einnahmen (EUR)','Ausgaben (EUR)','Gewinn (EUR)',t('Kumuliert (EUR)'),'Einträge']];
+  const rows=[['Monat','Einnahmen (EUR)','Ausgaben (EUR)','Gewinn (EUR)','Kumuliert (EUR)','Einträge']];
   let c=0;
   for(let i=0;i<12;i++){
     const mi=String(i+1).padStart(2,'0');
@@ -386,7 +386,7 @@ function openMonatDetail(yr, mi){
       <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:${gew>=0?'var(--green)':'var(--red)'}">${gew>=0?'+':''}${fmt(gew)}</div>
     </div>`;
 
-  document.getElementById('mon-modal-count').textContent = `${entries.length} ${t('Einträge')}`;
+  document.getElementById('mon-modal-count').textContent = `${entries.length} ${'Einträge'}`;
 
   if(!entries.length){
     document.getElementById('mon-modal-tbody').innerHTML=`<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--sub)">Keine Einträge für ${_monLabel}</td></tr>`;
@@ -513,23 +513,23 @@ function exportMonatXLS(){
    </Row>
 ${rows}
    <Row ss:StyleID="total">
-    <Cell ss:MergeAcross="5"><Data ss:Type="String">${t('GESAMT')} ${esc(_monLabel)}</Data></Cell>
+    <Cell ss:MergeAcross="5"><Data ss:Type="String">${'GESAMT'} ${esc(_monLabel)}</Data></Cell>
     <Cell><Data ss:Type="Number">${(ein-aus).toFixed(2)}</Data></Cell>
     <Cell><Data ss:Type="String"></Data></Cell>
    </Row>
    <Row><Cell ss:MergeAcross="7"><Data ss:Type="String"></Data></Cell></Row>
    <Row ss:StyleID="total">
-    <Cell><Data ss:Type="String">${t('Einnahmen')}</Data></Cell>
+    <Cell><Data ss:Type="String">${'Einnahmen'}</Data></Cell>
     <Cell><Data ss:Type="Number">${ein.toFixed(2)}</Data></Cell>
     <Cell ss:MergeAcross="5"><Data ss:Type="String"></Data></Cell>
    </Row>
    <Row ss:StyleID="total">
-    <Cell><Data ss:Type="String">${t('Ausgaben')}</Data></Cell>
+    <Cell><Data ss:Type="String">${'Ausgaben'}</Data></Cell>
     <Cell><Data ss:Type="Number">${aus.toFixed(2)}</Data></Cell>
     <Cell ss:MergeAcross="5"><Data ss:Type="String"></Data></Cell>
    </Row>
    <Row ss:StyleID="total">
-    <Cell><Data ss:Type="String">${t('Gewinn')}</Data></Cell>
+    <Cell><Data ss:Type="String">${'Gewinn'}</Data></Cell>
     <Cell><Data ss:Type="Number">${gew.toFixed(2)}</Data></Cell>
     <Cell ss:MergeAcross="5"><Data ss:Type="String"></Data></Cell>
    </Row>

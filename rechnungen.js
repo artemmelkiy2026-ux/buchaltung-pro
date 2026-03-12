@@ -19,7 +19,7 @@ function renderRech(){
   const tb=document.getElementById('rech-tbody'),em=document.getElementById('rech-empty');
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  const smap={offen:'rs-offen 🟡 '+t('Offen'),ueberfaellig:'rs-ueberfaellig 🔴 '+t('Überfällig'),bezahlt:'rs-bezahlt 🟢 '+t('Bezahlt')};
+  const smap={offen:'rs-offen 🟡 '+'Offen',ueberfaellig:'rs-ueberfaellig 🔴 '+'Überfällig',bezahlt:'rs-bezahlt 🟢 '+'Bezahlt'};
   const smapMob={offen:'🟡',ueberfaellig:'🔴',bezahlt:'🟢'};
   const mob=isMob();
   tb.innerHTML=filtered.sort((a,b)=>b.datum.localeCompare(a.datum)).map(r=>`

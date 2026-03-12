@@ -159,10 +159,7 @@
   <div class="card-body">
 
     <!-- Переключатель языка -->
-    <div class="lang-switcher">
-      <button class="lang-btn active" id="btn-de" onclick="setLang('de')">🇩🇪 DE</button>
-      <button class="lang-btn" id="btn-ru" onclick="setLang('ru')">🇷🇺 RU</button>
-    </div>
+    
 
     <!-- DE -->
     <div class="lang-content active" id="content-de">
@@ -177,24 +174,7 @@
         <li>Steuerliche Entscheidungen nur mit <strong>zugelassenem Steuerberater</strong> (§ 3 StBerG).</li>
         <li><strong>Nicht für den produktiven Einsatz</strong> oder offizielle Steuererklärungen geeignet.</li>
       </ul>
-    </div>
-
-    <!-- RU -->
-    <div class="lang-content" id="content-ru">
-      <div class="lang-label">🇷🇺 Русский · Уведомление</div>
-      <div class="lang-text">
-        Программа находится в стадии <strong style="color:var(--text)">бета-тестирования</strong> и предоставляется исключительно в ознакомительных целях.
-        Не является <strong style="color:var(--text)">налоговой, юридической или финансовой консультацией</strong>.
-      </div>
-      <ul class="rules-list">
-        <li>Все расчёты носят <strong>ознакомительный характер</strong> без гарантии точности.</li>
-        <li>Разработчик не несёт <strong>никакой ответственности</strong> за ущерб от использования.</li>
-        <li>Налоговые решения — только с <strong>сертифицированным налоговым консультантом</strong>.</li>
-        <li><strong>Не предназначено для промышленного использования</strong> или официальных деклараций.</li>
-      </ul>
-    </div>
-
-    <!-- Чекбокс -->
+    </div><!-- Чекбокс -->
     <label id="check-label" class="checkbox-row" onclick="toggleCheck()">
       <div class="custom-check" id="custom-check">
         <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -224,36 +204,11 @@
 
 <script>
   let checked = false;
-  let lang = 'de';
 
-  const texts = {
-    de: {
-      check: '<strong>Ich habe den Hinweis gelesen und verstanden.</strong><br>Ich nutze diese Software ausschließlich zu Testzwecken.',
-      btn:   'Verstanden &amp; Akzeptiert — Software öffnen',
-      done:  'Wird geöffnet...'
-    },
-    ru: {
-      check: '<strong>Я прочитал и понял предупреждение.</strong><br>Использую исключительно в ознакомительных целях.',
-      btn:   'Понял &amp; Принял — Открыть программу',
-      done:  'Открываем...'
-    }
+  const btnText = {
+    active: 'Verstanden &amp; Akzeptiert — Software öffnen',
+    done:   'Wird geöffnet...'
   };
-
-  function setLang(l) {
-    lang = l;
-    document.getElementById('content-de').classList.toggle('active', l === 'de');
-    document.getElementById('content-ru').classList.toggle('active', l === 'ru');
-    document.getElementById('btn-de').classList.toggle('active', l === 'de');
-    document.getElementById('btn-ru').classList.toggle('active', l === 'ru');
-    document.getElementById('check-txt').innerHTML = texts[l].check;
-    document.getElementById('btn-txt').innerHTML = texts[l].btn;
-    // Сбрасываем чекбокс при смене языка
-    if (checked) {
-      checked = false;
-      document.getElementById('check-label').classList.remove('checked');
-      document.getElementById('accept-btn').classList.remove('active');
-    }
-  }
 
   function toggleCheck() {
     checked = !checked;
@@ -265,12 +220,11 @@
     if (!checked) return;
     localStorage.setItem('buch_disclaimer_v2', '1');
     const btn = document.getElementById('accept-btn');
-    document.getElementById('btn-txt').textContent = texts[lang].done;
+    document.getElementById('btn-txt').innerHTML = btnText.done;
     btn.style.background = 'linear-gradient(135deg, var(--green), #4a8a56)';
     setTimeout(() => { window.location.href = 'index.html'; }, 600);
   }
 
-  // Если открыли disclaimer напрямую без входа — на login.html
   if (localStorage.getItem('buch_disclaimer_v2') === '1') {
     window.location.replace('index.html');
   }

@@ -102,7 +102,7 @@ function addEintrag(){
   // Проверка дней месяца
   const daysInMonth=[0,31,febMax,31,30,31,30,31,31,30,31,30,31];
   if(dd<1||dd>daysInMonth[dm])return toast(`Ungültiges Datum!`,'err');
-  if(!betrag || betrag <= 0) return toast(t('Betrag eingeben!'), 'err');
+  if(!betrag || betrag <= 0) return toast('Betrag eingeben!', 'err');
   const entryYear=datum.substring(0,4);
 
   // MwSt / Vorsteuer bei Regelbesteuerung
@@ -144,7 +144,7 @@ function addEintrag(){
   clearForm();
   calcNfMwst(); // reset summary
   const mwLabel = !isKleinunternehmer(datum.substring(0,4))&&mwBet>0 ? ` (Netto: ${netBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €, MwSt: ${mwBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €)` : '';
-  toast(`${t(curTyp)} ${t('gespeichert')}: ${fmt(betrag)}${mwLabel}`, 'ok');
+  toast(`${t(curTyp)} ${'gespeichert'}: ${fmt(betrag)}${mwLabel}`, 'ok');
 }
 
 function calcNfVorsteuer(){
@@ -232,7 +232,7 @@ function renderDash(){
   document.getElementById('d-lim-bar').style.background=pct>80?'var(--red)':pct>60?'var(--yellow)':'var(--yellow)';
   document.getElementById('d-ein-bar').style.width=ein>0?Math.min(100,Math.round(ein/(ein+aus)*100))+'%':'0%';
   document.getElementById('d-aus-bar').style.width=aus>0?Math.min(100,Math.round(aus/(ein+aus)*100))+'%':'0%';
-  g('d-cnt',ye.length+'');g('d-cnt-s',`${ye.filter(e=>e.typ==='Einnahme').length} ${t('Ein.')} / ${ye.filter(e=>e.typ==='Ausgabe').length} ${t('Aus.')}`);
+  g('d-cnt',ye.length+'');g('d-cnt-s',`${ye.filter(e=>e.typ==='Einnahme').length} ${'Ein.'} / ${ye.filter(e=>e.typ==='Ausgabe').length} ${'Aus.'}`);
 
   // Chart - CHART.JS (профессиональный график)
   const chartYr=yr==='Alle'?new Date().getFullYear()+'':yr;
@@ -252,7 +252,7 @@ function renderDash(){
         labels: MS,
         datasets: [
           {
-            label: ('  '+t('Einnahme')),
+            label: ('  '+'Einnahme'),
             data: ea,
             borderColor: '#22c55e',
             backgroundColor: 'rgba(34, 197, 94, 0.1)',
@@ -266,7 +266,7 @@ function renderDash(){
             pointHoverRadius: 7,
           },
           {
-            label: ('  '+t('Ausgabe')),
+            label: ('  '+'Ausgabe'),
             data: aa,
             borderColor: '#ef4444',
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -280,7 +280,7 @@ function renderDash(){
             pointHoverRadius: 7,
           },
           {
-            label: ('  '+t('Gewinn')),
+            label: ('  '+'Gewinn'),
             data: ga,
             borderColor: '#a78bfa',
             backgroundColor: 'rgba(167, 139, 250, 0.08)',
@@ -408,7 +408,7 @@ function renderDash(){
       <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:10px">${e.zahlungsart||'—'}</span></td>
       <td class="mob-hide" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${e.beschreibung}">${e.beschreibung}</td>
       <td style="text-align:right;white-space:nowrap"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
-    </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--sub)">'+t('Keine Einträge')+'</td></tr>';
+    </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--sub)">'+'Keine Einträge'+'</td></tr>';
 }
 
 // ── EINTRÄGE ──────────────────────────────────────────────────────────────
