@@ -3,7 +3,7 @@ const SK='buch_pro_v1';
 const KE=['Dienstleistung','Honorar','Warenverkauf','Miete (Einnahme)','Zinsen/Dividenden','Erstattung','Sonstiges Einnahme'];
 const KA=['Büromaterial','Software / IT','Telefon / Internet','Fahrtkosten','Miete / Büro','Marketing / Werbung','Fortbildung','Versicherung','Bankgebühren','Steuern / Abgaben','Hardware','Fremdleistungen','Bewirtung','Sonstiges Ausgabe'];
 const ZAHL=['Überweisung','Barzahlung','PayPal','EC-Karte','Lastschrift','Sonstiges'];
-const ZICONS={'Überweisung':'<i class="fas fa-university"></i>','Barzahlung':'<i class="fas fa-solid fa-euro-sign"></i>','PayPal':'<i class="fab fa-cc-paypal"></i>','EC-Karte':'<i class="fas fa-credit-card"></i>','Lastschrift':'<i class="fas fa-exchange-alt"></i>','Sonstiges':'<i class="fas fa-solid fa-euro-sign"></i>'};
+const ZICONS={'Überweisung':'<i class="fas fa-university"></i>','Barzahlung':'<i class="fas fa-solid fa-euro-sign"></i>','PayPal':'<i class="fa-brands fa-paypal"></i>','EC-Karte':'<i class="fas fa-credit-card"></i>','Lastschrift':'<i class="fas fa-exchange-alt"></i>','Sonstiges':'<i class="fas fa-solid fa-euro-sign"></i>'};
 const ZCOLS={'Überweisung':'var(--blue)','Barzahlung':'var(--yellow)','PayPal':'var(--purple)','EC-Karte':'var(--cyan)','Lastschrift':'var(--green)','Sonstiges':'var(--muted)'};
 const ZBADGE={'Überweisung':'b-bar','Barzahlung':'b-cash','PayPal':'b-pp','EC-Karte':'b-trans','Lastschrift':'b-ein','Sonstiges':''};
 // ── НОРМАЛИЗАЦИЯ: русский/украинский → немецкий ключ ────────────
