@@ -100,9 +100,9 @@ window.addEventListener('supabase-ready', () => {
 });
 let curTyp='Einnahme', fTyp='Alle', sortCol='datum', sortAsc=false;
 let fileHandle=null, asOn=false, asTimer=null, curPage='dashboard';
-// ✅ Переменные для сортировки Dashboard "Letzte 10"
+// <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для сортировки Dashboard "Letzte 10"
 let dashSortCol='datum', dashSortAsc=false;
-// ✅ Переменные для пагинации Einträge
+// <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для пагинации Einträge
 let einPage=1, einPerPage=50;
 let zPage=1, zPerPage=50;  // Пагинация для Zahlungsarten
 let ustPage=1;              // Пагинация для USt-Buchungen
@@ -115,7 +115,7 @@ function appInit(){
   setTimeout(()=>{
     const today=new Date().toISOString().split('T')[0];
     const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
-    if(due.length) toast(`🔁 ${due.length} ${'wiederkehrende Zahlung'}${due.length>1?'en':''} ${'fällig!'}`, 'ok');
+    if(due.length) toast(`<i class="fas fa-sync-alt"></i> ${due.length} ${'wiederkehrende Zahlung'}${due.length>1?'en':''} ${'fällig!'}`, 'ok');
   },800);
 }
 
