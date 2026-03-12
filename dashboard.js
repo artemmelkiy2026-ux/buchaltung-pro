@@ -784,7 +784,7 @@ function renderZ(){
     const bgMap={'--blue':'rgba(26,69,120,.1)','--yellow':'rgba(224,140,26,.1)','--purple':'rgba(111,66,193,.1)','--cyan':'rgba(13,127,170,.1)','--green':'rgba(93,157,105,.1)','--muted':'rgba(132,150,170,.1)'};
     const iconBgCol=bgMap[col]||'rgba(26,69,120,.1)';
     return `<div class="zk">
-      <div class="zk-bar" style="background:${col}"></div>
+
       <div class="zk-body">
         <div class="zk-header">
           <div class="zk-icon-wrap" style="background:${iconBgCol};color:${col}">
