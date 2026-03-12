@@ -19,8 +19,8 @@ function renderRech(){
   const tb=document.getElementById('rech-tbody'),em=document.getElementById('rech-empty');
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  const smap={offen:'rs-offen ● '+'Offen',ueberfaellig:'rs-ueberfaellig ● '+'Überfällig',bezahlt:'rs-bezahlt ● '+'Bezahlt'};
-  const smapMob={offen:'●',ueberfaellig:'●',bezahlt:'●'};
+  const smap={offen:'rs-offen <i class="fas fa-circle" style="color:var(--yellow)"></i> Offen',ueberfaellig:'rs-ueberfaellig <i class="fas fa-circle" style="color:var(--red)"></i> Überfällig',bezahlt:'rs-bezahlt <i class="fas fa-circle" style="color:var(--green)"></i> Bezahlt'};
+  const smapMob={offen:'<i class="fas fa-circle" style="color:var(--yellow)"></i>',ueberfaellig:'<i class="fas fa-circle" style="color:var(--red)"></i>',bezahlt:'<i class="fas fa-circle" style="color:var(--green)"></i>'};
   const mob=isMob();
   tb.innerHTML=filtered.sort((a,b)=>b.datum.localeCompare(a.datum)).map(r=>`
     <tr onclick="editRech('${r.id}')" style="cursor:pointer">

@@ -289,9 +289,9 @@ function showKundeRechnungen(id) {
     empty.style.display = 'none';
     wrap.style.display  = '';
     const smap = {
-      offen:        '<span class="rech-status rs-offen">● Offen</span>',
-      ueberfaellig: '<span class="rech-status rs-ueberfaellig">● Überfällig</span>',
-      bezahlt:      '<span class="rech-status rs-bezahlt">● Bezahlt</span>',
+      offen:        '<span class="rech-status rs-offen"><i class="fas fa-circle" style="color:var(--yellow)"></i> Offen</span>',
+      ueberfaellig: '<span class="rech-status rs-ueberfaellig"><i class="fas fa-circle" style="color:var(--red)"></i> Überfällig</span>',
+      bezahlt:      '<span class="rech-status rs-bezahlt"><i class="fas fa-circle" style="color:var(--green)"></i> Bezahlt</span>',
     };
     tbody.innerHTML = rechs.map(r => `
       <tr style="cursor:pointer" onclick="openRechFromKunde('${r.id}')">
