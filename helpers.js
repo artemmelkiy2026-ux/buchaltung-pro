@@ -1152,10 +1152,7 @@ function renderUst(){
   }
 }
 function addUstEintrag(){
-  const dd  = (document.getElementById('ust-new-dat-d').value||'').padStart(2,'0');
-  const mm  = (document.getElementById('ust-new-dat-m').value||'').padStart(2,'0');
-  const yy  = document.getElementById('ust-new-dat-y').value||'';
-  const datum = (dd&&mm&&yy&&dd!='00'&&mm!='00') ? `${yy}-${mm}-${dd}` : '';
+  const datum = document.getElementById('ust-new-dat').value;
   const typ   = document.getElementById('ust-new-typ').value;
   const bet   = parseFloat(document.getElementById('ust-new-bet').value);
   const rate  = parseFloat(document.getElementById('ust-new-rate').value)||0;
@@ -1173,9 +1170,7 @@ function addUstEintrag(){
   renderUst();
   document.getElementById('ust-new-bet').value='';
   document.getElementById('ust-new-dsc').value='';
-  document.getElementById('ust-new-dat-d').value='';
-  document.getElementById('ust-new-dat-m').value='';
-  document.getElementById('ust-new-dat-y').value='';
+  document.getElementById('ust-new-dat').value='';
   toast('✓ USt-Eintrag gespeichert ('+entryYr+')','ok');
 }
 

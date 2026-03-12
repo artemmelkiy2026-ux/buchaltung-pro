@@ -661,17 +661,7 @@
     <div class="form-panel" style="padding:16px">
       <div class="fg" style="margin-bottom:10px">
         <label>Datum</label>
-        <div style="display:flex;gap:6px;align-items:center">
-          <input type="number" id="ust-new-dat-d" placeholder="TT" min="1" max="31" inputmode="numeric"
-            style="width:64px;text-align:center;padding:10px 8px;font-size:15px;border:1px solid var(--border);border-radius:var(--r);background:var(--s2);color:var(--text);-webkit-appearance:none;appearance:none;box-sizing:border-box">
-          <span style="color:var(--sub)">.</span>
-          <input type="number" id="ust-new-dat-m" placeholder="MM" min="1" max="12" inputmode="numeric"
-            style="width:64px;text-align:center;padding:10px 8px;font-size:15px;border:1px solid var(--border);border-radius:var(--r);background:var(--s2);color:var(--text);-webkit-appearance:none;appearance:none;box-sizing:border-box">
-          <span style="color:var(--sub)">.</span>
-          <input type="number" id="ust-new-dat-y" placeholder="JJJJ" min="2000" max="2099" inputmode="numeric"
-            style="flex:1;text-align:center;padding:10px 8px;font-size:15px;border:1px solid var(--border);border-radius:var(--r);background:var(--s2);color:var(--text);-webkit-appearance:none;appearance:none;box-sizing:border-box">
-        </div>
-        <input type="hidden" id="ust-new-dat">
+        <input type="date" id="ust-new-dat" max="2099-12-31" min="2000-01-01" style="-webkit-appearance:none;appearance:none;width:100%;box-sizing:border-box;">
       </div>
       <div class="fgrow c2">
         <div class="fg" style="margin-bottom:10px"><label>Typ</label>
