@@ -1163,10 +1163,15 @@ function addUstEintrag(){
   const entry = { id: Date.now()+'', datum, typ, betrag: bet, rate, beschreibung: dsc };
   data.ustEintraege.push(entry);
   sbSaveUstEintrag(entry);
+  // Переключаем год на год созданной записи, чтобы она была видна
+  const entryYr = datum.substring(0,4);
+  const yrSel = document.getElementById('ust-yr');
+  if(yrSel) yrSel.value = entryYr;
   renderUst();
   document.getElementById('ust-new-bet').value='';
   document.getElementById('ust-new-dsc').value='';
-  toast('✓ USt-Eintrag gespeichert','ok');
+  document.getElementById('ust-new-dat').value='';
+  toast('✓ USt-Eintrag gespeichert ('+entryYr+')','ok');
 }
 
 function delUstEintrag(id){
