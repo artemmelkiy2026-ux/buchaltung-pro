@@ -717,15 +717,27 @@ async function saveFirmaData() {
   if (logoInput && logoInput.dataset.b64) {
     p.logo = logoInput.dataset.b64;
   }
+  // Сохраняем в localStorage (быстрый доступ)
   localStorage.setItem('bp_firma', JSON.stringify(p));
-  // Сохраняем логотип в Supabase user_data (синхронизация между устройствами)
+  // Сохраняем ВСЁ в Supabase user_data (основное хранилище)
   if (currentUser) {
     try {
       await sb.from('user_data').upsert({
-        user_id: currentUser.id,
-        logo: p.logo || null,
+        user_id:       currentUser.id,
+        firma_name:    p.name            || null,
+        firma_strasse: p.strasse         || null,
+        firma_plz:     p.plz             || null,
+        firma_ort:     p.ort             || null,
+        firma_tel:     p.tel             || null,
+        firma_email:   p.email           || null,
+        firma_iban:    p.iban            || null,
+        firma_bic:     p.bic             || null,
+        firma_steuernr:p.steuernr        || null,
+        firma_ustid:   p.ustid           || null,
+        firma_footer:  p.rechnung_footer || null,
+        logo:          p.logo            || null,
       }, { onConflict: 'user_id' });
-    } catch(e) { console.warn('[logo sync]', e); }
+    } catch(e) { console.warn('[firma save]', e); toast('⚠️ Supabase-Fehler beim Speichern', 'err'); return; }
   }
   // Сохраняем E-Mail шаблон
   const subEl = document.getElementById('email-tmpl-subject');
@@ -737,7 +749,7 @@ async function saveFirmaData() {
     };
     localStorage.setItem('bp_email_template', JSON.stringify(tmpl));
   }
-  toast('✅ Einstellungen gespeichert!', 'ok');
+  toast('✅ Firmendaten gespeichert!', 'ok');
   closeModal('firma-modal');
 }
 
