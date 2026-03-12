@@ -135,7 +135,7 @@
 <div class="page-inner">
   <div style="display:flex;align-items: flex-start;justify-content:space-between;margin-bottom:20px;">
     <div>
-      <h1 style="font-size:20px;font-weight:700">Dashboard</h1>
+      <h1 style="font-size:20px;font-weight:700"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
       <p style="color:var(--sub);font-size:14px;margin-top:3px">Übersicht — <span id="dash-yr-lbl"></span></p>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
@@ -195,7 +195,7 @@
 <div class="page" id="p-eintraege">
 <div class="page-inner">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-    <h1 style="font-size:20px;font-weight:700">Einträge</h1>
+    <h1 style="font-size:20px;font-weight:700"><i class="fas fa-list"></i> Einträge</h1>
   </div>
 
   <div class="toolbar">
@@ -304,7 +304,7 @@
 <!-- ── NEUER EINTRAG ── -->
 <div class="page" id="p-neu">
 <div class="page-inner" style="max-width:620px">
-  <h1 style="font-size:20px;font-weight:700;margin-bottom:12px">Neuer Eintrag</h1>
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:12px"><i class="fas fa-plus-circle"></i> Neuer Eintrag</h1>
   <!-- USt-Mode Banner in Neuer Eintrag -->
   <div class="form-panel">
     <div class="typ-toggle">
@@ -363,7 +363,7 @@
 <div class="page" id="p-bericht">
 <div class="page-inner">
   <div class="rep-year-row">
-    <h1 style="font-size:20px;font-weight:700">Monatsbericht</h1>
+    <h1 style="font-size:20px;font-weight:700"><i class="fas fa-calendar-alt"></i> Monatsbericht</h1>
     <select id="rep-yr" onchange="renderRep()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-family:var(--mono);font-size:13px;outline:none;margin-left:12px"></select>
     <div style="margin-left:auto;display:flex;gap:8px">
 <button class="csv" onclick="exportRepCSV()"><span class="mob-hide"> Jahresbericht </span>CSV <i class="fa-solid fa-download"></i></button>
@@ -396,7 +396,7 @@
 <div class="page-inner">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <div>
-      <h1 style="font-size:18px;font-weight:700">Zahlungsarten</h1>
+      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-credit-card"></i> Zahlungsarten</h1>
       <p style="color:var(--sub);font-size:12px;margin-top:3px">Analyse nach Zahlungsart</p>
     </div>
     <select id="z-yr" onchange="renderZ()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;font-family:var(--sans)">
@@ -579,7 +579,7 @@
   <!-- Заголовок + выбор года -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
     <div>
-      <h1 style="font-size:18px;font-weight:700">% Umsatzsteuer</h1>
+      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-percentage"></i> Umsatzsteuer</h1>
       <p style="color:var(--sub);font-size:12px;margin-top:3px">USt-Modus je Jahr · Zahllast · Voranmeldung</p>
     </div>
     <select id="ust-yr" onchange="ustPage=1;renderUst()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 14px;font-size:13px;font-weight:600;outline:none;cursor:pointer"></select>
