@@ -190,7 +190,7 @@ function renderKat(){
         ${k}
       </td>
       <td style="padding:10px 14px;text-align:right;font-family:var(--mono);color:${katTyp==='Einnahme'?'var(--green)':'var(--red)'}">${fmt(v)}</td>
-      <td style="padding:10px 14px;text-align:right;font-family:var(--mono);color:var(--sub)">${Math.round(v/total*100)}%</td>
+      <td class="mob-hide" style="padding:10px 14px;text-align:right;font-family:var(--mono);color:var(--sub)">${Math.round(v/total*100)}%</td>
       <td style="padding:10px 14px">
         <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:50%">
           <div style="height:100%;width:${Math.round(v/sorted[0][1]*100)}%;background:${PIE_COLORS[i%PIE_COLORS.length]};border-radius:3px"></div>
