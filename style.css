@@ -140,7 +140,7 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 /* ── SIDEBAR ── */
 .sidebar{width:220px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
 .sidebar-section{padding:16px 12px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--sub)}
-.nav-item{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r);margin:1px 8px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:all .15s;border:1px solid transparent}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r);margin:1px 8px;cursor:pointer;color:#304a66;font-size:13px;font-weight:500;transition:all .15s;border:1px solid transparent}
 .nav-item:hover{background:var(--s2);color:var(--text)}
 .nav-item.active{background:#002a5be3;color:#ffffff}
 .nav-item .ic{width:16px;text-align:center;font-size:14px}
