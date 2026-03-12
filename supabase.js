@@ -89,7 +89,7 @@ async function sbLoadAll() {
 async function sbLoadUserData() {
   if (!currentUser) return { pin_hash: null, deleted_at: null, disclaimer_accepted: false };
   const { data } = await sb.from('user_data')
-    .select('pin_hash, deleted_at, disclaimer_accepted, client_id, logo')
+    .select('pin_hash, deleted_at, disclaimer_accepted, client_id, logo, firma_name, firma_strasse, firma_plz, firma_ort, firma_tel, firma_email, firma_iban, firma_bic, firma_steuernr, firma_ustid, firma_footer')
     .eq('user_id', currentUser.id)
     .maybeSingle();
   return data || { pin_hash: null, deleted_at: null, disclaimer_accepted: false };
@@ -531,12 +531,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       window._dataReady = true;
 
       const remotePin = userData.pin_hash || null;
-      // Синхронизируем логотип из Supabase в localStorage
-      if (userData.logo) {
+      // Синхронизируем данные фирмы из Supabase в localStorage (master = Supabase)
+      if (userData) {
         try {
           const bp = JSON.parse(localStorage.getItem('bp_firma') || '{}');
-          if (!bp.logo) { bp.logo = userData.logo; localStorage.setItem('bp_firma', JSON.stringify(bp)); }
-        } catch(e) {}
+          const firmaFields = ['firma_name','firma_strasse','firma_plz','firma_ort',
+                               'firma_tel','firma_email','firma_iban','firma_bic',
+                               'firma_steuernr','firma_ustid','firma_footer','logo'];
+          const localKeys   = ['name','strasse','plz','ort',
+                               'tel','email','iban','bic',
+                               'steuernr','ustid','rechnung_footer','logo'];
+          let changed = false;
+          firmaFields.forEach((dbKey, i) => {
+            if (userData[dbKey] != null) {
+              bp[localKeys[i]] = userData[dbKey];
+              changed = true;
+            }
+          });
+          if (changed) localStorage.setItem('bp_firma', JSON.stringify(bp));
+        } catch(e) { console.warn('[firma sync]', e); }
       }
 
       if (remotePin) {
