@@ -896,27 +896,38 @@ function preprocessImage(file) {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
-      // Max 2000px Breite — größer bringt nichts, verlangsamt nur
-      const MAX = 2000;
       let w = img.width, h = img.height;
-      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+
+      // Tesseract braucht mindestens 300px Breite — schmale Kassenzettel hochskalieren
+      const MIN_W = 600;
+      const MAX_W = 2400;
+
+      if (w < MIN_W) {
+        const scale = MIN_W / w;
+        w = MIN_W;
+        h = Math.round(h * scale);
+      } else if (w > MAX_W) {
+        h = Math.round(h * MAX_W / w);
+        w = MAX_W;
+      }
 
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
 
-      // Bild zeichnen
+      // Bildglättung beim Hochskalieren
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, w, h);
 
-      // Graustufen + Kontrast erhöhen
+      // Graustufen + Kontrast
       const imageData = ctx.getImageData(0, 0, w, h);
       const d = imageData.data;
       for (let i = 0; i < d.length; i += 4) {
-        // Graustufen
         const gray = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
-        // Kontrast: Faktor 1.5, Mittelpunkt 128
-        const contrast = Math.min(255, Math.max(0, (gray - 128) * 1.5 + 128));
+        const contrast = Math.min(255, Math.max(0, (gray - 128) * 1.6 + 128));
         d[i] = d[i+1] = d[i+2] = contrast;
+        // Alpha unverändert lassen
       }
       ctx.putImageData(imageData, 0, 0);
 
