@@ -33,19 +33,19 @@ function setTyp(t){
   document.getElementById('btn-a').className='tt'+(t==='Ausgabe'?' aa':'');
   updateKatSel();
   updateMwstFormVisibility();
-  // Scan-Box nur bei Ausgabe anzeigen
+  // Scan-Box: Desktop immer Platz reservieren, Mobil komplett ausblenden
   const scanBox = document.getElementById('scan-beleg-box');
   if(scanBox) {
     const isMobile = window.innerWidth <= 900;
-    if(t === 'Ausgabe') {
-      scanBox.style.display = 'block';
-      // Desktop: grid bleibt 2-spaltig; Mobil: 1-spaltig
-      const layout = document.getElementById('neu-layout');
-      if(layout) layout.style.gridTemplateColumns = isMobile ? '1fr' : '1fr 380px';
-    } else {
-      scanBox.style.display = 'none';
-      const layout = document.getElementById('neu-layout');
+    const layout = document.getElementById('neu-layout');
+    if(isMobile) {
+      scanBox.style.display = t === 'Ausgabe' ? 'block' : 'none';
+      scanBox.style.visibility = '';
       if(layout) layout.style.gridTemplateColumns = '1fr';
+    } else {
+      scanBox.style.display = 'block';
+      scanBox.style.visibility = t === 'Ausgabe' ? 'visible' : 'hidden';
+      if(layout) layout.style.gridTemplateColumns = '1fr 380px';
     }
   }
 }
