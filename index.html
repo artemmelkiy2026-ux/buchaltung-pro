@@ -306,6 +306,65 @@
 <div class="page-inner" style="max-width:620px">
   <h1 style="font-size:20px;font-weight:700;margin-bottom:12px"><i class="fas fa-plus-circle"></i> Neuer Eintrag</h1>
   <!-- USt-Mode Banner in Neuer Eintrag -->
+    <!-- ── BON-SCANNER INLINE ── -->
+    <div id="bon-inline" style="display:none;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);border-radius:var(--r2);background:rgba(99,102,241,.03);padding:16px">
+      <div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
+        <i class="fas fa-camera"></i> Bon scannen
+      </div>
+      <div id="bon-step-upload">
+        <div id="bon-drop-zone"
+          style="border:2px dashed rgba(99,102,241,.3);border-radius:8px;padding:20px;text-align:center;cursor:pointer;background:var(--s2)"
+          onclick="document.getElementById('bon-file-input').click()">
+          <i class="fas fa-receipt" style="font-size:24px;color:var(--sub);margin-bottom:8px;display:block"></i>
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Foto auswählen</div>
+          <div style="font-size:11px;color:var(--sub)">Kamera oder Galerie</div>
+        </div>
+        <input type="file" id="bon-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleBonFile(event)">
+        <div id="bon-preview-wrap" style="display:none;margin-top:8px;position:relative">
+          <img id="bon-preview-img" style="width:100%;border-radius:6px;max-height:160px;object-fit:contain;background:var(--s2)">
+          <button onclick="resetBonScanner()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px">✕</button>
+        </div>
+        <button id="bon-scan-start-btn" class="btn primary" style="width:100%;padding:9px;margin-top:8px;display:none;background:#6366f1;border-color:#6366f1" onclick="startBonScan()">
+          <i class="fas fa-magic"></i> KI-Analyse starten
+        </button>
+      </div>
+      <div id="bon-step-result" style="display:none">
+        <div id="bon-loading" style="text-align:center;padding:20px">
+          <i class="fas fa-spinner fa-spin" style="font-size:24px;color:#6366f1;margin-bottom:8px;display:block"></i>
+          <div style="font-size:13px;font-weight:600">Beleg wird analysiert…</div>
+        </div>
+        <div id="bon-result" style="display:none">
+          <div style="font-size:11px;color:var(--sub);margin-bottom:8px"><i class="fas fa-check-circle" style="color:var(--green)"></i> Erkannte Daten — bitte prüfen</div>
+          <div style="display:grid;gap:8px">
+            <div class="fg" style="margin:0"><label>Datum</label><input type="date" id="bon-res-datum"></div>
+            <div class="fg" style="margin:0"><label>Betrag (€)</label><input type="number" id="bon-res-betrag" step="0.01"></div>
+            <div class="fg" style="margin:0"><label>Kategorie</label><select id="bon-res-kat"></select></div>
+            <div class="fg" style="margin:0"><label>Zahlungsart</label>
+              <select id="bon-res-zahl">
+                <option value="EC-Karte">EC-Karte</option>
+                <option value="Barzahlung">Barzahlung</option>
+                <option value="Überweisung">Überweisung</option>
+                <option value="PayPal">PayPal</option>
+                <option value="Lastschrift">Lastschrift</option>
+                <option value="Sonstiges">Sonstiges</option>
+              </select>
+            </div>
+            <div class="fg" style="margin:0"><label>Beschreibung</label><input type="text" id="bon-res-beschr" style="font-size:12px"></div>
+            <div class="fg" style="margin:0"><label>Notiz</label><textarea id="bon-res-notiz" style="font-size:12px;min-height:56px;resize:vertical"></textarea></div>
+          </div>
+          <div id="bon-mwst-info" style="display:none;margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);font-size:12px;font-family:var(--mono)"></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn primary" style="flex:1;padding:9px" onclick="applyBonResult()"><i class="fas fa-check"></i> Übernehmen</button>
+            <button class="btn" style="padding:9px 12px" onclick="resetBonScanner()"><i class="fas fa-redo"></i></button>
+          </div>
+        </div>
+        <div id="bon-error" style="display:none;text-align:center;padding:12px">
+          <i class="fas fa-exclamation-triangle" style="font-size:20px;color:var(--yellow);margin-bottom:8px;display:block"></i>
+          <div id="bon-error-msg" style="font-size:13px;margin-bottom:10px"></div>
+          <button class="btn" style="padding:8px 16px" onclick="resetBonScanner()"><i class="fas fa-redo"></i> Nochmal</button>
+        </div>
+      </div>
+    </div>
   <div class="form-panel">
     <div class="typ-toggle">
       <button class="tt ae" id="btn-e" onclick="setTyp('Einnahme')">▲ Einnahme</button>
@@ -354,70 +413,6 @@
     <div style="display:flex;gap:10px;margin-top:4px">
       <button class="btn primary" style="flex:1;padding:11px" onclick="addEintrag()"><i class="fas fa-save"></i> Speichern</button>
       <button class="btn" style="padding:11px 20px" onclick="clearForm()">✕ Leeren</button>
-    </div>
-
-    <!-- ── BON-SCANNER INLINE ── -->
-    <div id="bon-inline" style="display:none;margin-top:16px;border:1px solid rgba(99,102,241,.25);border-radius:var(--r2);background:rgba(99,102,241,.03);padding:16px">
-      <div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
-        <i class="fas fa-camera"></i> Bon scannen
-      </div>
-
-      <!-- Шаг 1: загрузка -->
-      <div id="bon-step-upload">
-        <div id="bon-drop-zone"
-          style="border:2px dashed rgba(99,102,241,.3);border-radius:8px;padding:20px;text-align:center;cursor:pointer;background:var(--s2)"
-          onclick="document.getElementById('bon-file-input').click()">
-          <i class="fas fa-receipt" style="font-size:24px;color:var(--sub);margin-bottom:8px;display:block"></i>
-          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Foto auswählen</div>
-          <div style="font-size:11px;color:var(--sub)">Kamera oder Galerie</div>
-        </div>
-        <input type="file" id="bon-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleBonFile(event)">
-        <div id="bon-preview-wrap" style="display:none;margin-top:8px;position:relative">
-          <img id="bon-preview-img" style="width:100%;border-radius:6px;max-height:160px;object-fit:contain;background:var(--s2)">
-          <button onclick="resetBonScanner()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px">✕</button>
-        </div>
-        <button id="bon-scan-start-btn" class="btn primary" style="width:100%;padding:9px;margin-top:8px;display:none;background:#6366f1;border-color:#6366f1" onclick="startBonScan()">
-          <i class="fas fa-magic"></i> KI-Analyse starten
-        </button>
-      </div>
-
-      <!-- Шаг 2: лоадер + результат -->
-      <div id="bon-step-result" style="display:none">
-        <div id="bon-loading" style="text-align:center;padding:20px">
-          <i class="fas fa-spinner fa-spin" style="font-size:24px;color:#6366f1;margin-bottom:8px;display:block"></i>
-          <div style="font-size:13px;font-weight:600">Beleg wird analysiert…</div>
-        </div>
-        <div id="bon-result" style="display:none">
-          <div style="font-size:11px;color:var(--sub);margin-bottom:8px"><i class="fas fa-check-circle" style="color:var(--green)"></i> Erkannte Daten — bitte prüfen</div>
-          <div style="display:grid;gap:8px">
-            <div class="fg" style="margin:0"><label>Datum</label><input type="date" id="bon-res-datum"></div>
-            <div class="fg" style="margin:0"><label>Betrag (€)</label><input type="number" id="bon-res-betrag" step="0.01"></div>
-            <div class="fg" style="margin:0"><label>Kategorie</label><select id="bon-res-kat"></select></div>
-            <div class="fg" style="margin:0"><label>Zahlungsart</label>
-              <select id="bon-res-zahl">
-                <option value="EC-Karte">EC-Karte</option>
-                <option value="Barzahlung">Barzahlung</option>
-                <option value="Überweisung">Überweisung</option>
-                <option value="PayPal">PayPal</option>
-                <option value="Lastschrift">Lastschrift</option>
-                <option value="Sonstiges">Sonstiges</option>
-              </select>
-            </div>
-            <div class="fg" style="margin:0"><label>Beschreibung</label><input type="text" id="bon-res-beschr" style="font-size:12px"></div>
-            <div class="fg" style="margin:0"><label>Notiz</label><textarea id="bon-res-notiz" style="font-size:12px;min-height:56px;resize:vertical"></textarea></div>
-          </div>
-          <div id="bon-mwst-info" style="display:none;margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);font-size:12px;font-family:var(--mono)"></div>
-          <div style="display:flex;gap:8px;margin-top:10px">
-            <button class="btn primary" style="flex:1;padding:9px" onclick="applyBonResult()"><i class="fas fa-check"></i> Übernehmen</button>
-            <button class="btn" style="padding:9px 12px" onclick="resetBonScanner()"><i class="fas fa-redo"></i></button>
-          </div>
-        </div>
-        <div id="bon-error" style="display:none;text-align:center;padding:12px">
-          <i class="fas fa-exclamation-triangle" style="font-size:20px;color:var(--yellow);margin-bottom:8px;display:block"></i>
-          <div id="bon-error-msg" style="font-size:13px;margin-bottom:10px"></div>
-          <button class="btn" style="padding:8px 16px" onclick="resetBonScanner()"><i class="fas fa-redo"></i> Nochmal</button>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -1195,107 +1190,5 @@
 <script src="journal.js"></script>
 <script src="umsatzsteuer.js"></script>
 <script src="bonscanner.js"></script>
-      <button onclick="closeBonScanner()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--sub)">✕</button>
-    </div>
-
-    <!-- Шаг 1: загрузка фото -->
-    <div id="bon-step-upload">
-      <div id="bon-drop-zone" 
-        style="border:2px dashed var(--border);border-radius:12px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)"
-        onclick="document.getElementById('bon-file-input').click()"
-        ondragover="event.preventDefault();this.style.borderColor='#6366f1'"
-        ondragleave="this.style.borderColor='var(--border)'"
-        ondrop="handleBonDrop(event)">
-        <i class="fas fa-receipt" style="font-size:32px;color:var(--sub);margin-bottom:12px;display:block"></i>
-        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Foto des Belegs auswählen</div>
-        <div style="font-size:12px;color:var(--sub)">Tippen zum Öffnen · Kamera oder Galerie</div>
-      </div>
-      <input type="file" id="bon-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleBonFile(event)">
-      
-      <!-- превью фото -->
-      <div id="bon-preview-wrap" style="display:none;margin-top:12px;position:relative">
-        <img id="bon-preview-img" style="width:100%;border-radius:8px;max-height:220px;object-fit:contain;background:var(--s2)">
-        <button onclick="resetBonScanner()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px">✕</button>
-      </div>
-
-      <button id="bon-scan-start-btn" class="btn primary" style="width:100%;padding:11px;margin-top:12px;display:none" onclick="startBonScan()">
-        <i class="fas fa-magic"></i> KI-Analyse starten
-      </button>
-    </div>
-
-    <!-- Шаг 2: загрузка/результат -->
-    <div id="bon-step-result" style="display:none">
-      <!-- Лоадер -->
-      <div id="bon-loading" style="text-align:center;padding:24px">
-        <div style="font-size:28px;margin-bottom:12px">
-          <i class="fas fa-spinner fa-spin" style="color:#6366f1"></i>
-        </div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px">Beleg wird analysiert…</div>
-        <div style="font-size:12px;color:var(--sub)">Claude liest den Bon</div>
-      </div>
-
-      <!-- Результат -->
-      <div id="bon-result" style="display:none">
-        <div style="font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">
-          <i class="fas fa-check-circle" style="color:var(--green)"></i> Erkannte Daten — bitte prüfen
-        </div>
-        <div style="display:grid;gap:10px">
-          <div class="fg" style="margin:0">
-            <label>Datum</label>
-            <input type="date" id="bon-res-datum">
-          </div>
-          <div class="fg" style="margin:0">
-            <label>Betrag (€)</label>
-            <input type="number" id="bon-res-betrag" step="0.01" min="0.01">
-          </div>
-          <div class="fg" style="margin:0">
-            <label>Kategorie</label>
-            <select id="bon-res-kat"></select>
-          </div>
-          <div class="fg" style="margin:0">
-            <label>Zahlungsart</label>
-            <select id="bon-res-zahl">
-              <option value="EC-Karte">EC-Karte</option>
-              <option value="Barzahlung">Barzahlung</option>
-              <option value="Überweisung">Überweisung</option>
-              <option value="PayPal">PayPal</option>
-              <option value="Lastschrift">Lastschrift</option>
-              <option value="Sonstiges">Sonstiges</option>
-            </select>
-          </div>
-          <div class="fg" style="margin:0">
-            <label>Beschreibung</label>
-            <input type="text" id="bon-res-beschr" style="font-size:12px">
-          </div>
-          <div class="fg" style="margin:0">
-            <label>Notiz (Positionen)</label>
-            <textarea id="bon-res-notiz" style="font-size:12px;min-height:70px;resize:vertical"></textarea>
-          </div>
-        </div>
-
-        <div id="bon-mwst-info" style="display:none;margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);font-size:12px;font-family:var(--mono)"></div>
-
-        <div style="display:flex;gap:8px;margin-top:14px">
-          <button class="btn primary" style="flex:1;padding:10px" onclick="applyBonResult()">
-            <i class="fas fa-check"></i> Übernehmen
-          </button>
-          <button class="btn" style="padding:10px 14px" onclick="resetBonScanner()">
-            <i class="fas fa-redo"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Ошибка -->
-      <div id="bon-error" style="display:none;text-align:center;padding:16px">
-        <i class="fas fa-exclamation-triangle" style="font-size:24px;color:var(--yellow);margin-bottom:10px;display:block"></i>
-        <div id="bon-error-msg" style="font-size:13px;color:var(--text);margin-bottom:14px"></div>
-        <button class="btn" style="padding:9px 20px" onclick="resetBonScanner()">
-          <i class="fas fa-redo"></i> Nochmal versuchen
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
