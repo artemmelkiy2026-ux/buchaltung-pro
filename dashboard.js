@@ -890,42 +890,7 @@ function renderZ(){
   }
 }
 
-// ── Bild-Vorverarbeitung für bessere OCR ──────────────────────────────────
-function preprocessImage(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      let w = img.width, h = img.height;
-      const MIN_W = 800;
-      const MAX_W = 2400;
-      if (w < MIN_W) { const s = MIN_W/w; w=MIN_W; h=Math.round(h*s); }
-      else if (w > MAX_W) { h=Math.round(h*MAX_W/w); w=MAX_W; }
-
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, 0, 0, w, h);
-
-      const imageData = ctx.getImageData(0, 0, w, h);
-      const d = imageData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const gray = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
-        const c = Math.min(255, Math.max(0, (gray-128)*1.8+128));
-        d[i] = d[i+1] = d[i+2] = c;
-      }
-      ctx.putImageData(imageData, 0, 0);
-      URL.revokeObjectURL(url);
-      resolve(canvas.toDataURL('image/png'));
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Bild konnte nicht geladen werden')); };
-    img.src = url;
-  });
-}
-
-// ── Beleg scannen (Tesseract.js OCR) ──────────────────────────────────────
+// ── Beleg scannen via Gemini Vision API (Supabase Edge Function) ──────────
 let _scanFile = null;
 
 function scanBelegPreview(input) {
@@ -955,55 +920,50 @@ async function scanBelegStart() {
 async function scanBeleg(file) {
   const status = document.getElementById('scan-status');
   status.style.display = 'block';
-  status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Bild wird vorbereitet…';
+  status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Beleg wird analysiert…';
 
   try {
-    const imgUrl = await preprocessImage(file);
-    status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Text wird erkannt…';
+    // Bild zu base64 (max 1600px für schnelle Übertragung)
+    const base64 = await resizeToBase64(file, 1600);
+    const mediaType = file.type || 'image/jpeg';
 
-    const { data: { text } } = await Tesseract.recognize(imgUrl, 'deu+eng', {
-      logger: m => {
-        if (m.status === 'recognizing text') {
-          const pct = Math.round((m.progress||0)*100);
-          status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Erkenne Text… ${pct}%`;
-        }
-      }
+    const resp = await fetch(`${SUPA_URL}/functions/v1/scan-beleg`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64, mediaType })
     });
 
-    if (!text || text.trim().length < 5) throw new Error('Kein Text erkannt. Bitte deutlicheres Foto machen.');
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error || 'Serverfehler');
+    }
 
-    const result = parseBelegText(text);
+    const result = await resp.json();
     const filled = [];
 
-    // 1. Datum
     if (result.datum) {
       document.getElementById('nf-dat').value = result.datum;
       updateMwstFormVisibility();
       filled.push('Datum');
     }
-    // 2. MwSt-Satz zuerst
     if (result.mwst_rate !== undefined) {
       const mwstSel = document.getElementById('nf-mwst-rate');
       if (mwstSel) mwstSel.value = result.mwst_rate;
     }
-    // 3. Brutto-Betrag
     if (result.betrag) {
-      document.getElementById('nf-bet').value = result.betrag.toFixed(2);
+      document.getElementById('nf-bet').value = parseFloat(result.betrag).toFixed(2);
       calcNfVorsteuer(); calcNfMwst();
-      filled.push('Betrag ' + result.betrag.toFixed(2) + ' €');
+      filled.push('Betrag ' + parseFloat(result.betrag).toFixed(2) + ' €');
     }
-    // 4. Beschreibung
     if (result.beschreibung) {
       document.getElementById('nf-dsc').value = result.beschreibung;
       filled.push('Beschreibung');
     }
-    // 5. Notiz
     if (result.notiz) {
       const noteEl = document.getElementById('nf-note');
       if (noteEl) noteEl.value = result.notiz;
       filled.push('Notiz');
     }
-    // 6. Zahlungsart
     if (result.zahlungsart) {
       const zahlSel = document.getElementById('nf-zahl');
       if (zahlSel) zahlSel.value = result.zahlungsart;
@@ -1011,7 +971,7 @@ async function scanBeleg(file) {
     }
 
     if (filled.length === 0) {
-      status.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--orange)"></i> Text erkannt, aber keine Daten gefunden. Bitte manuell eingeben.';
+      status.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--orange)"></i> Keine Daten erkannt. Bitte manuell eingeben.';
     } else {
       status.innerHTML = `<i class="fas fa-check-circle" style="color:var(--green)"></i> Erkannt: ${filled.join(' · ')} — bitte prüfen!`;
     }
@@ -1021,6 +981,28 @@ async function scanBeleg(file) {
     status.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--red)"></i> ${err.message}`;
     setTimeout(() => { status.style.display = 'none'; }, 6000);
   }
+}
+
+// Bild skalieren + zu base64 konvertieren
+function resizeToBase64(file, maxW) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.92).split(',')[1]);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Bild konnte nicht geladen werden')); };
+    img.src = url;
+  });
 }
 
 function parseBelegText(text) {
