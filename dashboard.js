@@ -1014,109 +1014,140 @@ function parseBelegText(text) {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   const result = {};
 
-  // ── Datum ──────────────────────────────────────────────────────────────
-  // Formate: 01.02.2025 / 2025-02-01 / 01/02/2025 / 01.02.25
-  const datPatterns = [
-    /\b(\d{1,2})[.\-\/](\d{1,2})[.\-\/](20\d{2})\b/,  // DD.MM.YYYY
-    /\b(20\d{2})[.\-\/](\d{1,2})[.\-\/](\d{1,2})\b/,  // YYYY-MM-DD
-    /\b(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{2})\b/,    // DD.MM.YY
-  ];
+  // ── 1. DATUM ────────────────────────────────────────────────────────────
+  // Priorität: Zeile mit "Datum:" zuerst, dann alle anderen Zeilen
+  // Formate: DD.MM.YYYY | DD-MM-YYYY | DD/MM/YYYY | DD.MM.YY
+  const dateRx = /\b(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{2,4})\b/;
+  
+  // Zuerst Zeile mit explizitem "Datum:" Label suchen
   for (const line of lines) {
-    for (let i = 0; i < datPatterns.length; i++) {
-      const m = line.match(datPatterns[i]);
-      if (m) {
-        let d, mo, y;
-        if (i === 1) { [, y, mo, d] = m; }
-        else {
-          [, d, mo, y] = m;
-          if (y.length === 2) y = '20' + y;
-        }
-        d = d.padStart(2,'0'); mo = mo.padStart(2,'0');
-        if (parseInt(mo) >= 1 && parseInt(mo) <= 12 && parseInt(d) >= 1 && parseInt(d) <= 31) {
-          result.datum = `${y}-${mo}-${d}`;
-          break;
-        }
+    if (!/datum/i.test(line)) continue;
+    const m = line.match(dateRx);
+    if (!m) continue;
+    let [, d, mo, y] = m;
+    if (y.length === 2) y = '20' + y;
+    const yi = parseInt(y), mi = parseInt(mo), di = parseInt(d);
+    if (yi >= 2010 && yi <= 2035 && mi >= 1 && mi <= 12 && di >= 1 && di <= 31) {
+      result.datum = `${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
+      break;
+    }
+  }
+  // Fallback: erste Zeile mit gültigem Datum
+  if (!result.datum) {
+    for (const line of lines) {
+      const m = line.match(dateRx);
+      if (!m) continue;
+      let [, d, mo, y] = m;
+      if (y.length === 2) y = '20' + y;
+      const yi = parseInt(y), mi = parseInt(mo), di = parseInt(d);
+      if (yi >= 2010 && yi <= 2035 && mi >= 1 && mi <= 12 && di >= 1 && di <= 31) {
+        result.datum = `${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
+        break;
       }
     }
-    if (result.datum) break;
   }
 
-  // ── Betrag — Gesamtbetrag ───────────────────────────────────────────────
-  // Suche nach Schlüsselwörtern: Gesamt, Total, Summe, Zahlung, Betrag, EUR
-  const totalKeywords = /gesamt|total|summe|zahlung|endbetrag|zu zahlen|gesamtbetrag|bar|brutto/i;
+  // ── 2. BRUTTO-BETRAG ────────────────────────────────────────────────────
+  // Priorität 1: BRUTTO-Zeile in MwSt-Tabelle (z.B. "1 19 % 25,95 4,14 21,81")
+  // Priorität 2: Zeile mit SUMME/GESAMT/BETRAG + Zahl
+  // Priorität 3: Zeile mit "GEGEBEN" (gezahlter Betrag)
+  // Priorität 4: größte Zahl auf dem Bon
   const amountRx = /(\d{1,6}[.,]\d{2})/g;
 
-  let candidates = [];
-
+  // Prio 1: BRUTTO in MwSt-Fußzeile — typisch: "1 19 % BRUTTO MWST NETTO" dann Zahlen
+  // Suche Zeile mit "brutto" label oder MwSt-Tabellenwert
   for (const line of lines) {
-    const amounts = [...line.matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
-    if (amounts.length === 0) continue;
-    const maxAmt = Math.max(...amounts);
-    const isTotal = totalKeywords.test(line);
-    candidates.push({ amt: maxAmt, isTotal, line });
+    if (!/brutto/i.test(line)) continue;
+    const nums = [...line.matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
+    if (nums.length >= 1) {
+      // In "1 19 % 25,95 4,14 21,81" ist Brutto die erste (größte) Zahl
+      result.betrag = Math.max(...nums);
+      break;
+    }
   }
 
-  // Bevorzuge Zeilen mit Schlüsselwort
-  const totalLine = candidates.filter(c => c.isTotal).sort((a,b) => b.amt - a.amt)[0];
-  if (totalLine) {
-    result.betrag = totalLine.amt;
-  } else {
-    // Fallback: größte Zahl auf dem Beleg (wahrscheinlich Gesamtbetrag)
-    const largest = candidates.sort((a,b) => b.amt - a.amt)[0];
-    if (largest && largest.amt > 0) result.betrag = largest.amt;
+  // Prio 2: SUMME / GESAMT / TOTAL
+  if (!result.betrag) {
+    const totalRx = /\b(summe|gesamt|total|gesamtbetrag|endbetrag|zu zahlen|zahlbetrag)\b/i;
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (!totalRx.test(lines[i])) continue;
+      const nums = [...lines[i].matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
+      if (nums.length > 0) { result.betrag = Math.max(...nums); break; }
+    }
   }
 
-  // ── MwSt-Satz — wähle den auf dem Beleg dominanten Satz ───────────────
-  // Suche MwSt-Beträge neben dem Prozentsatz: "19% 12,34" oder "7% 0,89"
-  const mwstLineRx = /(19|7)\s*%[^\n]{0,30}?(\d{1,4}[.,]\d{2})/gi;
-  const mwstMatches = { 19: 0, 7: 0 };
-  let m;
-  while ((m = mwstLineRx.exec(text)) !== null) {
-    const rate = parseInt(m[1]);
-    const amt = parseFloat(m[2].replace(',','.'));
-    if (rate === 19 || rate === 7) mwstMatches[rate] = Math.max(mwstMatches[rate], amt);
-  }
-  if (mwstMatches[19] > 0 || mwstMatches[7] > 0) {
-    result.mwst_rate = mwstMatches[19] >= mwstMatches[7] ? 19 : 7;
-  } else if (/\b19\s*%/.test(text)) {
-    result.mwst_rate = 19;
-  } else if (/\b7\s*%/.test(text)) {
-    result.mwst_rate = 7;
-  } else {
-    result.mwst_rate = 19; // Standard-Fallback
+  // Prio 3: GEGEBEN / Betrag EUR (Zahlungsbeleg)
+  if (!result.betrag) {
+    for (const line of lines) {
+      if (!/\b(gegeben|betrag|betrag eur)\b/i.test(line)) continue;
+      const nums = [...line.matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
+      if (nums.length > 0) { result.betrag = Math.max(...nums); break; }
+    }
   }
 
-  // ── Beschreibung — Firmenname + Belegnummer ───────────────────────────
-  let firmaName = '';
-  for (const line of lines.slice(0, 8)) {
-    if (line.length < 3) continue;
-    if (/^\d/.test(line)) continue;
-    if (/^[*\-=_#]{2,}/.test(line)) continue;
-    firmaName = line.substring(0, 40);
-    break;
+  // Prio 4: größte Zahl
+  if (!result.betrag) {
+    const allNums = [...text.matchAll(amountRx)]
+      .map(m => parseFloat(m[1].replace(',','.')))
+      .filter(n => n > 0.5 && n < 99999);
+    if (allNums.length) result.betrag = Math.max(...allNums);
   }
-  // Belegnummer suchen: Bon-Nr, Beleg-Nr, Rechnung, Nr., #
+
+  // ── 3. MWST-SATZ ────────────────────────────────────────────────────────
+  // Suche "19 %" oder "19%" mit Betrag daneben — typisch in Fußzeile
+  // Hornbach: "1 19 % 25,95 4,14 21,81"
+  const mwstRowRx = /\b(19|7)\s*%/g;
+  const found = { 19: false, 7: false };
+  let mm;
+  while ((mm = mwstRowRx.exec(text)) !== null) {
+    found[parseInt(mm[1])] = true;
+  }
+  if (found[19]) result.mwst_rate = 19;
+  else if (found[7]) result.mwst_rate = 7;
+  else result.mwst_rate = 19;
+
+  // ── 4. FIRMENNAME + BELEGNUMMER → Beschreibung ──────────────────────────
+  // Firmenname: erste sinnvolle Zeile (nicht Sternchen, nicht reine Zahlen, min 3 Zeichen)
+  const skipLineRx = /^[*\-=_#+]{2,}$|^\d+$|^(tel|fax|www|http|ust|weee|steuer)/i;
+  let firma = '';
+  for (const line of lines.slice(0, 10)) {
+    if (line.length < 3 || skipLineRx.test(line)) continue;
+    // Bevorzuge Zeilen die wie ein Firmenname aussehen (Großbuchstaben oder gemischt)
+    if (/[A-Za-zÄÖÜäöüß]{3,}/.test(line)) {
+      firma = line.replace(/\s+/g, ' ').substring(0, 35);
+      break;
+    }
+  }
+
+  // Belegnummer: "Beleg-Nr. 6850" / "Bon-Nr: 123" / "Beleg-Nr. 6850"
   let belegNr = '';
-  const belegRx = /(?:bon[\s\-]?nr|beleg[\s\-]?nr|re[\s\-]?nr|rechnungs[\s\-]?nr|nr\.|receipt|#)\s*[:\.]?\s*([A-Z0-9\-\/]+)/i;
+  const belegRx = /(?:beleg[-\s]?nr|bon[-\s]?nr|re[-\s]?nr|belegnr|bonnr|rechnungs[-\s]?nr)[.\s:]*([A-Z0-9\-\/]+)/i;
   for (const line of lines) {
     const m = line.match(belegRx);
-    if (m) { belegNr = m[1].substring(0, 20); break; }
-  }
-  if (firmaName) {
-    result.beschreibung = belegNr ? `${firmaName} · Nr. ${belegNr}` : firmaName;
+    if (m && m[1] && m[1].length <= 15) { belegNr = m[1]; break; }
   }
 
-  // ── Notiz — Artikelliste ────────────────────────────────────────────────
-  // Zeilen die wie Artikel aussehen: Text + Preis daneben, nicht Header/Footer
-  const skipRx = /gesamt|total|summe|mwst|steuer|zahlung|vielen dank|datum|uhrzeit|kasse|beleg|bon|rechnung|tel|fax|www|@|ust|%/i;
-  const articleRx = /^(.{2,40}?)\s{2,}(\d{1,4}[.,]\d{2})\s*$/;
+  result.beschreibung = firma
+    ? (belegNr ? `${firma} · Nr. ${belegNr}` : firma)
+    : (belegNr ? `Beleg Nr. ${belegNr}` : '');
+
+  // ── 5. ARTIKELLISTE → Notiz ─────────────────────────────────────────────
+  // Zeilen die wie Artikel aussehen: "Artikelname    Preis"
+  // Ausschließen: Kopf, Fuß, MwSt-Tabelle, Zahlungsinfos
+  const skipNotizRx = /gesamt|summe|total|mwst|steuer|gegeben|zahlung|datum|uhrzeit|beleg|bon|rechnung|tel|fax|www|@|iban|bic|sepa|terminal|trace|karte|transaktion|vielen dank|filial|steuernr|weee/i;
+  const articleRx = /^(.{2,35}?)\s{2,}(\d{1,4}[.,]\d{2})\s*\d*\s*$/;
   const articles = [];
+
   for (const line of lines) {
-    if (skipRx.test(line)) continue;
+    if (skipNotizRx.test(line)) continue;
     const m = line.match(articleRx);
     if (m) {
-      articles.push(`${m[1].trim()} ${m[2]}`);
-      if (articles.length >= 8) break;
+      const name = m[1].trim();
+      const price = m[2];
+      if (name.length >= 2 && !/^\d+$/.test(name)) {
+        articles.push(`${name}  ${price}`);
+        if (articles.length >= 10) break;
+      }
     }
   }
   if (articles.length > 0) result.notiz = articles.join('\n');
