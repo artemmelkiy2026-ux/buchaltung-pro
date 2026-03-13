@@ -927,28 +927,34 @@ async function scanBeleg(input) {
     // Felder befüllen
     let filled = [];
 
+    // 1. Datum
     if (result.datum) {
       document.getElementById('nf-dat').value = result.datum;
       updateMwstFormVisibility();
       filled.push('Datum');
     }
+    // 2. MwSt-Satz zuerst setzen — damit calcNfMwst korrekt rechnet
+    if (result.mwst_rate !== undefined) {
+      const mwstSel = document.getElementById('nf-mwst-rate');
+      if (mwstSel) mwstSel.value = result.mwst_rate;
+    }
+    // 3. Brutto-Betrag eintragen + neu berechnen
     if (result.betrag) {
       document.getElementById('nf-bet').value = result.betrag.toFixed(2);
-      calcNfVorsteuer(); calcNfMwst();
-      filled.push('Betrag');
+      calcNfVorsteuer();
+      calcNfMwst(); // berechnet Netto + MwSt-Betrag aus Brutto
+      filled.push('Betrag ' + result.betrag.toFixed(2) + ' € (Brutto)');
     }
+    // 4. Beschreibung
     if (result.beschreibung) {
       document.getElementById('nf-dsc').value = result.beschreibung;
       filled.push('Beschreibung');
     }
+    // 5. Notiz
     if (result.notiz) {
       const noteEl = document.getElementById('nf-note');
       if (noteEl) noteEl.value = result.notiz;
       filled.push('Notiz');
-    }
-    if (result.mwst_rate) {
-      const mwstSel = document.getElementById('nf-mwst-rate');
-      if (mwstSel) { mwstSel.value = result.mwst_rate; calcNfMwst(); }
     }
 
     if (filled.length === 0) {
@@ -1022,9 +1028,25 @@ function parseBelegText(text) {
     if (largest && largest.amt > 0) result.betrag = largest.amt;
   }
 
-  // ── MwSt-Satz ──────────────────────────────────────────────────────────
-  if (/\b7\s*%/.test(text)) result.mwst_rate = 7;
-  else if (/\b19\s*%/.test(text)) result.mwst_rate = 19;
+  // ── MwSt-Satz — wähle den auf dem Beleg dominanten Satz ───────────────
+  // Suche MwSt-Beträge neben dem Prozentsatz: "19% 12,34" oder "7% 0,89"
+  const mwstLineRx = /(19|7)\s*%[^\n]{0,30}?(\d{1,4}[.,]\d{2})/gi;
+  const mwstMatches = { 19: 0, 7: 0 };
+  let m;
+  while ((m = mwstLineRx.exec(text)) !== null) {
+    const rate = parseInt(m[1]);
+    const amt = parseFloat(m[2].replace(',','.'));
+    if (rate === 19 || rate === 7) mwstMatches[rate] = Math.max(mwstMatches[rate], amt);
+  }
+  if (mwstMatches[19] > 0 || mwstMatches[7] > 0) {
+    result.mwst_rate = mwstMatches[19] >= mwstMatches[7] ? 19 : 7;
+  } else if (/\b19\s*%/.test(text)) {
+    result.mwst_rate = 19;
+  } else if (/\b7\s*%/.test(text)) {
+    result.mwst_rate = 7;
+  } else {
+    result.mwst_rate = 19; // Standard-Fallback
+  }
 
   // ── Beschreibung — Firmenname + Belegnummer ───────────────────────────
   let firmaName = '';
