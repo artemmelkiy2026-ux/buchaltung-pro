@@ -33,9 +33,21 @@ function setTyp(t){
   document.getElementById('btn-a').className='tt'+(t==='Ausgabe'?' aa':'');
   updateKatSel();
   updateMwstFormVisibility();
-  // Scan-Button nur bei Ausgabe anzeigen
+  // Scan-Box nur bei Ausgabe anzeigen
   const scanBox = document.getElementById('scan-beleg-box');
-  if(scanBox) scanBox.style.display = t==='Ausgabe' ? 'block' : 'none';
+  if(scanBox) {
+    const isMobile = window.innerWidth <= 900;
+    if(t === 'Ausgabe') {
+      scanBox.style.display = 'block';
+      // Desktop: grid bleibt 2-spaltig; Mobil: 1-spaltig
+      const layout = document.getElementById('neu-layout');
+      if(layout) layout.style.gridTemplateColumns = isMobile ? '1fr' : '1fr 380px';
+    } else {
+      scanBox.style.display = 'none';
+      const layout = document.getElementById('neu-layout');
+      if(layout) layout.style.gridTemplateColumns = '1fr';
+    }
+  }
 }
 function updateMwstFormVisibility(){
   const yr=document.getElementById('nf-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
@@ -927,8 +939,20 @@ async function scanBelegStart() {
 
 async function scanBeleg(base64, mediaType) {
   const status = document.getElementById('scan-status');
+  const statusInner = document.getElementById('scan-status-inner');
   status.style.display = 'block';
-  status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Beleg wird analysiert…';
+  if (statusInner) {
+    statusInner.className = 'scan-analyzing';
+    statusInner.innerHTML = `
+      <div style="margin-bottom:10px">
+        <i class="fas fa-robot scan-icon-bounce" style="font-size:28px;color:var(--blue)"></i>
+      </div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px">KI analysiert den Beleg…</div>
+      <div style="font-size:12px;color:var(--sub)">Datum · Betrag · Artikel werden erkannt</div>
+      <div style="margin-top:10px;height:3px;border-radius:2px;background:var(--border);overflow:hidden">
+        <div id="scan-progress-bar" style="height:100%;width:10%;background:var(--blue);border-radius:2px;transition:width .3s"></div>
+      </div>`;
+  }
 
   try {
     const resp = await fetch(`${SUPA_URL}/functions/v1/scan-beleg`, {
@@ -977,16 +1001,38 @@ async function scanBeleg(base64, mediaType) {
       filled.push(result.zahlungsart);
     }
 
-    if (filled.length === 0) {
-      status.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--orange)"></i> Keine Daten erkannt. Bitte manuell eingeben.';
-    } else {
-      status.innerHTML = `<i class="fas fa-check-circle" style="color:var(--green)"></i> Erkannt: ${filled.join(' · ')} — bitte prüfen!`;
+    if (statusInner) {
+      if (filled.length === 0) {
+        statusInner.className = 'scan-result-fadein';
+        statusInner.style.borderColor = 'rgba(249,115,22,.3)';
+        statusInner.innerHTML = `
+          <i class="fas fa-exclamation-triangle" style="font-size:22px;color:#f97316;margin-bottom:8px;display:block"></i>
+          <div style="font-weight:600;font-size:13px">Keine Daten erkannt</div>
+          <div style="font-size:12px;color:var(--sub);margin-top:4px">Bitte manuell eingeben</div>`;
+      } else {
+        statusInner.className = 'scan-result-fadein';
+        statusInner.style.borderColor = 'rgba(34,197,94,.3)';
+        statusInner.style.background = 'rgba(34,197,94,.05)';
+        statusInner.innerHTML = `
+          <i class="fas fa-check-circle" style="font-size:22px;color:var(--green);margin-bottom:8px;display:block"></i>
+          <div style="font-weight:600;font-size:13px;color:var(--green)">Erfolgreich erkannt!</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.6">${filled.join('<br>')}</div>`;
+      }
     }
-    setTimeout(() => { status.style.display = 'none'; }, 6000);
+    setTimeout(() => { status.style.display = 'none'; if(statusInner) statusInner.style.cssText=''; }, 6000);
 
   } catch (err) {
-    status.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--red)"></i> ${err.message}`;
-    setTimeout(() => { status.style.display = 'none'; }, 6000);
+    if (statusInner) {
+      statusInner.className = 'scan-result-fadein';
+      statusInner.style.borderColor = 'rgba(239,68,68,.3)';
+      statusInner.innerHTML = `
+        <i class="fas fa-exclamation-circle" style="font-size:22px;color:var(--red);margin-bottom:8px;display:block"></i>
+        <div style="font-weight:600;font-size:13px">Fehler</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:4px">${err.message}</div>`;
+    } else {
+      status.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--red)"></i> ${err.message}`;
+    }
+    setTimeout(() => { status.style.display = 'none'; if(statusInner) statusInner.style.cssText=''; }, 6000);
   }
 }
 

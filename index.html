@@ -13,6 +13,51 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+<style>
+/* Scan layout: desktop 2col, mobile 1col */
+@media (max-width: 900px) {
+  #neu-layout {
+    grid-template-columns: 1fr !important;
+  }
+  #scan-beleg-box {
+    position: static !important;
+    order: -1; /* Scan-Box oben auf Mobil */
+  }
+}
+
+/* Scan pulsing animation */
+@keyframes scan-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(59,130,246,.4); }
+  70%  { box-shadow: 0 0 0 12px rgba(59,130,246,0); }
+  100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+}
+@keyframes scan-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes scan-bounce {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes scan-fadein {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.scan-analyzing {
+  animation: scan-pulse 1.5s infinite;
+}
+.scan-icon-spin {
+  display:inline-block;
+  animation: scan-spin 1s linear infinite;
+}
+.scan-icon-bounce {
+  display:inline-block;
+  animation: scan-bounce 1s ease-in-out infinite;
+}
+.scan-result-fadein {
+  animation: scan-fadein .4s ease;
+}
+</style>
 </head>
 <body>
 
@@ -303,34 +348,14 @@
 
 <!-- ── NEUER EINTRAG ── -->
 <div class="page" id="p-neu">
-<div class="page-inner" style="max-width:620px">
-  <h1 style="font-size:20px;font-weight:700;margin-bottom:12px"><i class="fas fa-plus-circle"></i> Neuer Eintrag</h1>
+<div class="page-inner" style="max-width:1100px">
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:16px"><i class="fas fa-plus-circle"></i> Neuer Eintrag</h1>
 
-  <!-- Beleg scannen -->
-  <div id="scan-beleg-box" style="margin-bottom:12px;display:none">
-    <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBelegPreview(this)">
-    <button class="btn" onclick="document.getElementById('scan-file-input').click()"
-      style="width:100%;padding:11px;background:var(--s2);border:1.5px dashed var(--border);color:var(--text);font-size:14px;font-weight:600;border-radius:var(--r);display:flex;align-items:center;justify-content:center;gap:8px">
-      <i class="fas fa-camera"></i> Beleg / Rechnung scannen
-    </button>
-    <!-- Vorschau + Hinweis -->
-    <div id="scan-preview-box" style="display:none;margin-top:10px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--s2)">
-      <img id="scan-preview-img" style="width:100%;max-height:220px;object-fit:contain;display:block">
-      <div style="padding:10px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:8px">
-        <i class="fas fa-info-circle"></i>
-        <span>Bitte Beleg <strong>gerade von oben</strong> fotografieren für beste Ergebnisse</span>
-      </div>
-      <div style="padding:0 10px 10px;display:flex;gap:8px">
-        <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:9px;font-size:13px">
-          <i class="fas fa-search"></i> Jetzt scannen
-        </button>
-        <button class="btn" onclick="scanBelegCancel()" style="padding:9px 14px;font-size:13px">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
-    <div id="scan-status" style="display:none;margin-top:8px;font-size:13px;color:var(--sub);text-align:center"></div>
-  </div>
+  <!-- Desktop: 2 Spalten. Mobil: 1 Spalte -->
+  <div id="neu-layout" style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start">
+
+  <!-- LINKE SPALTE: Formular -->
+  <div>
 
   <!-- USt-Mode Banner in Neuer Eintrag -->
   <div class="form-panel">
@@ -383,6 +408,59 @@
       <button class="btn" style="padding:11px 20px" onclick="clearForm()">✕ Leeren</button>
     </div>
   </div>
+
+  </div><!-- /linke Spalte -->
+
+  <!-- RECHTE SPALTE: Beleg scannen -->
+  <div id="scan-beleg-box" style="display:none;position:sticky;top:20px">
+    <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBelegPreview(this)">
+
+    <!-- Scan-Button -->
+    <div id="scan-btn-area">
+      <button onclick="document.getElementById('scan-file-input').click()"
+        style="width:100%;padding:20px 16px;background:var(--s2);border:2px dashed var(--border);color:var(--text);font-size:15px;font-weight:600;border-radius:var(--r2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;transition:border-color .2s,background .2s"
+        onmouseover="this.style.borderColor='var(--blue)';this.style.background='rgba(59,130,246,.05)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--s2)'">
+        <i class="fas fa-camera" style="font-size:32px;color:var(--blue);opacity:.8"></i>
+        <span>Beleg / Rechnung scannen</span>
+        <span style="font-size:12px;font-weight:400;color:var(--sub)">Foto hochladen oder Kamera öffnen</span>
+      </button>
+    </div>
+
+    <!-- Vorschau -->
+    <div id="scan-preview-box" style="display:none;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--s2)">
+      <div style="position:relative">
+        <img id="scan-preview-img" style="width:100%;max-height:300px;object-fit:contain;display:block">
+        <button onclick="scanBelegCancel()"
+          style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div style="padding:10px 12px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px;border-top:1px solid var(--border)">
+        <i class="fas fa-lightbulb" style="color:#f59e0b"></i>
+        Beleg <strong>gerade von oben</strong> fotografieren für beste Ergebnisse
+      </div>
+      <div style="padding:8px 12px 12px;display:flex;gap:8px">
+        <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:10px;font-size:14px">
+          <i class="fas fa-magic"></i> KI-Analyse starten
+        </button>
+      </div>
+    </div>
+
+    <!-- Status / Animation -->
+    <div id="scan-status" style="display:none;margin-top:12px">
+      <div id="scan-status-inner" style="padding:16px;border-radius:var(--r2);background:var(--s2);border:1px solid var(--border);text-align:center">
+      </div>
+    </div>
+
+    <!-- Hinweis-Box -->
+    <div style="margin-top:12px;padding:12px;border-radius:var(--r);background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);font-size:12px;color:var(--sub);line-height:1.6">
+      <div style="font-weight:600;color:var(--blue);margin-bottom:4px"><i class="fas fa-robot"></i> KI-Belegerfassung</div>
+      Datum, Betrag, MwSt, Zahlungsart und Artikel werden automatisch erkannt und in die Felder eingetragen.
+    </div>
+  </div><!-- /rechte Spalte -->
+
+  </div><!-- /neu-layout -->
 </div>
 </div>
 
