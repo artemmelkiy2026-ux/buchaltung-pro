@@ -1005,6 +1005,12 @@ async function scanBeleg(input) {
       if (noteEl) noteEl.value = result.notiz;
       filled.push('Notiz');
     }
+    // 6. Zahlungsart
+    if (result.zahlungsart) {
+      const zahlSel = document.getElementById('nf-zahl');
+      if (zahlSel) zahlSel.value = result.zahlungsart;
+      filled.push(result.zahlungsart);
+    }
 
     if (filled.length === 0) {
       status.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--orange)"></i> Text erkannt, aber keine Beträge gefunden. Bitte manuell eingeben.';
@@ -1143,25 +1149,43 @@ function parseBelegText(text) {
     : (belegNr ? `Beleg Nr. ${belegNr}` : '');
 
   // ── 5. ARTIKELLISTE → Notiz ─────────────────────────────────────────────
-  // Zeilen die wie Artikel aussehen: "Artikelname    Preis"
-  // Ausschließen: Kopf, Fuß, MwSt-Tabelle, Zahlungsinfos
-  const skipNotizRx = /gesamt|summe|total|mwst|steuer|gegeben|zahlung|datum|uhrzeit|beleg|bon|rechnung|tel|fax|www|@|iban|bic|sepa|terminal|trace|karte|transaktion|vielen dank|filial|steuernr|weee/i;
-  const articleRx = /^(.{2,35}?)\s{2,}(\d{1,4}[.,]\d{2})\s*\d*\s*$/;
+  const skipNotizRx = /gesamt|summe|total|mwst|steuer|gegeben|zahlung|datum|uhrzeit|beleg|bon|rechnung|tel|fax|www|@|iban|bic|sepa|terminal|trace|karte|transaktion|vielen dank|filial|steuernr|weee|stück|stueck|art\/ean|artean/i;
+  // Artikel: optionales "N x" am Anfang (Menge), dann Name, dann Preis
+  // z.B. "1 Stück x  25,95" oder "D6XNP 28/34 vs    25,95 1" oder "Brot           1,29"
+  const articleRx = /^(?:\d+\s*(?:stück|stk|x|st\.)?\s+)?(.{2,35}?)\s{2,}(\d{1,4}[.,]\d{2})\s*(?:\d\s*)?$/i;
   const articles = [];
 
   for (const line of lines) {
     if (skipNotizRx.test(line)) continue;
     const m = line.match(articleRx);
     if (m) {
-      const name = m[1].trim();
+      let name = m[1].trim();
       const price = m[2];
-      if (name.length >= 2 && !/^\d+$/.test(name)) {
+      // Mengenangabe am Anfang entfernen: "1 x", "2x", "3 St."
+      name = name.replace(/^\d+\s*(x|st\.|stk\.?|stück)?\s*/i, '').trim();
+      if (name.length >= 2 && !/^\d+$/.test(name) && !/^[*\-=]{2,}/.test(name)) {
         articles.push(`${name}  ${price}`);
         if (articles.length >= 10) break;
       }
     }
   }
   if (articles.length > 0) result.notiz = articles.join('\n');
+
+  // ── 6. ZAHLUNGSART ──────────────────────────────────────────────────────
+  const tl = text.toLowerCase();
+  if (/bar(?:zahlung|geld)?\b|cash|\bbar\b/i.test(text) && !/kontaktlos|ec.?karte|sepa|kreditkarte|paypal/i.test(text)) {
+    result.zahlungsart = 'Barzahlung';
+  } else if (/paypal/i.test(text)) {
+    result.zahlungsart = 'PayPal';
+  } else if (/lastschrift|sepa/i.test(text)) {
+    result.zahlungsart = 'Lastschrift';
+  } else if (/kreditkarte|credit|mastercard|visa|amex/i.test(text)) {
+    result.zahlungsart = 'EC-Karte';
+  } else if (/ec.?karte|kartenzahlung|kontaktlos|girocard|debit/i.test(text)) {
+    result.zahlungsart = 'EC-Karte';
+  } else if (/überweisung|wire transfer/i.test(text)) {
+    result.zahlungsart = 'Überweisung';
+  }
 
   return result;
 }
