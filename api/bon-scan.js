@@ -1,8 +1,8 @@
 // Vercel Serverless Function — прокси для Anthropic API
-// Ключ хранится в Vercel Environment Variables, клиент его не видит
+
+export const config = { api: { bodyParser: { sizeLimit: '10mb' } } };
 
 export default async function handler(req, res) {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,10 +11,11 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { image_base64, image_type, prompt } = req.body;
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { image_base64, image_type, prompt } = body || {};
 
     if (!image_base64 || !prompt) {
-      return res.status(400).json({ error: 'Fehlende Parameter' });
+      return res.status(400).json({ error: 'Fehlende Parameter: image_base64, prompt' });
     }
 
     const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
@@ -35,14 +36,7 @@ export default async function handler(req, res) {
         messages: [{
           role: 'user',
           content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: image_type || 'image/jpeg',
-                data: image_base64,
-              }
-            },
+            { type: 'image', source: { type: 'base64', media_type: image_type || 'image/jpeg', data: image_base64 }},
             { type: 'text', text: prompt }
           ]
         }]
@@ -50,10 +44,7 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data?.error?.message || 'API Fehler' });
-    }
+    if (!response.ok) return res.status(response.status).json({ error: data?.error?.message || 'API Fehler' });
 
     const text = (data.content || []).map(b => b.text || '').join('').trim();
     return res.status(200).json({ result: text });
