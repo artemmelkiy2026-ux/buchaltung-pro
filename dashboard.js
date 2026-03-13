@@ -920,6 +920,8 @@ async function scanBelegPreview(input) {
   img.src = `data:${_scanMediaType};base64,${_scanBase64}`;
   preview.style.display = 'block';
   document.getElementById('scan-status').style.display = 'none';
+  const btnArea = document.getElementById('scan-btn-area');
+  if (btnArea) btnArea.style.display = 'none';
   input.value = '';
 }
 
@@ -942,6 +944,8 @@ function scanBelegCancel() {
   _scanBase64 = null;
   _scanMediaType = null;
   document.getElementById('scan-preview-box').style.display = 'none';
+  const btnArea = document.getElementById('scan-btn-area');
+  if (btnArea) btnArea.style.display = '';
 }
 
 async function scanBelegStart() {
