@@ -75,6 +75,25 @@ input[type="date"] {
     appearance: none;
     width: 100%;
     box-sizing: border-box;
+    color: var(--text);
+    background: var(--s2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    min-height: 38px;
+    display: block;
+    -webkit-text-fill-color: var(--text);
+}
+input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+    color: var(--text);
+    min-height: 1.2em;
+}
+input[type="date"]:focus {
+    border-color: var(--blue);
 }
 
 /* ── HEADER ── */
