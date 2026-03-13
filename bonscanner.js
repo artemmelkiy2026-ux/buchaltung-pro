@@ -131,7 +131,10 @@ function resetBonScanner() {
 
 // ── Основная функция сканирования ─────────────────────────────────
 // Вызывает Supabase Edge Function — ключ хранится на сервере, клиент его не видит
-const BON_EDGE_URL = 'https://dvmhstytoonpacxwdxuj.supabase.co/functions/v1/bon-scanner';
+// API ключ берётся из config.js (файл не публикуется на GitHub)
+function getBonApiKey() {
+  return (typeof ANTHROPIC_KEY !== 'undefined' && ANTHROPIC_KEY) || '';
+}
 
 async function startBonScan() {
   if (!_bonImageBase64) return;
@@ -149,25 +152,31 @@ async function startBonScan() {
   document.getElementById('bon-error').style.display = 'none';
 
   try {
-    // Вызываем Edge Function — ключ на стороне Supabase
-    const response = await fetch(BON_EDGE_URL, {
+    const apiKey = getBonApiKey();
+    if (!apiKey) throw new Error('API-Schlüssel nicht konfiguriert (config.js fehlt)');
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
       body: JSON.stringify({
-        image_base64: _bonImageBase64,
-        image_type:   _bonImageType || 'image/jpeg',
-        prompt:       buildBonPrompt(ustMode),
+        model: 'claude-opus-4-5',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: _bonImageType || 'image/jpeg', data: _bonImageBase64 }},
+          { type: 'text', text: buildBonPrompt(ustMode) }
+        ]}]
       })
     });
 
     const resp = await response.json();
+    if (!response.ok) throw new Error(resp?.error?.message || `HTTP ${response.status}`);
 
-    if (!response.ok || resp.error) {
-      throw new Error(resp.error || `HTTP ${response.status}`);
-    }
-
-    // Парсим JSON из ответа Claude
-    const text  = resp.result || '';
+    const text = (resp.content || []).map(b => b.text || '').join('').trim();
     const clean = text.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```\s*$/,'').trim();
     const parsed = JSON.parse(clean);
     _bonResult = parsed;
