@@ -946,7 +946,6 @@ function scanBelegCancel() {
 
 async function scanBelegStart() {
   if (!_scanBase64) return;
-  document.getElementById('scan-preview-box').style.display = 'none';
   await scanBeleg(_scanBase64, _scanMediaType);
   _scanBase64 = null;
   _scanMediaType = null;
