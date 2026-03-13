@@ -413,7 +413,7 @@
 
   <!-- RECHTE SPALTE: Beleg scannen -->
   <div id="scan-beleg-box" style="display:none;position:sticky;top:20px">
-    <input type="file" id="scan-file-input" accept="image/*" style="display:none" onchange="scanBelegPreview(this)">
+    <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBelegPreview(this)">
 
     <!-- Scan-Button -->
     <div id="scan-btn-area">
@@ -428,21 +428,21 @@
     </div>
 
     <!-- Vorschau -->
-    <div id="scan-preview-box" style="display:none;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--s2);  margin:10px 0px;">
-          <div style="padding:15px 12px;font-size:12px;color: var(--sub);">
-   Wichtig: Bitte kontrollieren Sie alle automatisch ausgefüllten Felder, bevor Sie den Vorgang abschließen.
-      </div>
+    <div id="scan-preview-box" style="display:none;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--s2)">
       <div style="position:relative">
-        <img id="scan-preview-img" style="width:100%;max-height:100%;object-fit:contain;display:block;>
+        <img id="scan-preview-img" style="width:100%;max-height:300px;object-fit:contain;display:block">
         <button onclick="scanBelegCancel()"
           style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px">
           <i class="fas fa-times"></i>
         </button>
       </div>
-
+      <div style="padding:10px 12px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px;border-top:1px solid var(--border)">
+        <i class="fas fa-lightbulb" style="color:#f59e0b"></i>
+        Beleg <strong>gerade von oben</strong> fotografieren für beste Ergebnisse
+      </div>
       <div style="padding:8px 12px 12px;display:flex;gap:8px">
         <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:10px;font-size:14px">
-          KI-Analyse starten
+          <i class="fas fa-magic"></i> KI-Analyse starten
         </button>
       </div>
     </div>
@@ -455,7 +455,7 @@
 
     <!-- Hinweis-Box -->
     <div style="margin-top:12px;padding:12px;border-radius:var(--r);background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);font-size:12px;color:var(--sub);line-height:1.6">
-      <div style="font-weight:600;color:var(--blue);margin-bottom:4px"> KI-Belegerfassung</div>
+      <div style="font-weight:600;color:var(--blue);margin-bottom:4px"><i class="fas fa-robot"></i> KI-Belegerfassung</div>
       Datum, Betrag, MwSt, Zahlungsart und Artikel werden automatisch erkannt und in die Felder eingetragen.
     </div>
   </div><!-- /rechte Spalte -->
