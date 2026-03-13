@@ -10,7 +10,7 @@ const KA_SCAN = [
   'Bewirtung','Sonstiges Ausgabe'
 ];
 
-const ANTHROPIC_API_KEY = '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';
+const ANTHROPIC_API_KEY = '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';
 
 // ── Промпт — принимает OCR текст ─────────────────────────────────
 function buildBonPrompt(ocrText, ustMode) {
