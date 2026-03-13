@@ -66,19 +66,27 @@ let _bonImageBase64 = null;
 let _bonImageType   = null;
 let _bonResult      = null;
 
-// ── Открыть/закрыть модалку ───────────────────────────────────────
-function openBonScanner() {
-  // Заполняем категории
-  const sel = document.getElementById('bon-res-kat');
-  sel.innerHTML = KA_SCAN.map(k => `<option value="${k}">${k}</option>`).join('');
-
-  document.getElementById('bon-modal-bg').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+// ── Открыть/закрыть inline блок ──────────────────────────────────
+function toggleBonScanner() {
+  const block = document.getElementById('bon-inline');
+  const isOpen = block.style.display !== 'none';
+  if (isOpen) {
+    block.style.display = 'none';
+    resetBonScanner();
+  } else {
+    // Заполняем категории
+    const sel = document.getElementById('bon-res-kat');
+    sel.innerHTML = KA_SCAN.map(k => `<option value="${k}">${k}</option>`).join('');
+    block.style.display = '';
+    block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 }
 
+function openBonScanner() { toggleBonScanner(); }
+
 function closeBonScanner() {
-  document.getElementById('bon-modal-bg').style.display = 'none';
-  document.body.style.overflow = '';
+  document.getElementById('bon-inline').style.display = 'none';
+  resetBonScanner();
 }
 
 // ── Обработка файла ───────────────────────────────────────────────
