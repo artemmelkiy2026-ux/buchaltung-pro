@@ -68,12 +68,6 @@ let _bonResult      = null;
 
 // ── Открыть/закрыть модалку ───────────────────────────────────────
 function openBonScanner() {
-  const key = localStorage.getItem('bp_anthropic_key');
-  if (!key) {
-    toast('<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Kein API-Schlüssel. Bitte in den Einstellungen eingeben.', 'err');
-    setTimeout(() => nav('mehr', null), 1200);
-    return;
-  }
   // Заполняем категории
   const sel = document.getElementById('bon-res-kat');
   sel.innerHTML = KA_SCAN.map(k => `<option value="${k}">${k}</option>`).join('');
@@ -136,17 +130,18 @@ function resetBonScanner() {
 }
 
 // ── Основная функция сканирования ─────────────────────────────────
+// Вызывает Supabase Edge Function — ключ хранится на сервере, клиент его не видит
+const BON_EDGE_URL = 'https://dvmhstytoonpacxwdxuj.supabase.co/functions/v1/bon-scanner';
+
 async function startBonScan() {
   if (!_bonImageBase64) return;
-  const key = localStorage.getItem('bp_anthropic_key');
-  if (!key) { toast('Kein API-Schlüssel', 'err'); return; }
 
   // Определяем USt-режим текущего года
   const yr = new Date().getFullYear().toString();
   const ustMode = (typeof data !== 'undefined' && data.ustModeByYear)
     ? (data.ustModeByYear[yr] || '§19') : '§19';
 
-  // Показываем шаг результата с лоадером
+  // Показываем лоадер
   document.getElementById('bon-step-upload').style.display = 'none';
   document.getElementById('bon-step-result').style.display = '';
   document.getElementById('bon-loading').style.display = '';
@@ -154,46 +149,25 @@ async function startBonScan() {
   document.getElementById('bon-error').style.display = 'none';
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    // Вызываем Edge Function — ключ на стороне Supabase
+    const response = await fetch(BON_EDGE_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 1024,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: _bonImageType,
-                data: _bonImageBase64,
-              }
-            },
-            {
-              type: 'text',
-              text: buildBonPrompt(ustMode),
-            }
-          ]
-        }]
+        image_base64: _bonImageBase64,
+        image_type:   _bonImageType || 'image/jpeg',
+        prompt:       buildBonPrompt(ustMode),
       })
     });
 
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err?.error?.message || `HTTP ${response.status}`);
+    const resp = await response.json();
+
+    if (!response.ok || resp.error) {
+      throw new Error(resp.error || `HTTP ${response.status}`);
     }
 
-    const data_resp = await response.json();
-    const text = (data_resp.content || []).map(b => b.text || '').join('').trim();
-
-    // Парсим JSON — убираем возможные backtick-обёртки
+    // Парсим JSON из ответа Claude
+    const text  = resp.result || '';
     const clean = text.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```\s*$/,'').trim();
     const parsed = JSON.parse(clean);
     _bonResult = parsed;
@@ -203,9 +177,10 @@ async function startBonScan() {
     document.getElementById('bon-loading').style.display = 'none';
     document.getElementById('bon-error').style.display = '';
     let msg = err.message || 'Unbekannter Fehler';
-    if (msg.includes('401')) msg = 'API-Schlüssel ungültig. Bitte in den Einstellungen prüfen.';
-    if (msg.includes('429')) msg = 'API-Limit erreicht. Bitte kurz warten.';
-    if (msg.includes('fetch')) msg = 'Keine Internetverbindung.';
+    if (msg.includes('401') || msg.includes('403')) msg = 'Zugriff verweigert. Edge Function prüfen.';
+    if (msg.includes('429')) msg = 'Zu viele Anfragen. Bitte kurz warten.';
+    if (msg.includes('fetch') || msg.includes('network')) msg = 'Keine Internetverbindung.';
+    if (msg.includes('nicht konfiguriert')) msg = 'API-Schlüssel in Supabase Secrets nicht gesetzt.';
     document.getElementById('bon-error-msg').textContent = msg;
   }
 }

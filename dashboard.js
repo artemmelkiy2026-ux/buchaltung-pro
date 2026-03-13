@@ -35,10 +35,7 @@ function setTyp(t){
   updateMwstFormVisibility();
   // Bon-Scanner Button: nur bei Ausgabe anzeigen
   const scanBtn = document.getElementById('bon-scan-btn');
-  if(scanBtn){
-    const hasKey = !!localStorage.getItem('bp_anthropic_key');
-    scanBtn.style.display = (t==='Ausgabe' && hasKey) ? '' : 'none';
-  }
+  if(scanBtn) scanBtn.style.display = t==='Ausgabe' ? '' : 'none';
 }
 function updateMwstFormVisibility(){
   const yr=document.getElementById('nf-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
