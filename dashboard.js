@@ -890,6 +890,44 @@ function renderZ(){
   }
 }
 
+// ── Bild-Vorverarbeitung für bessere OCR ──────────────────────────────────
+function preprocessImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      // Max 2000px Breite — größer bringt nichts, verlangsamt nur
+      const MAX = 2000;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      // Bild zeichnen
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Graustufen + Kontrast erhöhen
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        // Graustufen
+        const gray = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+        // Kontrast: Faktor 1.5, Mittelpunkt 128
+        const contrast = Math.min(255, Math.max(0, (gray - 128) * 1.5 + 128));
+        d[i] = d[i+1] = d[i+2] = contrast;
+      }
+      ctx.putImageData(imageData, 0, 0);
+
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Bild konnte nicht geladen werden')); };
+    img.src = url;
+  });
+}
+
 // ── Beleg scannen (Tesseract.js OCR) ──────────────────────────────────────
 async function scanBeleg(input) {
   const file = input.files[0];
@@ -900,8 +938,8 @@ async function scanBeleg(input) {
   status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Bild wird geladen…';
 
   try {
-    // Bild als URL vorbereiten
-    const imgUrl = URL.createObjectURL(file);
+    // Bild via Canvas vorverarbeiten: Kontrast + Graustufen → bessere OCR-Qualität
+    const imgUrl = await preprocessImage(file);
 
     status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Text wird erkannt… (kann 10–20 Sek. dauern)';
 
