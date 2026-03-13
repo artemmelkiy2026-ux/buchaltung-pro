@@ -923,6 +923,21 @@ async function scanBelegPreview(input) {
   input.value = '';
 }
 
+function openScanZoom() {
+  const img = document.getElementById('scan-preview-img');
+  if (!img || !img.src) return;
+  const modal = document.getElementById('scan-zoom-modal');
+  if (!modal) return;
+  document.getElementById('scan-zoom-img').src = img.src;
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeScanZoom() {
+  document.getElementById('scan-zoom-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
 function scanBelegCancel() {
   _scanBase64 = null;
   _scanMediaType = null;
@@ -942,15 +957,12 @@ async function scanBeleg(base64, mediaType) {
   const statusInner = document.getElementById('scan-status-inner');
   status.style.display = 'block';
   if (statusInner) {
-    statusInner.className = 'scan-analyzing';
+    statusInner.className = '';
+    statusInner.style.cssText = 'padding:8px 0;background:none;border:none;text-align:left';
     statusInner.innerHTML = `
-      <div style="margin-bottom:10px">
-        <i class="fas fa-robot scan-icon-bounce" style="font-size:28px;color:var(--blue)"></i>
-      </div>
-      <div style="font-weight:600;font-size:14px;margin-bottom:4px">KI analysiert den Beleg…</div>
-      <div style="font-size:12px;color:var(--sub)">Datum · Betrag · Artikel werden erkannt</div>
-      <div style="margin-top:10px;height:3px;border-radius:2px;background:var(--border);overflow:hidden">
-        <div id="scan-progress-bar" style="height:100%;width:10%;background:var(--blue);border-radius:2px;transition:width .3s"></div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:5px">Laden...</div>
+      <div style="height:3px;border-radius:2px;background:var(--border);overflow:hidden">
+        <div style="height:100%;width:30%;background:rgba(59,130,246,.5);border-radius:2px;animation:scan-progress-slide 1.4s ease-in-out infinite"></div>
       </div>`;
   }
 
@@ -970,12 +982,10 @@ async function scanBeleg(base64, mediaType) {
     }
 
     const result = await resp.json();
-    const filled = [];
 
     if (result.datum) {
       document.getElementById('nf-dat').value = result.datum;
       updateMwstFormVisibility();
-      filled.push('Datum');
     }
     if (result.mwst_rate !== undefined) {
       const mwstSel = document.getElementById('nf-mwst-rate');
@@ -984,55 +994,29 @@ async function scanBeleg(base64, mediaType) {
     if (result.betrag) {
       document.getElementById('nf-bet').value = parseFloat(result.betrag).toFixed(2);
       calcNfVorsteuer(); calcNfMwst();
-      filled.push('Betrag ' + parseFloat(result.betrag).toFixed(2) + ' €');
     }
     if (result.beschreibung) {
       document.getElementById('nf-dsc').value = result.beschreibung;
-      filled.push('Beschreibung');
     }
     if (result.notiz) {
       const noteEl = document.getElementById('nf-note');
       if (noteEl) noteEl.value = result.notiz;
-      filled.push('Notiz');
     }
     if (result.zahlungsart) {
       const zahlSel = document.getElementById('nf-zahl');
       if (zahlSel) zahlSel.value = result.zahlungsart;
-      filled.push(result.zahlungsart);
     }
 
-    if (statusInner) {
-      if (filled.length === 0) {
-        statusInner.className = 'scan-result-fadein';
-        statusInner.style.borderColor = 'rgba(249,115,22,.3)';
-        statusInner.innerHTML = `
-          <i class="fas fa-exclamation-triangle" style="font-size:22px;color:#f97316;margin-bottom:8px;display:block"></i>
-          <div style="font-weight:600;font-size:13px">Keine Daten erkannt</div>
-          <div style="font-size:12px;color:var(--sub);margin-top:4px">Bitte manuell eingeben</div>`;
-      } else {
-        statusInner.className = 'scan-result-fadein';
-        statusInner.style.borderColor = 'rgba(34,197,94,.3)';
-        statusInner.style.background = 'rgba(34,197,94,.05)';
-        statusInner.innerHTML = `
-          <i class="fas fa-check-circle" style="font-size:22px;color:var(--green);margin-bottom:8px;display:block"></i>
-          <div style="font-weight:600;font-size:13px;color:var(--green)">Erfolgreich erkannt!</div>
-          <div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.6">${filled.join('<br>')}</div>`;
-      }
-    }
-    setTimeout(() => { status.style.display = 'none'; if(statusInner) statusInner.style.cssText=''; }, 6000);
+    // Hide progress bar, keep preview visible
+    status.style.display = 'none';
+    if (statusInner) statusInner.style.cssText = '';
 
   } catch (err) {
     if (statusInner) {
-      statusInner.className = 'scan-result-fadein';
-      statusInner.style.borderColor = 'rgba(239,68,68,.3)';
-      statusInner.innerHTML = `
-        <i class="fas fa-exclamation-circle" style="font-size:22px;color:var(--red);margin-bottom:8px;display:block"></i>
-        <div style="font-weight:600;font-size:13px">Fehler</div>
-        <div style="font-size:12px;color:var(--sub);margin-top:4px">${err.message}</div>`;
-    } else {
-      status.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--red)"></i> ${err.message}`;
+      statusInner.style.cssText = 'padding:8px 0;background:none;border:none;text-align:left';
+      statusInner.innerHTML = `<div style="font-size:12px;color:var(--red)">${err.message}</div>`;
     }
-    setTimeout(() => { status.style.display = 'none'; if(statusInner) statusInner.style.cssText=''; }, 6000);
+    setTimeout(() => { status.style.display = 'none'; if(statusInner) statusInner.style.cssText=''; }, 4000);
   }
 }
 
