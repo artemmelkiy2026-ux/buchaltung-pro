@@ -322,6 +322,41 @@ body {
     </div>
   </div>
 
+
+  <!-- API Key für Bon-Scanner -->
+  <div class="section">
+    <div class="section-title">KI-Funktionen</div>
+    <div class="settings-card" style="padding:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div class="setting-icon" style="background:rgba(99,102,241,.1)"><i class="fas fa-robot" style="color:#6366f1"></i></div>
+        <div>
+          <div class="setting-label">Anthropic API-Schlüssel</div>
+          <div class="setting-sub">Für den Bon-Scanner (Belege automatisch erfassen)</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." 
+          style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;
+                 color:var(--text);padding:9px 12px;font-size:13px;font-family:monospace;outline:none"
+          oninput="checkApiKeyInput()">
+        <button id="api-key-toggle" onclick="toggleApiKeyVisibility()" 
+          style="background:var(--s2);border:1px solid var(--border);border-radius:8px;
+                 padding:9px 12px;cursor:pointer;color:var(--sub)">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="api-key-save-btn" class="btn primary" style="flex:1;padding:9px;font-size:13px" onclick="saveApiKey()" disabled>
+          <i class="fas fa-save"></i> Speichern
+        </button>
+        <button id="api-key-clear-btn" class="btn" style="padding:9px 14px;font-size:13px;display:none" onclick="clearApiKey()">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+      <div id="api-key-status" style="margin-top:8px;font-size:12px;display:none"></div>
+    </div>
+  </div>
+
   <!-- Выход -->
   <div class="section">
     <div class="section-title">Sitzung</div>
@@ -1005,6 +1040,82 @@ function copyClientId() {
 }
 
 init();
+
+  // ── API KEY MANAGEMENT ────────────────────────────────────────
+  function loadApiKeyStatus() {
+    const key = localStorage.getItem('bp_anthropic_key') || '';
+    const inp = document.getElementById('api-key-input');
+    const clearBtn = document.getElementById('api-key-clear-btn');
+    const status = document.getElementById('api-key-status');
+    if (key) {
+      inp.value = key;
+      clearBtn.style.display = '';
+      status.style.display = '';
+      status.innerHTML = '<i class="fas fa-check-circle" style="color:var(--green)"></i> API-Schlüssel gespeichert — Bon-Scanner aktiv';
+      status.style.color = 'var(--green)';
+    } else {
+      status.style.display = '';
+      status.innerHTML = '<i class="fas fa-info-circle" style="color:var(--sub)"></i> Kein Schlüssel — Bon-Scanner deaktiviert. <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">API-Key holen →</a>';
+      status.style.color = 'var(--sub)';
+    }
+  }
+  function checkApiKeyInput() {
+    const val = document.getElementById('api-key-input').value.trim();
+    document.getElementById('api-key-save-btn').disabled = !val;
+  }
+  function toggleApiKeyVisibility() {
+    const inp = document.getElementById('api-key-input');
+    const icon = document.querySelector('#api-key-toggle i');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      icon.className = 'fas fa-eye-slash';
+    } else {
+      inp.type = 'password';
+      icon.className = 'fas fa-eye';
+    }
+  }
+  async function saveApiKey() {
+    const val = document.getElementById('api-key-input').value.trim();
+    if (!val) return;
+    const btn = document.getElementById('api-key-save-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Speichern…';
+    try {
+      if (typeof sbSaveAnthropicKey === 'function') {
+        await sbSaveAnthropicKey(val);
+      } else {
+        localStorage.setItem('bp_anthropic_key', val);
+      }
+      document.getElementById('api-key-clear-btn').style.display = '';
+      const status = document.getElementById('api-key-status');
+      status.style.display = '';
+      status.innerHTML = '<i class="fas fa-check-circle" style="color:var(--green)"></i> API-Schlüssel in Supabase gespeichert — Bon-Scanner aktiv';
+      status.style.color = 'var(--green)';
+      toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> API-Schlüssel gespeichert');
+    } catch(e) {
+      toast('<i class="fas fa-times-circle" style="color:var(--red)"></i> Fehler beim Speichern', 'err');
+    } finally {
+      btn.innerHTML = '<i class="fas fa-save"></i> Speichern';
+      btn.disabled = false;
+    }
+  }
+  async function clearApiKey() {
+    try {
+      if (typeof sbSaveAnthropicKey === 'function') {
+        await sbSaveAnthropicKey(null);
+      } else {
+        localStorage.removeItem('bp_anthropic_key');
+      }
+    } catch(e) {}
+    document.getElementById('api-key-input').value = '';
+    document.getElementById('api-key-clear-btn').style.display = 'none';
+    document.getElementById('api-key-save-btn').disabled = true;
+    const status = document.getElementById('api-key-status');
+    status.innerHTML = '<i class="fas fa-info-circle" style="color:var(--sub)"></i> Kein Schlüssel — Bon-Scanner deaktiviert';
+    status.style.color = 'var(--sub)';
+    toast('<i class="fas fa-times-circle" style="color:var(--red)"></i> API-Schlüssel gelöscht');
+  }
+
 </script>
 </body>
 </html>
