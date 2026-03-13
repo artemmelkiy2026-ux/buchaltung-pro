@@ -131,9 +131,8 @@ function resetBonScanner() {
 
 // ── Основная функция сканирования ─────────────────────────────────
 // Вызывает Supabase Edge Function — ключ хранится на сервере, клиент его не видит
-// API ключ берётся из config.js (файл не публикуется на GitHub)
 function getBonApiKey() {
-  return (typeof ANTHROPIC_KEY !== 'undefined' && ANTHROPIC_KEY) || '';
+  return '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';
 }
 
 async function startBonScan() {
