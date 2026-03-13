@@ -891,42 +891,46 @@ function renderZ(){
 }
 
 // ── Beleg scannen via Gemini Vision API (Supabase Edge Function) ──────────
-let _scanFile = null;
+let _scanBase64 = null;
+let _scanMediaType = null;
 
-function scanBelegPreview(input) {
+async function scanBelegPreview(input) {
   const file = input.files[0];
   if (!file) return;
-  _scanFile = file;
+
+  // Sofort zu base64 konvertieren — kein File-Objekt speichern
+  _scanMediaType = file.type || 'image/jpeg';
+  _scanBase64 = await resizeToBase64(file, 1600);
+
   const preview = document.getElementById('scan-preview-box');
   const img = document.getElementById('scan-preview-img');
-  img.src = URL.createObjectURL(file);
+  // Preview aus base64 anzeigen
+  img.src = `data:${_scanMediaType};base64,${_scanBase64}`;
   preview.style.display = 'block';
   document.getElementById('scan-status').style.display = 'none';
   input.value = '';
 }
 
 function scanBelegCancel() {
-  _scanFile = null;
+  _scanBase64 = null;
+  _scanMediaType = null;
   document.getElementById('scan-preview-box').style.display = 'none';
 }
 
 async function scanBelegStart() {
-  if (!_scanFile) return;
+  if (!_scanBase64) return;
   document.getElementById('scan-preview-box').style.display = 'none';
-  await scanBeleg(_scanFile);
-  _scanFile = null;
+  await scanBeleg(_scanBase64, _scanMediaType);
+  _scanBase64 = null;
+  _scanMediaType = null;
 }
 
-async function scanBeleg(file) {
+async function scanBeleg(base64, mediaType) {
   const status = document.getElementById('scan-status');
   status.style.display = 'block';
   status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Beleg wird analysiert…';
 
   try {
-    // Bild zu base64 (max 1600px für schnelle Übertragung)
-    const base64 = await resizeToBase64(file, 1600);
-    const mediaType = file.type || 'image/jpeg';
-
     const resp = await fetch(`${SUPA_URL}/functions/v1/scan-beleg`, {
       method: 'POST',
       headers: {
