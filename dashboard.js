@@ -886,3 +886,148 @@ function renderZ(){
     if(zpag) zpag.innerHTML = paginationHTML;
   }
 }
+
+// ── Beleg scannen (Tesseract.js OCR) ──────────────────────────────────────
+async function scanBeleg(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const status = document.getElementById('scan-status');
+  status.style.display = 'block';
+  status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Bild wird geladen…';
+
+  try {
+    // Bild als URL vorbereiten
+    const imgUrl = URL.createObjectURL(file);
+
+    status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Text wird erkannt… (kann 10–20 Sek. dauern)';
+
+    // Tesseract OCR — Deutsch + Englisch für bessere Zahlenerkennung
+    const { data: { text } } = await Tesseract.recognize(imgUrl, 'deu+eng', {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          const pct = Math.round((m.progress || 0) * 100);
+          status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Erkenne Text… ${pct}%`;
+        }
+      }
+    });
+
+    URL.revokeObjectURL(imgUrl);
+
+    if (!text || text.trim().length < 5) {
+      throw new Error('Kein Text erkannt. Bitte deutlicheres Foto machen.');
+    }
+
+    // Text parsen
+    const result = parseBelegText(text);
+
+    // Felder befüllen
+    let filled = [];
+
+    if (result.datum) {
+      document.getElementById('nf-dat').value = result.datum;
+      updateMwstFormVisibility();
+      filled.push('Datum');
+    }
+    if (result.betrag) {
+      document.getElementById('nf-bet').value = result.betrag.toFixed(2);
+      calcNfVorsteuer(); calcNfMwst();
+      filled.push('Betrag');
+    }
+    if (result.beschreibung) {
+      const notizEl = document.getElementById('nf-notiz');
+      if (notizEl) notizEl.value = result.beschreibung;
+      filled.push('Beschreibung');
+    }
+    if (result.mwst_rate) {
+      const mwstSel = document.getElementById('nf-mwst-rate');
+      if (mwstSel) { mwstSel.value = result.mwst_rate; calcNfMwst(); }
+    }
+
+    if (filled.length === 0) {
+      status.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--orange)"></i> Text erkannt, aber keine Beträge gefunden. Bitte manuell eingeben.';
+    } else {
+      status.innerHTML = `<i class="fas fa-check-circle" style="color:var(--green)"></i> Erkannt: ${filled.join(', ')} — bitte prüfen!`;
+    }
+    setTimeout(() => { status.style.display = 'none'; }, 5000);
+
+  } catch (err) {
+    status.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--red)"></i> ${err.message}`;
+    setTimeout(() => { status.style.display = 'none'; }, 6000);
+  }
+
+  input.value = '';
+}
+
+function parseBelegText(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const result = {};
+
+  // ── Datum ──────────────────────────────────────────────────────────────
+  // Formate: 01.02.2025 / 2025-02-01 / 01/02/2025 / 01.02.25
+  const datPatterns = [
+    /\b(\d{1,2})[.\-\/](\d{1,2})[.\-\/](20\d{2})\b/,  // DD.MM.YYYY
+    /\b(20\d{2})[.\-\/](\d{1,2})[.\-\/](\d{1,2})\b/,  // YYYY-MM-DD
+    /\b(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{2})\b/,    // DD.MM.YY
+  ];
+  for (const line of lines) {
+    for (let i = 0; i < datPatterns.length; i++) {
+      const m = line.match(datPatterns[i]);
+      if (m) {
+        let d, mo, y;
+        if (i === 1) { [, y, mo, d] = m; }
+        else {
+          [, d, mo, y] = m;
+          if (y.length === 2) y = '20' + y;
+        }
+        d = d.padStart(2,'0'); mo = mo.padStart(2,'0');
+        if (parseInt(mo) >= 1 && parseInt(mo) <= 12 && parseInt(d) >= 1 && parseInt(d) <= 31) {
+          result.datum = `${y}-${mo}-${d}`;
+          break;
+        }
+      }
+    }
+    if (result.datum) break;
+  }
+
+  // ── Betrag — Gesamtbetrag ───────────────────────────────────────────────
+  // Suche nach Schlüsselwörtern: Gesamt, Total, Summe, Zahlung, Betrag, EUR
+  const totalKeywords = /gesamt|total|summe|zahlung|endbetrag|zu zahlen|gesamtbetrag|bar|brutto/i;
+  const amountRx = /(\d{1,6}[.,]\d{2})/g;
+
+  let candidates = [];
+
+  for (const line of lines) {
+    const amounts = [...line.matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
+    if (amounts.length === 0) continue;
+    const maxAmt = Math.max(...amounts);
+    const isTotal = totalKeywords.test(line);
+    candidates.push({ amt: maxAmt, isTotal, line });
+  }
+
+  // Bevorzuge Zeilen mit Schlüsselwort
+  const totalLine = candidates.filter(c => c.isTotal).sort((a,b) => b.amt - a.amt)[0];
+  if (totalLine) {
+    result.betrag = totalLine.amt;
+  } else {
+    // Fallback: größte Zahl auf dem Beleg (wahrscheinlich Gesamtbetrag)
+    const largest = candidates.sort((a,b) => b.amt - a.amt)[0];
+    if (largest && largest.amt > 0) result.betrag = largest.amt;
+  }
+
+  // ── MwSt-Satz ──────────────────────────────────────────────────────────
+  if (/\b7\s*%/.test(text)) result.mwst_rate = 7;
+  else if (/\b19\s*%/.test(text)) result.mwst_rate = 19;
+
+  // ── Beschreibung — erste sinnvolle Zeile (Firmenname) ──────────────────
+  // Meist erste nicht-leere Zeile die kein Datum/Zahl ist
+  for (const line of lines.slice(0, 6)) {
+    if (line.length < 3) continue;
+    if (/^\d/.test(line)) continue;          // beginnt mit Zahl
+    if (/^[*\-=_#]{2,}/.test(line)) continue; // Trennlinien
+    result.beschreibung = line.substring(0, 60);
+    break;
+  }
+
+  return result;
+}

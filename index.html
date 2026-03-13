@@ -305,6 +305,17 @@
 <div class="page" id="p-neu">
 <div class="page-inner" style="max-width:620px">
   <h1 style="font-size:20px;font-weight:700;margin-bottom:12px"><i class="fas fa-plus-circle"></i> Neuer Eintrag</h1>
+
+  <!-- Beleg scannen -->
+  <div style="margin-bottom:12px">
+    <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBeleg(this)">
+    <button class="btn" onclick="document.getElementById('scan-file-input').click()"
+      style="width:100%;padding:11px;background:var(--s2);border:1.5px dashed var(--border);color:var(--text);font-size:14px;font-weight:600;border-radius:var(--r);display:flex;align-items:center;justify-content:center;gap:8px">
+      <i class="fas fa-camera"></i> Beleg / Rechnung scannen
+    </button>
+    <div id="scan-status" style="display:none;margin-top:8px;font-size:13px;color:var(--sub);text-align:center"></div>
+  </div>
+
   <!-- USt-Mode Banner in Neuer Eintrag -->
   <div class="form-panel">
     <div class="typ-toggle">
@@ -1129,5 +1140,7 @@
 <script src="kunden.js"></script>
 <script src="journal.js"></script>
 <script src="umsatzsteuer.js"></script>
+  <!-- Tesseract.js OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </body>
 </html>
