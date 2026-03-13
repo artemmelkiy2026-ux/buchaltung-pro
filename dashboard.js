@@ -929,7 +929,10 @@ async function scanBeleg(file) {
 
     const resp = await fetch(`${SUPA_URL}/functions/v1/scan-beleg`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPA_KEY}`
+      },
       body: JSON.stringify({ image: base64, mediaType })
     });
 
