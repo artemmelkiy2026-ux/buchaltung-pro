@@ -33,6 +33,9 @@ function setTyp(t){
   document.getElementById('btn-a').className='tt'+(t==='Ausgabe'?' aa':'');
   updateKatSel();
   updateMwstFormVisibility();
+  // Scan-Button nur bei Ausgabe anzeigen
+  const scanBox = document.getElementById('scan-beleg-box');
+  if(scanBox) scanBox.style.display = t==='Ausgabe' ? 'block' : 'none';
 }
 function updateMwstFormVisibility(){
   const yr=document.getElementById('nf-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
@@ -935,9 +938,13 @@ async function scanBeleg(input) {
       filled.push('Betrag');
     }
     if (result.beschreibung) {
-      const notizEl = document.getElementById('nf-notiz');
-      if (notizEl) notizEl.value = result.beschreibung;
+      document.getElementById('nf-dsc').value = result.beschreibung;
       filled.push('Beschreibung');
+    }
+    if (result.notiz) {
+      const noteEl = document.getElementById('nf-note');
+      if (noteEl) noteEl.value = result.notiz;
+      filled.push('Notiz');
     }
     if (result.mwst_rate) {
       const mwstSel = document.getElementById('nf-mwst-rate');
@@ -1019,15 +1026,40 @@ function parseBelegText(text) {
   if (/\b7\s*%/.test(text)) result.mwst_rate = 7;
   else if (/\b19\s*%/.test(text)) result.mwst_rate = 19;
 
-  // ── Beschreibung — erste sinnvolle Zeile (Firmenname) ──────────────────
-  // Meist erste nicht-leere Zeile die kein Datum/Zahl ist
-  for (const line of lines.slice(0, 6)) {
+  // ── Beschreibung — Firmenname + Belegnummer ───────────────────────────
+  let firmaName = '';
+  for (const line of lines.slice(0, 8)) {
     if (line.length < 3) continue;
-    if (/^\d/.test(line)) continue;          // beginnt mit Zahl
-    if (/^[*\-=_#]{2,}/.test(line)) continue; // Trennlinien
-    result.beschreibung = line.substring(0, 60);
+    if (/^\d/.test(line)) continue;
+    if (/^[*\-=_#]{2,}/.test(line)) continue;
+    firmaName = line.substring(0, 40);
     break;
   }
+  // Belegnummer suchen: Bon-Nr, Beleg-Nr, Rechnung, Nr., #
+  let belegNr = '';
+  const belegRx = /(?:bon[\s\-]?nr|beleg[\s\-]?nr|re[\s\-]?nr|rechnungs[\s\-]?nr|nr\.|receipt|#)\s*[:\.]?\s*([A-Z0-9\-\/]+)/i;
+  for (const line of lines) {
+    const m = line.match(belegRx);
+    if (m) { belegNr = m[1].substring(0, 20); break; }
+  }
+  if (firmaName) {
+    result.beschreibung = belegNr ? `${firmaName} · Nr. ${belegNr}` : firmaName;
+  }
+
+  // ── Notiz — Artikelliste ────────────────────────────────────────────────
+  // Zeilen die wie Artikel aussehen: Text + Preis daneben, nicht Header/Footer
+  const skipRx = /gesamt|total|summe|mwst|steuer|zahlung|vielen dank|datum|uhrzeit|kasse|beleg|bon|rechnung|tel|fax|www|@|ust|%/i;
+  const articleRx = /^(.{2,40}?)\s{2,}(\d{1,4}[.,]\d{2})\s*$/;
+  const articles = [];
+  for (const line of lines) {
+    if (skipRx.test(line)) continue;
+    const m = line.match(articleRx);
+    if (m) {
+      articles.push(`${m[1].trim()} ${m[2]}`);
+      if (articles.length >= 8) break;
+    }
+  }
+  if (articles.length > 0) result.notiz = articles.join('\n');
 
   return result;
 }

@@ -307,7 +307,7 @@
   <h1 style="font-size:20px;font-weight:700;margin-bottom:12px"><i class="fas fa-plus-circle"></i> Neuer Eintrag</h1>
 
   <!-- Beleg scannen -->
-  <div style="margin-bottom:12px">
+  <div id="scan-beleg-box" style="margin-bottom:12px;display:none">
     <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBeleg(this)">
     <button class="btn" onclick="document.getElementById('scan-file-input').click()"
       style="width:100%;padding:11px;background:var(--s2);border:1.5px dashed var(--border);color:var(--text);font-size:14px;font-weight:600;border-radius:var(--r);display:flex;align-items:center;justify-content:center;gap:8px">
