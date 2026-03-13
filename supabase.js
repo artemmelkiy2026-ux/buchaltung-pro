@@ -89,7 +89,7 @@ async function sbLoadAll() {
 async function sbLoadUserData() {
   if (!currentUser) return { pin_hash: null, deleted_at: null, disclaimer_accepted: false };
   const { data } = await sb.from('user_data')
-    .select('pin_hash, deleted_at, disclaimer_accepted, client_id, logo, firma_name, firma_strasse, firma_plz, firma_ort, firma_tel, firma_email, firma_iban, firma_bic, firma_steuernr, firma_ustid, firma_footer, anthropic_key')
+    .select('pin_hash, deleted_at, disclaimer_accepted, client_id, logo, firma_name, firma_strasse, firma_plz, firma_ort, firma_tel, firma_email, firma_iban, firma_bic, firma_steuernr, firma_ustid, firma_footer')
     .eq('user_id', currentUser.id)
     .maybeSingle();
   return data || { pin_hash: null, deleted_at: null, disclaimer_accepted: false };
@@ -217,22 +217,6 @@ async function sbDeleteRechnung(id) {
 async function sbSaveWied(w)       { await sb.from('wiederkehrend').upsert(wiedToDb(w), {onConflict:'id'}); }
 async function sbDeleteWied(id)    { await sb.from('wiederkehrend').delete().eq('id',id).eq('user_id',currentUser.id); }
 async function sbSaveUstMode(j,m)  { await sb.from('ust_mode').upsert({user_id:currentUser.id,jahr:j,mode:m},{onConflict:'user_id,jahr'}); }
-async function sbSaveAnthropicKey(key) {
-  if (!currentUser) return;
-  const val = key ? key.trim() : null;
-  await sb.from('user_data').upsert({ user_id: currentUser.id, anthropic_key: val }, { onConflict: 'user_id' });
-  // Дублируем в localStorage как кэш
-  if (val) localStorage.setItem('bp_anthropic_key', val);
-  else localStorage.removeItem('bp_anthropic_key');
-}
-async function sbLoadAnthropicKey() {
-  if (!currentUser) return null;
-  const { data } = await sb.from('user_data').select('anthropic_key').eq('user_id', currentUser.id).single();
-  const key = data?.anthropic_key || null;
-  if (key) localStorage.setItem('bp_anthropic_key', key);
-  else localStorage.removeItem('bp_anthropic_key');
-  return key;
-}
 async function sbSaveUstEintrag(e) {
   if (!currentUser) return;
   const {error} = await sb.from('ust_eintraege').upsert(ustEintragToDb(e), {onConflict:'id'});
@@ -582,11 +566,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           { user_id: currentUser.id, disclaimer_accepted: true },
           { onConflict: 'user_id' }
         ); } catch(e) {} })();
-      }
-
-      // Синхронизация Anthropic API Key
-      if (userData.anthropic_key) {
-        localStorage.setItem('bp_anthropic_key', userData.anthropic_key);
       }
 
       // Баннер удаления

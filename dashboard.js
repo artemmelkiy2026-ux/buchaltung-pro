@@ -33,13 +33,6 @@ function setTyp(t){
   document.getElementById('btn-a').className='tt'+(t==='Ausgabe'?' aa':'');
   updateKatSel();
   updateMwstFormVisibility();
-  // Bon-Scanner: показываем блок при Ausgabe, скрываем при Einnahme
-  const bonInline = document.getElementById('bon-inline');
-  if(bonInline) {
-    bonInline.style.display = t==='Ausgabe' ? '' : 'none';
-    if(t==='Ausgabe' && typeof openBonScanner === 'function') openBonScanner();
-    if(t==='Einnahme' && typeof resetBonScanner === 'function') resetBonScanner();
-  }
 }
 function updateMwstFormVisibility(){
   const yr=document.getElementById('nf-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
