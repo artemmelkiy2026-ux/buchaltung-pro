@@ -308,11 +308,27 @@
 
   <!-- Beleg scannen -->
   <div id="scan-beleg-box" style="margin-bottom:12px;display:none">
-    <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBeleg(this)">
+    <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBelegPreview(this)">
     <button class="btn" onclick="document.getElementById('scan-file-input').click()"
       style="width:100%;padding:11px;background:var(--s2);border:1.5px dashed var(--border);color:var(--text);font-size:14px;font-weight:600;border-radius:var(--r);display:flex;align-items:center;justify-content:center;gap:8px">
       <i class="fas fa-camera"></i> Beleg / Rechnung scannen
     </button>
+    <!-- Vorschau + Hinweis -->
+    <div id="scan-preview-box" style="display:none;margin-top:10px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--s2)">
+      <img id="scan-preview-img" style="width:100%;max-height:220px;object-fit:contain;display:block">
+      <div style="padding:10px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:8px">
+        <i class="fas fa-info-circle"></i>
+        <span>Bitte Beleg <strong>gerade von oben</strong> fotografieren für beste Ergebnisse</span>
+      </div>
+      <div style="padding:0 10px 10px;display:flex;gap:8px">
+        <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:9px;font-size:13px">
+          <i class="fas fa-search"></i> Jetzt scannen
+        </button>
+        <button class="btn" onclick="scanBelegCancel()" style="padding:9px 14px;font-size:13px">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
     <div id="scan-status" style="display:none;margin-top:8px;font-size:13px;color:var(--sub);text-align:center"></div>
   </div>
 

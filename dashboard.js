@@ -897,40 +897,26 @@ function preprocessImage(file) {
     const url = URL.createObjectURL(file);
     img.onload = () => {
       let w = img.width, h = img.height;
-
-      // Tesseract braucht mindestens 300px Breite — schmale Kassenzettel hochskalieren
-      const MIN_W = 600;
+      const MIN_W = 800;
       const MAX_W = 2400;
-
-      if (w < MIN_W) {
-        const scale = MIN_W / w;
-        w = MIN_W;
-        h = Math.round(h * scale);
-      } else if (w > MAX_W) {
-        h = Math.round(h * MAX_W / w);
-        w = MAX_W;
-      }
+      if (w < MIN_W) { const s = MIN_W/w; w=MIN_W; h=Math.round(h*s); }
+      else if (w > MAX_W) { h=Math.round(h*MAX_W/w); w=MAX_W; }
 
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
-
-      // Bildglättung beim Hochskalieren
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, w, h);
 
-      // Graustufen + Kontrast
       const imageData = ctx.getImageData(0, 0, w, h);
       const d = imageData.data;
       for (let i = 0; i < d.length; i += 4) {
-        const gray = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
-        const contrast = Math.min(255, Math.max(0, (gray - 128) * 1.6 + 128));
-        d[i] = d[i+1] = d[i+2] = contrast;
-        // Alpha unverändert lassen
+        const gray = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+        const c = Math.min(255, Math.max(0, (gray-128)*1.8+128));
+        d[i] = d[i+1] = d[i+2] = c;
       }
       ctx.putImageData(imageData, 0, 0);
-
       URL.revokeObjectURL(url);
       resolve(canvas.toDataURL('image/png'));
     };
@@ -940,41 +926,54 @@ function preprocessImage(file) {
 }
 
 // ── Beleg scannen (Tesseract.js OCR) ──────────────────────────────────────
-async function scanBeleg(input) {
+let _scanFile = null;
+
+function scanBelegPreview(input) {
   const file = input.files[0];
   if (!file) return;
+  _scanFile = file;
+  const preview = document.getElementById('scan-preview-box');
+  const img = document.getElementById('scan-preview-img');
+  img.src = URL.createObjectURL(file);
+  preview.style.display = 'block';
+  document.getElementById('scan-status').style.display = 'none';
+  input.value = '';
+}
 
+function scanBelegCancel() {
+  _scanFile = null;
+  document.getElementById('scan-preview-box').style.display = 'none';
+}
+
+async function scanBelegStart() {
+  if (!_scanFile) return;
+  document.getElementById('scan-preview-box').style.display = 'none';
+  await scanBeleg(_scanFile);
+  _scanFile = null;
+}
+
+async function scanBeleg(file) {
   const status = document.getElementById('scan-status');
   status.style.display = 'block';
-  status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Bild wird geladen…';
+  status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Bild wird vorbereitet…';
 
   try {
-    // Bild via Canvas vorverarbeiten: Kontrast + Graustufen → bessere OCR-Qualität
     const imgUrl = await preprocessImage(file);
+    status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Text wird erkannt…';
 
-    status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Text wird erkannt… (kann 10–20 Sek. dauern)';
-
-    // Tesseract OCR — Deutsch + Englisch für bessere Zahlenerkennung
     const { data: { text } } = await Tesseract.recognize(imgUrl, 'deu+eng', {
       logger: m => {
         if (m.status === 'recognizing text') {
-          const pct = Math.round((m.progress || 0) * 100);
+          const pct = Math.round((m.progress||0)*100);
           status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Erkenne Text… ${pct}%`;
         }
       }
     });
 
-    URL.revokeObjectURL(imgUrl);
+    if (!text || text.trim().length < 5) throw new Error('Kein Text erkannt. Bitte deutlicheres Foto machen.');
 
-    if (!text || text.trim().length < 5) {
-      throw new Error('Kein Text erkannt. Bitte deutlicheres Foto machen.');
-    }
-
-    // Text parsen
     const result = parseBelegText(text);
-
-    // Felder befüllen
-    let filled = [];
+    const filled = [];
 
     // 1. Datum
     if (result.datum) {
@@ -982,17 +981,16 @@ async function scanBeleg(input) {
       updateMwstFormVisibility();
       filled.push('Datum');
     }
-    // 2. MwSt-Satz zuerst setzen — damit calcNfMwst korrekt rechnet
+    // 2. MwSt-Satz zuerst
     if (result.mwst_rate !== undefined) {
       const mwstSel = document.getElementById('nf-mwst-rate');
       if (mwstSel) mwstSel.value = result.mwst_rate;
     }
-    // 3. Brutto-Betrag eintragen + neu berechnen
+    // 3. Brutto-Betrag
     if (result.betrag) {
       document.getElementById('nf-bet').value = result.betrag.toFixed(2);
-      calcNfVorsteuer();
-      calcNfMwst(); // berechnet Netto + MwSt-Betrag aus Brutto
-      filled.push('Betrag ' + result.betrag.toFixed(2) + ' € (Brutto)');
+      calcNfVorsteuer(); calcNfMwst();
+      filled.push('Betrag ' + result.betrag.toFixed(2) + ' €');
     }
     // 4. Beschreibung
     if (result.beschreibung) {
@@ -1013,18 +1011,16 @@ async function scanBeleg(input) {
     }
 
     if (filled.length === 0) {
-      status.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--orange)"></i> Text erkannt, aber keine Beträge gefunden. Bitte manuell eingeben.';
+      status.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--orange)"></i> Text erkannt, aber keine Daten gefunden. Bitte manuell eingeben.';
     } else {
-      status.innerHTML = `<i class="fas fa-check-circle" style="color:var(--green)"></i> Erkannt: ${filled.join(', ')} — bitte prüfen!`;
+      status.innerHTML = `<i class="fas fa-check-circle" style="color:var(--green)"></i> Erkannt: ${filled.join(' · ')} — bitte prüfen!`;
     }
-    setTimeout(() => { status.style.display = 'none'; }, 5000);
+    setTimeout(() => { status.style.display = 'none'; }, 6000);
 
   } catch (err) {
     status.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--red)"></i> ${err.message}`;
     setTimeout(() => { status.style.display = 'none'; }, 6000);
   }
-
-  input.value = '';
 }
 
 function parseBelegText(text) {
@@ -1032,160 +1028,147 @@ function parseBelegText(text) {
   const result = {};
 
   // ── 1. DATUM ────────────────────────────────────────────────────────────
-  // Priorität: Zeile mit "Datum:" zuerst, dann alle anderen Zeilen
-  // Formate: DD.MM.YYYY | DD-MM-YYYY | DD/MM/YYYY | DD.MM.YY
+  // Priorität: Zeile mit "Datum:" zuerst, dann alle anderen
   const dateRx = /\b(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{2,4})\b/;
-  
-  // Zuerst Zeile mit explizitem "Datum:" Label suchen
-  for (const line of lines) {
-    if (!/datum/i.test(line)) continue;
+  const tryDate = (line) => {
     const m = line.match(dateRx);
-    if (!m) continue;
+    if (!m) return null;
     let [, d, mo, y] = m;
     if (y.length === 2) y = '20' + y;
-    const yi = parseInt(y), mi = parseInt(mo), di = parseInt(d);
-    if (yi >= 2010 && yi <= 2035 && mi >= 1 && mi <= 12 && di >= 1 && di <= 31) {
-      result.datum = `${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
-      break;
-    }
+    const yi=parseInt(y), mi=parseInt(mo), di=parseInt(d);
+    if (yi>=2010 && yi<=2035 && mi>=1 && mi<=12 && di>=1 && di<=31)
+      return `${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
+    return null;
+  };
+  for (const line of lines) {
+    if (/datum/i.test(line)) { const d = tryDate(line); if (d) { result.datum = d; break; } }
   }
-  // Fallback: erste Zeile mit gültigem Datum
   if (!result.datum) {
-    for (const line of lines) {
-      const m = line.match(dateRx);
-      if (!m) continue;
-      let [, d, mo, y] = m;
-      if (y.length === 2) y = '20' + y;
-      const yi = parseInt(y), mi = parseInt(mo), di = parseInt(d);
-      if (yi >= 2010 && yi <= 2035 && mi >= 1 && mi <= 12 && di >= 1 && di <= 31) {
-        result.datum = `${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
-        break;
-      }
-    }
+    for (const line of lines) { const d = tryDate(line); if (d) { result.datum = d; break; } }
   }
 
   // ── 2. BRUTTO-BETRAG ────────────────────────────────────────────────────
-  // Priorität 1: BRUTTO-Zeile in MwSt-Tabelle (z.B. "1 19 % 25,95 4,14 21,81")
-  // Priorität 2: Zeile mit SUMME/GESAMT/BETRAG + Zahl
-  // Priorität 3: Zeile mit "GEGEBEN" (gezahlter Betrag)
-  // Priorität 4: größte Zahl auf dem Bon
   const amountRx = /(\d{1,6}[.,]\d{2})/g;
+  const getAmounts = (line) => [...line.matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
 
-  // Prio 1: BRUTTO in MwSt-Fußzeile — typisch: "1 19 % BRUTTO MWST NETTO" dann Zahlen
-  // Suche Zeile mit "brutto" label oder MwSt-Tabellenwert
+  // Prio 1: строка с BRUTTO (MwSt-Tabelle внизу чека)
   for (const line of lines) {
     if (!/brutto/i.test(line)) continue;
-    const nums = [...line.matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
-    if (nums.length >= 1) {
-      // In "1 19 % 25,95 4,14 21,81" ist Brutto die erste (größte) Zahl
-      result.betrag = Math.max(...nums);
-      break;
-    }
+    const nums = getAmounts(line);
+    if (nums.length) { result.betrag = Math.max(...nums); break; }
   }
-
-  // Prio 2: SUMME / GESAMT / TOTAL
+  // Prio 2: SUMME/GESAMT/TOTAL — ищем снизу вверх
   if (!result.betrag) {
-    const totalRx = /\b(summe|gesamt|total|gesamtbetrag|endbetrag|zu zahlen|zahlbetrag)\b/i;
-    for (let i = lines.length - 1; i >= 0; i--) {
-      if (!totalRx.test(lines[i])) continue;
-      const nums = [...lines[i].matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
-      if (nums.length > 0) { result.betrag = Math.max(...nums); break; }
+    for (let i = lines.length-1; i >= 0; i--) {
+      if (!/\b(summe|gesamt|total|gesamtbetrag|endbetrag|zu zahlen|zahlbetrag)\b/i.test(lines[i])) continue;
+      const nums = getAmounts(lines[i]);
+      if (nums.length) { result.betrag = Math.max(...nums); break; }
     }
   }
-
-  // Prio 3: GEGEBEN / Betrag EUR (Zahlungsbeleg)
+  // Prio 3: GEGEBEN / Betrag EUR
   if (!result.betrag) {
     for (const line of lines) {
-      if (!/\b(gegeben|betrag|betrag eur)\b/i.test(line)) continue;
-      const nums = [...line.matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.')));
-      if (nums.length > 0) { result.betrag = Math.max(...nums); break; }
+      if (!/\b(gegeben|betrag eur|betrag)\b/i.test(line)) continue;
+      const nums = getAmounts(line);
+      if (nums.length) { result.betrag = Math.max(...nums); break; }
     }
   }
-
-  // Prio 4: größte Zahl
+  // Prio 4: größte Zahl im Text
   if (!result.betrag) {
-    const allNums = [...text.matchAll(amountRx)]
-      .map(m => parseFloat(m[1].replace(',','.')))
-      .filter(n => n > 0.5 && n < 99999);
-    if (allNums.length) result.betrag = Math.max(...allNums);
+    const all = [...text.matchAll(amountRx)].map(m => parseFloat(m[1].replace(',','.'))).filter(n => n > 0.5 && n < 99999);
+    if (all.length) result.betrag = Math.max(...all);
   }
 
   // ── 3. MWST-SATZ ────────────────────────────────────────────────────────
-  // Suche "19 %" oder "19%" mit Betrag daneben — typisch in Fußzeile
-  // Hornbach: "1 19 % 25,95 4,14 21,81"
-  const mwstRowRx = /\b(19|7)\s*%/g;
-  const found = { 19: false, 7: false };
-  let mm;
-  while ((mm = mwstRowRx.exec(text)) !== null) {
-    found[parseInt(mm[1])] = true;
-  }
-  if (found[19]) result.mwst_rate = 19;
-  else if (found[7]) result.mwst_rate = 7;
-  else result.mwst_rate = 19;
+  const has19 = /\b19\s*%/.test(text);
+  const has7  = /\b7\s*%/.test(text);
+  result.mwst_rate = has19 ? 19 : has7 ? 7 : 19;
 
-  // ── 4. FIRMENNAME + BELEGNUMMER → Beschreibung ──────────────────────────
-  // Firmenname: erste sinnvolle Zeile (nicht Sternchen, nicht reine Zahlen, min 3 Zeichen)
-  const skipLineRx = /^[*\-=_#+]{2,}$|^\d+$|^(tel|fax|www|http|ust|weee|steuer)/i;
+  // ── 4. FIRMENNAME → für Beschreibung ────────────────────────────────────
+  const skipLineRx = /^[*\-=_#+.\d\s]{0,3}$|^(tel|fax|www|http|ust|weee|steuer|iban|bic|filiale|filial)/i;
   let firma = '';
-  for (const line of lines.slice(0, 10)) {
+  for (const line of lines.slice(0, 12)) {
     if (line.length < 3 || skipLineRx.test(line)) continue;
-    // Bevorzuge Zeilen die wie ein Firmenname aussehen (Großbuchstaben oder gemischt)
-    if (/[A-Za-zÄÖÜäöüß]{3,}/.test(line)) {
-      firma = line.replace(/\s+/g, ' ').substring(0, 35);
-      break;
-    }
+    if (/[A-Za-zÄÖÜäöüß]{3,}/.test(line)) { firma = line.replace(/\s+/g,' ').substring(0,35); break; }
   }
 
-  // Belegnummer: "Beleg-Nr. 6850" / "Bon-Nr: 123" / "Beleg-Nr. 6850"
+  // ── 5. BELEGNUMMER ───────────────────────────────────────────────────────
   let belegNr = '';
-  const belegRx = /(?:beleg[-\s]?nr|bon[-\s]?nr|re[-\s]?nr|belegnr|bonnr|rechnungs[-\s]?nr)[.\s:]*([A-Z0-9\-\/]+)/i;
+  const belegRx = /(?:beleg[-\s]?nr|bon[-\s]?nr|re[-\s]?nr|belegnr|bonnr|rechnungs[-\s]?nr)[.\s:]*([A-Z0-9\-\/]{1,15})/i;
   for (const line of lines) {
     const m = line.match(belegRx);
-    if (m && m[1] && m[1].length <= 15) { belegNr = m[1]; break; }
+    if (m && m[1]) { belegNr = m[1]; break; }
   }
 
-  result.beschreibung = firma
-    ? (belegNr ? `${firma} · Nr. ${belegNr}` : firma)
-    : (belegNr ? `Beleg Nr. ${belegNr}` : '');
+  // ── 6. BESCHREIBUNG = Firmenname + Datum + Belegnummer ──────────────────
+  const parts = [];
+  if (firma) parts.push(firma);
+  if (result.datum) {
+    const [y,mo,d] = result.datum.split('-');
+    parts.push(`${d}.${mo}.${y}`);
+  }
+  if (belegNr) parts.push(`Nr. ${belegNr}`);
+  result.beschreibung = parts.join(' · ');
 
-  // ── 5. ARTIKELLISTE → Notiz ─────────────────────────────────────────────
-  const skipNotizRx = /gesamt|summe|total|mwst|steuer|gegeben|zahlung|datum|uhrzeit|beleg|bon|rechnung|tel|fax|www|@|iban|bic|sepa|terminal|trace|karte|transaktion|vielen dank|filial|steuernr|weee|stück|stueck|art\/ean|artean/i;
-  // Artikel: optionales "N x" am Anfang (Menge), dann Name, dann Preis
-  // z.B. "1 Stück x  25,95" oder "D6XNP 28/34 vs    25,95 1" oder "Brot           1,29"
-  const articleRx = /^(?:\d+\s*(?:stück|stk|x|st\.)?\s+)?(.{2,35}?)\s{2,}(\d{1,4}[.,]\d{2})\s*(?:\d\s*)?$/i;
+  // ── 7. ARTIKELLISTE → Notiz ─────────────────────────────────────────────
+  // Zeilen die wie Artikel aussehen: Text (min 3 Zeichen) + Leerzeichen + Preis
+  // Ausschließen: Kopfzeilen, Summen, Zahlungsinfos, MwSt-Tabelle
+  const skipNotizRx = /gesamt|summe|total|mwst|steuer|gegeben|zahlung|datum|uhrzeit|beleg|bon|rechnung|tel|fax|www|@|iban|bic|sepa|terminal|trace|transaktion|vielen dank|filial|steuernr|weee|artean|art\/ean|stück|stk\.|brutto|netto|sonderp/i;
+
+  // Artikel-Pattern: optionale Menge am Anfang, dann Name, dann Preis
+  // Beispiele: "Brot           1,29"  "2x Kaffee    4,50"  "D6XNP 28/34    25,95"
+  const articleRx = /^(?:\d+\s*[xX×]\s*)?(.{3,35}?)\s{2,}(\d{1,4}[.,]\d{2})\s*[\d\s]*$/;
   const articles = [];
 
-  for (const line of lines) {
+  // Bereich: nach Kopfzeilen (ca. ab Zeile 5) bis vor Summen-Bereich
+  // Summen-Bereich finden
+  let sumIdx = lines.length;
+  for (let i = 0; i < lines.length; i++) {
+    if (/\b(summe|gesamt|total)\b/i.test(lines[i])) { sumIdx = i; break; }
+  }
+
+  for (let i = 4; i < sumIdx; i++) {
+    const line = lines[i];
     if (skipNotizRx.test(line)) continue;
     const m = line.match(articleRx);
     if (m) {
-      let name = m[1].trim();
+      let name = m[1].trim().replace(/^\d+\s*[xX×]\s*/,'');
       const price = m[2];
-      // Mengenangabe am Anfang entfernen: "1 x", "2x", "3 St."
-      name = name.replace(/^\d+\s*(x|st\.|stk\.?|stück)?\s*/i, '').trim();
-      if (name.length >= 2 && !/^\d+$/.test(name) && !/^[*\-=]{2,}/.test(name)) {
-        articles.push(`${name}  ${price}`);
-        if (articles.length >= 10) break;
+      if (name.length >= 3 && !/^\d+$/.test(name) && !/^[*\-=]{2,}/.test(name)) {
+        articles.push(`${name}  ${price} €`);
+        if (articles.length >= 12) break;
       }
     }
   }
+
+  // Wenn keine Artikel gefunden — versuche mittleren Bereich des Textes
+  if (articles.length === 0) {
+    const midStart = Math.floor(lines.length * 0.15);
+    const midEnd   = Math.floor(lines.length * 0.65);
+    for (let i = midStart; i < midEnd; i++) {
+      const line = lines[i];
+      if (skipNotizRx.test(line)) continue;
+      const nums = getAmounts(line);
+      if (nums.length > 0 && line.length > 5 && /[A-Za-zÄÖÜäöüß]{2,}/.test(line)) {
+        const clean = line.replace(/^\d+\s*[xX×]\s*/, '').trim();
+        if (clean.length >= 3) {
+          articles.push(clean);
+          if (articles.length >= 12) break;
+        }
+      }
+    }
+  }
+
   if (articles.length > 0) result.notiz = articles.join('\n');
 
-  // ── 6. ZAHLUNGSART ──────────────────────────────────────────────────────
-  const tl = text.toLowerCase();
-  if (/bar(?:zahlung|geld)?\b|cash|\bbar\b/i.test(text) && !/kontaktlos|ec.?karte|sepa|kreditkarte|paypal/i.test(text)) {
-    result.zahlungsart = 'Barzahlung';
-  } else if (/paypal/i.test(text)) {
-    result.zahlungsart = 'PayPal';
-  } else if (/lastschrift|sepa/i.test(text)) {
-    result.zahlungsart = 'Lastschrift';
-  } else if (/kreditkarte|credit|mastercard|visa|amex/i.test(text)) {
-    result.zahlungsart = 'EC-Karte';
-  } else if (/ec.?karte|kartenzahlung|kontaktlos|girocard|debit/i.test(text)) {
-    result.zahlungsart = 'EC-Karte';
-  } else if (/überweisung|wire transfer/i.test(text)) {
-    result.zahlungsart = 'Überweisung';
-  }
+  // ── 8. ZAHLUNGSART ──────────────────────────────────────────────────────
+  const hasKarte = /ec.?karte|kartenzahlung|kontaktlos|girocard|debit|kreditkarte|mastercard|visa|amex|credit/i.test(text);
+  const hasBar   = /\bbar(?:zahlung|geld)?\b|\bcash\b/i.test(text);
+  if (hasKarte)                          result.zahlungsart = 'EC-Karte';
+  else if (/paypal/i.test(text))         result.zahlungsart = 'PayPal';
+  else if (/lastschrift|sepa/i.test(text)) result.zahlungsart = 'Lastschrift';
+  else if (hasBar)                       result.zahlungsart = 'Barzahlung';
+  else if (/überweisung/i.test(text))    result.zahlungsart = 'Überweisung';
 
   return result;
 }
