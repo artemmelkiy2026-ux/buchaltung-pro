@@ -745,16 +745,16 @@ function renderRep(){
       ${isRegel&&m.mwst>0?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div style="background:rgba(249,115,22,.06);border-radius:8px;padding:8px 10px">
           <div style="font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">MwSt</div>
-          <div style="font-size:12px;font-weight:600;font-family:var(--mono);color:#f97316">${fmt(m.mwst)}</div>
+          <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:#f97316">${fmt(m.mwst)}</div>
         </div>
         <div style="background:rgba(13,127,170,.06);border-radius:8px;padding:8px 10px">
-          <div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Zahllast</div>
+          <div style="font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Zahllast</div>
           <div style="font-size:12px;font-weight:600;font-family:var(--mono);color:var(--cyan)">${m.zahllast>0?'+':''}${fmt(m.zahllast)}</div>
         </div>
       </div>`:''}
       <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px">
-        <span style="font-size:11px;color:var(--sub)">${m.count||'0'} Einträge</span>
-        <span style="font-size:11px;color:${cc};font-family:var(--mono)">${hasData?'Σ '+(cumul2>=0?'+':'')+fmt(cumul2):'—'}</span>
+        <span style="font-size:12px;color:var(--sub)">${m.count||'0'} Einträge</span>
+        <span style="font-size:12px;color:${cc};font-family:var(--mono)">${hasData?'Σ '+(cumul2>=0?'+':'')+fmt(cumul2):'—'}</span>
       </div>
     </div>`;
   }).join('');
