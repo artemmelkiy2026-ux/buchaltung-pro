@@ -569,23 +569,25 @@ function renderEin(){
       return '<div style="display:flex;flex-direction:column;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
         +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
         +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
-        +'<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">'
+        +'<div style="display:flex;align-items:flex-start;gap:10px">'
         +'<div style="flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center;margin-top:2px">'
         +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:11px"></i></div>'
         +'<div style="flex:1;min-width:0">'
-        +(stLbl?'<div style="margin-bottom:4px">'+stLbl+'</div>':'')
-        +'<div style="font-size:11px;color:var(--sub);font-family:var(--mono);margin-bottom:3px">'+fd(e.datum)+'</div>'
-        +'<div style="font-size:14px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3">'
+        +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+        +(stLbl?stLbl:'')
+        +'<span style="font-size:11px;color:var(--sub);font-family:var(--mono)">'+fd(e.datum)+'</span>'
+        +'</div>'
+        +'<div style="font-size:14px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3;margin-bottom:'+(mwstBadge?'4px':'0px')+'">'
         +(e.beschreibung||e.kategorie)
         +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
         +'</div>'
+        +(mwstBadge?'<div style="margin-top:3px">'+mwstBadge+'</div>':'')
         +'</div>'
         +'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border)">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px;border-top:1px solid var(--border)">'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
         +'<span>'+e.kategorie+'</span>'
         +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
-        +mwstBadge
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
         +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
