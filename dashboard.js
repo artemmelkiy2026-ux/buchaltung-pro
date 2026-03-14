@@ -453,15 +453,15 @@ function renderDash(){
     }
   }
   const mob=isMob();
-  document.getElementById('d-recent').innerHTML=recent.length?recent.map(e=>{
-    const isEin=e.typ==='Einnahme', st=e.is_storno||e._storniert;
-    const click=mob?'showMobDetail('+JSON.stringify(e).replace(/"/g,"'")+')':'';
-    return '<div onclick="'+click+'" style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s1);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;cursor:pointer;transition:box-shadow .15s" onmouseover="this.style.background=\'var(--s2)\'" onmouseout="this.style.background=\'var(--s1)\'">'
-      +'<div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)')+';display:flex;align-items:center;justify-content:center"><i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:11px"></i></div>'
-      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(e.beschreibung||e.kategorie)+'</div>'
-      +'<div style="font-size:11px;color:var(--sub);margin-top:2px;display:flex;gap:5px;flex-wrap:wrap"><span style="font-family:var(--mono)">'+fd(e.datum)+'</span><span>·</span><span>'+e.kategorie+'</span><span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span></div></div>'
-      +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;flex:0 0 auto">'+(isEin?'+':'−')+fmt(e.betrag)+'</span></div>';
-  }).join(''):'<div style="text-align:center;padding:30px;color:var(--sub)">Keine Einträge</div>';
+  document.getElementById('d-recent').innerHTML=recent.length?recent.map(e=>`
+    <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''};${(e.is_storno||e._storniert)?'opacity:0.45;background:rgba(148,163,184,0.07);':''}">
+      <td style="font-family:var(--mono);font-size:11px;color:var(--sub);white-space:nowrap">${mob?fdm(e.datum):fd(e.datum)}</td>
+      <td style="white-space:nowrap"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}" style="display:inline-flex;align-items:center;gap:5px">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}${mob?'':'<span style="font-size:11px;font-weight:600">'+(e.typ==='Einnahme'?'Einnahme':'Ausgabe')+'</span>'}</span></td>
+      <td class="mob-hide" style="color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.kategorie}">${e.kategorie}</td>
+      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:10px">${e.zahlungsart||'—'}</span></td>
+      <td class="mob-hide" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${e.beschreibung}">${e.beschreibung}</td>
+      <td style="text-align:right;white-space:nowrap"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
+    </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--sub)">'+'Keine Einträge'+'</td></tr>';
 }
 
 // ── EINTRÄGE ──────────────────────────────────────────────────────────────
@@ -529,6 +529,22 @@ function renderEin(){
   const tb=document.getElementById('e-tbody'),em=document.getElementById('e-empty');
   const mob=isMob();
   
+  // Показываем/скрываем мобильный заголовок Beschreibung
+  const thDescMob = document.getElementById('th-desc-mob');
+  if(thDescMob) {
+    thDescMob.style.display = mob ? 'table-cell' : 'none';
+  }
+  // MwSt-Spalten anzeigen wenn Regelbesteuerung aktiv
+  const einJahr = document.getElementById('f-jahr')?.value || 'Alle';
+  const showMwstHdr = !isKleinunternehmer(einJahr==='Alle'?new Date().getFullYear()+'':einJahr) && !mob;
+  ['th-netto','th-mwst'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = showMwstHdr ? 'table-cell' : 'none';
+  });
+  // Betrag-Spalten-Titel
+  const thBet=document.getElementById('th-bet');
+  if(thBet) thBet.textContent = showMwstHdr ? 'Brutto' : 'Betrag';
+  
   if(!entries.length){
     tb.innerHTML='';
     em.style.display='block';
@@ -546,26 +562,58 @@ function renderEin(){
     
     // Рендеринг записей текущей страницы
     tb.innerHTML=pageEntries.map(e=>{
-      const isEin=e.typ==='Einnahme', st=e.is_storno||e._storniert;
       const rowYr=e.datum.substring(0,4);
-      const showMwst=!isKleinunternehmer(rowYr), hasMwst=e.mwstBetrag>0||e.vorsteuerBet>0;
-      const mwstVal=isEin?(e.mwstBetrag||0):(e.vorsteuerBet||0);
-      const nettoVal=isEin?(e.nettoBetrag||e.betrag):(e.betrag-(e.vorsteuerBet||0));
-      const mwstRate=e.mwstRate||e.vorsteuerRate||0;
-      let stLbl='';
-      if(e.is_storno&&e.storno_of) stLbl='<span style="font-size:9px;font-weight:700;color:#94a3b8;background:rgba(148,163,184,0.15);padding:2px 5px;border-radius:3px;margin-right:4px">&#8617; Storno</span>';
-      else if(st) stLbl='<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">&#10007; Storniert</span>';
-      else if(e.korrektur_von) stLbl='<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">&#9998; Korrektur</span>';
-      const mwstTxt=showMwst&&hasMwst?' <span style="font-size:10px;color:#f97316;font-family:var(--mono)">· Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>':'';
-      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s1);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'" onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.06)\'" onmouseout="this.style.background=\'var(--s1)\';this.style.boxShadow=\'\'">';
-        +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)')+';display:flex;align-items:center;justify-content:center"><i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
-        +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+stLbl+(e.beschreibung||e.kategorie)+(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>':'')+'</div>'
-        +'<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:11px;color:var(--sub)"><span style="font-family:var(--mono)">'+fd(e.datum)+'</span><span>·</span><span>'+e.kategorie+'</span><span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'+mwstTxt+'</div>'
-        +'</div><div style="flex:0 0 auto;display:flex;align-items:center;gap:8px">'
-        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
-        +(!st?'<div style="display:flex;gap:3px"><button class="del-btn edit-btn" onclick="editE(event,\''+e.id+'\')" ><i class="fas fa-edit"></i></button><button class="del-btn" onclick="delE(event,\''+e.id+'\')" ><i class="fas fa-times"></i></button></div>':'<span style="font-size:10px;color:var(--sub)">GoBD</span>')
-        +'</div></div>';
-    }).join('');
+      const showMwst = !isKleinunternehmer(rowYr);
+      const hasMwst = e.mwstBetrag>0||e.vorsteuerBet>0;
+      const mwstVal = e.typ==='Einnahme'?(e.mwstBetrag||0):(e.vorsteuerBet||0);
+      const nettoVal = e.typ==='Einnahme'?(e.nettoBetrag||e.betrag):(e.betrag-(e.vorsteuerBet||0));
+      const mwstRate = e.mwstRate||e.vorsteuerRate||0;
+      return `
+      <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''};${(e.is_storno||e._storniert)?'opacity:0.45;background:rgba(148,163,184,0.07);':''}">
+        <td style="font-family:var(--mono);font-size:11px;color:var(--sub)">${mob?fdm(e.datum):fd(e.datum)}</td>
+        <td><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'} ${mob?'':e.typ}</span></td>
+        <td class="mob-hide" style="color:var(--sub);font-size:12px">${e.kategorie}</td>
+        <td class="mob-hide"><span title="${e.notiz||''}">
+          ${(()=>{
+            // Sторно-Gegenbuchung: zeige auf welchen Originalbeleg sie sich bezieht
+            if(e.is_storno&&e.storno_of){
+              const orig=data.eintraege.find(x=>x.id===e.storno_of);
+              const ref=orig?('<b>'+fd(orig.datum)+'</b> · '+fmt(orig.betrag)+' ('+orig.beschreibung+')'):'Beleg nicht gefunden';
+              const korr=data.eintraege.find(x=>x.korrektur_von===e.storno_of);
+              const korrRef=korr?' → Korrektur: <b>'+fmt(korr.betrag)+'</b>':'';
+              return '<span style="font-size:9px;font-weight:700;color:#94a3b8;background:rgba(148,163,184,0.15);padding:2px 6px;border-radius:3px;margin-right:4px">↩ Storno-Gegenbuchung</span>'
+                    +'<span style="font-size:10px;color:var(--sub)">hebt auf: '+ref+korrRef+'</span>';
+            }
+            // Stornierter Originalbeleg
+            if(e.is_storno&&!e.storno_of){
+              const stornoRec=data.eintraege.find(x=>x.storno_of===e.id);
+              const korr=data.eintraege.find(x=>x.korrektur_von===e.id);
+              const stornoRef=stornoRec?('<b>'+fd(stornoRec.datum)+'</b>'):'?';
+              const korrRef=korr?' → Korrektur: <b>'+fmt(korr.betrag)+'</b> am '+fd(korr.datum):'';
+              return '<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 6px;border-radius:3px;margin-right:4px">✗ Storniert</span>'
+                    +'<span style="font-size:10px;color:var(--sub)">am '+stornoRef+korrRef+'</span>';
+            }
+            // Korrigierter Beleg: zeige Bezug zum stornierten Original
+            if(e.korrektur_von){
+              const orig=data.eintraege.find(x=>x.id===e.korrektur_von);
+              const ref=orig?('<b>'+fd(orig.datum)+'</b> · '+fmt(orig.betrag)):'?';
+              return '<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 6px;border-radius:3px;margin-right:4px">✎ Korrektur</span>'
+                    +'<span style="font-size:10px;color:var(--sub)">ersetzt: '+ref+'</span> ';
+            }
+            return '';
+          })()}${e.beschreibung}${e.notiz?` <span style="color:var(--sub);font-size:10px"><i class="fas fa-sticky-note"></i></span>`:''}</span></td>
+        ${mob?`<td style="font-size:11px;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.beschreibung||'—'}</td>`:''}
+        <td class="mob-hide"><span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span></td>
+        ${showMwst&&!mob?`<td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:var(--sub)">${hasMwst?fmt(nettoVal):'—'}</td>
+        <td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:#f97316">${hasMwst?'+'+fmt(mwstVal)+' ('+mwstRate+'%)':'—'}</td>`:''}
+        <td style="text-align:right"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
+        <td class="mob-hide" style="white-space:nowrap">
+          ${!(e.is_storno||e._storniert)?`
+          <button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,'${e.id}')"><i class="fas fa-edit"></i></button>
+          <button class="del-btn" onclick="delE(event,'${e.id}')"><i class="fas fa-times"></i></button>
+          `:'<span style="font-size:10px;color:var(--sub)">GoBD</span>'}
+        </td>
+      </tr>`;}).join('');
     
     // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
     let paginationHTML = '';
@@ -706,17 +754,29 @@ function renderRep(){
     tot.ein+=m.ein;tot.aus+=m.aus;tot.cnt+=m.count;cumul+=m.gew;
     const gc=m.gew>=0?'var(--green)':'var(--red)';
     const cc=cumul>=0?'var(--green)':'var(--red)';
-    return '<div onclick="openMonatDetail(\''+yr+'\',\''+m.mi+'\')" style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--s1);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;cursor:pointer;transition:box-shadow .15s" onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,.06)\'" onmouseout="this.style.background=\'var(--s1)\';this.style.boxShadow=\'\'">';
-      +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(m.gew>=0?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)')+';display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:700;color:'+(m.gew>=0?'var(--green)':'var(--red)')+'">'+(m.count?MS[m.i]:'–')+'</span></div>'
-      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;margin-bottom:3px">'+(mob?MS[m.i]:MN[m.i])+'</div>'
-      +'<div style="font-size:11px;color:var(--sub);display:flex;gap:8px;flex-wrap:wrap">'
-      +'<span style="color:var(--green)">E: '+fmt(m.ein)+'</span>'
-      +'<span style="color:var(--red)">A: '+fmt(m.aus)+'</span>'
-      +(isRegel?'<span style="color:#f97316">USt: '+fmt(m.mwst)+'</span><span style="color:var(--cyan)">ZL: '+(m.zahllast>0?'+':'')+fmt(m.zahllast)+'</span>':'')
-      +'<span style="color:var(--sub)">Kum: '+(cumul>=0?'+':'')+fmt(cumul)+'</span>'
-      +'</div></div>'
-      +'<div style="flex:0 0 auto;text-align:right"><span style="font-size:15px;font-weight:700;color:'+gc+'">'+(m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—')+'</span>'+(m.count?'<div style="font-size:10px;color:var(--sub);margin-top:2px">'+m.count+' Eintr.</div>':'')+'</div>'
-      +'</div>';
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Мобильная версия - более компактная
+    if(mob) {
+      return `<tr style="cursor:pointer" onclick="openMonatDetail('${yr}','${m.mi}')" title="Klicken für Details">
+        <td style="font-weight:${m.count?'500':'400'};color:${m.count?'var(--text)':'var(--sub)'}">
+          <span style="font-size:12px">${MS[m.i]}</span><br/>
+          <span style="font-size:10px;color:var(--sub)">E: ${fmt(m.ein)}</span><br/>
+          <span style="font-size:10px;color:var(--sub)">A: ${fmt(m.aus)}</span>
+        </td>
+        <td style="text-align:right;color:${gc};font-weight:600;padding-left:12px">
+          <span style="font-size:12px">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span>
+        </td>
+      </tr>`;
+    } else {
+      return `<tr style="cursor:pointer" onclick="openMonatDetail('${yr}','${m.mi}')" title="Klicken für Details" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+        <td style="font-weight:${m.count?'500':'400'};color:${m.count?'var(--text)':'var(--sub)'}">${MN[m.i]} <span style="font-size:10px;color:var(--sub)">↗</span></td>
+        <td style="color:var(--green)">${m.ein>0?fmt(m.ein):'—'}</td>
+        ${isRegel?`<td style="color:var(--sub);font-size:11px">${m.netto>0?fmt(m.netto):'—'}</td><td style="color:#f97316;font-size:11px">${m.mwst>0?fmt(m.mwst):'—'}</td><td style="color:var(--cyan);font-size:11px;font-weight:600">${m.zahllast!=0?(m.zahllast>0?'+':'')+fmt(m.zahllast):'—'}</td>`:''}
+        <td style="color:var(--red)">${m.aus>0?fmt(m.aus):'—'}</td>
+        <td style="color:${gc};font-weight:600">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</td>
+        <td style="color:${cc}">${m.count?(cumul>=0?'+':'')+fmt(cumul):'—'}</td>
+        <td style="color:var(--sub)">${m.count||'—'}</td>
+      </tr>`;
+    }
   }).join('');
   const tg=tot.ein-tot.aus;
   // <i class="fas fa-check-circle" style="color:var(--green)"></i> Footer также адаптивен
@@ -819,13 +879,14 @@ function renderZ(){
     const pageEntries = sorted.slice(start, end);
     
     ztb.innerHTML=pageEntries.map(e=>{
-      const isEin=e.typ==='Einnahme';
-      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s1);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;transition:box-shadow .15s" onmouseover="this.style.background=\'var(--s2)\'" onmouseout="this.style.background=\'var(--s1)\'">'
-        +'<div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)')+';display:flex;align-items:center;justify-content:center"><i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:11px"></i></div>'
-        +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(e.beschreibung||e.kategorie)+'</div>'
-        +'<div style="font-size:11px;color:var(--sub);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap"><span style="font-family:var(--mono)">'+fd(e.datum)+'</span><span>·</span>'
-        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(ZICONS[e.zahlungsart]||'')+' '+(e.zahlungsart||'Sonstiges')+'</span></div></div>'
-        +'<span style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--'+(isEin?'green':'red')+');font-family:var(--mono)">'+(isEin?'+':'−')+fmt(e.betrag)+'</span></div>';
+      const yearForDisplay = mob ? e.datum.substring(2,4) : e.datum.substring(0,4);
+      return `<tr>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--sub)">${fd(e.datum)}</td>
+        <td><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'} ${mob?'':''+e.typ}</span></td>
+        ${mob?'':`<td>${e.beschreibung}</td>`}
+        <td><span class="badge ${ZBADGE[e.zahlungsart]||''}">${ZICONS[e.zahlungsart]||''} ${mob?'':e.zahlungsart||'Sonstiges'}</span></td>
+        <td style="text-align:right"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
+      </tr>`;
     }).join('');
     
     // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация

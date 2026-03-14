@@ -196,20 +196,17 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .ftab.active{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
 .ml{margin-left:auto}
 
-/* ── TABLE / CARDS ── */
+/* ── TABLE ── */
 .tbl-wrap{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;flex:1}
 table{width:100%;border-collapse:collapse}
 thead th{padding:10px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:var(--s2);border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;transition:color .15s}
 thead th:hover{color:var(--text)}
 thead th.sort-asc::after{content:' ↑'} thead th.sort-desc::after{content:' ↓'}
-tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--s2)}
 tbody tr.sel{background:var(--bdim)}
 tbody td{padding:10px 14px;font-size:13px}
-/* Sort button active state */
-button.btn.sort-asc::after{content:' ↑';font-size:9px}
-button.btn.sort-desc::after{content:' ↓';font-size:9px}
 .empty-state{text-align:center;padding:60px;color:var(--sub)}
 .empty-state .ei{font-size:40px;margin-bottom:12px}
 

@@ -187,14 +187,24 @@
   <!-- Recent -->
   <div class="tbl-wrap">
     <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--sub)">Letzte 10 Einträge</div>
-    <div style="display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center">
-      <span style="font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.08em">Sortieren:</span>
-      <button class="btn" style="padding:3px 8px;font-size:10px" onclick="sortDash('datum')">Datum</button>
-      <button class="btn" style="padding:3px 8px;font-size:10px" onclick="sortDash('betrag')">Betrag</button>
-      <button class="btn" style="padding:3px 8px;font-size:10px" onclick="sortDash('typ')">Typ</button>
-      <button class="btn" style="padding:3px 8px;font-size:10px" onclick="sortDash('kategorie')">Kategorie</button>
-    </div>
-    <div id="d-recent" style="padding:8px 8px 0"></div>
+    <table id="d-recent-tbl" style="table-layout:auto;width:100%">
+      <colgroup>
+        <col style="width:85px"><!-- Datum -->
+        <col style="width:40px"><!-- Typ -->
+        <col class="mob-hide" style="width:160px"><!-- Kategorie -->
+        <col><!-- Zahlungsart — растягивается -->
+        <col class="mob-hide"><!-- Beschreibung — остаток -->
+        <col style="width:110px"><!-- Betrag -->
+      </colgroup>
+      <thead><tr>
+        <th onclick="sortDash('datum')" style="cursor:pointer">Datum</th>
+        <th onclick="sortDash('typ')" style="cursor:pointer">Typ</th>
+        <th class="mob-hide" onclick="sortDash('kategorie')" style="cursor:pointer">Kategorie</th>
+        <th onclick="sortDash('zahlungsart')" style="cursor:pointer">Zahlungsart</th>
+        <th class="mob-hide" onclick="sortDash('beschreibung')" style="cursor:pointer">Beschreibung</th>
+        <th onclick="sortDash('betrag')" style="cursor:pointer;text-align:right">Betrag</th>
+      </tr></thead>
+    <tbody id="d-recent"></tbody></table>
   </div>
 </div>
 </div>
@@ -247,17 +257,20 @@
   </div>
 
   <div class="tbl-wrap" style="margin-bottom:0">
-    <div style="display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center">
-      <span style="font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.08em">Sortieren:</span>
-      <button class="btn" id="th-datum" style="padding:3px 8px;font-size:10px" onclick="sortE('datum')">Datum</button>
-      <button class="btn" id="th-bet" style="padding:3px 8px;font-size:10px" onclick="sortE('betrag')">Betrag</button>
-      <button class="btn" id="th-kat" style="padding:3px 8px;font-size:10px" onclick="sortE('kategorie')">Kategorie</button>
-      <button class="btn" id="th-zahl" style="padding:3px 8px;font-size:10px" onclick="sortE('zahlungsart')">Zahlungsart</button>
-      <button class="btn" id="th-desc" style="padding:3px 8px;font-size:10px" onclick="sortE('beschreibung')">Beschreibung</button>
-      <span id="th-typ" style="display:none"></span><span id="th-desc-mob" style="display:none"></span>
-      <span id="th-netto" style="display:none"></span><span id="th-mwst" style="display:none"></span>
-    </div>
-    <div id="e-tbody" style="padding:8px 8px 0"></div>
+    <table>
+      <thead><tr>
+        <th onclick="sortE('datum')" id="th-datum" style="cursor:pointer">Datum</th>
+        <th onclick="sortE('typ')" id="th-typ" style="cursor:pointer">Typ</th>
+        <th onclick="sortE('kategorie')" id="th-kat" class="mob-hide" style="cursor:pointer">Kategorie</th>
+        <th onclick="sortE('beschreibung')" id="th-desc" class="mob-hide" style="cursor:pointer">Beschreibung</th>
+        <th id="th-desc-mob" style="display:none;cursor:pointer" onclick="sortE('beschreibung')">Beschr.</th>
+        <th onclick="sortE('zahlungsart')" id="th-zahl" class="mob-hide" style="cursor:pointer">Zahlungsart</th>
+        <th id="th-netto" class="mob-hide" style="text-align:right;display:none;font-size:10px;color:#f97316">Netto</th>
+        <th id="th-mwst" class="mob-hide" style="text-align:right;display:none;font-size:10px;color:#f97316">MwSt</th>
+        <th onclick="sortE('betrag')" id="th-bet" style="text-align:right;cursor:pointer">Brutto</th>
+        <th></th>
+      </tr></thead>
+      <tbody id="e-tbody"></tbody>
     </table>
     <div id="e-pagination" style="margin-top:12px"></div>
     <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-inbox"></i></div><p>Keine Einträge gefunden</p></div>
@@ -469,9 +482,12 @@
 
   <div class="month-cards" id="month-cards"></div>
 
-  <div style="margin-top:12px">
-    <div id="rep-tbody"></div>
-    <div id="rep-tfoot" style="margin-top:4px"></div>
+  <div class="ann-tbl">
+    <table>
+      <thead><tr><th>Monat</th><th class="mob-hide">Einnahmen (Brutto)</th><th class="mob-hide" id="rep-th-netto" style="display:none;color:#f97316;font-size:10px">Netto</th><th class="mob-hide" id="rep-th-mwst" style="display:none;color:#f97316;font-size:10px">MwSt <i class="fas fa-circle" style="color:#f97316"></i></th><th class="mob-hide" id="rep-th-zl" style="display:none;color:var(--cyan);font-size:10px">Zahllast</th><th class="mob-hide">Ausgaben</th><th class="mob-hide">Gewinn</th><th class="mob-hide">Kumuliert</th><th class="mob-hide">Einträge</th></tr></thead>
+      <tbody id="rep-tbody"></tbody>
+      <tfoot id="rep-tfoot"></tfoot>
+    </table>
   </div>
 </div>
 </div>
@@ -490,7 +506,9 @@
   </div>
   <div class="zk-grid" id="zk-grid"></div>
   <div class="tbl-wrap">
-    <div id="z-tbody" style="padding:8px 8px 0"></div>
+    <table>
+      <thead><tr><th>Datum</th><th>Typ</th><th class="mob-hide">Beschreibung</th><th><span class="mob-hide">Zahlungsart</span><span class="mob-show">Zahl</span></th><th style="text-align:right">Betrag</th></tr></thead>
+      <tbody id="z-tbody"></tbody>
     </table>
     <div id="z-pagination" style="margin-top:12px"></div>
     <div id="z-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-credit-card"></i></div><p>Keine Einträge</p></div>
