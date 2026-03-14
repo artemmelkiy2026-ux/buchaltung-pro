@@ -546,9 +546,9 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     gap: 8px;
     margin-bottom: 12px;
   }
-  .sc { padding: 12px 12px; }
-  .sc-val { font-size: 19px; }
-  .sc-lbl { font-size: 13px; }
+  .sc { padding: 14px 14px; }
+  .sc-val { font-size: 22px; }
+  .sc-lbl { font-size: 14px; }
 
   /* ── Dashboard заголовок ── */
   #p-dashboard .page-inner > div:first-child {
@@ -567,7 +567,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   /* ── Таблицы: убираем горизонтальный скролл там где применён mob-hide ── */
   .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--r); }
   table { min-width: 0; }
-  thead th, tbody td { padding: 8px 10px; font-size: 12px; }
+  thead th, tbody td { padding: 10px 12px; font-size: 13px; }
   .sum-row { overflow-x: visible; display: grid; grid-template-columns: 1fr 1fr; }
   .sum-cell { min-width: 0; padding: 10px 12px; border-right: none; border-bottom: 1px solid var(--border); }
   .sum-cell:first-child { text-align: left; }
@@ -633,8 +633,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   .rep-year-row h2 { font-size: 15px; }
 
   /* ── Кнопки — touch-friendly ── */
-  .btn { min-height: 38px; }
-  .tt { padding: 11px; min-height: 44px; }
+  .btn { min-height: 42px; font-size: 14px; }
+  .tt { padding: 13px; min-height: 48px; font-size: 15px; }
 
   /* ── Annual table ── */
   .ann-tbl { overflow-x: auto; }
@@ -805,7 +805,7 @@ th.sort-desc::after {
    МАЛЕНЬКИЕ ЭКРАНЫ 480px
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .stats { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr; gap: 8px; }
   .month-cards { grid-template-columns: 1fr; }
   .zk-grid { grid-template-columns: 1fr; gap: 8px; }
   #prog-cards { grid-template-columns: 1fr !important; }
@@ -813,9 +813,13 @@ th.sort-desc::after {
   #rech-cards { grid-template-columns: 1fr !important; }
   #rep-stats { grid-template-columns: 1fr !important; }
   #mon-modal-stats { grid-template-columns: 1fr !important; }
-  .page-inner { padding: 10px 15px; }
+  .page-inner { padding: 12px 14px 16px; }
   .logo { font-size: 12px; }
-  .sc-val { font-size: 22px; }
+  .sc-val { font-size: 24px; }
+  .sc-lbl { font-size: 13px; }
+  thead th, tbody td { padding: 11px 10px; font-size: 13px; }
+  .btn { min-height: 44px; font-size: 15px; }
+  .tt { min-height: 50px; font-size: 15px; }
   #mob-bottom-nav {   display: flex;
     position: fixed;
     bottom: 0;
@@ -917,6 +921,51 @@ th.sort-desc::after {
   }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   ПЛАНШЕТ 769px – 1100px
+   ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) and (max-width: 1100px) {
+  /* Sidebar уже, контент шире */
+  .sidebar { width: 180px; min-width: 180px; }
+  .sidebar .nav-item { font-size: 12px; padding: 8px 10px; }
+  .sidebar .ic { width: 24px; font-size: 13px; }
+
+  /* Контент */
+  .page-inner { padding: 16px 16px 20px; }
+
+  /* Stats: 3 колонки */
+  .stats { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .sc { padding: 14px 14px; }
+  .sc-val { font-size: 20px; }
+
+  /* Месяц-карточки: 3 колонки */
+  .month-cards { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+  /* Zahlungsarten: 3 колонки */
+  .zk-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Таблицы: чуть крупнее */
+  thead th, tbody td { padding: 9px 11px; font-size: 12px; }
+
+  /* Prognose/Kategorien: 2 колонки */
+  #p-prognose .prog-2col { grid-template-columns: 1fr 1fr; }
+  #p-kategorien .kat-2col { grid-template-columns: 280px 1fr; }
+
+  /* Rechnungen cards */
+  #rech-cards { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
+  #kunden-cards { grid-template-columns: repeat(3, 1fr); }
+
+  /* Neuer Eintrag: 2 колонки */
+  #neu-layout { grid-template-columns: 1fr 340px !important; }
+
+  /* Toolbar: плотнее */
+  .toolbar { gap: 6px; }
+  .toolbar-group { padding: 4px 8px; }
+
+  /* Header */
+  .logo img { width: 120px; }
+}
 /* ── iOS: отключить автозум при фокусе на input (font-size < 16px) ── */
 input, select, textarea {
   font-size: 16px !important;
