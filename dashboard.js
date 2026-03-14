@@ -565,7 +565,7 @@ function renderEin(){
         stLbl='<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
       }
       const mwstBadge = showMwst&&hasMwst
-        ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> · Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
+        ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
       return '<div style="display:flex;flex-direction:column;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
         +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
         +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
@@ -581,7 +581,7 @@ function renderEin(){
         +(e.beschreibung||e.kategorie)
         +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
         +'</div>'
-        +'<div style="margin-top:3px">'+(mwstBadge?mwstBadge:'<span style="font-size:10px;color:var(--sub)">Ohne MwSt</span>')+'</div>'
+        +'<div style="margin-top:3px">'+(mwstBadge?mwstBadge:'<span style="font-size:10px;color:#f97316">Ohne MwSt</span>')+'</div>'
         +'</div>'
         +'</div>'
         +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px;border-top:1px solid var(--border)">'
