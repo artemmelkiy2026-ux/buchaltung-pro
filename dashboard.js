@@ -80,7 +80,7 @@ function renderLetzteEinnahmen() {
         <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
         <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px">
           <span>${fd(e.datum)}</span>
-         
+          <span>·</span>
           <span>${e.kategorie}</span>
         </div>
       </div>
@@ -565,7 +565,7 @@ function renderEin(){
         stLbl='<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
       }
       const mwstBadge = showMwst&&hasMwst
-        ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
+        ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> · Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
       const _eid=''+e.id;
       return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;cursor:pointer;'+(st?'opacity:0.45;':'')+'"'
         +(!st?' onclick="if(window.innerWidth<=900&&!event.target.closest(\'.del-btn\')){editE(event,\'' +e.id+ '\')}"':'')
@@ -575,17 +575,18 @@ function renderEin(){
         +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
         +'<div style="flex:1;min-width:0">'
         +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'
-        +stLbl+(e.beschreibung||e.kategorie)
+        +(e.beschreibung||e.kategorie)
         +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
         +'<span style="font-family:var(--mono)">'+fd(e.datum)+'</span>'
-        +'<span>'+e.kategorie+'</span>'
-        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
+        +'<span>·</span><span>'+e.kategorie+'</span>'
+        +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
         +mwstBadge
         +'</div></div>'
-        +'<div style="flex:0 0 auto;display:flex;align-items:center;gap:8px">'
+        +'<div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
         +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+        +(stLbl?'<div style="text-align:right">'+stLbl+'</div>':'')
         +(!st
           ?'<div style="display:flex;gap:3px">'
            +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,\''+e.id+'\')" ><i class="fas fa-edit"></i></button>'
