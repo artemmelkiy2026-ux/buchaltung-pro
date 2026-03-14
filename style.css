@@ -196,18 +196,20 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .ftab.active{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
 .ml{margin-left:auto}
 
-/* ── TABLE — card style ── */
-.tbl-wrap{background:transparent;border:none;border-radius:var(--r2);overflow:visible;flex:1}
-table{width:100%;border-collapse:separate;border-spacing:0 6px}
-thead th{padding:8px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:transparent;border:none;cursor:pointer;white-space:nowrap;user-select:none;transition:color .15s}
+/* ── TABLE / CARDS ── */
+.tbl-wrap{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;flex:1}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:var(--s2);border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;transition:color .15s}
 thead th:hover{color:var(--text)}
 thead th.sort-asc::after{content:' ↑'} thead th.sort-desc::after{content:' ↓'}
-tbody tr{background:var(--s1);border:1px solid var(--border);border-radius:12px;transition:box-shadow .15s,background .15s;cursor:pointer}
-tbody tr:hover{background:var(--s2);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--s2)}
 tbody tr.sel{background:var(--bdim)}
-tbody td{padding:10px 14px;font-size:13px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-tbody td:first-child{border-left:1px solid var(--border);border-radius:12px 0 0 12px}
-tbody td:last-child{border-right:1px solid var(--border);border-radius:0 12px 12px 0}
+tbody td{padding:10px 14px;font-size:13px}
+/* Sort button active state */
+button.btn.sort-asc::after{content:' ↑';font-size:9px}
+button.btn.sort-desc::after{content:' ↓';font-size:9px}
 .empty-state{text-align:center;padding:60px;color:var(--sub)}
 .empty-state .ei{font-size:40px;margin-bottom:12px}
 
@@ -268,14 +270,12 @@ tr:hover .del-btn{opacity:1}
 /* Annual table */
 .ann-tbl{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
 .ann-tbl table{width:100%}
-.ann-tbl{border-collapse:separate;border-spacing:0 6px}
-.ann-tbl thead th{background:transparent;padding:8px 16px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);border:none;text-align:left}
+.ann-tbl thead th{background:var(--s2);padding:10px 16px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);border-bottom:1px solid var(--border);text-align:left}
 .ann-tbl thead th:not(:first-child){text-align:right}
-.ann-tbl tbody td{padding:10px 16px;font-size:13px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--s1)}
-.ann-tbl tbody td:first-child{border-left:1px solid var(--border);border-radius:12px 0 0 12px}
-.ann-tbl tbody td:last-child{border-right:1px solid var(--border);border-radius:0 12px 12px 0}
+.ann-tbl tbody td{padding:10px 16px;font-size:13px;border-bottom:1px solid var(--border)}
 .ann-tbl tbody td:not(:first-child){text-align:right;font-family:var(--mono)}
-.ann-tbl tbody tr:hover td{background:var(--s2);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ann-tbl tbody tr:last-child td{border-bottom:none}
+.ann-tbl tbody tr:hover{background:var(--s2)}
 .ann-tbl tfoot td{padding:11px 16px;font-weight:700;font-family:var(--mono);font-size:13px;background:var(--s3);border-top:2px solid var(--border)}
 .ann-tbl tfoot td:not(:first-child){text-align:right}
 
