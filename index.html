@@ -247,30 +247,44 @@
     <button class="csv" onclick="exportPDF()" style="background:var(--blue);color:#fff"><i class="fa-solid fa-file-pdf"></i> PDF</button>
   </div>
 
-  <div class="tbl-wrap" style="margin-bottom:0">
-    <table>
-      <thead><tr>
-        <th onclick="sortE('datum')" id="th-datum" style="cursor:pointer">Datum</th>
-        <th onclick="sortE('typ')" id="th-typ" style="cursor:pointer">Typ</th>
-        <th onclick="sortE('kategorie')" id="th-kat" class="mob-hide" style="cursor:pointer">Kategorie</th>
-        <th onclick="sortE('beschreibung')" id="th-desc" class="mob-hide" style="cursor:pointer">Beschreibung</th>
-        <th id="th-desc-mob" style="display:none;cursor:pointer" onclick="sortE('beschreibung')">Beschr.</th>
-        <th onclick="sortE('zahlungsart')" id="th-zahl" class="mob-hide" style="cursor:pointer">Zahlungsart</th>
-        <th id="th-netto" class="mob-hide" style="text-align:right;display:none;font-size:10px;color:#f97316">Netto</th>
-        <th id="th-mwst" class="mob-hide" style="text-align:right;display:none;font-size:10px;color:#f97316">MwSt</th>
-        <th onclick="sortE('betrag')" id="th-bet" style="text-align:right;cursor:pointer">Brutto</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="e-tbody"></tbody>
-    </table>
-    <div id="e-pagination" style="margin-top:12px"></div>
-    <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-inbox"></i></div><p>Keine Einträge gefunden</p></div>
-    <!-- Summary row -->
-    <div class="sum-row" id="e-sum">
-      <div class="sum-cell"><div class="sum-lbl">Einträge</div><div class="sum-val" id="es-cnt">0</div></div>
-      <div class="sum-cell" style="text-align:right"><div class="sum-lbl">Einnahmen</div><div class="sum-val" style="color:var(--green)" id="es-ein">0,00 €</div></div>
-      <div class="sum-cell" style="text-align:right"><div class="sum-lbl">Ausgaben</div><div class="sum-val" style="color:var(--red)" id="es-aus">0,00 €</div></div>
-      <div class="sum-cell" style="text-align:right"><div class="sum-lbl">Gewinn</div><div class="sum-val" id="es-gew">0,00 €</div></div>
+  <!-- Sort bar -->
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" id="esort-datum"       style="padding:4px 10px;font-size:11px" onclick="sortE('datum')">Datum</button>
+    <button class="btn" id="esort-betrag"      style="padding:4px 10px;font-size:11px" onclick="sortE('betrag')">Betrag</button>
+    <button class="btn" id="esort-kategorie"   style="padding:4px 10px;font-size:11px" onclick="sortE('kategorie')">Kategorie</button>
+    <button class="btn" id="esort-zahlungsart" style="padding:4px 10px;font-size:11px" onclick="sortE('zahlungsart')">Zahlung</button>
+    <!-- compat hidden elements for JS refs -->
+    <span id="th-datum" style="display:none"></span>
+    <span id="th-typ" style="display:none"></span>
+    <span id="th-kat" style="display:none"></span>
+    <span id="th-desc" style="display:none"></span>
+    <span id="th-desc-mob" style="display:none"></span>
+    <span id="th-zahl" style="display:none"></span>
+    <span id="th-netto" style="display:none"></span>
+    <span id="th-mwst" style="display:none"></span>
+    <span id="th-bet" style="display:none"></span>
+  </div>
+  <div id="e-tbody"></div>
+  <div id="e-pagination" style="margin-top:8px"></div>
+  <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-inbox"></i></div><p>Keine Einträge gefunden</p></div>
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px" id="e-sum">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einträge</div>
+      <div style="font-size:18px;font-weight:700" id="es-cnt">0</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
+      <div style="font-size:18px;font-weight:700;color:var(--green)" id="es-ein">0,00 €</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Ausgaben</div>
+      <div style="font-size:18px;font-weight:700;color:var(--red)" id="es-aus">0,00 €</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Gewinn</div>
+      <div style="font-size:18px;font-weight:700" id="es-gew">0,00 €</div>
     </div>
   </div>
 </div>
