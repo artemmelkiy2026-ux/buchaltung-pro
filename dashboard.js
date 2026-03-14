@@ -307,13 +307,13 @@ function renderDash(){
           {
             label: ('  '+'Einnahme'),
             data: ea,
-            borderColor: '#22c55e',
+            borderColor: '#1d9047',
             backgroundColor: 'rgba(34, 197, 94, 0.1)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
             pointRadius: 5,
-            pointBackgroundColor: '#22c55e',
+            pointBackgroundColor: '#1d9047',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointHoverRadius: 7,
@@ -562,7 +562,7 @@ function renderEin(){
       } else if(st){
         stLbl='<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✗ Storniert</span>';
       } else if(e.korrektur_von){
-        stLbl='<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
+        stLbl='<span style="font-size:9px;font-weight:700;color:#1d9047;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
