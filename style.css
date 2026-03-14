@@ -196,17 +196,37 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .ftab.active{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
 .ml{margin-left:auto}
 
-/* ── TABLE ── */
-.tbl-wrap{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;flex:1}
-table{width:100%;border-collapse:collapse}
-thead th{padding:10px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:var(--s2);border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;transition:color .15s}
+/* ── TABLE — card rows ── */
+.tbl-wrap{background:transparent;border:none;border-radius:var(--r2);overflow:visible;flex:1}
+table{width:100%;border-collapse:separate;border-spacing:0 6px}
+thead th{padding:6px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:transparent;border:none;cursor:pointer;white-space:nowrap;user-select:none;transition:color .15s}
 thead th:hover{color:var(--text)}
-thead th.sort-asc::after{content:' ↑'} thead th.sort-desc::after{content:' ↓'}
-tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--s2)}
+thead th.sort-asc::after{content:' ↑';color:var(--blue)} thead th.sort-desc::after{content:' ↓';color:var(--blue)}
+tbody tr{background:#fff;border-radius:12px;transition:box-shadow .15s,background .15s;cursor:pointer}
+tbody tr:hover{background:var(--s2);box-shadow:0 2px 10px rgba(0,0,0,.07)}
 tbody tr.sel{background:var(--bdim)}
-tbody td{padding:10px 14px;font-size:13px}
+tbody td{padding:11px 14px;font-size:13px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+tbody td:first-child{border-left:1px solid var(--border);border-radius:12px 0 0 12px}
+tbody td:last-child{border-right:1px solid var(--border);border-radius:0 12px 12px 0}
+/* ── tbl-wrap header div (e.g. "Letzte 10 Einträge") ── */
+.tbl-wrap > div:first-child:not([id]):not(.sum-row):not(.filter-tabs):not([class*="ftab"]) {
+  background: var(--blue);
+  color: #fff;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+}
+/* sum-row: сделаем тоже карточкой */
+.sum-row {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 8px;
+}
+
 .empty-state{text-align:center;padding:60px;color:var(--sub)}
 .empty-state .ei{font-size:40px;margin-bottom:12px}
 
@@ -267,12 +287,15 @@ tr:hover .del-btn{opacity:1}
 /* Annual table */
 .ann-tbl{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
 .ann-tbl table{width:100%}
-.ann-tbl thead th{background:var(--s2);padding:10px 16px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);border-bottom:1px solid var(--border);text-align:left}
+.ann-tbl{border-collapse:separate!important;border-spacing:0 6px!important}
+.ann-tbl thead th{background:transparent;padding:6px 16px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);border:none;text-align:left}
 .ann-tbl thead th:not(:first-child){text-align:right}
-.ann-tbl tbody td{padding:10px 16px;font-size:13px;border-bottom:1px solid var(--border)}
+.ann-tbl tbody tr{background:#fff;border-radius:12px}
+.ann-tbl tbody tr:hover{background:var(--s2);box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.ann-tbl tbody td{padding:10px 16px;font-size:13px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ann-tbl tbody td:first-child{border-left:1px solid var(--border);border-radius:12px 0 0 12px}
+.ann-tbl tbody td:last-child{border-right:1px solid var(--border);border-radius:0 12px 12px 0}
 .ann-tbl tbody td:not(:first-child){text-align:right;font-family:var(--mono)}
-.ann-tbl tbody tr:last-child td{border-bottom:none}
-.ann-tbl tbody tr:hover{background:var(--s2)}
 .ann-tbl tfoot td{padding:11px 16px;font-weight:700;font-family:var(--mono);font-size:13px;background:var(--s3);border-top:2px solid var(--border)}
 .ann-tbl tfoot td:not(:first-child){text-align:right}
 
@@ -546,9 +569,9 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     gap: 8px;
     margin-bottom: 12px;
   }
-  .sc { padding: 14px 14px; }
-  .sc-val { font-size: 22px; }
-  .sc-lbl { font-size: 14px; }
+  .sc { padding: 12px 12px; }
+  .sc-val { font-size: 19px; }
+  .sc-lbl { font-size: 13px; }
 
   /* ── Dashboard заголовок ── */
   #p-dashboard .page-inner > div:first-child {
@@ -565,9 +588,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   .filter-tabs { flex-wrap: wrap; gap: 2px; }
 
   /* ── Таблицы: убираем горизонтальный скролл там где применён mob-hide ── */
-  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--r); }
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 0; }
+  tbody td{ padding:10px 10px; }
   table { min-width: 0; }
-  thead th, tbody td { padding: 10px 12px; font-size: 13px; }
+  thead th, tbody td { padding: 8px 10px; font-size: 12px; }
   .sum-row { overflow-x: visible; display: grid; grid-template-columns: 1fr 1fr; }
   .sum-cell { min-width: 0; padding: 10px 12px; border-right: none; border-bottom: 1px solid var(--border); }
   .sum-cell:first-child { text-align: left; }
@@ -633,8 +657,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   .rep-year-row h2 { font-size: 15px; }
 
   /* ── Кнопки — touch-friendly ── */
-  .btn { min-height: 42px; font-size: 14px; }
-  .tt { padding: 13px; min-height: 48px; font-size: 15px; }
+  .btn { min-height: 38px; }
+  .tt { padding: 11px; min-height: 44px; }
 
   /* ── Annual table ── */
   .ann-tbl { overflow-x: auto; }
@@ -805,7 +829,7 @@ th.sort-desc::after {
    МАЛЕНЬКИЕ ЭКРАНЫ 480px
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .stats { grid-template-columns: 1fr; gap: 8px; }
+  .stats { grid-template-columns: 1fr; }
   .month-cards { grid-template-columns: 1fr; }
   .zk-grid { grid-template-columns: 1fr; gap: 8px; }
   #prog-cards { grid-template-columns: 1fr !important; }
@@ -813,13 +837,9 @@ th.sort-desc::after {
   #rech-cards { grid-template-columns: 1fr !important; }
   #rep-stats { grid-template-columns: 1fr !important; }
   #mon-modal-stats { grid-template-columns: 1fr !important; }
-  .page-inner { padding: 12px 14px 16px; }
+  .page-inner { padding: 10px 15px; }
   .logo { font-size: 12px; }
-  .sc-val { font-size: 24px; }
-  .sc-lbl { font-size: 13px; }
-  thead th, tbody td { padding: 11px 10px; font-size: 13px; }
-  .btn { min-height: 44px; font-size: 15px; }
-  .tt { min-height: 50px; font-size: 15px; }
+  .sc-val { font-size: 22px; }
   #mob-bottom-nav {   display: flex;
     position: fixed;
     bottom: 0;
@@ -921,51 +941,6 @@ th.sort-desc::after {
   }
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   ПЛАНШЕТ 769px – 1100px
-   ═══════════════════════════════════════════════════════════════ */
-@media (min-width: 769px) and (max-width: 1100px) {
-  /* Sidebar уже, контент шире */
-  .sidebar { width: 180px; min-width: 180px; }
-  .sidebar .nav-item { font-size: 12px; padding: 8px 10px; }
-  .sidebar .ic { width: 24px; font-size: 13px; }
-
-  /* Контент */
-  .page-inner { padding: 16px 16px 20px; }
-
-  /* Stats: 3 колонки */
-  .stats { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .sc { padding: 14px 14px; }
-  .sc-val { font-size: 20px; }
-
-  /* Месяц-карточки: 3 колонки */
-  .month-cards { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-  /* Zahlungsarten: 3 колонки */
-  .zk-grid { grid-template-columns: repeat(3, 1fr); }
-
-  /* Таблицы: чуть крупнее */
-  thead th, tbody td { padding: 9px 11px; font-size: 12px; }
-
-  /* Prognose/Kategorien: 2 колонки */
-  #p-prognose .prog-2col { grid-template-columns: 1fr 1fr; }
-  #p-kategorien .kat-2col { grid-template-columns: 280px 1fr; }
-
-  /* Rechnungen cards */
-  #rech-cards { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
-  #kunden-cards { grid-template-columns: repeat(3, 1fr); }
-
-  /* Neuer Eintrag: 2 колонки */
-  #neu-layout { grid-template-columns: 1fr 340px !important; }
-
-  /* Toolbar: плотнее */
-  .toolbar { gap: 6px; }
-  .toolbar-group { padding: 4px 8px; }
-
-  /* Header */
-  .logo img { width: 120px; }
-}
 /* ── iOS: отключить автозум при фокусе на input (font-size < 16px) ── */
 input, select, textarea {
   font-size: 16px !important;
