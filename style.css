@@ -327,7 +327,7 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
 .zk-row{display:flex;gap:12px;margin-bottom:10px}
 .zk-pill{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:var(--sub)}
 .zk-pill i{font-size:11px}
-.zk-sub{font-size:10px;color:var(--muted);padding-top:8px;border-top:1px solid var(--border)}
+.zk-sub{font-size:11px;color:var(--muted);padding-top:8px;border-top:1px solid var(--border)}
 .zk-prog{height:3px;background:var(--border);border-radius:2px;margin-bottom:10px;overflow:hidden}
 .zk-prog-fill{height:100%;border-radius:2px;transition:width .4s}
 
