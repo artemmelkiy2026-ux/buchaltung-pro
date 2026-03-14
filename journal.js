@@ -5,12 +5,10 @@ function renderJournal() {
   const em = document.getElementById('journal-empty');
   if (!tb) return;
 
-  // Только записи которые участвуют в сторно-цепочках
-  const stornoIds  = new Set(data.eintraege.filter(e => e.is_storno).map(e => e.storno_of).filter(Boolean));
-  const korrIds    = new Set(data.eintraege.filter(e => e.korrektur_von).map(e => e.korrektur_von).filter(Boolean));
-  const involved   = new Set([...stornoIds, ...korrIds]);
+  const stornoIds = new Set(data.eintraege.filter(e => e.is_storno).map(e => e.storno_of).filter(Boolean));
+  const korrIds   = new Set(data.eintraege.filter(e => e.korrektur_von).map(e => e.korrektur_von).filter(Boolean));
+  const involved  = new Set([...stornoIds, ...korrIds]);
 
-  // Собираем все записи в цепочках
   const journalEntries = data.eintraege.filter(e =>
     e.is_storno || e.korrektur_von || involved.has(e.id)
   ).sort((a, b) => b.datum.localeCompare(a.datum));
@@ -22,7 +20,6 @@ function renderJournal() {
   }
   em.style.display = 'none';
 
-  // Группируем в цепочки по корневому id
   function getRootId(e) {
     if (e.korrektur_von) return e.korrektur_von;
     if (e.is_storno && e.storno_of) return e.storno_of;
@@ -36,80 +33,97 @@ function renderJournal() {
     chains[root].push(e);
   });
 
-  // Сортируем внутри цепочки: оригинал → сторно → корректура
   function chainOrder(e) {
-    if (!e.is_storno && !e.korrektur_von) return 0; // оригинал
-    if (e.is_storno) return 1;                       // сторно
-    if (e.korrektur_von) return 2;                   // корректура
+    if (!e.is_storno && !e.korrektur_von) return 0;
+    if (e.is_storno) return 1;
+    if (e.korrektur_von) return 2;
     return 3;
   }
 
-  const mob = isMob();
   let html = '';
 
   Object.values(chains).forEach((chain, ci) => {
     chain.sort((a, b) => chainOrder(a) - chainOrder(b));
 
+    // Карточка цепочки
+    html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden">`;
+
     chain.forEach((e, idx) => {
-      // Бейдж и стиль строки
-      let badge = '', rowStyle = '', rowBg = '';
+      let badge = '', rowBg = '', opacity = '1', connector = '';
 
       if (!e.is_storno && !e.korrektur_von && involved.has(e.id)) {
-        // Оригинал который был сторнирован
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
-        rowStyle = 'opacity:0.6;';
-        rowBg = 'background:rgba(224,140,26,.04);';
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
+        rowBg = 'background:rgba(224,140,26,.03);';
+        opacity = '0.7';
       } else if (e.is_storno) {
-        // Сторно-запись
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
-        rowStyle = 'opacity:0.55;';
-        rowBg = 'background:rgba(148,163,184,.04);';
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
+        rowBg = 'background:rgba(148,163,184,.03);';
+        opacity = '0.6';
       } else if (e.korrektur_von) {
-        // Корректирующая запись
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:rgba(93,157,105,.12);color:var(--green);border:1px solid rgba(93,157,105,.3)">✎ Korrektur</span>`;
-        rowBg = 'background:rgba(93,157,105,.04);';
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(93,157,105,.12);color:var(--green);border:1px solid rgba(93,157,105,.3)">✎ Korrektur</span>`;
+        rowBg = 'background:rgba(93,157,105,.03);';
       }
 
-      // Связь между записями
+      // Связь
       let link = '';
       if (e.is_storno && e.storno_of) {
         const orig = data.eintraege.find(x => x.id === e.storno_of);
-        if (orig) link = `<div style="font-size:10px;color:var(--sub);margin-top:3px">hebt auf: ${fd(orig.datum)} · ${fmt(orig.betrag)}</div>`;
+        if (orig) link = `<span style="font-size:10px;color:var(--sub)">hebt auf: ${fd(orig.datum)} · ${fmt(orig.betrag)}</span>`;
       } else if (e.korrektur_von) {
         const orig = data.eintraege.find(x => x.id === e.korrektur_von);
-        if (orig) link = `<div style="font-size:10px;color:var(--sub);margin-top:3px">ersetzt: ${fd(orig.datum)} · ${fmt(orig.betrag)}</div>`;
+        if (orig) link = `<span style="font-size:10px;color:var(--sub)">ersetzt: ${fd(orig.datum)} · ${fmt(orig.betrag)}</span>`;
       } else if (involved.has(e.id)) {
         const stornoRec = data.eintraege.find(x => x.storno_of === e.id);
         const korr = data.eintraege.find(x => x.korrektur_von === e.id);
-        if (stornoRec) link = `<div style="font-size:10px;color:var(--sub);margin-top:3px">→ Storno am ${fd(stornoRec.datum)}${korr ? ` · Korrektur: ${fmt(korr.betrag)} am ${fd(korr.datum)}` : ''}</div>`;
+        if (stornoRec) link = `<span style="font-size:10px;color:var(--sub)">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
       }
 
-      // Разделитель между цепочками
-      const chainSep = idx === 0 && ci > 0
-        ? `<tr><td colspan="6" style="padding:4px 0;background:var(--bg)"></td></tr>`
-        : '';
+      // Разделитель между записями внутри цепочки
+      const sep = idx > 0 ? `<div style="height:1px;background:var(--border);margin:0 14px"></div>` : '';
 
-      html += `${chainSep}<tr style="${rowStyle}${rowBg}border-bottom:1px solid var(--border)">
-        <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;white-space:nowrap">${fd(e.datum)}</td>
-        <td style="padding:10px 14px">${badge}</td>
-        <td style="padding:10px 14px;font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" class="mob-hide">
-          ${e.beschreibung||e.kategorie||'—'}
-          ${link}
-        </td>
-        <td style="padding:10px 14px" class="mob-hide">
-          <span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'▲':'▼'} ${e.typ}</span>
-        </td>
-        <td style="padding:10px 14px;text-align:right;font-family:var(--mono);font-weight:600;font-size:13px;white-space:nowrap">
-          <span style="color:${e.typ==='Einnahme'?'var(--green)':'var(--red)'}">${e.typ==='Einnahme'?'+':'-'}${fmt(e.betrag)}</span>
-        </td>
-        <td style="padding:10px 14px;font-size:11px;color:var(--sub);font-family:var(--mono)" class="mob-hide">${e.id}</td>
-      </tr>`;
+      const isEin = e.typ === 'Einnahme';
+      const iconBg = isEin ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+      const iconColor = isEin ? 'var(--green)' : 'var(--red)';
+      const arrow = isEin ? 'up' : 'down';
+      const amtColor = isEin ? 'var(--green)' : 'var(--red)';
+      const amtSign = isEin ? '+' : '−';
+
+      html += `${sep}
+        <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
+            <div style="flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
+              <i class="fas fa-arrow-${arrow}" style="color:${iconColor};font-size:11px"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+                ${badge}
+                <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${fd(e.datum)}</span>
+              </div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3;margin-bottom:${link?'4px':'0'}">
+                ${e.beschreibung||e.kategorie||'—'}
+              </div>
+              ${link ? `<div style="margin-top:2px">${link}</div>` : ''}
+            </div>
+            <div style="flex:0 0 auto;text-align:right">
+              <div style="font-size:15px;font-weight:700;font-family:var(--mono);color:${amtColor};white-space:nowrap">${amtSign}${fmt(e.betrag)}</div>
+              <div style="font-size:10px;color:var(--sub);margin-top:2px">${e.typ}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">
+              <span>${e.kategorie||'—'}</span>
+              ${e.zahlungsart ? `<span>·</span><span class="badge" style="font-size:10px">${e.zahlungsart}</span>` : ''}
+            </div>
+            <div style="font-size:10px;color:var(--sub);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;max-width:120px;white-space:nowrap" title="${e.id}">${e.id}</div>
+          </div>
+        </div>`;
     });
+
+    html += `</div>`;
   });
 
   tb.innerHTML = html;
 
-  // Обновляем счётчик
   const total = Object.keys(chains).length;
   const el = document.getElementById('journal-count');
   if (el) el.textContent = `${total} Storno-Kette${total !== 1 ? 'n' : ''}`;

@@ -303,23 +303,11 @@
   <div style="background:rgba(26,69,120,.06);border:1px solid rgba(26,69,120,.2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px">
     <i class="fas fa-info-circle"></i> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
   </div>
-  <div class="tbl-wrap">
-    <table style="width:100%">
-      <thead><tr>
-        <th>Datum</th>
-        <th>Status</th>
-        <th class="mob-hide">Beschreibung</th>
-        <th class="mob-hide">Typ</th>
-        <th style="text-align:right">Betrag</th>
-        <th class="mob-hide">ID</th>
-      </tr></thead>
-      <tbody id="journal-tbody"></tbody>
-    </table>
-    <div id="journal-empty" class="empty-state" style="display:none">
-      <div class="ei"><i class="fas fa-book"></i></div>
-      <p>Keine Storno-Buchungen vorhanden</p>
-      <p style="font-size:12px;color:var(--sub);margin-top:6px">Alle Einträge sind unverändert</p>
-    </div>
+  <div id="journal-tbody"></div>
+  <div id="journal-empty" class="empty-state" style="display:none">
+    <div class="ei"><i class="fas fa-book"></i></div>
+    <p>Keine Storno-Buchungen vorhanden</p>
+    <p style="font-size:12px;color:var(--sub);margin-top:6px">Alle Einträge sind unverändert</p>
   </div>
 </div>
 </div>
