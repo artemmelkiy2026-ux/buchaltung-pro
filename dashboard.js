@@ -878,14 +878,21 @@ function renderZ(){
     const pageEntries = sorted.slice(start, end);
     
     ztb.innerHTML=pageEntries.map(e=>{
-      const yearForDisplay = mob ? e.datum.substring(2,4) : e.datum.substring(0,4);
-      return `<tr>
-        <td style="font-family:var(--mono);font-size:11px;color:var(--sub)">${fd(e.datum)}</td>
-        <td><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'} ${mob?'':''+e.typ}</span></td>
-        ${mob?'':`<td>${e.beschreibung}</td>`}
-        <td><span class="badge ${ZBADGE[e.zahlungsart]||''}">${ZICONS[e.zahlungsart]||''} ${mob?'':e.zahlungsart||'Sonstiges'}</span></td>
-        <td style="text-align:right"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
-      </tr>`;
+      const isEin=e.typ==='Einnahme';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s"'
+        +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
+        +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
+        +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
+        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
+        +'<span style="font-family:var(--mono)">'+fd(e.datum)+'</span>'
+        +'<span>&middot;</span>'
+        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(ZICONS[e.zahlungsart]||'')+' '+(e.zahlungsart||'Sonstiges')+'</span>'
+        +'</div></div>'
+        +'<div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--'+(isEin?'green':'red')+');font-family:var(--mono);white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</div>'
+        +'</div>';
     }).join('');
     
     // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
