@@ -738,18 +738,18 @@ function renderRep(){
           <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:var(--green)">${hasData?fmt(m.ein):'—'}</div>
         </div>
         <div style="background:rgba(239,68,68,.06);border-radius:8px;padding:8px 10px">
-          <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Ausgaben</div>
+          <div style="font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Ausgaben</div>
           <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:var(--red)">${hasData?fmt(m.aus):'—'}</div>
         </div>
       </div>
       ${isRegel&&m.mwst>0?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div style="background:rgba(249,115,22,.06);border-radius:8px;padding:8px 10px">
-          <div style="font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">MwSt</div>
+          <div style="font-size:12px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">MwSt</div>
           <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:#f97316">${fmt(m.mwst)}</div>
         </div>
         <div style="background:rgba(13,127,170,.06);border-radius:8px;padding:8px 10px">
-          <div style="font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Zahllast</div>
-          <div style="font-size:12px;font-weight:600;font-family:var(--mono);color:var(--cyan)">${m.zahllast>0?'+':''}${fmt(m.zahllast)}</div>
+          <div style="font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Zahllast</div>
+          <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:var(--cyan)">${m.zahllast>0?'+':''}${fmt(m.zahllast)}</div>
         </div>
       </div>`:''}
       <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px">
