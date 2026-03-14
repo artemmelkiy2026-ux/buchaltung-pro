@@ -705,6 +705,7 @@ function renderRep(){
   const bestM=months.reduce((b,m)=>m.gew>b.gew?m:b,months[0]);
   g('rs-best',bestM.count?fmt(bestM.gew):'—');g('rs-best-s',bestM.count?MN[bestM.i]:'');
 
+  const mxE=Math.max(...months.map(m=>m.ein),1),mxA=Math.max(...months.map(m=>m.aus),1);
   const curMon=new Date().getMonth();
   const mob=isMob();
   document.getElementById('month-cards').innerHTML=months.map(m=>{
@@ -717,7 +718,10 @@ function renderRep(){
         <div class="mc-stat"><label>Einnahmen</label><span style="color:var(--green)">${m.ein>0?fmt(m.ein):'—'}</span></div>
         <div class="mc-stat"><label>Ausgaben</label><span style="color:var(--red)">${m.aus>0?fmt(m.aus):'—'}</span></div>
       </div>
-
+      <div class="mc-bars">
+        <div class="mc-bar-row"><label style="color:var(--green);font-size:9px">E</label><div class="mc-bar-bg"><div class="mc-bar-fill ein" style="width:${Math.round(m.ein/mxE*100)}%"></div></div></div>
+        <div class="mc-bar-row"><label style="color:var(--red);font-size:9px">A</label><div class="mc-bar-bg"><div class="mc-bar-fill aus" style="width:${Math.round(m.aus/mxA*100)}%"></div></div></div>
+      </div>
     </div>`;
   }).join('');
 

@@ -71,17 +71,6 @@ async function saveEdit(){
   renderAll(); closeModal('edit-modal'); toast('✓ Korrektur gespeichert (GoBD-konform)','ok');
 }
 
-// ── DELETE FROM EDIT MODAL ───────────────────────────────────────────────
-async function delFromEdit(){
-  if(!editId) return;
-  closeModal('edit-modal');
-  // Небольшая задержка чтобы модалка закрылась
-  setTimeout(async () => {
-    const fakeEvt = { stopPropagation: () => {} };
-    await delE(fakeEvt, editId);
-  }, 100);
-}
-
 // ── MODAL HELPERS ────────────────────────────────────────────────────────
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}

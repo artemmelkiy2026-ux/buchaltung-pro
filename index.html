@@ -24,11 +24,6 @@
     order: -1;
   }
 }
-@media (max-width: 768px) {
-  * { max-width: 100%; }
-  img, video, iframe { max-width: 100% !important; }
-  input, select, textarea { max-width: 100% !important; box-sizing: border-box !important; }
-}
 /* Scan progress animation */
 @keyframes scan-progress-slide {
   0%   { transform: translateX(-100%); }
@@ -208,93 +203,90 @@
 <!-- ── EINTRÄGE ── -->
 <div class="page" id="p-eintraege">
 <div class="page-inner">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h1 style="font-size:20px;font-weight:700"><i class="fas fa-list"></i> Einträge</h1>
+  </div>
 
-  <!-- Заголовок + кнопки экспорта -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-    <h1 style="font-size:20px;font-weight:700;white-space:nowrap"><i class="fas fa-list"></i> Einträge</h1>
-    <div style="display:flex;gap:6px">
-      <button class="csv" onclick="exportCSV()"><i class="fa-solid fa-download"></i><span class="mob-hide"> CSV</span></button>
-      <button class="csv" onclick="exportPDF()" style="background:var(--blue);color:#fff"><i class="fa-solid fa-file-pdf"></i><span class="mob-hide"> PDF</span></button>
+  <div class="toolbar">
+    <div class="filter-tabs">
+      <button class="ftab active" onclick="setFTyp('Alle',this)">Alle</button>
+      <button class="ftab" onclick="setFTyp('Einnahme',this)">▲ Einnahmen</button>
+      <button class="ftab" onclick="setFTyp('Ausgabe',this)">▼ Ausgaben</button>
     </div>
-  </div>
-
-  <!-- Тип фильтр -->
-  <div class="filter-tabs" style="margin-bottom:10px">
-    <button class="ftab active" onclick="setFTyp('Alle',this)">Alle</button>
-    <button class="ftab" onclick="setFTyp('Einnahme',this)">▲ Einnahmen</button>
-    <button class="ftab" onclick="setFTyp('Ausgabe',this)">▼ Ausgaben</button>
-  </div>
-
-  <!-- Фильтры — адаптивная сетка -->
-  <div class="ein-filters">
-    <select id="f-jahr" onchange="renderEin()" title="Jahr">
-      <option value="Alle">Alle Jahre</option>
-    </select>
-    <select id="f-mon" onchange="renderEin()" title="Monat">
-      <option value="Alle">Alle Monate</option>
-      <option value="01">Januar</option><option value="02">Februar</option><option value="03">März</option>
-      <option value="04">April</option><option value="05">Mai</option><option value="06">Juni</option>
-      <option value="07">Juli</option><option value="08">August</option><option value="09">September</option>
-      <option value="10">Oktober</option><option value="11">November</option><option value="12">Dezember</option>
-    </select>
-    <select id="f-kat" onchange="renderEin()" title="Kategorie">
-      <option value="Alle">Alle Kategorien</option>
-    </select>
-    <select id="f-zahl" onchange="renderEin()" title="Zahlungsart">
-      <option value="Alle">Alle Zahlungen</option>
-      <option>Überweisung</option><option>Barzahlung</option><option>PayPal</option>
-      <option>EC-Karte</option><option>Lastschrift</option><option>Sonstiges</option>
-    </select>
-    <div style="position:relative;grid-column:span 2">
-      <i class="fas fa-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--sub);font-size:12px;pointer-events:none"></i>
-      <input type="text" id="f-q" placeholder="Suche..." oninput="renderEin()"
-        style="width:100%;padding-left:30px;box-sizing:border-box">
+    <div class="toolbar-group">
+      <label>Jahr</label>
+      <select id="f-jahr" onchange="renderEin()"><option value="Alle">Alle</option></select>
     </div>
+    <div class="toolbar-group">
+      <label>Monat</label>
+      <select id="f-mon" onchange="renderEin()">
+        <option value="Alle">Alle</option>
+        <option value="01">Januar</option><option value="02">Februar</option><option value="03">März</option>
+        <option value="04">April</option><option value="05">Mai</option><option value="06">Juni</option>
+        <option value="07">Juli</option><option value="08">August</option><option value="09">September</option>
+        <option value="10">Oktober</option><option value="11">November</option><option value="12">Dezember</option>
+      </select>
+    </div>
+    <div class="toolbar-group">
+      <label>Kategorie</label>
+      <select id="f-kat" onchange="renderEin()"><option value="Alle">Alle</option></select>
+    </div>
+    <div class="toolbar-group">
+      <label><span class="mob-hide">Zahlung</span><span class="mob-show">Zahl</span></label>
+      <select id="f-zahl" onchange="renderEin()">
+        <option value="Alle">Alle</option>
+        <option>Überweisung</option><option>Barzahlung</option><option>PayPal</option>
+        <option>EC-Karte</option><option>Lastschrift</option><option>Sonstiges</option>
+      </select>
+    </div>
+    <div class="toolbar-group">
+      <label><i class="fas fa-search"></i></label>
+      <input type="text" id="f-q" placeholder="Suche..." oninput="renderEin()" style="width:140px">
+    </div>
+    <button class="csv" onclick="exportCSV()"><i class="fa-solid fa-download"></i> CSV</button>
+    <button class="csv" onclick="exportPDF()" style="background:var(--blue);color:#fff"><i class="fa-solid fa-file-pdf"></i> PDF</button>
   </div>
 
-  <!-- Сортировка -->
-  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;margin-top:10px">
-    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sort:</span>
+  <!-- Sort bar -->
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
     <button class="btn" id="esort-datum"       style="padding:4px 10px;font-size:11px" onclick="sortE('datum')">Datum</button>
     <button class="btn" id="esort-betrag"      style="padding:4px 10px;font-size:11px" onclick="sortE('betrag')">Betrag</button>
     <button class="btn" id="esort-kategorie"   style="padding:4px 10px;font-size:11px" onclick="sortE('kategorie')">Kategorie</button>
     <button class="btn" id="esort-zahlungsart" style="padding:4px 10px;font-size:11px" onclick="sortE('zahlungsart')">Zahlung</button>
-    <!-- compat hidden elements -->
-    <span id="th-datum" style="display:none"></span><span id="th-typ" style="display:none"></span>
-    <span id="th-kat" style="display:none"></span><span id="th-desc" style="display:none"></span>
-    <span id="th-desc-mob" style="display:none"></span><span id="th-zahl" style="display:none"></span>
-    <span id="th-netto" style="display:none"></span><span id="th-mwst" style="display:none"></span>
+    <!-- compat hidden elements for JS refs -->
+    <span id="th-datum" style="display:none"></span>
+    <span id="th-typ" style="display:none"></span>
+    <span id="th-kat" style="display:none"></span>
+    <span id="th-desc" style="display:none"></span>
+    <span id="th-desc-mob" style="display:none"></span>
+    <span id="th-zahl" style="display:none"></span>
+    <span id="th-netto" style="display:none"></span>
+    <span id="th-mwst" style="display:none"></span>
     <span id="th-bet" style="display:none"></span>
   </div>
-
-  <!-- Список -->
   <div id="e-tbody"></div>
   <div id="e-pagination" style="margin-top:8px"></div>
-  <div id="e-empty" class="empty-state" style="display:none">
-    <div class="ei"><i class="fas fa-inbox"></i></div>
-    <p>Keine Einträge gefunden</p>
-  </div>
-
-  <!-- Итоги -->
-  <div class="e-sum-grid" id="e-sum" style="margin-top:14px">
-    <div class="e-sum-card">
-      <div class="e-sum-lbl">Einträge</div>
-      <div class="e-sum-val" id="es-cnt">0</div>
+  <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-inbox"></i></div><p>Keine Einträge gefunden</p></div>
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px" id="e-sum">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einträge</div>
+      <div style="font-size:18px;font-weight:700" id="es-cnt">0</div>
     </div>
-    <div class="e-sum-card">
-      <div class="e-sum-lbl">Einnahmen</div>
-      <div class="e-sum-val" style="color:var(--green)" id="es-ein">0,00 €</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
+      <div style="font-size:18px;font-weight:700;color:var(--green)" id="es-ein">0,00 €</div>
     </div>
-    <div class="e-sum-card">
-      <div class="e-sum-lbl">Ausgaben</div>
-      <div class="e-sum-val" style="color:var(--red)" id="es-aus">0,00 €</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Ausgaben</div>
+      <div style="font-size:18px;font-weight:700;color:var(--red)" id="es-aus">0,00 €</div>
     </div>
-    <div class="e-sum-card">
-      <div class="e-sum-lbl">Gewinn</div>
-      <div class="e-sum-val" id="es-gew">0,00 €</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Gewinn</div>
+      <div style="font-size:18px;font-weight:700" id="es-gew">0,00 €</div>
     </div>
   </div>
-
 </div>
 </div>
 
@@ -338,7 +330,7 @@
   <h1 style="font-size:20px;font-weight:700;margin-bottom:16px"><i class="fa-solid fa-plus"></i> Neuer Eintrag</h1>
 
   <!-- Desktop: 2 Spalten. Mobil: 1 Spalte -->
-  <div id="neu-layout" style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;max-width:100%;overflow-x:hidden">
+  <div id="neu-layout" style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start">
 
   <!-- LINKE SPALTE: Formular -->
   <div>
@@ -495,13 +487,13 @@
 
   <div class="month-cards" id="month-cards"></div>
 
-  <!-- Таблица скрыта — используем только month-cards блоки -->
-  <div style="display:none" id="rep-tbody-wrap">
-    <table><tbody id="rep-tbody"></tbody><tfoot id="rep-tfoot"></tfoot></table>
+  <div class="ann-tbl">
+    <table>
+      <thead><tr><th>Monat</th><th class="mob-hide">Einnahmen (Brutto)</th><th class="mob-hide" id="rep-th-netto" style="display:none;color:#f97316;font-size:10px">Netto</th><th class="mob-hide" id="rep-th-mwst" style="display:none;color:#f97316;font-size:10px">MwSt <i class="fas fa-circle" style="color:#f97316"></i></th><th class="mob-hide" id="rep-th-zl" style="display:none;color:var(--cyan);font-size:10px">Zahllast</th><th class="mob-hide">Ausgaben</th><th class="mob-hide">Gewinn</th><th class="mob-hide">Kumuliert</th><th class="mob-hide">Einträge</th></tr></thead>
+      <tbody id="rep-tbody"></tbody>
+      <tfoot id="rep-tfoot"></tfoot>
+    </table>
   </div>
-  <div style="display:none" id="rep-th-netto"></div>
-  <div style="display:none" id="rep-th-mwst"></div>
-  <div style="display:none" id="rep-th-zl"></div>
 </div>
 </div>
 
@@ -880,7 +872,6 @@
     <div style="display:flex;gap:10px;margin-top:4px">
       <button class="btn primary" style="flex:1;padding:10px" onclick="saveEdit()"><i class="fas fa-save"></i> Speichern</button>
       <button class="btn" style="padding:10px 18px" onclick="closeModal('edit-modal')">Abbrechen</button>
-      <button class="btn" style="padding:10px 14px;color:var(--red);border-color:var(--red);background:var(--rdim)" onclick="delFromEdit()" title="Löschen"><i class="fas fa-trash"></i></button>
     </div>
   </div>
 </div>
