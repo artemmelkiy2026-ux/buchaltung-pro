@@ -1086,7 +1086,7 @@ function resizeToBase64(file, maxW) {
       // Шаг 2: автокроп — ищем границы чека по светлым пикселям
       const pixels = tctx.getImageData(0, 0, w, h).data;
       const threshold = 200;       // пиксели светлее этого — часть чека
-      const margin = 8;            // отступ вокруг найденного края
+      const margin = 3;            // отступ вокруг найденного края
       const minLightFraction = 0.3; // минимум 30% светлых пикселей в строке
 
       const isLight = (x, y) => {
