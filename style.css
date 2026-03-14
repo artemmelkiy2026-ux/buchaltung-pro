@@ -282,7 +282,7 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
 .sum-val{font-family:var(--mono);font-size:14px;font-weight:600}
 
 /* ── FORM PANEL ── */
-.form-panel{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:16px;}
+.form-panel{background:var(--s1);border-radius:var(--r2);padding:20px;margin-bottom:16px;}
 .form-panel h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--sub);margin-bottom:16px;display:flex;align-items:center;gap:7px}
 .typ-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 .tt{padding:9px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--sub);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;text-align:center}
@@ -635,7 +635,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   .mob-show { display: inline !important; }
 
   /* ── Формы ── */
-  .form-panel { padding: 14px 12px; margin-bottom: 10px; }
+  .form-panel { padding: 0px; margin-bottom: 10px; }
   .fgrow.c2 { grid-template-columns: 1fr; }
   .fgrow.c3 { grid-template-columns: 1fr; }
 
