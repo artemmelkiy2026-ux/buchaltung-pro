@@ -414,55 +414,47 @@ function renderDash(){
     });
   }
 
-  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Обновляем визуальные индикаторы сортировки
-  const thHeaders = document.querySelectorAll('#d-recent-tbl th');
-  thHeaders.forEach(th => {
-    th.classList.remove('sort-asc', 'sort-desc');
-    const colName = {
-      'Datum': 'datum',
-      'Typ': 'typ',
-      'Kat.': 'kategorie',
-      'Zahlung': 'zahlungsart',
-      'Beschreibung': 'beschreibung',
-      'Betrag': 'betrag'
-    }[th.textContent.trim()];
-    if(colName === dashSortCol) {
-      th.classList.add(dashSortAsc ? 'sort-asc' : 'sort-desc');
-    }
+  // Обновляем sort-кнопки
+  ['datum','betrag','typ'].forEach(col=>{
+    const btn=document.getElementById('dsort-'+col);
+    if(!btn) return;
+    btn.style.background = dashSortCol===col ? 'var(--blue)' : '';
+    btn.style.color      = dashSortCol===col ? '#fff' : '';
+    const lbl = col==='datum'?'Datum':col==='betrag'?'Betrag':'Typ';
+    btn.textContent = lbl + (dashSortCol===col ? (dashSortAsc?' ↑':' ↓') : '');
   });
-  
-  // Recent 10 — показываем последние 10 ПО ВЫБРАННОМУ ГОДУ
-  let recent=[...ye]  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Используем ye (отфильтрованные по году данные)
-    .sort((a,b)=>b.datum.localeCompare(a.datum))  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Сначала сортируем по дате (новые сверху)
-    .slice(0,10);                                   // <i class="fas fa-check-circle" style="color:var(--green)"></i> Берём первые 10 (последние по дате)
-  
-  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Потом сортируем эти 10 по выбранной колонке
+
+  // Recent 10 — последние по выбранному году
+  let recent=[...ye].sort((a,b)=>b.datum.localeCompare(a.datum)).slice(0,10);
   if(dashSortCol !== 'datum') {
     recent.sort((a,b)=>{
       let va=a[dashSortCol], vb=b[dashSortCol];
-      // Для чисел (betrag)
       if(dashSortCol==='betrag'){ va=+va; vb=+vb; }
-      // Для других (typ, kategorie, zahlungsart, beschreibung)
       if(dashSortAsc) return va>vb?1:-1;
       return va<vb?1:-1;
     });
-  } else {
-    // Если сортируем по дате - используем dashSortAsc для порядка
-    if(dashSortAsc) {
-      recent.reverse(); // Обратный порядок (старые сверху)
-    }
-  }
+  } else { if(dashSortAsc) recent.reverse(); }
+
   const mob=isMob();
-  document.getElementById('d-recent').innerHTML=recent.length?recent.map(e=>`
-    <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''};${(e.is_storno||e._storniert)?'opacity:0.45;background:rgba(148,163,184,0.07);':''}">
-      <td style="font-family:var(--mono);font-size:11px;color:var(--sub);white-space:nowrap">${mob?fdm(e.datum):fd(e.datum)}</td>
-      <td style="white-space:nowrap"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}" style="display:inline-flex;align-items:center;gap:5px">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}${mob?'':'<span style="font-size:11px;font-weight:600">'+(e.typ==='Einnahme'?'Einnahme':'Ausgabe')+'</span>'}</span></td>
-      <td class="mob-hide" style="color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.kategorie}">${e.kategorie}</td>
-      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:10px">${e.zahlungsart||'—'}</span></td>
-      <td class="mob-hide" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${e.beschreibung}">${e.beschreibung}</td>
-      <td style="text-align:right;white-space:nowrap"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
-    </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--sub)">'+'Keine Einträge'+'</td></tr>';
-}
+  document.getElementById('d-recent').innerHTML = recent.length ? recent.map(e => {
+    const isEin=e.typ==='Einnahme', st=e.is_storno||e._storniert;
+    const click=mob?'showMobDetail('+JSON.stringify(e).replace(/"/g,"'")+')':'';
+    return '<div onclick="'+click+'"'
+      +' style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
+      +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
+      +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
+      +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
+      +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
+      +'<span style="font-family:var(--mono)">'+(mob?fdm(e.datum):fd(e.datum))+'</span>'
+      +'<span>&middot;</span><span>'+e.kategorie+'</span>'
+      +'<span>&middot;</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
+      +'</div></div>'
+      +'<div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--'+(isEin?'green':'red')+');font-family:var(--mono);white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</div>'
+      +'</div>';
+  }).join('') : '<div style="text-align:center;padding:30px;color:var(--sub)">Keine Einträge</div>';
 
 // ── EINTRÄGE ──────────────────────────────────────────────────────────────
 function getFiltered(){
