@@ -1,5 +1,14 @@
 // ── JOURNAL (GoBD Buchungsjournal) ────────────────────────────────────────
 
+let journalSortCol = 'datum';
+let journalSortAsc = false;
+
+function sortJournal(col) {
+  if (journalSortCol === col) { journalSortAsc = !journalSortAsc; }
+  else { journalSortCol = col; journalSortAsc = false; }
+  renderJournal();
+}
+
 function renderJournal() {
   const tb = document.getElementById('journal-tbody');
   const em = document.getElementById('journal-empty');
@@ -11,11 +20,16 @@ function renderJournal() {
 
   const journalEntries = data.eintraege.filter(e =>
     e.is_storno || e.korrektur_von || involved.has(e.id)
-  ).sort((a, b) => b.datum.localeCompare(a.datum));
+  );
 
   if (!journalEntries.length) {
     tb.innerHTML = '';
     em.style.display = 'block';
+    // Сбрасываем кнопки
+    ['datum','betrag'].forEach(c => {
+      const b = document.getElementById('jsort-'+c);
+      if(b) { b.style.background=''; b.style.color=''; b.textContent = c==='datum'?'Datum':'Betrag'; }
+    });
     return;
   }
   em.style.display = 'none';
@@ -26,11 +40,20 @@ function renderJournal() {
     return e.id;
   }
 
+  // Собираем цепочки
   const chains = {};
   journalEntries.forEach(e => {
     const root = getRootId(e);
     if (!chains[root]) chains[root] = [];
-    chains[root].push(e);
+    if (!chains[root].find(x => x.id === e.id)) chains[root].push(e);
+  });
+
+  // Убеждаемся что оригинал тоже в цепочке
+  Object.keys(chains).forEach(rootId => {
+    const orig = data.eintraege.find(x => x.id === rootId);
+    if (orig && !chains[rootId].find(x => x.id === rootId)) {
+      chains[rootId].unshift(orig);
+    }
   });
 
   function chainOrder(e) {
@@ -40,16 +63,42 @@ function renderJournal() {
     return 3;
   }
 
+  // Получаем дату и сумму последней записи в цепочке для сортировки
+  function getChainLatestDatum(chain) {
+    return chain.reduce((latest, e) => e.datum > latest ? e.datum : latest, '0000-00-00');
+  }
+  function getChainMaxBetrag(chain) {
+    return Math.max(...chain.map(e => e.betrag));
+  }
+
+  // Сортируем цепочки
+  let chainList = Object.values(chains);
+  chainList.sort((a, b) => {
+    const va = journalSortCol === 'datum' ? getChainLatestDatum(a) : getChainMaxBetrag(a);
+    const vb = journalSortCol === 'datum' ? getChainLatestDatum(b) : getChainMaxBetrag(b);
+    return journalSortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+
+  // Обновляем кнопки сортировки
+  ['datum','betrag'].forEach(c => {
+    const b = document.getElementById('jsort-'+c);
+    if (!b) return;
+    const lbl = c === 'datum' ? 'Datum' : 'Betrag';
+    b.style.background = journalSortCol === c ? 'var(--blue)' : '';
+    b.style.color      = journalSortCol === c ? '#fff' : '';
+    b.textContent = lbl + (journalSortCol === c ? (journalSortAsc ? ' ↑' : ' ↓') : '');
+  });
+
   let html = '';
 
-  Object.values(chains).forEach((chain, ci) => {
-    chain.sort((a, b) => chainOrder(a) - chainOrder(b));
+  chainList.forEach((chain) => {
+    // Внутри цепочки: последняя корректура первой, потом сторно, потом оригинал
+    chain.sort((a, b) => chainOrder(b) - chainOrder(a));
 
-    // Карточка цепочки
     html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden">`;
 
     chain.forEach((e, idx) => {
-      let badge = '', rowBg = '', opacity = '1', connector = '';
+      let badge = '', rowBg = '', opacity = '1';
 
       if (!e.is_storno && !e.korrektur_von && involved.has(e.id)) {
         badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
@@ -64,7 +113,6 @@ function renderJournal() {
         rowBg = 'background:rgba(93,157,105,.03);';
       }
 
-      // Связь
       let link = '';
       if (e.is_storno && e.storno_of) {
         const orig = data.eintraege.find(x => x.id === e.storno_of);
@@ -78,13 +126,10 @@ function renderJournal() {
         if (stornoRec) link = `<span style="font-size:10px;color:var(--sub)">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
       }
 
-      // Разделитель между записями внутри цепочки
       const sep = idx > 0 ? `<div style="height:1px;background:var(--border);margin:0 14px"></div>` : '';
-
       const isEin = e.typ === 'Einnahme';
       const iconBg = isEin ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
       const iconColor = isEin ? 'var(--green)' : 'var(--red)';
-      const arrow = isEin ? 'up' : 'down';
       const amtColor = isEin ? 'var(--green)' : 'var(--red)';
       const amtSign = isEin ? '+' : '−';
 
@@ -92,17 +137,17 @@ function renderJournal() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              <i class="fas fa-arrow-${arrow}" style="color:${iconColor};font-size:11px"></i>
+              <i class="fas fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
                 ${badge}
                 <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${fd(e.datum)}</span>
               </div>
-              <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3;margin-bottom:${link?'4px':'0'}">
+              <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3${link?';margin-bottom:4px':''}">
                 ${e.beschreibung||e.kategorie||'—'}
               </div>
-              ${link ? `<div style="margin-top:2px">${link}</div>` : ''}
+              ${link ? `<div>${link}</div>` : ''}
             </div>
             <div style="flex:0 0 auto;text-align:right">
               <div style="font-size:15px;font-weight:700;font-family:var(--mono);color:${amtColor};white-space:nowrap">${amtSign}${fmt(e.betrag)}</div>
@@ -124,7 +169,7 @@ function renderJournal() {
 
   tb.innerHTML = html;
 
-  const total = Object.keys(chains).length;
+  const total = chainList.length;
   const el = document.getElementById('journal-count');
   if (el) el.textContent = `${total} Storno-Kette${total !== 1 ? 'n' : ''}`;
 }
