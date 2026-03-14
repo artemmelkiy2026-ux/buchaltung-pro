@@ -664,7 +664,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   .fgrow.c3 { grid-template-columns: 1fr; }
 
   /* ── Месяц-карточки: 2 колонки ── */
-  .month-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .month-cards { grid-template-columns: 1fr; gap: 8px; }
 
   /* ── Zahlungsarten: 2 колонки ── */
   .zk-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -887,7 +887,7 @@ th.sort-desc::after {
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
   .stats { grid-template-columns: 1fr; }
-  .month-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .month-cards { grid-template-columns: 1fr; gap: 8px; }
   .zk-grid { grid-template-columns: 1fr; gap: 8px; }
   #prog-cards { grid-template-columns: 1fr !important; }
   #st-cards { grid-template-columns: 1fr !important; }
