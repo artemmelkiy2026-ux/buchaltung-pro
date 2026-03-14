@@ -365,9 +365,21 @@
         <div class="fg" style="margin:0">
           <label id="nf-mwst-rate-lbl">MwSt-Satz</label>
           <select id="nf-mwst-rate" onchange="calcNfMwst()" style="font-weight:700">
-            <option value="19" selected>19% — Standard</option>
-            <option value="7">7% — Ermäßigt</option>
-            <option value="0">0% — Keine MwSt</option>
+            <option value="19" selected>19% <span class="flag-circle">
+  <span class="band black"></span>
+  <span class="band red"></span>
+  <span class="band gold"></span>
+</span> Standard</option>
+            <option value="7">7% <span class="flag-circle">
+  <span class="band black"></span>
+  <span class="band red"></span>
+  <span class="band gold"></span>
+</span> Ermäßigt</option>
+            <option value="0">0% <span class="flag-circle">
+  <span class="band black"></span>
+  <span class="band red"></span>
+  <span class="band gold"></span>
+</span> Keine MwSt</option>
           </select>
         </div>
         <div class="fg" style="margin:0">
