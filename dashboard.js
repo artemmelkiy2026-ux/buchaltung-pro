@@ -220,7 +220,7 @@ function updateMwstFormVisibility(){
     const title=document.getElementById('nf-mwst-title');
     if(title){title.textContent='● Umsatzsteuer auf diese Einnahme';title.style.color='#f97316';}
     const betLbl=document.getElementById('nf-mwst-bet-lbl');
-    if(betLbl) betLbl.textContent='USt-Betrag (€)';
+    if(betLbl) betLbl.textContent='USt (€)';
     const betEl=document.getElementById('nf-mwst-bet');
     if(betEl) betEl.style.color='#f97316';
     const info=document.getElementById('nf-betrag-info');
