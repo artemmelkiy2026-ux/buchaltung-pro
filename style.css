@@ -893,6 +893,7 @@ th.sort-desc::after {
 .km-valid { border-color:var(--green) !important }
 .km-invalid { border-color:var(--red) !important }
 @media(max-width:768px){
+  .e-sum-grid{grid-template-columns:repeat(2,1fr)!important;}
   #kunden-cards { grid-template-columns:1fr }
 }
 
