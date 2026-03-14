@@ -729,13 +729,13 @@ function renderRep(){
       onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
       onmouseout="this.style.boxShadow=''">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:14px;font-weight:700;color:var(--text)">${MN[m.i]}</span>
-        <span style="font-size:15px;font-weight:700;font-family:var(--mono);color:${gc}">${hasData?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span>
+        <span style="font-size:16px;font-weight:700;color:var(--text)">${MN[m.i]}</span>
+        <span style="font-size:16px;font-weight:700;font-family:var(--mono);color:${gc}">${hasData?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:${isRegel&&m.mwst>0?'8px':'0'}">
         <div style="background:rgba(34,197,94,.06);border-radius:8px;padding:8px 10px">
-          <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Einnahmen</div>
-          <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--green)">${hasData?fmt(m.ein):'—'}</div>
+          <div style="font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Einnahmen</div>
+          <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:var(--green)">${hasData?fmt(m.ein):'—'}</div>
         </div>
         <div style="background:rgba(239,68,68,.06);border-radius:8px;padding:8px 10px">
           <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Ausgaben</div>
