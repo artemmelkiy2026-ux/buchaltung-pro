@@ -585,7 +585,7 @@ function renderEin(){
         +mwstBadge
         +'</div></div>'
         +'<div class="prise-1" style="flex:0 0 auto;display:flex;align-items:flex-end;gap:4px">'
-        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
         +(stLbl?'<div style="text-align:right">'+stLbl+'</div>':'')
         +(!st
           ?'<div style="display:flex;gap:3px">'
