@@ -911,8 +911,9 @@ async function scanBelegPreview(input) {
   if (!file) return;
 
   // Sofort zu base64 konvertieren — kein File-Objekt speichern
-  _scanMediaType = file.type || 'image/jpeg';
-  _scanBase64 = await resizeToBase64(file, 1600);
+  const { data: imgData, mediaType: imgType } = await resizeToBase64(file, 600);
+  _scanBase64 = imgData;
+  _scanMediaType = imgType;
 
   const preview = document.getElementById('scan-preview-box');
   const img = document.getElementById('scan-preview-img');
@@ -1030,15 +1031,25 @@ function resizeToBase64(file, maxW) {
     const url = URL.createObjectURL(file);
     img.onload = () => {
       let w = img.width, h = img.height;
-      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      // Ориентация: чек вертикальный — ограничиваем по короткой стороне
+      const isPortrait = h >= w;
+      if (isPortrait && w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      if (!isPortrait && h > maxW) { w = Math.round(w * maxW / h); h = maxW; }
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
+      // Grayscale — чек не нужен цветным, экономим ~40%
+      ctx.filter = 'grayscale(1)';
       ctx.drawImage(img, 0, 0, w, h);
       URL.revokeObjectURL(url);
-      resolve(canvas.toDataURL('image/jpeg', 0.92).split(',')[1]);
+      // WebP + quality 0.55 — лучше JPEG при меньшем весе
+      const webp = canvas.toDataURL('image/webp', 0.55);
+      // Fallback: если браузер не поддерживает WebP — используем JPEG
+      const isWebp = webp.startsWith('data:image/webp');
+      const out = isWebp ? webp : canvas.toDataURL('image/jpeg', 0.65);
+      resolve({ data: out.split(',')[1], mediaType: isWebp ? 'image/webp' : 'image/jpeg' });
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Bild konnte nicht geladen werden')); };
     img.src = url;
