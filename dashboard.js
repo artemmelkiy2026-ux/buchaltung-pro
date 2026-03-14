@@ -523,90 +523,74 @@ function renderEin(){
   const mob=isMob();
   
   // Показываем/скрываем мобильный заголовок Beschreibung
-  const thDescMob = document.getElementById('th-desc-mob');
-  if(thDescMob) {
-    thDescMob.style.display = mob ? 'table-cell' : 'none';
-  }
-  // MwSt-Spalten anzeigen wenn Regelbesteuerung aktiv
+  // Обновляем sort-кнопки
   const einJahr = document.getElementById('f-jahr')?.value || 'Alle';
-  const showMwstHdr = !isKleinunternehmer(einJahr==='Alle'?new Date().getFullYear()+'':einJahr) && !mob;
-  ['th-netto','th-mwst'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.style.display = showMwstHdr ? 'table-cell' : 'none';
+  const showMwst = !isKleinunternehmer(einJahr==='Alle'?new Date().getFullYear()+'':einJahr);
+  [['datum','Datum'],['betrag','Betrag'],['kategorie','Kategorie'],['zahlungsart','Zahlung']].forEach(([col,lbl])=>{
+    const btn=document.getElementById('esort-'+col);
+    if(!btn) return;
+    btn.style.background = sortCol===col ? 'var(--blue)' : '';
+    btn.style.color      = sortCol===col ? '#fff' : '';
+    btn.textContent = lbl + (sortCol===col ? (sortAsc?' ↑':' ↓') : '');
   });
-  // Betrag-Spalten-Titel
-  const thBet=document.getElementById('th-bet');
-  if(thBet) thBet.textContent = showMwstHdr ? 'Brutto' : 'Betrag';
-  
+
   if(!entries.length){
-    tb.innerHTML='';
+    document.getElementById('e-tbody').innerHTML='';
     em.style.display='block';
     document.getElementById('e-pagination').innerHTML='';
   } else {
     em.style.display='none';
-    
-    // <i class="fas fa-check-circle" style="color:var(--green)"></i> ПАГИНАЦИЯ: показываем только 50 записей на странице
     const totalPages = Math.ceil(entries.length / einPerPage);
-    if(einPage > totalPages) einPage = totalPages; // Если страница потеряна
-    
+    if(einPage > totalPages) einPage = totalPages;
     const start = (einPage - 1) * einPerPage;
-    const end = start + einPerPage;
+    const end   = start + einPerPage;
     const pageEntries = entries.slice(start, end);
-    
-    // Рендеринг записей текущей страницы
-    tb.innerHTML=pageEntries.map(e=>{
-      const rowYr=e.datum.substring(0,4);
-      const showMwst = !isKleinunternehmer(rowYr);
+
+    document.getElementById('e-tbody').innerHTML = pageEntries.map(e => {
+      const isEin = e.typ==='Einnahme';
+      const st    = e.is_storno||e._storniert;
+      const rowYr = e.datum.substring(0,4);
       const hasMwst = e.mwstBetrag>0||e.vorsteuerBet>0;
-      const mwstVal = e.typ==='Einnahme'?(e.mwstBetrag||0):(e.vorsteuerBet||0);
-      const nettoVal = e.typ==='Einnahme'?(e.nettoBetrag||e.betrag):(e.betrag-(e.vorsteuerBet||0));
-      const mwstRate = e.mwstRate||e.vorsteuerRate||0;
-      return `
-      <tr onclick="${mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:''}" style="${mob?'cursor:pointer':''};${(e.is_storno||e._storniert)?'opacity:0.45;background:rgba(148,163,184,0.07);':''}">
-        <td style="font-family:var(--mono);font-size:11px;color:var(--sub)">${mob?fdm(e.datum):fd(e.datum)}</td>
-        <td><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'} ${mob?'':e.typ}</span></td>
-        <td class="mob-hide" style="color:var(--sub);font-size:12px">${e.kategorie}</td>
-        <td class="mob-hide"><span title="${e.notiz||''}">
-          ${(()=>{
-            // Sторно-Gegenbuchung: zeige auf welchen Originalbeleg sie sich bezieht
-            if(e.is_storno&&e.storno_of){
-              const orig=data.eintraege.find(x=>x.id===e.storno_of);
-              const ref=orig?('<b>'+fd(orig.datum)+'</b> · '+fmt(orig.betrag)+' ('+orig.beschreibung+')'):'Beleg nicht gefunden';
-              const korr=data.eintraege.find(x=>x.korrektur_von===e.storno_of);
-              const korrRef=korr?' → Korrektur: <b>'+fmt(korr.betrag)+'</b>':'';
-              return '<span style="font-size:9px;font-weight:700;color:#94a3b8;background:rgba(148,163,184,0.15);padding:2px 6px;border-radius:3px;margin-right:4px">↩ Storno-Gegenbuchung</span>'
-                    +'<span style="font-size:10px;color:var(--sub)">hebt auf: '+ref+korrRef+'</span>';
-            }
-            // Stornierter Originalbeleg
-            if(e.is_storno&&!e.storno_of){
-              const stornoRec=data.eintraege.find(x=>x.storno_of===e.id);
-              const korr=data.eintraege.find(x=>x.korrektur_von===e.id);
-              const stornoRef=stornoRec?('<b>'+fd(stornoRec.datum)+'</b>'):'?';
-              const korrRef=korr?' → Korrektur: <b>'+fmt(korr.betrag)+'</b> am '+fd(korr.datum):'';
-              return '<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 6px;border-radius:3px;margin-right:4px">✗ Storniert</span>'
-                    +'<span style="font-size:10px;color:var(--sub)">am '+stornoRef+korrRef+'</span>';
-            }
-            // Korrigierter Beleg: zeige Bezug zum stornierten Original
-            if(e.korrektur_von){
-              const orig=data.eintraege.find(x=>x.id===e.korrektur_von);
-              const ref=orig?('<b>'+fd(orig.datum)+'</b> · '+fmt(orig.betrag)):'?';
-              return '<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 6px;border-radius:3px;margin-right:4px">✎ Korrektur</span>'
-                    +'<span style="font-size:10px;color:var(--sub)">ersetzt: '+ref+'</span> ';
-            }
-            return '';
-          })()}${e.beschreibung}${e.notiz?` <span style="color:var(--sub);font-size:10px"><i class="fas fa-sticky-note"></i></span>`:''}</span></td>
-        ${mob?`<td style="font-size:11px;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.beschreibung||'—'}</td>`:''}
-        <td class="mob-hide"><span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span></td>
-        ${showMwst&&!mob?`<td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:var(--sub)">${hasMwst?fmt(nettoVal):'—'}</td>
-        <td class="mob-hide" style="text-align:right;font-size:11px;font-family:var(--mono);color:#f97316">${hasMwst?'+'+fmt(mwstVal)+' ('+mwstRate+'%)':'—'}</td>`:''}
-        <td style="text-align:right"><span class="amt ${e.typ==='Einnahme'?'ein':'aus'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span></td>
-        <td class="mob-hide" style="white-space:nowrap">
-          ${!(e.is_storno||e._storniert)?`
-          <button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,'${e.id}')"><i class="fas fa-edit"></i></button>
-          <button class="del-btn" onclick="delE(event,'${e.id}')"><i class="fas fa-times"></i></button>
-          `:'<span style="font-size:10px;color:var(--sub)">GoBD</span>'}
-        </td>
-      </tr>`;}).join('');
+      const mwstVal = isEin?(e.mwstBetrag||0):(e.vorsteuerBet||0);
+      const nettoVal= isEin?(e.nettoBetrag||e.betrag):(e.betrag-(e.vorsteuerBet||0));
+      const mwstRate= e.mwstRate||e.vorsteuerRate||0;
+      // Storno label
+      let stLbl='';
+      if(e.is_storno&&e.storno_of){
+        const orig=data.eintraege.find(x=>x.id===e.storno_of);
+        stLbl='<span style="font-size:9px;font-weight:700;color:#94a3b8;background:rgba(148,163,184,0.15);padding:2px 5px;border-radius:3px;margin-right:4px">↩ Storno</span>';
+      } else if(st){
+        stLbl='<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✗ Storniert</span>';
+      } else if(e.korrektur_von){
+        stLbl='<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
+      }
+      const mwstBadge = showMwst&&hasMwst
+        ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> · Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
+        +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
+        +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
+        +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
+        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'
+        +stLbl+(e.beschreibung||e.kategorie)
+        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
+        +'<span style="font-family:var(--mono)">'+fd(e.datum)+'</span>'
+        +'<span>·</span><span>'+e.kategorie+'</span>'
+        +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
+        +mwstBadge
+        +'</div></div>'
+        +'<div style="flex:0 0 auto;display:flex;align-items:center;gap:8px">'
+        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+        +(!st
+          ?'<div style="display:flex;gap:3px">'
+           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,\''+e.id+'\')" ><i class="fas fa-edit"></i></button>'
+           +'<button class="del-btn" onclick="delE(event,\''+e.id+'\')" ><i class="fas fa-times"></i></button></div>'
+          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')
+        +'</div></div>';
+    }).join('');
     
     // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
     let paginationHTML = '';
