@@ -710,15 +710,24 @@ function renderRep(){
   const mxE=Math.max(...months.map(m=>m.ein),1),mxA=Math.max(...months.map(m=>m.aus),1);
   const curMon=new Date().getMonth();
   const mob=isMob();
+  let cumul2=0;
   document.getElementById('month-cards').innerHTML=months.map(m=>{
     const gc=m.gew>=0?'var(--green)':'var(--red)';
     const isCur=m.i===curMon&&yr===new Date().getFullYear()+'';
-    const mname=mob?MS[m.i]:MN[m.i];
+    cumul2+=m.gew;
+    const cc=cumul2>=0?'var(--green)':'var(--red)';
     return`<div class="mc${isCur?' current':''}" onclick="openMonatDetail('${yr}','${m.mi}')" style="cursor:pointer" title="${MN[m.i]} ${yr} — Details anzeigen">
-      <div class="mc-top"><span class="mc-name">${mname}</span><span class="mc-gew" style="color:${gc}">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span></div>
+      <div class="mc-top">
+        <span class="mc-name">${MN[m.i]}</span>
+        <span class="mc-gew" style="color:${gc}">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span>
+      </div>
       <div class="mc-body">
         <div class="mc-stat"><label>Einnahmen</label><span style="color:var(--green)">${m.ein>0?fmt(m.ein):'—'}</span></div>
         <div class="mc-stat"><label>Ausgaben</label><span style="color:var(--red)">${m.aus>0?fmt(m.aus):'—'}</span></div>
+        <div class="mc-stat"><label>Kumuliert</label><span style="color:${cc}">${m.count?(cumul2>=0?'+':'')+fmt(cumul2):'—'}</span></div>
+        <div class="mc-stat"><label>Einträge</label><span style="color:var(--sub)">${m.count||'—'}</span></div>
+        ${isRegel&&m.mwst>0?`<div class="mc-stat"><label style="color:#f97316">MwSt</label><span style="color:#f97316">${fmt(m.mwst)}</span></div>`:''}
+        ${isRegel&&m.zahllast!==0?`<div class="mc-stat"><label style="color:var(--cyan)">Zahllast</label><span style="color:var(--cyan)">${m.zahllast>0?'+':''}${fmt(m.zahllast)}</span></div>`:''}
       </div>
       <div class="mc-bars">
         <div class="mc-bar-row"><label style="color:var(--green);font-size:9px">E</label><div class="mc-bar-bg"><div class="mc-bar-fill ein" style="width:${Math.round(m.ein/mxE*100)}%"></div></div></div>

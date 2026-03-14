@@ -487,13 +487,13 @@
 
   <div class="month-cards" id="month-cards"></div>
 
-  <div class="ann-tbl">
-    <table>
-      <thead><tr><th>Monat</th><th class="mob-hide">Einnahmen (Brutto)</th><th class="mob-hide" id="rep-th-netto" style="display:none;color:#f97316;font-size:10px">Netto</th><th class="mob-hide" id="rep-th-mwst" style="display:none;color:#f97316;font-size:10px">MwSt <i class="fas fa-circle" style="color:#f97316"></i></th><th class="mob-hide" id="rep-th-zl" style="display:none;color:var(--cyan);font-size:10px">Zahllast</th><th class="mob-hide">Ausgaben</th><th class="mob-hide">Gewinn</th><th class="mob-hide">Kumuliert</th><th class="mob-hide">Einträge</th></tr></thead>
-      <tbody id="rep-tbody"></tbody>
-      <tfoot id="rep-tfoot"></tfoot>
-    </table>
+  <!-- Таблица скрыта — используем только month-cards блоки -->
+  <div style="display:none" id="rep-tbody-wrap">
+    <table><tbody id="rep-tbody"></tbody><tfoot id="rep-tfoot"></tfoot></table>
   </div>
+  <div style="display:none" id="rep-th-netto"></div>
+  <div style="display:none" id="rep-th-mwst"></div>
+  <div style="display:none" id="rep-th-zl"></div>
 </div>
 </div>
 
