@@ -112,6 +112,7 @@ function appInit(){
   document.getElementById('nf-dat').value=new Date().toISOString().split('T')[0];
   updateKatSel(); buildYearFilters(); renderAll();
   updateMwstFormVisibility();
+  setTyp(curTyp);
   setTimeout(()=>{
     const today=new Date().toISOString().split('T')[0];
     const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
@@ -165,4 +166,3 @@ function nav(id, el){
 }
 
 // ── AUTOSAVE (облако — сохраняется автоматически через persist) ──────────
-
