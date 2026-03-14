@@ -94,9 +94,7 @@ function setMwstRate(val) {
     const btn = document.getElementById('mwst-btn-' + v);
     if (!btn) return;
     const active = v === val;
-    btn.style.border    = active ? '2px solid var(--blue)' : '2px solid var(--border)';
-    btn.style.background= active ? 'var(--blue)' : 'var(--s2)';
-    btn.style.color     = active ? '#fff' : 'var(--text)';
+
   });
   calcNfMwst();
 }
