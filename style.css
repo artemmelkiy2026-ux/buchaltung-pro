@@ -54,6 +54,15 @@
   text-overflow: ellipsis;
 }
 
+  @media screen and (min-width: 1024px) {
+  .prise-1 {
+flex: 0 0 auto;
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
+}
+}
+
 @media (max-width: 768px) {
   .mob-hide { display: none; }
 }
