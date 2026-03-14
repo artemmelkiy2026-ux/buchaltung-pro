@@ -4,6 +4,20 @@
      Акцентный зелёный: #5d9d69
      Фон:              #f0f4f8
   ──────────────────────────────────────────────────────────── */
+
+/* ── Monatsbericht адаптив ──────────────────────────────────────── */
+.rep-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.rep-month-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+
+@media(max-width:900px) {
+  .rep-month-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+  .rep-stats-grid { grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:480px) {
+  .rep-month-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .rep-stats-grid { grid-template-columns:repeat(2,1fr); }
+}
+
 @media (max-width: 768px) {
   .mob-hide { display: none; }
 }

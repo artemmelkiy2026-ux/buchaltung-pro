@@ -717,80 +717,93 @@ function renderRep(){
   const mxE=Math.max(...months.map(m=>m.ein),1),mxA=Math.max(...months.map(m=>m.aus),1);
   const curMon=new Date().getMonth();
   const mob=isMob();
+  let cumul2=0;
   document.getElementById('month-cards').innerHTML=months.map(m=>{
     const gc=m.gew>=0?'var(--green)':'var(--red)';
     const isCur=m.i===curMon&&yr===new Date().getFullYear()+'';
-    const mname=mob?MS[m.i]:MN[m.i];
-    return`<div class="mc${isCur?' current':''}" onclick="openMonatDetail('${yr}','${m.mi}')" style="cursor:pointer" title="${MN[m.i]} ${yr} — Details anzeigen">
-      <div class="mc-top"><span class="mc-name">${mname}</span><span class="mc-gew" style="color:${gc}">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span></div>
-      <div class="mc-body">
-        <div class="mc-stat"><label>Einnahmen</label><span style="color:var(--green)">${m.ein>0?fmt(m.ein):'—'}</span></div>
-        <div class="mc-stat"><label>Ausgaben</label><span style="color:var(--red)">${m.aus>0?fmt(m.aus):'—'}</span></div>
+    cumul2+=m.gew;
+    const cc=cumul2>=0?'var(--green)':'var(--red)';
+    const hasData=m.count>0;
+    return`<div onclick="openMonatDetail('${yr}','${m.mi}')"
+      style="background:${isCur?'rgba(26,69,120,.06)':'var(--s1)'};border:${isCur?'2px solid var(--blue)':'1px solid var(--border)'};border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;opacity:${hasData?'1':'0.45'}"
+      onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
+      onmouseout="this.style.boxShadow=''">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:14px;font-weight:700;color:var(--text)">${MN[m.i]}</span>
+        <span style="font-size:15px;font-weight:700;font-family:var(--mono);color:${gc}">${hasData?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span>
       </div>
-      <div class="mc-bars">
-        <div class="mc-bar-row"><label style="color:var(--green);font-size:9px">E</label><div class="mc-bar-bg"><div class="mc-bar-fill ein" style="width:${Math.round(m.ein/mxE*100)}%"></div></div></div>
-        <div class="mc-bar-row"><label style="color:var(--red);font-size:9px">A</label><div class="mc-bar-bg"><div class="mc-bar-fill aus" style="width:${Math.round(m.aus/mxA*100)}%"></div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:${isRegel&&m.mwst>0?'8px':'0'}">
+        <div style="background:rgba(34,197,94,.06);border-radius:8px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Einnahmen</div>
+          <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--green)">${hasData?fmt(m.ein):'—'}</div>
+        </div>
+        <div style="background:rgba(239,68,68,.06);border-radius:8px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Ausgaben</div>
+          <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--red)">${hasData?fmt(m.aus):'—'}</div>
+        </div>
+      </div>
+      ${isRegel&&m.mwst>0?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div style="background:rgba(249,115,22,.06);border-radius:8px;padding:8px 10px">
+          <div style="font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">MwSt</div>
+          <div style="font-size:12px;font-weight:600;font-family:var(--mono);color:#f97316">${fmt(m.mwst)}</div>
+        </div>
+        <div style="background:rgba(13,127,170,.06);border-radius:8px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Zahllast</div>
+          <div style="font-size:12px;font-weight:600;font-family:var(--mono);color:var(--cyan)">${m.zahllast>0?'+':''}${fmt(m.zahllast)}</div>
+        </div>
+      </div>`:''}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border)">
+        <span style="font-size:11px;color:var(--sub)">${m.count||'0'} Einträge</span>
+        <span style="font-size:11px;color:${cc};font-family:var(--mono)">${hasData?'Σ '+(cumul2>=0?'+':'')+fmt(cumul2):'—'}</span>
       </div>
     </div>`;
   }).join('');
 
-  // Table — короткие месяцы на мобиле, КОМПАКТНАЯ ВЕРСИЯ
-  let cumul=0,tot={ein:0,aus:0,cnt:0};
-  document.getElementById('rep-tbody').innerHTML=months.map(m=>{
-    tot.ein+=m.ein;tot.aus+=m.aus;tot.cnt+=m.count;cumul+=m.gew;
-    const gc=m.gew>=0?'var(--green)':'var(--red)';
-    const cc=cumul>=0?'var(--green)':'var(--red)';
-    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Мобильная версия - более компактная
-    if(mob) {
-      return `<tr style="cursor:pointer" onclick="openMonatDetail('${yr}','${m.mi}')" title="Klicken für Details">
-        <td style="font-weight:${m.count?'500':'400'};color:${m.count?'var(--text)':'var(--sub)'}">
-          <span style="font-size:12px">${MS[m.i]}</span><br/>
-          <span style="font-size:10px;color:var(--sub)">E: ${fmt(m.ein)}</span><br/>
-          <span style="font-size:10px;color:var(--sub)">A: ${fmt(m.aus)}</span>
-        </td>
-        <td style="text-align:right;color:${gc};font-weight:600;padding-left:12px">
-          <span style="font-size:12px">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span>
-        </td>
-      </tr>`;
-    } else {
-      return `<tr style="cursor:pointer" onclick="openMonatDetail('${yr}','${m.mi}')" title="Klicken für Details" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
-        <td style="font-weight:${m.count?'500':'400'};color:${m.count?'var(--text)':'var(--sub)'}">${MN[m.i]} <span style="font-size:10px;color:var(--sub)">↗</span></td>
-        <td style="color:var(--green)">${m.ein>0?fmt(m.ein):'—'}</td>
-        ${isRegel?`<td style="color:var(--sub);font-size:11px">${m.netto>0?fmt(m.netto):'—'}</td><td style="color:#f97316;font-size:11px">${m.mwst>0?fmt(m.mwst):'—'}</td><td style="color:var(--cyan);font-size:11px;font-weight:600">${m.zahllast!=0?(m.zahllast>0?'+':'')+fmt(m.zahllast):'—'}</td>`:''}
-        <td style="color:var(--red)">${m.aus>0?fmt(m.aus):'—'}</td>
-        <td style="color:${gc};font-weight:600">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</td>
-        <td style="color:${cc}">${m.count?(cumul>=0?'+':'')+fmt(cumul):'—'}</td>
-        <td style="color:var(--sub)">${m.count||'—'}</td>
-      </tr>`;
-    }
-  }).join('');
-  const tg=tot.ein-tot.aus;
-  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Footer также адаптивен
-  if(mob) {
-    document.getElementById('rep-tfoot').innerHTML=`<tr>
-      <td style="font-weight:600">
-        <span style="font-size:12px">GESAMT ${yr.substring(2)}</span><br/>
-        <span style="font-size:10px;color:var(--green)">E: ${fmt(tot.ein)}</span><br/>
-        <span style="font-size:10px;color:var(--red)">A: ${fmt(tot.aus)}</span>
-      </td>
-      <td style="padding-right:10px; text-align:right;color:${tg>=0?'var(--green)':'var(--red)'};font-weight:600">
-        <span style="font-size:12px">${tg>=0?'+':''}${fmt(tg)}</span>
-      </td>
-    </tr>`;
-  } else {
-    const totMwst=months.reduce((s,m)=>s+m.mwst,0);
-    const totVost=months.reduce((s,m)=>s+m.vost,0);
-    const totNetto=months.reduce((s,m)=>s+m.netto,0);
-    const totZl=totMwst-totVost;
-    document.getElementById('rep-tfoot').innerHTML=`<tr>
-      <td>GESAMT ${yr}</td>
-      <td style="color:var(--green)">${fmt(tot.ein)}</td>
-      ${isRegel?`<td style="color:var(--sub);font-size:11px">${fmt(totNetto)}</td><td style="color:#f97316;font-size:11px">${fmt(totMwst)}</td><td style="color:var(--cyan);font-size:11px;font-weight:700">${totZl>0?'+':''}${fmt(totZl)}</td>`:''}
-      <td style="color:var(--red)">${fmt(tot.aus)}</td>
-      <td style="color:${tg>=0?'var(--green)':'var(--red)'}">${tg>=0?'+':''}${fmt(tg)}</td>
-      <td></td>
-      <td style="color:var(--sub)">${tot.cnt}</td>
-    </tr>`;
+  // Итоговый блок вместо таблицы
+  const tg=tEin-tAus;
+  const totMwst2=months.reduce((s,m)=>s+m.mwst,0);
+  const totVost2=months.reduce((s,m)=>s+m.vost,0);
+  const totZl2=totMwst2-totVost2;
+  const totCnt=months.reduce((s,m)=>s+m.count,0);
+  const totNetto2=months.reduce((s,m)=>s+m.netto,0);
+  const repTbody=document.getElementById('rep-tbody');
+  const repTfoot=document.getElementById('rep-tfoot');
+  if(repTbody) repTbody.innerHTML='';
+  if(repTfoot) repTfoot.innerHTML='';
+  const totBlock=document.getElementById('rep-total-block');
+  if(totBlock){
+    totBlock.style.display='';
+    totBlock.innerHTML=`
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Jahresübersicht ${yr}</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">${fmt(tEin)}</div>
+      </div>
+      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Ausgaben</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--red)">${fmt(tAus)}</div>
+      </div>
+      <div style="background:${tg>=0?'rgba(26,69,120,.06)':'rgba(239,68,68,.06)'};border:1px solid ${tg>=0?'rgba(26,69,120,.2)':'rgba(239,68,68,.2)'};border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Jahresgewinn</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:${tg>=0?'var(--blue)':'var(--red)'}">${tg>=0?'+':''}${fmt(tg)}</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einträge</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono)">${totCnt}</div>
+      </div>
+      ${isRegel?`
+      <div style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">MwSt gesamt</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f97316">${fmt(totMwst2)}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:3px">Netto: ${fmt(totNetto2)}</div>
+      </div>
+      <div style="background:rgba(13,127,170,.06);border:1px solid rgba(13,127,170,.2);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Zahllast</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--cyan)">${totZl2>0?'+':''}${fmt(totZl2)}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:3px">USt − VoSt</div>
+      </div>`:''}
+    </div>`;
   }
 }
 
