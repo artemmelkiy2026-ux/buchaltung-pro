@@ -87,6 +87,20 @@ function renderLetzteEinnahmen() {
       <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)">+${fmt(e.betrag)}</div>
     </div>`).join('');
 }
+function setMwstRate(val) {
+  const input = document.getElementById('nf-mwst-rate');
+  if (input) input.value = val;
+  [19, 7, 0].forEach(v => {
+    const btn = document.getElementById('mwst-btn-' + v);
+    if (!btn) return;
+    const active = v === val;
+    btn.style.border    = active ? '2px solid var(--blue)' : '2px solid var(--border)';
+    btn.style.background= active ? 'var(--blue)' : 'var(--s2)';
+    btn.style.color     = active ? '#fff' : 'var(--text)';
+  });
+  calcNfMwst();
+}
+
 function updateMwstFormVisibility(){
   const yr=document.getElementById('nf-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
   const klein=isKleinunternehmer(yr);
@@ -135,6 +149,7 @@ function clearForm(){
   document.getElementById('nf-dsc').value='';
   document.getElementById('nf-note').value='';
   // Дату НЕ сбрасываем — пользователь мог выбрать другой год
+  setMwstRate(19); // Сбрасываем MwSt на 19%
 }
 function addEintrag(){
   const datum=document.getElementById('nf-dat').value;
@@ -1056,8 +1071,7 @@ async function scanBeleg(base64, mediaType) {
       updateMwstFormVisibility();
     }
     if (result.mwst_rate !== undefined) {
-      const mwstSel = document.getElementById('nf-mwst-rate');
-      if (mwstSel) mwstSel.value = result.mwst_rate;
+      setMwstRate(parseInt(result.mwst_rate));
     }
     if (result.betrag) {
       document.getElementById('nf-bet').value = parseFloat(result.betrag).toFixed(2);
