@@ -296,7 +296,7 @@
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
     <div>
       <h1 style="font-size:20px;font-weight:700"><i class="fas fa-book"></i> Buchungsjournal</h1>
-      <p style="color:var(--sub);font-size:14px;margin-top:3px">GoBD-konforme Änderungshistorie · nur Storno-Ketten</p>
+      <p style="color:var(--sub);font-size:12px;margin-top:3px">GoBD-konforme Änderungshistorie · nur Storno-Ketten</p>
     </div>
     <span id="journal-count" style="font-size:12px;color:var(--sub);font-family:var(--mono)"></span>
   </div>
@@ -497,13 +497,19 @@
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <div>
       <h1 style="font-size:18px;font-weight:700"><i class="fas fa-credit-card"></i> Zahlungsarten</h1>
-      <p style="color:var(--sub);font-size:14px;margin-top:3px">Analyse nach Zahlungsart</p>
+      <p style="color:var(--sub);font-size:12px;margin-top:3px">Analyse nach Zahlungsart</p>
     </div>
     <select id="z-yr" onchange="renderZ()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;font-family:var(--sans)">
       <option>Alle</option>
     </select>
   </div>
   <div class="zk-grid" id="zk-grid"></div>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" id="zsort-datum"       style="padding:4px 10px;font-size:11px" onclick="sortZ('datum')">Datum</button>
+    <button class="btn" id="zsort-zahlungsart" style="padding:4px 10px;font-size:11px" onclick="sortZ('zahlungsart')">Zahlungsart</button>
+    <button class="btn" id="zsort-typ"         style="padding:4px 10px;font-size:11px" onclick="sortZ('typ')">Ein / Aus</button>
+  </div>
   <div id="z-tbody"></div>
   <div id="z-pagination" style="margin-top:8px"></div>
   <div id="z-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-credit-card"></i></div><p>Keine Einträge</p></div>

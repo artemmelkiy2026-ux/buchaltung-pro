@@ -808,6 +808,13 @@ function renderRep(){
 }
 
 // ── ZAHLUNGSARTEN ─────────────────────────────────────────────────────────
+function sortZ(col){
+  zSortAsc = zSortCol===col ? !zSortAsc : false;
+  zSortCol = col;
+  zPage = 1;
+  renderZ();
+}
+
 function renderZ(){
   buildYearFilters();
   const yr=document.getElementById('z-yr').value;
@@ -858,7 +865,20 @@ function renderZ(){
     </div>`;
   }).join('');
 
-  const sorted=[...ye].sort((a,b)=>b.datum.localeCompare(a.datum));
+  const sorted=[...ye].sort((a,b)=>{
+    if(zSortCol==='datum')     return zSortAsc ? a.datum.localeCompare(b.datum) : b.datum.localeCompare(a.datum);
+    if(zSortCol==='zahlungsart') return zSortAsc ? (a.zahlungsart||'').localeCompare(b.zahlungsart||'') : (b.zahlungsart||'').localeCompare(a.zahlungsart||'');
+    if(zSortCol==='typ')       return zSortAsc ? a.typ.localeCompare(b.typ) : b.typ.localeCompare(a.typ);
+    return b.datum.localeCompare(a.datum);
+  });
+  // Update sort buttons
+  [['datum','Datum'],['zahlungsart','Zahlungsart'],['typ','Ein / Aus']].forEach(([col,lbl])=>{
+    const btn=document.getElementById('zsort-'+col);
+    if(!btn) return;
+    btn.style.background = zSortCol===col ? 'var(--blue)' : '';
+    btn.style.color      = zSortCol===col ? '#fff' : '';
+    btn.textContent = lbl + (zSortCol===col ? (zSortAsc?' ↑':' ↓') : '');
+  });
   const ztb=document.getElementById('z-tbody'),zem=document.getElementById('z-empty');
   const zpag=document.getElementById('z-pagination');
   
