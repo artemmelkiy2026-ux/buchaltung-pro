@@ -332,7 +332,7 @@ tr:hover .del-btn{opacity:1}
 .mc-top{padding: 12px 14px;display: flex;justify-content: space-between;align-items: center;background: #e6ecf4e3;color: #000000;}
 .mc-name{font-size:16px;font-weight:600}
 .mc-gew{font-family:var(--mono);font-size:18px;font-weight:600}
-.mc-body{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mc-body{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;justify-items: center;}
 .mc-stat label{font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:2px}
 .mc-stat span{font-family:var(--mono);font-size:13px;font-weight:600}
 .mc-bars{padding:0 14px 12px;display:flex;flex-direction:column;gap:4px}
