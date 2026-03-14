@@ -572,13 +572,14 @@ function renderEin(){
         +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
         +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
         +'<div style="flex:1;min-width:0">'
-        +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'
-        +stLbl+(e.beschreibung||e.kategorie)
+        +(stLbl?'<div style="margin-bottom:2px;font-size:10px">'+stLbl+'</div>':'')
+        +'<div style="font-size:11px;color:var(--sub);font-family:var(--mono);margin-bottom:3px">'+fd(e.datum)+'</div>'
+        +'<div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">'
+        +(e.beschreibung||e.kategorie)
         +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
-        +'<span style="font-family:var(--mono)">'+fd(e.datum)+'</span>'
-        +'<span>·</span><span>'+e.kategorie+'</span>'
+        +'<span>'+e.kategorie+'</span>'
         +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
         +mwstBadge
         +'</div></div>'
