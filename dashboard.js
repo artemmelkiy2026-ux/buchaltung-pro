@@ -150,15 +150,52 @@ function renderLetzteEinnahmen() {
       <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)">+${fmt(e.betrag)}</div>
     </div>`).join('');
 }
+function toggleMwstDropdown() {
+  const panel   = document.getElementById('nf-mwst-panel');
+  const arrow   = document.getElementById('nf-mwst-arrow');
+  const trigger = document.getElementById('nf-mwst-rate-trigger');
+  const isOpen  = panel && panel.style.display !== 'none';
+  if (isOpen) {
+    panel.style.display = 'none';
+    if(arrow) arrow.style.transform = '';
+    if(trigger) trigger.style.borderColor = '';
+  } else {
+    if(panel) panel.style.display = 'block';
+    if(arrow) arrow.style.transform = 'rotate(180deg)';
+    if(trigger) trigger.style.borderColor = 'var(--blue)';
+  }
+}
+
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('nf-mwst-rate-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    const p = document.getElementById('nf-mwst-panel');
+    const a = document.getElementById('nf-mwst-arrow');
+    const t = document.getElementById('nf-mwst-rate-trigger');
+    if(p) p.style.display='none';
+    if(a) a.style.transform='';
+    if(t) t.style.borderColor='';
+  }
+});
+
 function setMwstRate(val) {
   const input = document.getElementById('nf-mwst-rate');
   if (input) input.value = val;
+  const labels = {19:'19% — Standard', 7:'7% — Ermäßigt', 0:'0% — Keine MwSt'};
+  const lbl = document.getElementById('nf-mwst-rate-label');
+  if (lbl) lbl.textContent = labels[val] || val+'%';
   [19, 7, 0].forEach(v => {
-    const btn = document.getElementById('mwst-btn-' + v);
-    if (!btn) return;
-    const active = v === val;
-   btn.style.border    = active ? '2px solid var(--blue)' : '2px solid var(--border)';
+    const opt = document.getElementById('mwst-opt-'+v);
+    if (!opt) return;
+    opt.style.background = v===val ? 'var(--bdim)' : '';
+    opt.style.color      = v===val ? 'var(--blue)' : 'var(--text)';
   });
+  const panel   = document.getElementById('nf-mwst-panel');
+  const arrow   = document.getElementById('nf-mwst-arrow');
+  const trigger = document.getElementById('nf-mwst-rate-trigger');
+  if(panel)   panel.style.display='none';
+  if(arrow)   arrow.style.transform='';
+  if(trigger) trigger.style.borderColor='';
   calcNfMwst();
 }
 
