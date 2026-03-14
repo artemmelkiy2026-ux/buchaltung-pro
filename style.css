@@ -329,7 +329,7 @@ tr:hover .del-btn{opacity:1}
 .mc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:all .2s;cursor:pointer}
 .mc:hover{border-color:var(--blue);transform:translateY(-1px)}
 .mc.current{border-color:var(--blue)}
-.mc-top{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background: #1d2d4b;color: #fff;}
+.mc-top{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background: #002a5be3;color: #fff;}
 .mc-name{font-size:16px;font-weight:600}
 .mc-gew{font-family:var(--mono);font-size:18px;font-weight:600}
 .mc-body{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
