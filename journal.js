@@ -63,9 +63,12 @@ function renderJournal() {
     return 3;
   }
 
-  // Получаем дату и сумму последней записи в цепочке для сортировки
+  // Получаем дату последнего изменения (created_at) для сортировки цепочек
   function getChainLatestDatum(chain) {
-    return chain.reduce((latest, e) => e.datum > latest ? e.datum : latest, '0000-00-00');
+    return chain.reduce((latest, e) => {
+      const ts = e.created_at || e.datum || '0000-00-00';
+      return ts > latest ? ts : latest;
+    }, '0000-00-00');
   }
   function getChainMaxBetrag(chain) {
     return Math.max(...chain.map(e => e.betrag));
@@ -92,8 +95,12 @@ function renderJournal() {
   let html = '';
 
   chainList.forEach((chain) => {
-    // Внутри цепочки: последняя корректура первой, потом сторно, потом оригинал
-    chain.sort((a, b) => chainOrder(b) - chainOrder(a));
+    // Внутри цепочки: по created_at убыванием — самое новое изменение вверху
+    chain.sort((a, b) => {
+      const ta = a.created_at || a.datum || '';
+      const tb = b.created_at || b.datum || '';
+      return tb.localeCompare(ta); // новее = выше
+    });
 
     html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden">`;
 

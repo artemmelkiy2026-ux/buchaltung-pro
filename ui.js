@@ -45,6 +45,8 @@ async function saveEdit(){
   if(i<0)return;
   // GoBD: нельзя редактировать — сторнируем оригинал и создаём новую запись
   const origEntry = {...data.eintraege[i]}; // сохраняем копию ДО любых push операций
+  // Корень цепочки: если редактируемая запись сама является корректурой — берём её korrektur_von
+  const chainRoot = origEntry.korrektur_von || editId;
   const storno = await sbStornoEintrag(editId);
   if (!storno) return toast('Fehler beim Stornieren','err');
   // sbStornoEintrag уже пометил оригинал локально
@@ -61,7 +63,7 @@ async function saveEdit(){
     notiz: document.getElementById('edit-note').value.trim(),
     is_storno: false,
     storno_of: null,
-    korrektur_von: editId,
+    korrektur_von: chainRoot,
     _storniert: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -69,6 +71,18 @@ async function saveEdit(){
   data.eintraege.push(newEntry);
   sbSaveEintrag(newEntry);
   renderAll(); closeModal('edit-modal'); toast('✓ Korrektur gespeichert (GoBD-konform)','ok');
+}
+
+// ── DELETE FROM EDIT MODAL ───────────────────────────────────────────────
+async function delFromEdit(){
+  if(!editId) return;
+  if(!confirm('Eintrag stornieren? (GoBD: Einträge können nicht gelöscht werden — es wird eine Storno-Gegenbuchung erstellt)')) return;
+  closeModal('edit-modal');
+  const storno = await sbStornoEintrag(editId);
+  if (!storno) return toast('Fehler beim Stornieren','err');
+  data.eintraege.push(storno);
+  renderAll();
+  toast('↩️ Storno-Gegenbuchung erstellt','ok');
 }
 
 // ── MODAL HELPERS ────────────────────────────────────────────────────────
