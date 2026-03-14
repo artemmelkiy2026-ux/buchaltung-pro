@@ -179,6 +179,7 @@ document.addEventListener('click', function(e) {
 });
 
 function setMwstRate(val) {
+  val = parseInt(val); // нормализуем строку в число
   const input = document.getElementById('nf-mwst-rate');
   if (input) input.value = val;
   const labels = {19:'19% — Standard', 7:'7% — Ermäßigt', 0:'0% — Keine MwSt'};
