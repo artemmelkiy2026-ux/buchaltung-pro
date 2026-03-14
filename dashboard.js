@@ -1103,7 +1103,7 @@ function resizeToBase64(file, maxW) {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       // Скан-эффект: grayscale + повышенный контраст + чуть ярче
-      ctx.filter = 'grayscale(1) contrast(1.3) brightness(1.4)';
+      ctx.filter = 'grayscale(1) contrast(1.5) brightness(1.3)';
       if (useCrop) {
         ctx.drawImage(tmp, left, top, cropW, cropH, 0, 0, cropW, cropH);
       } else {
