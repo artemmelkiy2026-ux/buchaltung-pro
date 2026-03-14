@@ -99,6 +99,8 @@ window.appAlert = function(message, { title='Hinweis', icon='ℹ️' }={}) {
 // ── КАСТОМНЫЙ SELECT DROPDOWN ─────────────────────────────────────────────
 
 const CS_SKIP = ['nf-mwst-rate']; // уже кастомный — пропускаем
+// Селекты которым нужна фиксированная компактная ширина (год-фильтры)
+const CS_COMPACT = ['rep-yr','dash-yr','z-yr','prog-yr','kat-yr','ust-yr'];
 
 class CustomSelect {
   constructor(originalSelect) {
@@ -122,13 +124,15 @@ class CustomSelect {
     const trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.className = 'cs-trigger';
+    const isCompact = CS_COMPACT.includes(this.id);
     trigger.style.cssText = `
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
-      width:100%;padding:7px 12px;
+      display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
+      width:${isCompact ? 'auto' : '100%'};min-width:${isCompact ? '90px' : '0'};padding:7px 12px;
       background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
       color:var(--text);font-size:13px;font-family:inherit;font-weight:500;
       cursor:pointer;text-align:left;outline:none;
       transition:border-color .15s,box-shadow .15s;`;
+    if (isCompact) wrap.style.width = 'auto';
     trigger.innerHTML = `
       <span class="cs-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
       <i class="fas fa-chevron-down cs-arrow" style="font-size:10px;color:var(--sub);flex-shrink:0;transition:transform .2s"></i>`;
@@ -146,7 +150,8 @@ class CustomSelect {
       display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);
       background:var(--s1);border:1px solid var(--border);border-radius:10px;
       box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:1000;
-      max-height:260px;overflow-y:auto;padding:4px;`;
+      max-height:260px;overflow-y:auto;padding:4px;
+      min-width:180px;width:max-content;max-width:320px;`;
 
     wrap.appendChild(trigger);
     wrap.appendChild(panel);
