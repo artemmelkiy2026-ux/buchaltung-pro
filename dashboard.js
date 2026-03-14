@@ -566,7 +566,9 @@ function renderEin(){
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> · Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
+      const _eid=''+e.id;
+      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;cursor:pointer;'+(st?'opacity:0.45;':'')+'"'
+        +(!st?' onclick="if(window.innerWidth<=900&&!event.target.closest(\'.del-btn\')){editE(event,\'' +e.id+ '\')}"':'')
         +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
         +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
         +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'

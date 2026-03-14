@@ -237,9 +237,10 @@ tbody td:last-child{border-right:1px solid var(--border);border-radius:0 12px 12
 .b-pp{background:var(--pdim);color:var(--purple)} .b-trans{background:var(--cdim);color:var(--cyan)}
 .amt{font-family:var(--mono);font-weight:600}
 .amt.ein{color:var(--green)} .amt.aus{color:var(--red)}
-.del-btn{opacity:0;background:none;border:none;color:var(--sub);cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .15s;font-size:12px}
-.del-btn:hover{color:var(--red);background:var(--rdim)}
+.del-btn{opacity:0.4;background:none;border:none;color:var(--sub);cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .15s;font-size:12px}
+.del-btn:hover{color:var(--red);background:var(--rdim);opacity:1}
 tr:hover .del-btn{opacity:1}
+.edit-btn:hover{color:var(--blue);opacity:1}
 
 /* ── SUMMARY ROW ── */
 .sum-row{display:flex;gap:0;background:var(--s2);border-top:2px solid var(--border);padding:0}
@@ -677,7 +678,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   /* EINTRAEGE compact table */
   #e-tbody .mob-hide { display: none; }
-  .del-btn { padding: 4px 6px; font-size: 13px; min-height: 30px; }
+  .del-btn { display: none !important; }
 
   /* BERICHT stats 2-col, short month names */
   #rep-stats { grid-template-columns: 1fr 1fr !important; gap: 8px; }
