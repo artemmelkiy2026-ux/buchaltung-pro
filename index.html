@@ -185,26 +185,17 @@
   </div>
 
   <!-- Recent -->
-  <div class="tbl-wrap">
-    <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--sub)">Letzte 10 Einträge</div>
-    <table id="d-recent-tbl" style="table-layout:auto;width:100%">
-      <colgroup>
-        <col style="width:85px"><!-- Datum -->
-        <col style="width:40px"><!-- Typ -->
-        <col class="mob-hide" style="width:160px"><!-- Kategorie -->
-        <col><!-- Zahlungsart — растягивается -->
-        <col class="mob-hide"><!-- Beschreibung — остаток -->
-        <col style="width:110px"><!-- Betrag -->
-      </colgroup>
-      <thead><tr>
-        <th onclick="sortDash('datum')" style="cursor:pointer">Datum</th>
-        <th onclick="sortDash('typ')" style="cursor:pointer">Typ</th>
-        <th class="mob-hide" onclick="sortDash('kategorie')" style="cursor:pointer">Kategorie</th>
-        <th onclick="sortDash('zahlungsart')" style="cursor:pointer">Zahlungsart</th>
-        <th class="mob-hide" onclick="sortDash('beschreibung')" style="cursor:pointer">Beschreibung</th>
-        <th onclick="sortDash('betrag')" style="cursor:pointer;text-align:right">Betrag</th>
-      </tr></thead>
-    <tbody id="d-recent"></tbody></table>
+  <div id="d-recent-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">Letzte 10 Einträge</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;color:var(--sub)">Sortieren:</span>
+        <button class="btn" id="dsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortDash('datum')">Datum</button>
+        <button class="btn" id="dsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortDash('betrag')">Betrag</button>
+        <button class="btn" id="dsort-typ"    style="padding:4px 10px;font-size:11px" onclick="sortDash('typ')">Typ</button>
+      </div>
+    </div>
+    <div id="d-recent"></div>
   </div>
 </div>
 </div>
