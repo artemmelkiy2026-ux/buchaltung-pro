@@ -29,6 +29,12 @@ window._customConfirmResolve = null;
 
   const style = document.createElement('style');
   style.textContent = `
+    @keyframes cs-fade-in {
+      from { opacity:0; } to { opacity:1; }
+    }
+    @keyframes cs-slide-up {
+      from { transform:translateY(100%); } to { transform:translateY(0); }
+    }
     @keyframes app-confirm-in {
       from { opacity:0; transform:scale(.93) translateY(8px); }
       to   { opacity:1; transform:scale(1) translateY(0); }
@@ -230,36 +236,109 @@ class CustomSelect {
     this.panel.style.display === 'none' ? this._open() : this._close();
   }
 
+  _isMobile() {
+    return window.innerWidth <= 768;
+  }
+
   _open() {
     // Закрываем все другие
     document.querySelectorAll('.cs-panel').forEach(p => { p.style.display = 'none'; });
     document.querySelectorAll('.cs-arrow').forEach(a => { a.style.transform = ''; });
+    // Убираем все мобильные оверлеи
+    document.querySelectorAll('.cs-mob-overlay').forEach(o => o.remove());
 
-    this.panel.style.display = 'block';
-    this.arrow.style.transform = 'rotate(180deg)';
     this.trigger.style.borderColor = 'var(--blue)';
     this.trigger.style.boxShadow   = '0 0 0 2px rgba(59,130,246,.2)';
+    this.arrow.style.transform     = 'rotate(180deg)';
 
-    // Пересоздаём опции (могут быть обновлены динамически)
+    // Пересоздаём опции
     this._buildOptions();
     this._updateLabel();
 
-    // Позиционируем: вверх если снизу не хватает места
-    const triggerRect = this.trigger.getBoundingClientRect();
-    const panelH = Math.min(260, this.panel.scrollHeight + 8);
-    const spaceBelow = window.innerHeight - triggerRect.bottom;
-    const spaceAbove = triggerRect.top;
-    if (spaceBelow < panelH && spaceAbove > spaceBelow) {
-      this.panel.style.top    = 'auto';
-      this.panel.style.bottom = 'calc(100% + 4px)';
-    } else {
-      this.panel.style.top    = 'calc(100% + 4px)';
-      this.panel.style.bottom = 'auto';
-    }
+    if (this._isMobile()) {
+      // ── МОБИЛЬ: bottom sheet ──────────────────────────────────────────
+      const overlay = document.createElement('div');
+      overlay.className = 'cs-mob-overlay';
+      overlay.style.cssText = `
+        position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;
+        display:flex;align-items:flex-end;justify-content:center;
+        animation:cs-fade-in .15s ease`;
+      overlay.innerHTML = `
+        <div class="cs-mob-sheet" style="
+          background:var(--s1);border-radius:18px 18px 0 0;width:100%;
+          max-height:70vh;overflow:hidden;display:flex;flex-direction:column;
+          animation:cs-slide-up .22s ease;padding-bottom:env(safe-area-inset-bottom,0)">
+          <div style="display:flex;align-items:center;justify-content:space-between;
+            padding:14px 18px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
+            <span style="font-size:15px;font-weight:700;color:var(--text)" id="cs-mob-title"></span>
+            <button style="background:var(--s2);border:1px solid var(--border);border-radius:50%;
+              width:30px;height:30px;cursor:pointer;font-size:16px;color:var(--sub);
+              display:flex;align-items:center;justify-content:center"
+              onclick="this.closest('.cs-mob-overlay').remove()">✕</button>
+          </div>
+          <div class="cs-mob-list" style="overflow-y:auto;padding:8px;flex:1"></div>
+        </div>`;
 
-    // Скроллим к активному
-    const active = this.panel.querySelector(`[data-value="${CSS.escape(this.sel.value)}"]`);
-    if (active) active.scrollIntoView({ block: 'nearest' });
+      // Заголовок = label над select
+      const label = this.wrap.parentElement?.querySelector('label');
+      overlay.querySelector('#cs-mob-title').textContent = label?.textContent || '';
+
+      // Опции
+      const list = overlay.querySelector('.cs-mob-list');
+      Array.from(this.sel.options).forEach(opt => {
+        const item = document.createElement('div');
+        const active = opt.value === this.sel.value;
+        item.style.cssText = `
+          padding:14px 16px;border-radius:10px;cursor:pointer;font-size:15px;
+          display:flex;align-items:center;justify-content:space-between;gap:10px;
+          background:${active ? 'var(--bdim)' : 'transparent'};
+          color:${active ? 'var(--blue)' : 'var(--text)'};
+          font-weight:${active ? '700' : '400'};
+          margin-bottom:2px;`;
+        item.innerHTML = `<span>${opt.innerHTML||opt.text}</span>${active ? '<i class="fas fa-check" style="color:var(--blue);font-size:13px"></i>' : ''}`;
+        item.addEventListener('click', () => {
+          this.sel.value = opt.value;
+          this._updateLabel();
+          this.sel.dispatchEvent(new Event('change', { bubbles: true }));
+          overlay.style.opacity = '0';
+          overlay.style.transition = 'opacity .15s';
+          setTimeout(() => overlay.remove(), 150);
+          this._close();
+        });
+        list.appendChild(item);
+      });
+
+      // Закрыть по клику на оверлей
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) { overlay.remove(); this._close(); }
+      });
+
+      document.body.appendChild(overlay);
+
+      // Скроллим к активному
+      const activeItem = list.querySelector(`[style*="var(--bdim)"]`);
+      if (activeItem) setTimeout(() => activeItem.scrollIntoView({ block: 'center' }), 50);
+
+    } else {
+      // ── ДЕСКТОП: обычный dropdown ─────────────────────────────────────
+      this.panel.style.display = 'block';
+
+      // Позиционируем: вверх если снизу не хватает места
+      const triggerRect = this.trigger.getBoundingClientRect();
+      const panelH = Math.min(260, this.panel.scrollHeight + 8);
+      const spaceBelow = window.innerHeight - triggerRect.bottom;
+      if (spaceBelow < panelH && triggerRect.top > spaceBelow) {
+        this.panel.style.top    = 'auto';
+        this.panel.style.bottom = 'calc(100% + 4px)';
+      } else {
+        this.panel.style.top    = 'calc(100% + 4px)';
+        this.panel.style.bottom = 'auto';
+      }
+
+      // Скроллим к активному
+      const active = this.panel.querySelector(`[data-value="${CSS.escape(this.sel.value)}"]`);
+      if (active) active.scrollIntoView({ block: 'nearest' });
+    }
   }
 
   _close() {
@@ -267,6 +346,8 @@ class CustomSelect {
     this.arrow.style.transform = '';
     this.trigger.style.borderColor = '';
     this.trigger.style.boxShadow   = '';
+    // Убираем мобильный overlay если есть
+    document.querySelectorAll('.cs-mob-overlay').forEach(o => o.remove());
   }
 
   // Наблюдатель — если JS меняет select.value программно
