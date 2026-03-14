@@ -18,7 +18,6 @@
   overflow: hidden;
   vertical-align: middle; /* Выравнивание по центру строки */
   margin-right: 5px;   /* Небольшой отступ от текста */
-  border: 1px solid #f0f0f0; /* Легкая рамка, чтобы желтый не сливался с белым фоном */
 }
 
 .flag-circle .band {
