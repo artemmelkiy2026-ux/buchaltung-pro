@@ -452,7 +452,7 @@ function renderDash(){
       +'<span>&middot;</span><span>'+e.kategorie+'</span>'
       +'<span>&middot;</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
       +'</div></div>'
-      +'<div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--'+(isEin?'green':'red')+');font-family:var(--mono);white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</div>'
+      +'<div style="flex:0 0 auto;font-size:15px;font-weight:700;color:var(--'+(isEin?'green':'red')+');font-family:var(--mono);white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</div>'
       +'</div>';
   }).join('') : '<div style="text-align:center;padding:30px;color:var(--sub)">Keine Einträge</div>';
 }
