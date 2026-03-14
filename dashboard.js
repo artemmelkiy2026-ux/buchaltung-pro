@@ -50,7 +50,7 @@ function setTyp(t){
       if(scanBox) { scanBox.style.display = 'block'; scanBox.style.visibility = 'visible'; }
       if(einBox)  einBox.style.display = 'none';
     } else {
-      if(scanBox) { scanBox.style.display = 'block'; scanBox.style.visibility = 'hidden'; }
+      if(scanBox) { scanBox.style.display = 'none'; scanBox.style.visibility = ''; }
       if(einBox)  { einBox.style.display = 'block'; renderLetzteEinnahmen(); }
     }
   }
