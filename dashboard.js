@@ -80,7 +80,7 @@ function renderLetzteEinnahmen() {
         <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
         <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px">
           <span>${fd(e.datum)}</span>
-          <span>·</span>
+         
           <span>${e.kategorie}</span>
         </div>
       </div>
@@ -580,8 +580,8 @@ function renderEin(){
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
         +'<span style="font-family:var(--mono)">'+fd(e.datum)+'</span>'
-        +'<span>·</span><span>'+e.kategorie+'</span>'
-        +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
+        +'<span>'+e.kategorie+'</span>'
+        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
         +mwstBadge
         +'</div></div>'
         +'<div style="flex:0 0 auto;display:flex;align-items:center;gap:8px">'
