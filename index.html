@@ -374,7 +374,7 @@
 
   </div>
 
-
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:16px"><i class="fa-solid fa-plus"></i> Neuer Eintrag</h1>
 
   <!-- Desktop: 2 Spalten. Mobil: 1 Spalte -->
   <div id="neu-layout" style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start">
@@ -410,12 +410,49 @@
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
         <div class="fg" style="margin:0">
           <label id="nf-mwst-rate-lbl">MwSt-Satz</label>
-          <select id="nf-mwst-rate" onchange="calcNfMwst()" style="font-weight:700">
-            <option value="19" selected>19%</option>
-            <option value="7">7%</option>
-            <option value="0">0%</option>
-          </select>
-        </div>
+          <!-- Скрытый input хранит значение -->
+          <input type="hidden" id="nf-mwst-rate" value="19">
+          <!-- Кастомный компактный dropdown -->
+          <div id="nf-mwst-rate-wrap" style="position:relative;margin-top:4px">
+            <button type="button" id="nf-mwst-rate-trigger" onclick="toggleMwstDropdown()"
+              style="display:flex;align-items:center;justify-content:space-between;gap:8px;
+                     width:100%;padding:8px 12px;border-radius:var(--r);
+                     border:1px solid var(--border);background:var(--s2);
+                     color:var(--text);font-size:13px;font-weight:600;cursor:pointer;
+                     font-family:inherit;transition:border-color .15s">
+              <span style="display:flex;align-items:center;gap:7px">
+                <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                <span id="nf-mwst-rate-label">19% — Standard</span>
+              </span>
+              <i class="fas fa-chevron-down" id="nf-mwst-arrow" style="font-size:10px;color:var(--sub);transition:transform .2s"></i>
+            </button>
+            <div id="nf-mwst-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);
+              background:var(--s1);border:1px solid var(--border);border-radius:10px;
+              box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:200;padding:4px;min-width:160px">
+              <div onclick="setMwstRate(19)" style="display:flex;align-items:center;gap:8px;
+                padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+                id="mwst-opt-19"
+                onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+                <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                19% — Standard
+              </div>
+              <div onclick="setMwstRate(7)" style="display:flex;align-items:center;gap:8px;
+                padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+                id="mwst-opt-7"
+                onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+                <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                7% — Ermäßigt
+              </div>
+              <div onclick="setMwstRate(0)" style="display:flex;align-items:center;gap:8px;
+                padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+                id="mwst-opt-0"
+                onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+                <span style="display:inline-flex;width:1em;height:1em;border-radius:50%;
+                  background:var(--border);vertical-align:middle;border:1px solid var(--border2)"></span>
+                0% — Keine MwSt
+              </div>
+            </div>
+          </div>
         </div>
         <div class="fg" style="margin:0">
           <label>Netto (€)</label>
