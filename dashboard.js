@@ -126,7 +126,7 @@ function renderLetzteEinnahmen() {
   const recent = activeEintraege()
     .filter(e => e.typ === 'Einnahme')
     .sort((a,b) => b.datum.localeCompare(a.datum))
-    .slice(0, 9);
+    .slice(0, 7);
   if (!recent.length) {
     list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">Noch keine Einnahmen</div>';
     if(sumEl) sumEl.textContent = '';
