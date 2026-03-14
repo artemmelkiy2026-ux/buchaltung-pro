@@ -566,31 +566,37 @@ function renderEin(){
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> · Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
+      return '<div style="display:flex;flex-direction:column;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
         +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
         +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
-        +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
-        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
+        +'<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">'
+        +'<div style="flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center;margin-top:2px">'
+        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:11px"></i></div>'
         +'<div style="flex:1;min-width:0">'
-        +(stLbl?'<div style="margin-bottom:2px;font-size:10px">'+stLbl+'</div>':'')
+        +(stLbl?'<div style="margin-bottom:4px">'+stLbl+'</div>':'')
         +'<div style="font-size:11px;color:var(--sub);font-family:var(--mono);margin-bottom:3px">'+fd(e.datum)+'</div>'
-        +'<div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">'
+        +'<div style="font-size:14px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3">'
         +(e.beschreibung||e.kategorie)
         +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
         +'</div>'
+        +'</div>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border)">'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
         +'<span>'+e.kategorie+'</span>'
         +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
         +mwstBadge
-        +'</div></div>'
-        +'<div style="flex:0 0 auto;display:flex;align-items:center;gap:8px">'
-        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
         +(!st
-          ?'<div style="display:flex;gap:3px">'
-           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,\''+e.id+'\')" ><i class="fas fa-edit"></i></button>'
-           +'<button class="del-btn" onclick="delE(event,\''+e.id+'\')" ><i class="fas fa-times"></i></button></div>'
+          ?'<div style="display:flex;gap:2px">'
+           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'
+           +'<button class="del-btn" onclick="delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'
           :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')
-        +'</div></div>';
+        +'</div>'
+        +'</div>'
+        +'</div>';
     }).join('');
     
     // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
