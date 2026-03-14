@@ -1024,7 +1024,7 @@ async function scanBeleg(base64, mediaType) {
   }
 }
 
-// Bild skalieren + zu base64 konvertieren
+// Bild skalieren, Beleg-Autocrop + Scan-Effekt, zu base64 konvertieren
 function resizeToBase64(file, maxW) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -1035,18 +1035,83 @@ function resizeToBase64(file, maxW) {
       const isPortrait = h >= w;
       if (isPortrait && w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
       if (!isPortrait && h > maxW) { w = Math.round(w * maxW / h); h = maxW; }
+
+      // Шаг 1: рисуем в grayscale + контраст для лучшего кропа
+      const tmp = document.createElement('canvas');
+      tmp.width = w; tmp.height = h;
+      const tctx = tmp.getContext('2d');
+      tctx.filter = 'grayscale(1)';
+      tctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+
+      // Шаг 2: автокроп — ищем границы чека по светлым пикселям
+      // Чек белый, фон тёмный (стол, рука) — обрезаем тёмные края
+      const pixels = tctx.getImageData(0, 0, w, h).data;
+      const threshold = 200; // пиксели светлее этого — часть чека
+      const margin = 8;      // небольшой отступ вокруг чека
+
+      const isLight = (x, y) => {
+        const i = (y * w + x) * 4;
+        return pixels[i] > threshold && pixels[i+1] > threshold && pixels[i+2] > threshold;
+      };
+      // Сканируем каждую сторону построчно — ищем первую строку с достаточным кол-вом светлых пикселей
+      const minLightFraction = 0.3; // минимум 30% светлых пикселей в строке/столбце
+      let top = 0, bottom = h - 1, left = 0, right = w - 1;
+
+      // Сверху вниз
+      for (let y = 0; y < h; y++) {
+        let cnt = 0;
+        for (let x = 0; x < w; x++) if (isLight(x, y)) cnt++;
+        if (cnt / w >= minLightFraction) { top = y; break; }
+      }
+      // Снизу вверх
+      for (let y = h - 1; y >= 0; y--) {
+        let cnt = 0;
+        for (let x = 0; x < w; x++) if (isLight(x, y)) cnt++;
+        if (cnt / w >= minLightFraction) { bottom = y; break; }
+      }
+      // Слева направо
+      for (let x = 0; x < w; x++) {
+        let cnt = 0;
+        for (let y = top; y <= bottom; y++) if (isLight(x, y)) cnt++;
+        if (cnt / (bottom - top + 1) >= minLightFraction) { left = x; break; }
+      }
+      // Справа налево
+      for (let x = w - 1; x >= 0; x--) {
+        let cnt = 0;
+        for (let y = top; y <= bottom; y++) if (isLight(x, y)) cnt++;
+        if (cnt / (bottom - top + 1) >= minLightFraction) { right = x; break; }
+      }
+
+      // Добавляем отступ и ограничиваем границами
+      top    = Math.max(0, top - margin);
+      bottom = Math.min(h - 1, bottom + margin);
+      left   = Math.max(0, left - margin);
+      right  = Math.min(w - 1, right + margin);
+
+      const cropW = right - left + 1;
+      const cropH = bottom - top + 1;
+
+      // Если кроп дал слишком маленький результат — используем оригинал (защита)
+      const useCrop = cropW > w * 0.1 && cropH > h * 0.1;
+
+      // Шаг 3: финальный canvas — кропнутый + скан-эффект (контраст)
       const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
+      canvas.width  = useCrop ? cropW : w;
+      canvas.height = useCrop ? cropH : h;
       const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
-      // Grayscale — чек не нужен цветным, экономим ~40%
-      ctx.filter = 'grayscale(1)';
-      ctx.drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-      // WebP + quality 0.55 — лучше JPEG при меньшем весе
+      // Скан-эффект: grayscale + повышенный контраст + чуть ярче
+      ctx.filter = 'grayscale(1) contrast(1.6) brightness(1.05)';
+      if (useCrop) {
+        ctx.drawImage(tmp, left, top, cropW, cropH, 0, 0, cropW, cropH);
+      } else {
+        ctx.drawImage(tmp, 0, 0);
+      }
+
+      // Шаг 4: WebP 0.55 или JPEG fallback
       const webp = canvas.toDataURL('image/webp', 0.55);
-      // Fallback: если браузер не поддерживает WebP — используем JPEG
       const isWebp = webp.startsWith('data:image/webp');
       const out = isWebp ? webp : canvas.toDataURL('image/jpeg', 0.65);
       resolve({ data: out.split(',')[1], mediaType: isWebp ? 'image/webp' : 'image/jpeg' });
