@@ -752,7 +752,7 @@ function renderRep(){
           <div style="font-size:12px;font-weight:600;font-family:var(--mono);color:var(--cyan)">${m.zahllast>0?'+':''}${fmt(m.zahllast)}</div>
         </div>
       </div>`:''}
-      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px">
         <span style="font-size:11px;color:var(--sub)">${m.count||'0'} Einträge</span>
         <span style="font-size:11px;color:${cc};font-family:var(--mono)">${hasData?'Σ '+(cumul2>=0?'+':'')+fmt(cumul2):'—'}</span>
       </div>
