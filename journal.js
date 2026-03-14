@@ -63,10 +63,18 @@ function renderJournal() {
     return 3;
   }
 
-  // Получаем дату последнего изменения (created_at) для сортировки цепочек
-  function getChainLatestDatum(chain) {
-    return chain.reduce((latest, e) => {
-      const ts = e.created_at || e.datum || '0000-00-00';
+  // Берём максимальный created_at по всей цепочке (оригинал + все сторно/корректуры)
+  function getChainLatestTs(chain) {
+    // Собираем все связанные записи — не только те что попали в chain
+    const allIds = new Set(chain.map(e => e.id));
+    // Добавляем записи из data.eintraege которые ссылаются на любой id цепочки
+    const extra = data.eintraege.filter(e =>
+      (e.storno_of && allIds.has(e.storno_of)) ||
+      (e.korrektur_von && allIds.has(e.korrektur_von))
+    );
+    const all = [...chain, ...extra];
+    return all.reduce((latest, e) => {
+      const ts = e.created_at || e.updated_at || e.datum || '0000-00-00';
       return ts > latest ? ts : latest;
     }, '0000-00-00');
   }
@@ -77,8 +85,8 @@ function renderJournal() {
   // Сортируем цепочки
   let chainList = Object.values(chains);
   chainList.sort((a, b) => {
-    const va = journalSortCol === 'datum' ? getChainLatestDatum(a) : getChainMaxBetrag(a);
-    const vb = journalSortCol === 'datum' ? getChainLatestDatum(b) : getChainMaxBetrag(b);
+    const va = journalSortCol === 'datum' ? getChainLatestTs(a) : getChainMaxBetrag(a);
+    const vb = journalSortCol === 'datum' ? getChainLatestTs(b) : getChainMaxBetrag(b);
     return journalSortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
   });
 
