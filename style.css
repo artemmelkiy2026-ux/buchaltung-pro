@@ -9,29 +9,26 @@
 .rep-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .rep-month-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
 
-  .germany-circle {
-  width: 25px; /* Ширина кружка */
-  height: 25px; /* Высота кружка */
-  border-radius: 50%; /* Делает круг */
-  overflow: hidden; /* Скрывает лишнее */
+ .flag-circle {
+  display: inline-flex;
+  flex-direction: column;
+  width: 1em;          /* Размер подстраивается под высоту шрифта */
+  height: 1em;
+  border-radius: 50%;
+  overflow: hidden;
+  vertical-align: middle; /* Выравнивание по центру строки */
+  margin-right: 5px;   /* Небольшой отступ от текста */
+  border: 1px solid #f0f0f0; /* Легкая рамка, чтобы желтый не сливался с белым фоном */
 }
 
-.germany-circle .band {
-  height: 33.33%; /* Каждая полоса занимает 1/3 */
+.flag-circle .band {
+  flex: 1;             /* Равномерно распределяет 3 полосы */
+  width: 100%;
 }
 
-.germany-circle .black {
-  background-color: black;
-}
-
-.germany-circle .red {
-  background-color: red;
-}
-
-.germany-circle .yellow {
-  background-color: gold; /* Или yellow */
-}
-
+.flag-circle .black { background-color: #000000; }
+.flag-circle .red   { background-color: #FF0000; }
+.flag-circle .gold  { background-color: #FFCC00; }
 @media(max-width:900px) {
   .rep-month-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
   .rep-stats-grid { grid-template-columns:repeat(2,1fr); }
