@@ -237,9 +237,9 @@ tbody td:last-child{border-right:1px solid var(--border);border-radius:0 12px 12
 .b-pp{background:var(--pdim);color:var(--purple)} .b-trans{background:var(--cdim);color:var(--cyan)}
 .amt{font-family:var(--mono);font-weight:600}
 .amt.ein{color:var(--green)} .amt.aus{color:var(--red)}
-.del-btn{opacity:0;background:none;border:none;color:var(--sub);cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .15s;font-size:12px}
-.del-btn:hover{color:var(--red);background:var(--rdim)}
-tr:hover .del-btn{opacity:1}
+.del-btn{opacity:0.35;background:none;border:none;color:var(--sub);cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .15s;font-size:12px}
+.del-btn:hover{color:var(--red);background:var(--rdim);opacity:1}
+tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
 
 /* ── SUMMARY ROW ── */
 .sum-row{display:flex;gap:0;background:var(--s2);border-top:2px solid var(--border);padding:0}
