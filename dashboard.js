@@ -1047,15 +1047,15 @@ function resizeToBase64(file, maxW) {
       // Шаг 2: автокроп — ищем границы чека по светлым пикселям
       // Чек белый, фон тёмный (стол, рука) — обрезаем тёмные края
       const pixels = tctx.getImageData(0, 0, w, h).data;
-      const threshold = 200; // пиксели светлее этого — часть чека
-      const margin = 8;      // небольшой отступ вокруг чека
+      const threshold = 100; // пиксели светлее этого — часть чека
+      const margin = 3;      // небольшой отступ вокруг чека
 
       const isLight = (x, y) => {
         const i = (y * w + x) * 4;
         return pixels[i] > threshold && pixels[i+1] > threshold && pixels[i+2] > threshold;
       };
       // Сканируем каждую сторону построчно — ищем первую строку с достаточным кол-вом светлых пикселей
-      const minLightFraction = 0.3; // минимум 30% светлых пикселей в строке/столбце
+      const minLightFraction = 0.2; // минимум 20% светлых пикселей в строке/столбце
       let top = 0, bottom = h - 1, left = 0, right = w - 1;
 
       // Сверху вниз
