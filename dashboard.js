@@ -1048,7 +1048,7 @@ function resizeToBase64(file, maxW) {
       // Чек белый, фон тёмный (стол, рука) — обрезаем тёмные края
       const pixels = tctx.getImageData(0, 0, w, h).data;
       const threshold = 200; // пиксели светлее этого — часть чека
-      const margin = 5;      // небольшой отступ вокруг чека
+      const margin = 2;      // небольшой отступ вокруг чека
 
       const isLight = (x, y) => {
         const i = (y * w + x) * 4;
