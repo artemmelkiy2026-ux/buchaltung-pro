@@ -446,7 +446,7 @@ function renderDash(){
       +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
       +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
       +'<div style="flex:1;min-width:0">'
-      +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
+      +'<div style="font-size:13px;font-weight:500;white-space:nowrap;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
       +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
       +'<span style="font-family:var(--mono)">'+(mob?fdm(e.datum):fd(e.datum))+'</span>'
       +'<span>&middot;</span><span>'+e.kategorie+'</span>'
