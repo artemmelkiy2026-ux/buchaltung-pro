@@ -2,10 +2,13 @@
 
 let journalSortCol = 'datum';
 let journalSortAsc = false;
+let journalPage = 1;
+const journalPerPage = 5;
 
 function sortJournal(col) {
   if (journalSortCol === col) { journalSortAsc = !journalSortAsc; }
   else { journalSortCol = col; journalSortAsc = false; }
+  journalPage = 1;
   renderJournal();
 }
 
@@ -182,9 +185,112 @@ function renderJournal() {
     html += `</div>`;
   });
 
-  tb.innerHTML = html;
+  // Пагинация
+  const totalChains = chainList.length;
+  const totalPages = Math.ceil(totalChains / journalPerPage);
+  if (journalPage > totalPages) journalPage = totalPages || 1;
+  const pgStart = (journalPage - 1) * journalPerPage;
+  const pgEnd   = pgStart + journalPerPage;
+  const pageChains = chainList.slice(pgStart, pgEnd);
 
-  const total = chainList.length;
+  // Рендерим только текущую страницу
+  let pageHtml = '';
+  pageChains.forEach((chain) => {
+    chain.sort((a, b) => {
+      const ta = a.created_at || a.datum || '';
+      const tb2 = b.created_at || b.datum || '';
+      return tb2.localeCompare(ta);
+    });
+
+    pageHtml += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden">`;
+
+    chain.forEach((e, idx) => {
+      let badge = '', rowBg = '', opacity = '1';
+      if (!e.is_storno && !e.korrektur_von && involved.has(e.id)) {
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
+        rowBg = 'background:rgba(224,140,26,.03);'; opacity = '0.7';
+      } else if (e.is_storno) {
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
+        rowBg = 'background:rgba(148,163,184,.03);'; opacity = '0.6';
+      } else if (e.korrektur_von) {
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(93,157,105,.12);color:var(--green);border:1px solid rgba(93,157,105,.3)">✎ Korrektur</span>`;
+        rowBg = 'background:rgba(93,157,105,.03);';
+      }
+      let link = '';
+      if (e.is_storno && e.storno_of) {
+        const orig = data.eintraege.find(x => x.id === e.storno_of);
+        if (orig) link = `<span style="font-size:10px;color:var(--sub)">hebt auf: ${fd(orig.datum)} · ${fmt(orig.betrag)}</span>`;
+      } else if (e.korrektur_von) {
+        const orig = data.eintraege.find(x => x.id === e.korrektur_von);
+        if (orig) link = `<span style="font-size:10px;color:var(--sub)">ersetzt: ${fd(orig.datum)} · ${fmt(orig.betrag)}</span>`;
+      } else if (involved.has(e.id)) {
+        const stornoRec = data.eintraege.find(x => x.storno_of === e.id);
+        const korr = data.eintraege.find(x => x.korrektur_von === e.id);
+        if (stornoRec) link = `<span style="font-size:10px;color:var(--sub)">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
+      }
+      const sep = idx > 0 ? `<div style="height:1px;background:var(--border);margin:0 14px"></div>` : '';
+      const isEin = e.typ === 'Einnahme';
+      const iconBg = isEin ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+      const iconColor = isEin ? 'var(--green)' : 'var(--red)';
+      const amtColor = isEin ? 'var(--green)' : 'var(--red)';
+      const amtSign = isEin ? '+' : '−';
+      pageHtml += `${sep}
+        <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
+            <div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
+              <i class="fas fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+                ${badge}
+                <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${fd(e.datum)}</span>
+              </div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3${link?';margin-bottom:4px':''}">
+                ${e.beschreibung||e.kategorie||'—'}
+              </div>
+              ${link ? `<div>${link}</div>` : ''}
+            </div>
+            <div style="flex:0 0 auto;text-align:right">
+              <div style="font-size:15px;font-weight:700;font-family:var(--mono);color:${amtColor};white-space:nowrap">${amtSign}${fmt(e.betrag)}</div>
+              <div style="font-size:10px;color:var(--sub);margin-top:2px">${e.typ}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">
+              <span>${e.kategorie||'—'}</span>
+              ${e.zahlungsart ? `<span>·</span><span class="badge" style="font-size:10px">${e.zahlungsart}</span>` : ''}
+            </div>
+            <div style="font-size:10px;color:var(--sub);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;max-width:120px;white-space:nowrap" title="${e.id}">${e.id}</div>
+          </div>
+        </div>`;
+    });
+    pageHtml += `</div>`;
+  });
+
+  // Пагинация навигация
+  let paginationHtml = '';
+  if (totalPages > 1) {
+    paginationHtml = `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap">`;
+    if (journalPage > 1) paginationHtml += `<button class="btn" onclick="journalPage=1;renderJournal()" style="padding:6px 10px"><i class="fas fa-step-backward"></i></button>`;
+    if (journalPage > 1) paginationHtml += `<button class="btn" onclick="journalPage--;renderJournal()" style="padding:6px 10px"><i class="fas fa-chevron-left"></i></button>`;
+    const maxShow = 5;
+    let sp = Math.max(1, journalPage - Math.floor(maxShow/2));
+    let ep = Math.min(totalPages, sp + maxShow - 1);
+    if (ep - sp < maxShow - 1) sp = Math.max(1, ep - maxShow + 1);
+    for (let i = sp; i <= ep; i++) {
+      if (i === journalPage) paginationHtml += `<button class="btn" style="background:var(--blue);color:#fff;padding:6px 10px">${i}</button>`;
+      else paginationHtml += `<button class="btn" onclick="journalPage=${i};renderJournal()" style="padding:6px 10px">${i}</button>`;
+    }
+    if (journalPage < totalPages) paginationHtml += `<button class="btn" onclick="journalPage++;renderJournal()" style="padding:6px 10px"><i class="fas fa-chevron-right"></i></button>`;
+    if (journalPage < totalPages) paginationHtml += `<button class="btn" onclick="journalPage=${totalPages};renderJournal()" style="padding:6px 10px"><i class="fas fa-step-forward"></i></button>`;
+    paginationHtml += `<span style="font-size:11px;color:var(--sub);margin-left:8px">${pgStart+1}–${Math.min(pgEnd,totalChains)} / ${totalChains}</span>`;
+    paginationHtml += `</div>`;
+  }
+
+  tb.innerHTML = pageHtml;
+  const jpag = document.getElementById('journal-pagination');
+  if (jpag) jpag.innerHTML = paginationHtml;
+
   const el = document.getElementById('journal-count');
-  if (el) el.textContent = `${total} Storno-Kette${total !== 1 ? 'n' : ''}`;
+  if (el) el.textContent = `${totalChains} Storno-Kette${totalChains !== 1 ? 'n' : ''}`;
 }
