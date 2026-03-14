@@ -725,7 +725,7 @@ function renderRep(){
     const cc=cumul2>=0?'var(--green)':'var(--red)';
     const hasData=m.count>0;
     return`<div onclick="openMonatDetail('${yr}','${m.mi}')"
-      style="border:${isCur?'2px solid var(--blue)':'1px solid var(--border)'};border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;opacity:${hasData?'1':'0.45'}"
+      style="background:#fff;border:${isCur?'2px solid var(--blue)':'1px solid var(--border)'};border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;opacity:${hasData?'1':'0.45'}"
       onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
       onmouseout="this.style.boxShadow=''">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
