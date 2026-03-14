@@ -181,7 +181,7 @@ document.addEventListener('click', function(e) {
 function setMwstRate(val) {
   const input = document.getElementById('nf-mwst-rate');
   if (input) input.value = val;
-  const labels = {19:'19% — Standard', 7:'7% — Ermäßigt', 0:'0% — Keine MwSt'};
+  const labels = {19:'19%', 7:'7%', 0:'0%'};
   const lbl = document.getElementById('nf-mwst-rate-label');
   if (lbl) lbl.textContent = labels[val] || val+'%';
   [19, 7, 0].forEach(v => {
@@ -220,7 +220,7 @@ function updateMwstFormVisibility(){
     const title=document.getElementById('nf-mwst-title');
     if(title){title.textContent='● Umsatzsteuer auf diese Einnahme';title.style.color='#f97316';}
     const betLbl=document.getElementById('nf-mwst-bet-lbl');
-    if(betLbl) betLbl.textContent='USt (€)';
+    if(betLbl) betLbl.textContent='USt-Betrag (€)';
     const betEl=document.getElementById('nf-mwst-bet');
     if(betEl) betEl.style.color='#f97316';
     const info=document.getElementById('nf-betrag-info');
