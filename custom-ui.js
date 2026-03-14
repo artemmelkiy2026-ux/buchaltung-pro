@@ -151,7 +151,7 @@ class CustomSelect {
       background:var(--s1);border:1px solid var(--border);border-radius:10px;
       box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:1000;
       max-height:260px;overflow-y:auto;padding:4px;
-      min-width:180px;width:max-content;max-width:320px;`;
+      min-width:180px;width:max-content;max-width:min(320px, 90vw);`;
 
     wrap.appendChild(trigger);
     wrap.appendChild(panel);
@@ -242,6 +242,31 @@ class CustomSelect {
     // Пересоздаём опции (могут быть обновлены динамически)
     this._buildOptions();
     this._updateLabel();
+
+    // Позиционируем: вверх если снизу не хватает места
+    const triggerRect = this.trigger.getBoundingClientRect();
+    const panelH = Math.min(260, this.panel.scrollHeight + 8);
+    const spaceBelow = window.innerHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+    if (spaceBelow < panelH && spaceAbove > spaceBelow) {
+      this.panel.style.top    = 'auto';
+      this.panel.style.bottom = 'calc(100% + 4px)';
+    } else {
+      this.panel.style.top    = 'calc(100% + 4px)';
+      this.panel.style.bottom = 'auto';
+    }
+
+    // Корректируем горизонтальное положение если панель выходит за экран
+    requestAnimationFrame(() => {
+      const pr = this.panel.getBoundingClientRect();
+      if (pr.right > window.innerWidth - 8) {
+        this.panel.style.left  = 'auto';
+        this.panel.style.right = '0';
+      } else {
+        this.panel.style.left  = '0';
+        this.panel.style.right = 'auto';
+      }
+    });
 
     // Скроллим к активному
     const active = this.panel.querySelector(`[data-value="${CSS.escape(this.sel.value)}"]`);
