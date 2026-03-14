@@ -80,7 +80,7 @@ function renderLetzteEinnahmen() {
         <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
         <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px">
           <span>${fd(e.datum)}</span>
-         
+          <span>·</span>
           <span>${e.kategorie}</span>
         </div>
       </div>
@@ -307,13 +307,13 @@ function renderDash(){
           {
             label: ('  '+'Einnahme'),
             data: ea,
-            borderColor: '#1c9e4c',
+            borderColor: '#22c55e',
             backgroundColor: 'rgba(34, 197, 94, 0.1)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
             pointRadius: 5,
-            pointBackgroundColor: '#1c9e4c',
+            pointBackgroundColor: '#22c55e',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointHoverRadius: 7,
@@ -447,7 +447,7 @@ function renderDash(){
       +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
       +'<div style="flex:1;min-width:0">'
       +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
-      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sub)">'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
       +'<span style="font-family:var(--mono)">'+(mob?fdm(e.datum):fd(e.datum))+'</span>'
       +'<span>&middot;</span><span>'+e.kategorie+'</span>'
       +'<span>&middot;</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
@@ -562,31 +562,28 @@ function renderEin(){
       } else if(st){
         stLbl='<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✗ Storniert</span>';
       } else if(e.korrektur_von){
-        stLbl='<span style="font-size:11px;font-weight:700;color:#1c9e4c;background:rgb(34 197 94 / 9%);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
+        stLbl='<span style="font-size:9px;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
       }
       const mwstBadge = showMwst&&hasMwst
-        ? '<span style="font-size:12px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      const _eid=''+e.id;
-      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;cursor:pointer;'+(st?'opacity:0.45;':'')+'"'
-        +(!st?' onclick="if(window.innerWidth<=900&&!event.target.closest(\'.del-btn\')){editE(event,\'' +e.id+ '\')}"':'')
+        ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> · Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
         +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
         +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
         +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
         +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
         +'<div style="flex:1;min-width:0">'
         +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'
-        +(e.beschreibung||e.kategorie)
+        +stLbl+(e.beschreibung||e.kategorie)
         +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
         +'</div>'
-        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sub)">'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
         +'<span style="font-family:var(--mono)">'+fd(e.datum)+'</span>'
         +'<span>·</span><span>'+e.kategorie+'</span>'
         +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
         +mwstBadge
         +'</div></div>'
-        +'<div class="prise-1" style="flex:0 0 auto;display:flex;align-items:flex-end;gap:4px">'
-        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
-        +(stLbl?'<div style="text-align:right">'+stLbl+'</div>':'')
+        +'<div style="flex:0 0 auto;display:flex;align-items:center;gap:8px">'
+        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
         +(!st
           ?'<div style="display:flex;gap:3px">'
            +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,\''+e.id+'\')" ><i class="fas fa-edit"></i></button>'
@@ -708,32 +705,19 @@ function renderRep(){
   const bestM=months.reduce((b,m)=>m.gew>b.gew?m:b,months[0]);
   g('rs-best',bestM.count?fmt(bestM.gew):'—');g('rs-best-s',bestM.count?MN[bestM.i]:'');
 
-  const mxE=Math.max(...months.map(m=>m.ein),1),mxA=Math.max(...months.map(m=>m.aus),1);
   const curMon=new Date().getMonth();
   const mob=isMob();
-  let cumul2=0;
   document.getElementById('month-cards').innerHTML=months.map(m=>{
     const gc=m.gew>=0?'var(--green)':'var(--red)';
     const isCur=m.i===curMon&&yr===new Date().getFullYear()+'';
-    cumul2+=m.gew;
-    const cc=cumul2>=0?'var(--green)':'var(--red)';
+    const mname=mob?MS[m.i]:MN[m.i];
     return`<div class="mc${isCur?' current':''}" onclick="openMonatDetail('${yr}','${m.mi}')" style="cursor:pointer" title="${MN[m.i]} ${yr} — Details anzeigen">
-      <div class="mc-top">
-        <span class="mc-name">${MN[m.i]}</span>
-        <span class="mc-gew" style="color:${gc}">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span>
-      </div>
+      <div class="mc-top"><span class="mc-name">${mname}</span><span class="mc-gew" style="color:${gc}">${m.count?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span></div>
       <div class="mc-body">
         <div class="mc-stat"><label>Einnahmen</label><span style="color:var(--green)">${m.ein>0?fmt(m.ein):'—'}</span></div>
         <div class="mc-stat"><label>Ausgaben</label><span style="color:var(--red)">${m.aus>0?fmt(m.aus):'—'}</span></div>
-        <div class="mc-stat"><label>Kumuliert</label><span style="color:${cc}">${m.count?(cumul2>=0?'+':'')+fmt(cumul2):'—'}</span></div>
-        <div class="mc-stat"><label>Einträge</label><span style="color:var(--sub)">${m.count||'—'}</span></div>
-        ${isRegel&&m.mwst>0?`<div class="mc-stat"><label style="color:#f97316">MwSt</label><span style="color:#f97316">${fmt(m.mwst)}</span></div>`:''}
-        ${isRegel&&m.zahllast!==0?`<div class="mc-stat"><label style="color:var(--cyan)">Zahllast</label><span style="color:var(--cyan)">${m.zahllast>0?'+':''}${fmt(m.zahllast)}</span></div>`:''}
       </div>
-      <div class="mc-bars">
-        <div class="mc-bar-row"><label style="color:var(--green);font-size:9px">E</label><div class="mc-bar-bg"><div class="mc-bar-fill ein" style="width:${Math.round(m.ein/mxE*100)}%"></div></div></div>
-        <div class="mc-bar-row"><label style="color:var(--red);font-size:9px">A</label><div class="mc-bar-bg"><div class="mc-bar-fill aus" style="width:${Math.round(m.aus/mxA*100)}%"></div></div></div>
-      </div>
+
     </div>`;
   }).join('');
 
