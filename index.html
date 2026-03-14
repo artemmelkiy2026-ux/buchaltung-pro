@@ -24,6 +24,11 @@
     order: -1;
   }
 }
+@media (max-width: 768px) {
+  * { max-width: 100%; }
+  img, video, iframe { max-width: 100% !important; }
+  input, select, textarea { max-width: 100% !important; box-sizing: border-box !important; }
+}
 /* Scan progress animation */
 @keyframes scan-progress-slide {
   0%   { transform: translateX(-100%); }
@@ -333,7 +338,7 @@
   <h1 style="font-size:20px;font-weight:700;margin-bottom:16px"><i class="fa-solid fa-plus"></i> Neuer Eintrag</h1>
 
   <!-- Desktop: 2 Spalten. Mobil: 1 Spalte -->
-  <div id="neu-layout" style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start">
+  <div id="neu-layout" style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;max-width:100%;overflow-x:hidden">
 
   <!-- LINKE SPALTE: Formular -->
   <div>
