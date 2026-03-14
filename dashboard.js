@@ -584,7 +584,7 @@ function renderEin(){
         +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
         +mwstBadge
         +'</div></div>'
-        +'<div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
+        +'<div class="prise-1" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
         +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
         +(stLbl?'<div style="text-align:right">'+stLbl+'</div>':'')
         +(!st
