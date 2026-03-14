@@ -33,21 +33,59 @@ function setTyp(t){
   document.getElementById('btn-a').className='tt'+(t==='Ausgabe'?' aa':'');
   updateKatSel();
   updateMwstFormVisibility();
-  // Scan-Box: Desktop immer Platz reservieren, Mobil komplett ausblenden
+  const isMobile = window.innerWidth <= 900;
+  const layout = document.getElementById('neu-layout');
   const scanBox = document.getElementById('scan-beleg-box');
-  if(scanBox) {
-    const isMobile = window.innerWidth <= 900;
-    const layout = document.getElementById('neu-layout');
-    if(isMobile) {
-      scanBox.style.display = t === 'Ausgabe' ? 'block' : 'none';
-      scanBox.style.visibility = '';
-      if(layout) layout.style.gridTemplateColumns = '1fr';
+  const einBox  = document.getElementById('letzte-einnahmen-box');
+
+  if(isMobile) {
+    // Mobil: scan nur bei Ausgabe, einnahmen-box nie
+    if(scanBox) { scanBox.style.display = t === 'Ausgabe' ? 'block' : 'none'; scanBox.style.visibility = ''; }
+    if(einBox)  einBox.style.display = 'none';
+    if(layout)  layout.style.gridTemplateColumns = '1fr';
+  } else {
+    // Desktop: rechte Spalte immer 380px — wechselt Inhalt
+    if(layout) layout.style.gridTemplateColumns = '1fr 380px';
+    if(t === 'Ausgabe') {
+      if(scanBox) { scanBox.style.display = 'block'; scanBox.style.visibility = 'visible'; }
+      if(einBox)  einBox.style.display = 'none';
     } else {
-      scanBox.style.display = 'block';
-      scanBox.style.visibility = t === 'Ausgabe' ? 'visible' : 'hidden';
-      if(layout) layout.style.gridTemplateColumns = '1fr 380px';
+      if(scanBox) { scanBox.style.display = 'block'; scanBox.style.visibility = 'hidden'; }
+      if(einBox)  { einBox.style.display = 'block'; renderLetzteEinnahmen(); }
     }
   }
+}
+
+function renderLetzteEinnahmen() {
+  const list = document.getElementById('letzte-ein-list');
+  const sumEl = document.getElementById('letzte-ein-summe');
+  if (!list) return;
+  const recent = activeEintraege()
+    .filter(e => e.typ === 'Einnahme')
+    .sort((a,b) => b.datum.localeCompare(a.datum))
+    .slice(0, 5);
+  if (!recent.length) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">Noch keine Einnahmen</div>';
+    if(sumEl) sumEl.textContent = '';
+    return;
+  }
+  const total = recent.reduce((s,e) => s + e.betrag, 0);
+  if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
+  list.innerHTML = recent.map(e => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+      <div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center">
+        <i class="fas fa-arrow-up" style="color:var(--green);font-size:11px"></i>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
+        <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px">
+          <span>${fd(e.datum)}</span>
+          <span>·</span>
+          <span>${e.kategorie}</span>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)">+${fmt(e.betrag)}</div>
+    </div>`).join('');
 }
 function updateMwstFormVisibility(){
   const yr=document.getElementById('nf-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
@@ -911,9 +949,8 @@ async function scanBelegPreview(input) {
   if (!file) return;
 
   // Sofort zu base64 konvertieren — kein File-Objekt speichern
-  const { data: imgData, mediaType: imgType } = await resizeToBase64(file, 600);
-  _scanBase64 = imgData;
-  _scanMediaType = imgType;
+  _scanMediaType = file.type || 'image/jpeg';
+  _scanBase64 = await resizeToBase64(file, 1600);
 
   const preview = document.getElementById('scan-preview-box');
   const img = document.getElementById('scan-preview-img');
@@ -1024,97 +1061,22 @@ async function scanBeleg(base64, mediaType) {
   }
 }
 
-// Bild skalieren, Beleg-Autocrop + Scan-Effekt, zu base64 konvertieren
+// Bild skalieren + zu base64 konvertieren
 function resizeToBase64(file, maxW) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
       let w = img.width, h = img.height;
-      // Ориентация: чек вертикальный — ограничиваем по короткой стороне
-      const isPortrait = h >= w;
-      if (isPortrait && w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-      if (!isPortrait && h > maxW) { w = Math.round(w * maxW / h); h = maxW; }
-
-      // Шаг 1: рисуем в grayscale + контраст для лучшего кропа
-      const tmp = document.createElement('canvas');
-      tmp.width = w; tmp.height = h;
-      const tctx = tmp.getContext('2d');
-      tctx.filter = 'grayscale(1)';
-      tctx.drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-
-      // Шаг 2: автокроп — ищем границы чека по светлым пикселям
-      // Чек белый, фон тёмный (стол, рука) — обрезаем тёмные края
-      const pixels = tctx.getImageData(0, 0, w, h).data;
-      const threshold = 200; // пиксели светлее этого — часть чека
-      const margin = 2;      // небольшой отступ вокруг чека
-
-      const isLight = (x, y) => {
-        const i = (y * w + x) * 4;
-        return pixels[i] > threshold && pixels[i+1] > threshold && pixels[i+2] > threshold;
-      };
-      // Сканируем каждую сторону построчно — ищем первую строку с достаточным кол-вом светлых пикселей
-      const minLightFraction = 0.3; // минимум 30% светлых пикселей в строке/столбце
-      let top = 0, bottom = h - 1, left = 0, right = w - 1;
-
-      // Сверху вниз
-      for (let y = 0; y < h; y++) {
-        let cnt = 0;
-        for (let x = 0; x < w; x++) if (isLight(x, y)) cnt++;
-        if (cnt / w >= minLightFraction) { top = y; break; }
-      }
-      // Снизу вверх
-      for (let y = h - 1; y >= 0; y--) {
-        let cnt = 0;
-        for (let x = 0; x < w; x++) if (isLight(x, y)) cnt++;
-        if (cnt / w >= minLightFraction) { bottom = y; break; }
-      }
-      // Слева направо
-      for (let x = 0; x < w; x++) {
-        let cnt = 0;
-        for (let y = top; y <= bottom; y++) if (isLight(x, y)) cnt++;
-        if (cnt / (bottom - top + 1) >= minLightFraction) { left = x; break; }
-      }
-      // Справа налево
-      for (let x = w - 1; x >= 0; x--) {
-        let cnt = 0;
-        for (let y = top; y <= bottom; y++) if (isLight(x, y)) cnt++;
-        if (cnt / (bottom - top + 1) >= minLightFraction) { right = x; break; }
-      }
-
-      // Добавляем отступ и ограничиваем границами
-      top    = Math.max(0, top - margin);
-      bottom = Math.min(h - 1, bottom + margin);
-      left   = Math.max(0, left - margin);
-      right  = Math.min(w - 1, right + margin);
-
-      const cropW = right - left + 1;
-      const cropH = bottom - top + 1;
-
-      // Если кроп дал слишком маленький результат — используем оригинал (защита)
-      const useCrop = cropW > w * 0.1 && cropH > h * 0.1;
-
-      // Шаг 3: финальный canvas — кропнутый + скан-эффект (контраст)
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
       const canvas = document.createElement('canvas');
-      canvas.width  = useCrop ? cropW : w;
-      canvas.height = useCrop ? cropH : h;
+      canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
-      // Скан-эффект: grayscale + повышенный контраст + чуть ярче
-      ctx.filter = 'grayscale(1) contrast(1.5) brightness(1.3)';
-      if (useCrop) {
-        ctx.drawImage(tmp, left, top, cropW, cropH, 0, 0, cropW, cropH);
-      } else {
-        ctx.drawImage(tmp, 0, 0);
-      }
-
-      // Шаг 4: WebP 0.55 или JPEG fallback
-      const webp = canvas.toDataURL('image/webp', 0.55);
-      const isWebp = webp.startsWith('data:image/webp');
-      const out = isWebp ? webp : canvas.toDataURL('image/jpeg', 0.65);
-      resolve({ data: out.split(',')[1], mediaType: isWebp ? 'image/webp' : 'image/jpeg' });
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.92).split(',')[1]);
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Bild konnte nicht geladen werden')); };
     img.src = url;
