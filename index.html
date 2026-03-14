@@ -410,25 +410,12 @@
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
         <div class="fg" style="margin:0">
           <label id="nf-mwst-rate-lbl">MwSt-Satz</label>
-          <!-- Скрытый input хранит значение — JS читает его через .value -->
-          <input type="hidden" id="nf-mwst-rate" value="19">
-          <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px" id="nf-mwst-rate-btns">
-            <button type="button" id="mwst-btn-19" onclick="setMwstRate(19)"
-              style="display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:8px;border:2px solid var(--blue);cursor:pointer;font-size:13px;font-weight:700;width:100%;text-align:left">
-              <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
-              19%
-            </button>
-            <button type="button" id="mwst-btn-7" onclick="setMwstRate(7)"
-              style="display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:8px;border:2px solid var(--border);cursor:pointer;font-size:13px;font-weight:600;width:100%;text-align:left">
-              <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
-              7%
-            </button>
-            <button type="button" id="mwst-btn-0" onclick="setMwstRate(0)"
-                 style="display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:8px;border:2px solid var(--border);cursor:pointer;font-size:13px;font-weight:600;width:100%;text-align:left">
-              <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
-              0%
-            </button>
-          </div>
+          <select id="nf-mwst-rate" onchange="calcNfMwst()" style="font-weight:700">
+            <option value="19" selected>19%</option>
+            <option value="7">7%</option>
+            <option value="0">0%</option>
+          </select>
+        </div>
         </div>
         <div class="fg" style="margin:0">
           <label>Netto (€)</label>

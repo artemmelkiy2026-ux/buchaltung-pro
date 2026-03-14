@@ -150,52 +150,15 @@ function renderLetzteEinnahmen() {
       <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)">+${fmt(e.betrag)}</div>
     </div>`).join('');
 }
-function toggleMwstDropdown() {
-  const panel   = document.getElementById('nf-mwst-panel');
-  const arrow   = document.getElementById('nf-mwst-arrow');
-  const trigger = document.getElementById('nf-mwst-rate-trigger');
-  const isOpen  = panel && panel.style.display !== 'none';
-  if (isOpen) {
-    panel.style.display = 'none';
-    if(arrow) arrow.style.transform = '';
-    if(trigger) trigger.style.borderColor = '';
-  } else {
-    if(panel) panel.style.display = 'block';
-    if(arrow) arrow.style.transform = 'rotate(180deg)';
-    if(trigger) trigger.style.borderColor = 'var(--blue)';
-  }
-}
-
-document.addEventListener('click', function(e) {
-  const wrap = document.getElementById('nf-mwst-rate-wrap');
-  if (wrap && !wrap.contains(e.target)) {
-    const p = document.getElementById('nf-mwst-panel');
-    const a = document.getElementById('nf-mwst-arrow');
-    const t = document.getElementById('nf-mwst-rate-trigger');
-    if(p) p.style.display='none';
-    if(a) a.style.transform='';
-    if(t) t.style.borderColor='';
-  }
-});
-
 function setMwstRate(val) {
   const input = document.getElementById('nf-mwst-rate');
   if (input) input.value = val;
-  const labels = {19:'19%', 7:'7%', 0:'0%'};
-  const lbl = document.getElementById('nf-mwst-rate-label');
-  if (lbl) lbl.textContent = labels[val] || val+'%';
   [19, 7, 0].forEach(v => {
-    const opt = document.getElementById('mwst-opt-'+v);
-    if (!opt) return;
-    opt.style.background = v===val ? 'var(--bdim)' : '';
-    opt.style.color      = v===val ? 'var(--blue)' : 'var(--text)';
+    const btn = document.getElementById('mwst-btn-' + v);
+    if (!btn) return;
+    const active = v === val;
+   btn.style.border    = active ? '2px solid var(--blue)' : '2px solid var(--border)';
   });
-  const panel   = document.getElementById('nf-mwst-panel');
-  const arrow   = document.getElementById('nf-mwst-arrow');
-  const trigger = document.getElementById('nf-mwst-rate-trigger');
-  if(panel)   panel.style.display='none';
-  if(arrow)   arrow.style.transform='';
-  if(trigger) trigger.style.borderColor='';
   calcNfMwst();
 }
 
@@ -1433,4 +1396,735 @@ function parseBelegText(text) {
   else if (/überweisung/i.test(text))    result.zahlungsart = 'Überweisung';
 
   return result;
+}function setMwstRate(val) {
+  const sel = document.getElementById('nf-mwst-rate');
+  if (sel) {
+    sel.value = val;
+    // Обновляем кастомный dropdown если он уже инициализирован
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  calcNfMwst();
 }
+
+function updateMwstFormVisibility(){
+  const yr=document.getElementById('nf-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
+  const klein=isKleinunternehmer(yr);
+  const mwRow=document.getElementById('nf-mwst-row');
+  if(!mwRow) return;
+  if(klein){
+    mwRow.style.display='none';
+    const info=document.getElementById('nf-betrag-info');
+    if(info) info.textContent='';
+    return;
+  }
+  // Regelbesteuerung: show for both types
+  mwRow.style.display='';
+  const isEin=(curTyp==='Einnahme');
+  // Color scheme: orange for Einnahme (USt), blue for Ausgabe (Vorsteuer)
+  if(isEin){
+    mwRow.style.background='rgba(249,115,22,.07)';
+    mwRow.style.border='1px solid rgba(249,115,22,.3)';
+    const title=document.getElementById('nf-mwst-title');
+    if(title){title.textContent='● Umsatzsteuer auf diese Einnahme';title.style.color='#f97316';}
+    const betLbl=document.getElementById('nf-mwst-bet-lbl');
+    if(betLbl) betLbl.textContent='USt-Betrag (€)';
+    const betEl=document.getElementById('nf-mwst-bet');
+    if(betEl) betEl.style.color='#f97316';
+    const info=document.getElementById('nf-betrag-info');
+    if(info){info.textContent='= Brutto';info.style.color='#f97316';}
+  } else {
+    mwRow.style.background='rgba(59,130,246,.07)';
+    mwRow.style.border='1px solid rgba(59,130,246,.3)';
+    const title=document.getElementById('nf-mwst-title');
+    if(title){title.textContent='● Vorsteuer aus dieser Ausgabe';title.style.color='var(--blue)';}
+    const betLbl=document.getElementById('nf-mwst-bet-lbl');
+    if(betLbl) betLbl.textContent='Vorsteuer (€)';
+    const betEl=document.getElementById('nf-mwst-bet');
+    if(betEl) betEl.style.color='var(--blue)';
+    const info=document.getElementById('nf-betrag-info');
+    if(info){info.textContent='= Brutto';info.style.color='var(--blue)';}
+  }
+  calcNfMwst();
+}
+function updateKatSel(){
+  document.getElementById('nf-kat').innerHTML=(curTyp==='Einnahme'?KE:KA).map(k=>`<option value="${k}">${k}</option>`).join('');
+}
+function clearForm(){
+  document.getElementById('nf-bet').value='';
+  document.getElementById('nf-dsc').value='';
+  document.getElementById('nf-note').value='';
+  // Дату НЕ сбрасываем — пользователь мог выбрать другой год
+  setMwstRate(19); // Сбрасываем MwSt на 19%
+}
+function addEintrag(){
+  const datum=document.getElementById('nf-dat').value;
+  const betrag=parseFloat(document.getElementById('nf-bet').value);
+  const kat=document.getElementById('nf-kat').value;
+  const zahl=document.getElementById('nf-zahl').value;
+  const dsc=document.getElementById('nf-dsc').value.trim();
+  const note=document.getElementById('nf-note').value.trim();
+  calcNfVorsteuer(); // пересчёт при изменении суммы
+  if(!datum)return toast('Datum eingeben!','err');
+  // Валидация даты
+  const [dy,dm,dd]=datum.split('-').map(Number);
+  if(dy<2000||dy>2099)return toast('Jahr muss zwischen 2000 und 2099 liegen!','err');
+  // Проверка февраля
+  const isLeap=(dy%4===0&&(dy%100!==0||dy%400===0));
+  const febMax=isLeap?29:28;
+  if(dm===2&&dd>febMax)return toast(`Februar ${dy} hat nur ${febMax} Tage!`,'err');
+  // Проверка дней месяца
+  const daysInMonth=[0,31,febMax,31,30,31,30,31,31,30,31,30,31];
+  if(dd<1||dd>daysInMonth[dm])return toast(`Ungültiges Datum!`,'err');
+  if(!betrag || betrag <= 0) return toast('Betrag eingeben!', 'err');
+  const entryYear=datum.substring(0,4);
+
+  // MwSt / Vorsteuer bei Regelbesteuerung
+  const mwRateRaw=document.getElementById('nf-mwst-rate')?.value;
+  const mwRate=mwRateRaw===null||mwRateRaw===undefined?19:parseFloat(mwRateRaw);
+  const mwBet=r2(parseFloat(document.getElementById('nf-mwst-bet')?.value)||0);
+  const netBet=r2(parseFloat(document.getElementById('nf-netto-bet')?.value)||betrag);
+  const entry={id:Date.now()+'',datum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,betrag};
+  const entryYrMode=datum.substring(0,4);
+  if(!isKleinunternehmer(entryYrMode)&&mwBet>0){
+    if(curTyp==='Einnahme'){
+      entry.mwstRate=mwRate;
+      entry.mwstBetrag=mwBet;
+      entry.nettoBetrag=netBet;
+      if(!data.ustEintraege) data.ustEintraege=[];
+      const ustAutoE={id:Date.now()+'_ust',datum,typ:'Ausgang',rate:mwRate,betrag:mwBet,beschreibung:dsc||kat};
+      data.ustEintraege.push(ustAutoE);
+      sbSaveUstEintrag(ustAutoE);
+    } else {
+      entry.vorsteuerRate=mwRate;
+      entry.vorsteuerBet=mwBet;
+      entry.nettoBetrag=netBet;
+      if(!data.ustEintraege) data.ustEintraege=[];
+      const ustAutoA={id:Date.now()+'_vs',datum,typ:'Vorsteuer',rate:mwRate,betrag:mwBet,beschreibung:dsc||kat};
+      data.ustEintraege.push(ustAutoA);
+      sbSaveUstEintrag(ustAutoA);
+    }
+  }
+  data.eintraege.unshift(entry);
+  sbSaveEintrag(entry);
+  renderAll();
+  renderDash();
+  updateNeuToolbar(true);
+  const fj=document.getElementById('f-jahr');
+  if(fj){
+    const opt=[...fj.options].find(o=>o.value===entryYear);
+    if(opt) fj.value=entryYear; else fj.value='Alle';
+    renderEin();
+  }
+  clearForm();
+  calcNfMwst(); // reset summary
+  const mwLabel = !isKleinunternehmer(datum.substring(0,4))&&mwBet>0 ? ` (Netto: ${netBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €, MwSt: ${mwBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €)` : '';
+  toast(`${curTyp} gespeichert: ${fmt(betrag)}${mwLabel}`, 'ok');
+}
+
+function calcNfVorsteuer(){
+  const bet =parseFloat(document.getElementById('nf-bet')?.value)||0;
+  const rate=parseFloat(document.getElementById('nf-vs-rate')?.value)||0;
+  const mwst=rate===0?0:r2(bet*rate/(100+rate));
+  const el=document.getElementById('nf-vs-bet');
+  if(el) el.value=mwst>0?mwst.toFixed(2):'';
+}
+
+// MwSt-Kalkulator (Brutto → Netto + MwSt, für Einnahme und Ausgabe)
+function calcNfMwst(){
+  const bet=parseFloat(document.getElementById('nf-bet')?.value)||0;
+  const rateRaw=document.getElementById('nf-mwst-rate')?.value;
+  const rate=rateRaw===null||rateRaw===undefined?19:parseFloat(rateRaw);
+  const mwst=rate===0?0:r2(bet*rate/(100+rate));
+  const netto=r2(bet-mwst);
+  const mwEl=document.getElementById('nf-mwst-bet');
+  const neEl=document.getElementById('nf-netto-bet');
+  if(mwEl) mwEl.value=bet>0&&rate>0?mwst.toFixed(2):'';
+  if(neEl) neEl.value=bet>0?netto.toFixed(2):'';
+  // Summary line
+  const sumEl=document.getElementById('nf-mwst-summary');
+  if(sumEl){
+    if(bet>0&&rate>0){
+      const isEin=(curTyp==='Einnahme');
+      sumEl.style.display='';
+      sumEl.style.background=isEin?'rgba(249,115,22,.1)':'rgba(59,130,246,.1)';
+      sumEl.style.color=isEin?'#f97316':'var(--blue)';
+      const label=isEin?'USt':'Vorsteuer';
+      sumEl.innerHTML=
+        '<span style="color:var(--sub)">Netto: </span><strong>'+netto.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</strong>'
+        +' &nbsp;+&nbsp; <span style="color:var(--sub)">'+label+' '+rate+'%: </span><strong>'+mwst.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</strong>'
+        +' &nbsp;= &nbsp;<span style="color:var(--sub)">Brutto: </span><strong>'+bet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €</strong>';
+    } else {
+      sumEl.style.display='none';
+    }
+  }
+}
+
+
+// ── DASHBOARD SORTING ─────────────────────────────────────────────────────
+function sortDash(col){
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Для ВСЕХ колонок - можно менять порядок (↑↓)
+  dashSortAsc = dashSortCol === col ? !dashSortAsc : false;
+  dashSortCol = col;
+  renderDash();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────
+function renderDash(){
+  buildYearFilters();
+  const yr=document.getElementById('dash-yr').value;
+  document.getElementById('dash-yr-lbl').textContent=yr==='Alle'?'Alle Jahre':yr;
+  const ye=(yr==='Alle'?activeEintraege():activeEintraege().filter(e=>e.datum.startsWith(yr)));
+  const ein=sum(ye,'Einnahme'),aus=sum(ye,'Ausgabe'),gew=ein-aus;
+  // MwSt Dashboard-Berechnung
+  const mwstTotal = ye.filter(e=>e.mwstBetrag>0).reduce((s,e)=>s+e.mwstBetrag,0);
+  const vstTotal  = ye.filter(e=>e.vorsteuerBet>0).reduce((s,e)=>s+e.vorsteuerBet,0);
+  const zahllastDash = mwstTotal - vstTotal;
+  const regelYr = (yr==='Alle' ? new Date().getFullYear()+'' : yr);
+  const isRegel = !isKleinunternehmer(regelYr);
+  // MwSt card visibility
+  const mwstCard = document.getElementById('d-mwst-card');
+  if(mwstCard) mwstCard.style.display = isRegel ? '' : 'none';
+  if(isRegel && mwstCard){
+    mwstCard.querySelector('.sc-lbl').textContent = 'MwSt-Zahllast';
+    mwstCard.querySelector('.sc-val').textContent = (zahllastDash>=0?'+':'')+fmt(Math.abs(zahllastDash));
+    mwstCard.querySelector('.sc-val').style.color = zahllastDash>0?'var(--red)':'var(--green)';
+    mwstCard.querySelector('.sc-sub').textContent = 'USt '+fmt(mwstTotal)+' − VoSt '+fmt(vstTotal);
+  }
+  const pct=Math.min(100,Math.round(ein/250));
+  g('d-ein',fmt(ein));g('d-ein-c',ye.filter(e=>e.typ==='Einnahme').length+' Einträge');
+  g('d-aus',fmt(aus));g('d-aus-c',ye.filter(e=>e.typ==='Ausgabe').length+' Einträge');
+  g('d-gew',fmt(gew));document.getElementById('d-gew').style.color=gew>=0?'var(--green)':'var(--red)';
+  document.getElementById('d-gew').style.setProperty('color',gew>=0?'var(--green)':'var(--red)','important');
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Меняем класс карточки для изменения цвета верхней полоски
+  const gewCard = document.getElementById('d-gew').closest('.sc');
+  if(gewCard) {
+    gewCard.classList.remove('g','r','b','y','p');
+    gewCard.classList.add(gew>=0?'g':'r');
+  }
+  g('d-lim',pct+'%');g('d-lim-s',fmt(ein)+' von 25.000 €');
+  document.getElementById('d-lim-bar').style.width=pct+'%';
+  document.getElementById('d-lim-bar').style.background=pct>80?'var(--red)':pct>60?'var(--yellow)':'var(--yellow)';
+  document.getElementById('d-ein-bar').style.width=ein>0?Math.min(100,Math.round(ein/(ein+aus)*100))+'%':'0%';
+  document.getElementById('d-aus-bar').style.width=aus>0?Math.min(100,Math.round(aus/(ein+aus)*100))+'%':'0%';
+  g('d-cnt',ye.length+'');g('d-cnt-s',`${ye.filter(e=>e.typ==='Einnahme').length} ${'Ein.'} / ${ye.filter(e=>e.typ==='Ausgabe').length} ${'Aus.'}`);
+
+  // Chart - CHART.JS (профессиональный график)
+  const chartYr=yr==='Alle'?new Date().getFullYear()+'':yr;
+  const ea=Array(12).fill(0),aa=Array(12).fill(0);
+  activeEintraege().forEach(e=>{if(!e.datum.startsWith(chartYr))return;const m=parseInt(e.datum.substring(5,7))-1;if(e.typ==='Einnahme')ea[m]+=e.betrag;else aa[m]+=e.betrag;});
+  const ga=ea.map((e,i)=>e-aa[i]); // Gewinn pro Monat
+  
+  // Уничтожаем старый график если есть
+  if(window.dashChart) window.dashChart.destroy();
+  
+  // Создаём новый график
+  const chartCanvas = document.getElementById('d-chart');
+  if(chartCanvas) {
+    window.dashChart = new Chart(chartCanvas, {
+      type: 'line',
+      data: {
+        labels: MS,
+        datasets: [
+          {
+            label: ('  '+'Einnahme'),
+            data: ea,
+            borderColor: '#1d9047',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#1d9047',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 7,
+          },
+          {
+            label: ('  '+'Ausgabe'),
+            data: aa,
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#ef4444',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 7,
+          },
+          {
+            label: ('  '+'Gewinn'),
+            data: ga,
+            borderColor: '#a78bfa',
+            backgroundColor: 'rgba(167, 139, 250, 0.08)',
+            borderWidth: 2,
+            borderDash: [5, 4],
+            fill: false,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: ga.map(v => v >= 0 ? '#a78bfa' : '#f97316'),
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 6,
+            segment: {
+              borderColor: ctx => ctx.p0.parsed.y < 0 || ctx.p1.parsed.y < 0 ? '#f97316' : '#a78bfa',
+            },
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 10 // небольшой отступ от самого верха канваса
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            // ЭТО ВАЖНО: увеличиваем этот параметр, он толкает график вниз
+            // В новых версиях Chart.js это работает как margin-bottom
+            padding: 40, 
+            labels: {
+              color: '#64748b',
+              font: { size: 10, weight: '500', family: "'Inter', sans-serif" },
+              padding: 20, // Расстояние между кнопками (Einnahme <-> Ausgabe)
+              usePointStyle: true,
+              pointStyle: 'circle',
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: 'var(--border)',
+            borderWidth: 1,
+            padding: 12
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: 'rgba(255, 255, 255, 0.1)', drawBorder: false },
+            ticks: {
+              color: '#64748b', 
+              font: { size: 11, family: "'JetBrains Mono', monospace" },
+              padding: 10,
+              callback: function(value) { return fmt(value); }
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: '#64748b', font: { size: 11 }, padding: 5 }
+          }
+        }
+      },
+      // ХАК ДЛЯ ГАРАНТИРОВАННОГО ОТСТУПА (Margin Bottom для легенды)
+      plugins: [{
+        beforeInit: function(chart) {
+          const originalFit = chart.legend.fit;
+          chart.legend.fit = function fit() {
+            originalFit.bind(chart.legend)();
+            this.height += 30; // ВОТ ТВОИ 30 ПИКСЕЛЕЙ ОТСТУПА ВНИЗ ПОД ЛЕГЕНДОЙ
+          };
+        }
+      }]
+    });
+  }
+
+  // Обновляем sort-кнопки
+  ['datum','betrag','typ'].forEach(col=>{
+    const btn=document.getElementById('dsort-'+col);
+    if(!btn) return;
+    btn.style.background = dashSortCol===col ? 'var(--blue)' : '';
+    btn.style.color      = dashSortCol===col ? '#fff' : '';
+    const lbl = col==='datum'?'Datum':col==='betrag'?'Betrag':'Typ';
+    btn.textContent = lbl + (dashSortCol===col ? (dashSortAsc?' ↑':' ↓') : '');
+  });
+
+  // Recent 10 — последние по выбранному году
+  let recent=[...ye].sort((a,b)=>b.datum.localeCompare(a.datum)).slice(0,10);
+  if(dashSortCol !== 'datum') {
+    recent.sort((a,b)=>{
+      let va=a[dashSortCol], vb=b[dashSortCol];
+      if(dashSortCol==='betrag'){ va=+va; vb=+vb; }
+      if(dashSortAsc) return va>vb?1:-1;
+      return va<vb?1:-1;
+    });
+  } else { if(dashSortAsc) recent.reverse(); }
+
+  const mob=isMob();
+  document.getElementById('d-recent').innerHTML = recent.length ? recent.map(e => {
+    const isEin=e.typ==='Einnahme', st=e.is_storno||e._storniert;
+    const click=mob?'showMobDetail('+JSON.stringify(e).replace(/"/g,"'")+')':'';
+    return '<div onclick="'+click+'"'
+      +' style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
+      +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
+      +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
+      +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
+      +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
+      +'<span style="font-family:var(--mono)">'+(mob?fdm(e.datum):fd(e.datum))+'</span>'
+      +'<span>&middot;</span><span>'+e.kategorie+'</span>'
+      +'<span>&middot;</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
+      +'</div></div>'
+      +'<div style="flex:0 0 auto;font-size:15px;font-weight:700;color:var(--'+(isEin?'green':'red')+');font-family:var(--mono);white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</div>'
+      +'</div>';
+  }).join('') : '<div style="text-align:center;padding:30px;color:var(--sub)">Keine Einträge</div>';
+}
+
+// ── EINTRÄGE ──────────────────────────────────────────────────────────────
+function getFiltered(){
+  const j=document.getElementById('f-jahr').value;
+  const m=document.getElementById('f-mon').value;
+  const k=document.getElementById('f-kat').value;
+  const z=document.getElementById('f-zahl').value;
+  const q=document.getElementById('f-q').value.toLowerCase();
+  // Journal-Modus: alle Buchungen inkl. Storno anzeigen
+  if(fTyp==='Journal'){
+    return data.eintraege.filter(e=>{
+      const j=document.getElementById('f-jahr').value;
+      const m=document.getElementById('f-mon').value;
+      const q=document.getElementById('f-q').value.toLowerCase();
+      if(j!=='Alle'&&!e.datum.startsWith(j))return false;
+      if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;
+      if(q&&!e.beschreibung.toLowerCase().includes(q)
+         &&!(e.kategorie||'').toLowerCase().includes(q)
+         &&!e.datum.includes(q))return false;
+      return true;
+    });
+  }
+  return data.eintraege.filter(e=>{
+    if(e.is_storno||e._storniert)return false; // GoBD: скрываем sторно-записи
+    if(fTyp!=='Alle'&&e.typ!==fTyp)return false;
+    if(j!=='Alle'&&!e.datum.startsWith(j))return false;
+    if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;
+    if(k!=='Alle'&&e.kategorie!==k)return false;
+    if(z!=='Alle'&&(e.zahlungsart||'Sonstiges')!==z)return false;
+    // Поиск по описанию, категории И ДАТЕ
+    if(q&&!e.beschreibung.toLowerCase().includes(q)
+       &&!e.kategorie.toLowerCase().includes(q)
+       &&!e.datum.includes(q))return false;
+    return true;
+  });
+}
+
+function sortE(col){
+  Object.values(sortHeaders).forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('sort-asc','sort-desc');}});
+  sortAsc=sortCol===col?!sortAsc:false; sortCol=col;
+  const hid=sortHeaders[col];
+  if(hid){const el=document.getElementById(hid);if(el)el.classList.add(sortAsc?'sort-asc':'sort-desc');}
+  renderEin();
+}
+
+function setFTyp(t,btn){fTyp=t;document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderEin();}
+
+// ── PAGINATION HELPERS ────────────────────────────────────────────────────
+function nextTenPages(total) { einPage = Math.min(total, einPage + 10); renderEin(); }
+function prevTenPages() { einPage = Math.max(1, einPage - 10); renderEin(); }
+
+function renderEin(){
+  const entries=getFiltered().sort((a,b)=>{
+    let va=a[sortCol],vb=b[sortCol];
+    if(sortCol==='betrag'){va=+va;vb=+vb;}
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Для дат: sortAsc=false означает новые сверху (убывающий порядок)
+    if(sortCol==='datum') {
+      return sortAsc ? (va.localeCompare(vb)) : (vb.localeCompare(va)); // DESC по умолчанию
+    }
+    // Для других колонок: стандартная логика
+    return sortAsc?(va>vb?1:-1):(va<vb?1:-1);
+  });
+  const tb=document.getElementById('e-tbody'),em=document.getElementById('e-empty');
+  const mob=isMob();
+  
+  // Показываем/скрываем мобильный заголовок Beschreibung
+  // Обновляем sort-кнопки
+  const einJahr = document.getElementById('f-jahr')?.value || 'Alle';
+  const showMwst = !isKleinunternehmer(einJahr==='Alle'?new Date().getFullYear()+'':einJahr);
+  [['datum','Datum'],['betrag','Betrag'],['kategorie','Kategorie'],['zahlungsart','Zahlung']].forEach(([col,lbl])=>{
+    const btn=document.getElementById('esort-'+col);
+    if(!btn) return;
+    btn.style.background = sortCol===col ? 'var(--blue)' : '';
+    btn.style.color      = sortCol===col ? '#fff' : '';
+    btn.textContent = lbl + (sortCol===col ? (sortAsc?' ↑':' ↓') : '');
+  });
+
+  if(!entries.length){
+    document.getElementById('e-tbody').innerHTML='';
+    em.style.display='block';
+    document.getElementById('e-pagination').innerHTML='';
+  } else {
+    em.style.display='none';
+    const totalPages = Math.ceil(entries.length / einPerPage);
+    if(einPage > totalPages) einPage = totalPages;
+    const start = (einPage - 1) * einPerPage;
+    const end   = start + einPerPage;
+    const pageEntries = entries.slice(start, end);
+
+    document.getElementById('e-tbody').innerHTML = pageEntries.map(e => {
+      const isEin = e.typ==='Einnahme';
+      const st    = e.is_storno||e._storniert;
+      const rowYr = e.datum.substring(0,4);
+      const hasMwst = e.mwstBetrag>0||e.vorsteuerBet>0;
+      const mwstVal = isEin?(e.mwstBetrag||0):(e.vorsteuerBet||0);
+      const nettoVal= isEin?(e.nettoBetrag||e.betrag):(e.betrag-(e.vorsteuerBet||0));
+      const mwstRate= e.mwstRate||e.vorsteuerRate||0;
+      // Storno label
+      let stLbl='';
+      if(e.is_storno&&e.storno_of){
+        const orig=data.eintraege.find(x=>x.id===e.storno_of);
+        stLbl='<span style="font-size:9px;font-weight:700;color:#94a3b8;background:rgba(148,163,184,0.15);padding:2px 5px;border-radius:3px;margin-right:4px">↩ Storno</span>';
+      } else if(st){
+        stLbl='<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✗ Storniert</span>';
+      } else if(e.korrektur_von){
+        stLbl='<span style="font-size:9px;font-weight:700;color:#1d9047;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
+      }
+      const mwstBadge = showMwst&&hasMwst
+        ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
+      return '<div style="display:flex;flex-direction:column;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
+        +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
+        +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
+        +'<div style="display:flex;align-items:flex-start;gap:10px">'
+        +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center;margin-top:2px">'
+        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:11px"></i></div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+        +(stLbl?stLbl:'')
+        +'<span style="font-size:11px;color:var(--sub);font-family:var(--mono)">'+fd(e.datum)+'</span>'
+        +'</div>'
+        +'<div style="font-size:14px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3;margin-bottom:'+(mwstBadge?'4px':'0px')+'">'
+        +(e.beschreibung||e.kategorie)
+        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
+        +'</div>'
+        +'<div style="margin-top:3px">'+(mwstBadge?mwstBadge:'<span style="font-size:10px;color:#f97316">Ohne MwSt</span>')+'</div>'
+        +'</div>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px;border-top:1px solid var(--border)">'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
+        +'<span>'+e.kategorie+'</span>'
+        +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+        +(!st
+          ?'<div style="display:flex;gap:2px">'
+           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'
+           +'<button class="del-btn" onclick="delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'
+          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')
+        +'</div>'
+        +'</div>'
+        +'</div>';
+    }).join('');
+    
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
+    let paginationHTML = '';
+    if(totalPages > 1) {
+      paginationHTML += `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap">`;
+      
+      // Кнопка "на первую страницу"
+      if(einPage > 1) {
+        paginationHTML += `<button class="btn" onclick="einPage=1;renderEin()" style="padding:6px 10px" title="На первую"><i class="fas fa-step-backward"></i></button>`;
+      }
+      
+      // Кнопка "назад на 10 страниц"
+      if(einPage > 10) {
+        paginationHTML += `<button class="btn" onclick="prevTenPages()" style="padding:6px 10px" title="-10 страниц"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>`;
+      }
+      
+      // Кнопка "назад"
+      if(einPage > 1) {
+        paginationHTML += `<button class="btn" onclick="einPage--;renderEin()" style="padding:6px 10px" title="Назад"><i class="fas fa-chevron-left"></i></button>`;
+      }
+      
+      // Номера страниц
+      const maxPagesToShow = 5;
+      let startPage = Math.max(1, einPage - Math.floor(maxPagesToShow / 2));
+      let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+      if(endPage - startPage < maxPagesToShow - 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+      }
+      
+      for(let i = startPage; i <= endPage; i++) {
+        if(i === einPage) {
+          paginationHTML += `<button class="btn" style="background:var(--blue);color:#fff;padding:6px 10px">${i}</button>`;
+        } else {
+          paginationHTML += `<button class="btn" onclick="einPage=${i};renderEin()" style="padding:6px 10px">${i}</button>`;
+        }
+      }
+      
+      // Кнопка "вперёд"
+      if(einPage < totalPages) {
+        paginationHTML += `<button class="btn" onclick="einPage++;renderEin()" style="padding:6px 10px" title="Вперёд"><i class="fas fa-chevron-right"></i></button>`;
+      }
+      
+      // Кнопка "вперёд на 10 страниц"
+      if(einPage < totalPages - 9) {
+        paginationHTML += `<button class="btn" onclick="nextTenPages(${totalPages})" style="padding:6px 10px" title="+10 страниц"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>`;
+      }
+      
+      // Кнопка "на последнюю страницу"
+      if(einPage < totalPages) {
+        paginationHTML += `<button class="btn" onclick="einPage=${totalPages};renderEin()" style="padding:6px 10px" title="На последнюю"><i class="fas fa-step-forward"></i></button>`;
+      }
+      
+      paginationHTML += `<span style="font-size:11px;color:var(--sub);margin-left:12px">${start+1}-${Math.min(end, entries.length)} / ${entries.length}</span>`;
+      paginationHTML += `</div>`;
+    }
+    document.getElementById('e-pagination').innerHTML = paginationHTML;
+  }
+  
+  // Im Journal: nur aktive Buchungen für Summen
+  const activeE = entries.filter(e=>!e.is_storno&&!e._storniert);
+  const stornoE = entries.filter(e=>e.is_storno||e._storniert);
+  const ein=sum(activeE,'Einnahme'),aus=sum(activeE,'Ausgabe'),gew=ein-aus;
+  g('es-cnt', fTyp==='Journal'
+    ? `${activeE.length} aktiv · <span style="color:var(--sub);font-size:11px">${stornoE.length} Storno/Storniert</span>`
+    : entries.length+'');
+  g('es-ein',fmt(ein));g('es-aus',fmt(aus));
+  g('es-gew',(gew>=0?'+':'')+fmt(gew));
+  document.getElementById('es-gew').style.setProperty('color',gew>=0?'var(--green)':'var(--red)','important');
+}
+
+// ── MONTHLY REPORT ────────────────────────────────────────────────────────
+function renderRep(){
+  buildYearFilters();
+  const repYr=document.getElementById('rep-yr');
+  const yr=repYr.value||new Date().getFullYear()+'';
+  const ye=activeEintraege().filter(e=>e.datum.startsWith(yr));
+
+  const repJahr=document.getElementById('rep-yr')?.value||new Date().getFullYear()+'';
+  const isRegel=!isKleinunternehmer(repJahr);
+  // MwSt-Spalten im Bericht ein-/ausblenden
+  ['rep-th-netto','rep-th-mwst','rep-th-zl'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = isRegel ? 'table-cell' : 'none';
+  });
+  const months=Array.from({length:12},(_,i)=>{
+    const mi=String(i+1).padStart(2,'0');
+    const me=ye.filter(e=>e.datum.substring(5,7)===mi);
+    const ein=sum(me,'Einnahme'),aus=sum(me,'Ausgabe');
+    const mwst=me.filter(e=>e.mwstBetrag>0).reduce((s,e)=>s+e.mwstBetrag,0);
+    const vost=me.filter(e=>e.vorsteuerBet>0).reduce((s,e)=>s+e.vorsteuerBet,0);
+    const netto=me.filter(e=>e.typ==='Einnahme').reduce((s,e)=>s+(e.nettoBetrag||e.betrag),0);
+    return{i,mi,ein,aus,gew:ein-aus,count:me.length,mwst,vost,netto,zahllast:mwst-vost};
+  });
+
+  // Year stats
+  const tEin=months.reduce((s,m)=>s+m.ein,0),tAus=months.reduce((s,m)=>s+m.aus,0);
+  const tMwst=months.reduce((s,m)=>s+m.mwst,0), tVost=months.reduce((s,m)=>s+m.vost,0);
+  const tZl=tMwst-tVost;
+  g('rs-ein',fmt(tEin));g('rs-aus',fmt(tAus));
+  g('rs-gew',fmt(tEin-tAus));document.getElementById('rs-gew').style.setProperty('color',(tEin-tAus)>=0?'var(--green)':'var(--red)','important');
+  // MwSt Jahressummary card
+  const rsMwstCard=document.getElementById('rs-mwst-card');
+  if(rsMwstCard){
+    rsMwstCard.style.display=isRegel?'':'none';
+    if(isRegel){
+      rsMwstCard.querySelector('.sc-lbl').textContent='MwSt-Zahllast '+yr;
+      rsMwstCard.querySelector('.sc-val').textContent=(tZl>=0?'+':'')+fmt(tZl);
+      rsMwstCard.querySelector('.sc-val').style.color=tZl>0?'var(--red)':'var(--green)';
+      rsMwstCard.querySelector('.sc-sub').textContent='USt '+fmt(tMwst)+' − VoSt '+fmt(tVost);
+    }
+  }
+  const bestM=months.reduce((b,m)=>m.gew>b.gew?m:b,months[0]);
+  g('rs-best',bestM.count?fmt(bestM.gew):'—');g('rs-best-s',bestM.count?MN[bestM.i]:'');
+
+  const mxE=Math.max(...months.map(m=>m.ein),1),mxA=Math.max(...months.map(m=>m.aus),1);
+  const curMon=new Date().getMonth();
+  const mob=isMob();
+  let cumul2=0;
+  document.getElementById('month-cards').innerHTML=months.map(m=>{
+    const gc=m.gew>=0?'var(--green)':'var(--red)';
+    const isCur=m.i===curMon&&yr===new Date().getFullYear()+'';
+    cumul2+=m.gew;
+    const cc=cumul2>=0?'var(--green)':'var(--red)';
+    const hasData=m.count>0;
+    return`<div onclick="openMonatDetail('${yr}','${m.mi}')"
+      style="background:#fff;border:${isCur?'2px solid var(--blue)':'1px solid var(--border)'};border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;opacity:${hasData?'1':'0.45'}"
+      onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
+      onmouseout="this.style.boxShadow=''">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:16px;font-weight:700;color:var(--text)">${MN[m.i]}</span>
+        <span style="font-size:16px;font-weight:700;font-family:var(--mono);color:${gc}">${hasData?(m.gew>=0?'+':'')+fmt(m.gew):'—'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:${isRegel&&m.mwst>0?'8px':'0'}">
+        <div style="background:rgba(34,197,94,.06);border-radius:8px;padding:8px 10px">
+          <div style="font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Einnahmen</div>
+          <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:var(--green)">${hasData?fmt(m.ein):'—'}</div>
+        </div>
+        <div style="background:rgba(239,68,68,.06);border-radius:8px;padding:8px 10px">
+          <div style="font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Ausgaben</div>
+          <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:var(--red)">${hasData?fmt(m.aus):'—'}</div>
+        </div>
+      </div>
+      ${isRegel&&m.mwst>0?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div style="background:rgba(249,115,22,.06);border-radius:8px;padding:8px 10px">
+          <div style="font-size:12px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">MwSt</div>
+          <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:#f97316">${fmt(m.mwst)}</div>
+        </div>
+        <div style="background:rgba(13,127,170,.06);border-radius:8px;padding:8px 10px">
+          <div style="font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Zahllast</div>
+          <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:var(--cyan)">${m.zahllast>0?'+':''}${fmt(m.zahllast)}</div>
+        </div>
+      </div>`:''}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px">
+        <span style="font-size:12px;color:var(--sub)">${m.count||'0'} Einträge</span>
+        <span style="font-size:12px;color:${cc};font-family:var(--mono)">${hasData?'Σ '+(cumul2>=0?'+':'')+fmt(cumul2):'—'}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Итоговый блок вместо таблицы
+  const tg=tEin-tAus;
+  const totMwst2=months.reduce((s,m)=>s+m.mwst,0);
+  const totVost2=months.reduce((s,m)=>s+m.vost,0);
+  const totZl2=totMwst2-totVost2;
+  const totCnt=months.reduce((s,m)=>s+m.count,0);
+  const totNetto2=months.reduce((s,m)=>s+m.netto,0);
+  const repTbody=document.getElementById('rep-tbody');
+  const repTfoot=document.getElementById('rep-tfoot');
+  if(repTbody) repTbody.innerHTML='';
+  if(repTfoot) repTfoot.innerHTML='';
+  const totBlock=document.getElementById('rep-total-block');
+  if(totBlock){
+    totBlock.style.display='';
+    totBlock.innerHTML=`
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Jahresübersicht ${yr}</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">${fmt(tEin)}</div>
+      </div>
+      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Ausgaben</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--red)">${fmt(tAus)}</div>
+      </div>
+      <div style="background:${tg>=0?'rgba(26,69,120,.06)':'rgba(239,68,68,.06)'};border:1px solid ${tg>=0?'rgba(26,69,120,.2)':'rgba(239,68,68,.2)'};border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Jahresgewinn</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:${tg>=0?'var(--blue)':'var(--red)'}">${tg>=0?'+':''}${fmt(tg)}</div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einträge</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono)">${totCnt}</div>
+      </div>
+      ${isRegel?`
+      <div style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">MwSt gesamt</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f97316">${fmt(totMwst2)}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:3px">Netto: ${fmt(totNetto2)}</div>
+      </div>
+      <div style="background:rgba(13,127,170,.06);border:1px solid rgba(13,127,170,.2);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Zahllast</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--cyan)">${totZl2>0?'+':''}${fmt(totZl2)}</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:3px">USt − VoSt</div>
+      </div>`:''}
+    </div>`;
+  }
+}
+
+// ── ZAHLUNGSARTEN ─────────────────────────────────────────────────────────
