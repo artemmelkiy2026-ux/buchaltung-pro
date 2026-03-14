@@ -447,7 +447,7 @@ function renderDash(){
       +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
       +'<div style="flex:1;min-width:0">'
       +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
-      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sub)">'
       +'<span style="font-family:var(--mono)">'+(mob?fdm(e.datum):fd(e.datum))+'</span>'
       +'<span>&middot;</span><span>'+e.kategorie+'</span>'
       +'<span>&middot;</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
@@ -578,7 +578,7 @@ function renderEin(){
         +(e.beschreibung||e.kategorie)
         +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
         +'</div>'
-        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sub)">'
         +'<span style="font-family:var(--mono)">'+fd(e.datum)+'</span>'
         +'<span>·</span><span>'+e.kategorie+'</span>'
         +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
