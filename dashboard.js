@@ -739,7 +739,7 @@ function renderRep(){
         </div>
         <div style="background:rgba(239,68,68,.06);border-radius:8px;padding:8px 10px">
           <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Ausgaben</div>
-          <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--red)">${hasData?fmt(m.aus):'—'}</div>
+          <div style="font-size:15px;font-weight:600;font-family:var(--mono);color:var(--red)">${hasData?fmt(m.aus):'—'}</div>
         </div>
       </div>
       ${isRegel&&m.mwst>0?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
