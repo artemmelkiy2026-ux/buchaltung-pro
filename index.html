@@ -414,14 +414,14 @@
     
       <div style="position:relative">
       
-  <img id="scan-preview-img" style="width:100%;max-height:520px;object-fit:contain;display:block;transition:transform .15s ease;cursor:crosshair" onmousemove="if(window.innerWidth>900){const r=this.getBoundingClientRect();const x=((event.clientX-r.left)/r.width*100).toFixed(1);const y=((event.clientY-r.top)/r.height*100).toFixed(1);this.style.transformOrigin=x+'% '+y+'%';this.style.transform='scale(2)'}" onmouseleave="this.style.transform='';this.style.transformOrigin=''">        <button onclick="scanBelegCancel()"
+  <img id="scan-preview-img" style="width:100%;max-height:100%;object-fit:contain;display:block;transition:transform .15s ease;cursor:crosshair" onmousemove="if(window.innerWidth>900){const r=this.getBoundingClientRect();const x=((event.clientX-r.left)/r.width*100).toFixed(1);const y=((event.clientY-r.top)/r.height*100).toFixed(1);this.style.transformOrigin=x+'% '+y+'%';this.style.transform='scale(2)'}" onmouseleave="this.style.transform='';this.style.transformOrigin=''">        <button onclick="scanBelegCancel()"
           style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px">
           <i class="fas fa-times"></i>
         </button>
       </div>
     
-      <div style="padding:8px 12px 12px;display:flex;gap:8px;">
-        <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:10px;font-size:14px;z-index:1;">
+      <div style="padding:8px 12px 12px;display:flex;gap:8px">
+        <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:10px;font-size:14px">
          KI-Analyse starten
         </button>
       </div>
@@ -439,6 +439,22 @@
       Datum, Betrag, MwSt, Zahlungsart und Artikel werden automatisch erkannt und in die Felder eingetragen.
     </div>
   </div><!-- /rechte Spalte -->
+
+  <!-- Rechte Spalte Einnahme: Letzte Einnahmen (nur Desktop) -->
+  <div id="letzte-einnahmen-box" style="display:none;position:sticky;top:20px">
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+          <i class="fas fa-arrow-up" style="color:var(--green);font-size:11px"></i>
+          Letzte Einnahmen
+        </span>
+        <span id="letzte-ein-summe" style="font-size:12px;color:var(--sub)"></span>
+      </div>
+      <div id="letzte-ein-list">
+        <!-- gefüllt durch renderLetzteEinnahmen() -->
+      </div>
+    </div>
+  </div>
 
   </div><!-- /neu-layout -->
 </div>
