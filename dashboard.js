@@ -27,6 +27,69 @@ function onLoad(ev){
   r.readAsText(f);ev.target.value='';
 }
 // ── FORM ──────────────────────────────────────────────────────────────────
+// ── NEU TOOLBAR — анимированный счётчик ──────────────────────────────────
+let _toolbarEin = 0;
+let _toolbarAus = 0;
+
+function updateNeuToolbar(animate = false) {
+  const ye = activeEintraege();
+  const newEin = ye.filter(e => e.typ === 'Einnahme').reduce((s, e) => s + e.betrag, 0);
+  const newAus = ye.filter(e => e.typ === 'Ausgabe').reduce((s, e) => s + e.betrag, 0);
+  const cntEin = ye.filter(e => e.typ === 'Einnahme').length;
+  const cntAus = ye.filter(e => e.typ === 'Ausgabe').length;
+
+  if (animate) {
+    animateCounter('toolbar-ein-val', _toolbarEin, newEin);
+    animateCounter('toolbar-aus-val', _toolbarAus, newAus);
+  } else {
+    const elEin = document.getElementById('toolbar-ein-val');
+    const elAus = document.getElementById('toolbar-aus-val');
+    if (elEin) elEin.textContent = fmt(newEin);
+    if (elAus) elAus.textContent = fmt(newAus);
+  }
+
+  const elCntEin = document.getElementById('toolbar-ein-cnt');
+  const elCntAus = document.getElementById('toolbar-aus-cnt');
+  if (elCntEin) elCntEin.textContent = cntEin + ' Einträge';
+  if (elCntAus) elCntAus.textContent = cntAus + ' Einträge';
+
+  _toolbarEin = newEin;
+  _toolbarAus = newAus;
+}
+
+function animateCounter(elId, from, to) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const duration = 900; // ms
+  const steps = 45;
+  const stepTime = duration / steps;
+  let current = from;
+  const diff = to - from;
+  if (diff === 0) return;
+
+  // Подсветка при изменении
+  el.style.transition = 'transform .15s ease, opacity .15s ease';
+  el.style.transform  = 'scale(1.08)';
+  el.style.opacity    = '0.85';
+  setTimeout(() => {
+    el.style.transform = 'scale(1)';
+    el.style.opacity   = '1';
+  }, 150);
+
+  let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    // Easing: быстро в начале, замедляется к концу
+    const progress = 1 - Math.pow(1 - step / steps, 3);
+    current = from + diff * progress;
+    el.textContent = fmt(Math.round(current * 100) / 100);
+    if (step >= steps) {
+      clearInterval(timer);
+      el.textContent = fmt(to);
+    }
+  }, stepTime);
+}
+
 function setTyp(t){
   curTyp=t;
   document.getElementById('btn-e').className='tt'+(t==='Einnahme'?' ae':'');
@@ -201,6 +264,7 @@ function addEintrag(){
   sbSaveEintrag(entry);
   renderAll();
   renderDash();
+  updateNeuToolbar(true);
   const fj=document.getElementById('f-jahr');
   if(fj){
     const opt=[...fj.options].find(o=>o.value===entryYear);

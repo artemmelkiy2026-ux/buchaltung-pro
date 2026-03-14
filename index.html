@@ -321,6 +321,60 @@
 <!-- ── NEUER EINTRAG ── -->
 <div class="page" id="p-neu">
 <div class="page-inner">
+
+  <!-- ── TOOLBAR ── -->
+  <div id="neu-toolbar" style="
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;
+    margin-bottom:20px;border-radius:16px;overflow:hidden">
+
+    <!-- Einnahmen -->
+    <div style="
+      background:linear-gradient(135deg,#3d8b4e 0%,#5d9d69 100%);
+      border-radius:14px;padding:16px 20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;
+        border-radius:50%;background:rgba(255,255,255,.08)"></div>
+      <div style="position:absolute;bottom:-24px;left:-10px;width:100px;height:100px;
+        border-radius:50%;background:rgba(255,255,255,.05)"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);
+          display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-arrow-up" style="color:#fff;font-size:12px"></i>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);
+          text-transform:uppercase;letter-spacing:.08em">Einnahmen</span>
+      </div>
+      <div id="toolbar-ein-val" style="
+        font-size:22px;font-weight:800;color:#fff;font-family:var(--mono);
+        letter-spacing:-.5px;position:relative;line-height:1.1">0,00 €</div>
+      <div id="toolbar-ein-cnt" style="font-size:11px;color:rgba(255,255,255,.7);
+        margin-top:4px;position:relative">0 Einträge</div>
+    </div>
+
+    <!-- Ausgaben -->
+    <div style="
+      background:linear-gradient(135deg,#b02a37 0%,#dc3545 100%);
+      border-radius:14px;padding:16px 20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;
+        border-radius:50%;background:rgba(255,255,255,.08)"></div>
+      <div style="position:absolute;bottom:-24px;left:-10px;width:100px;height:100px;
+        border-radius:50%;background:rgba(255,255,255,.05)"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);
+          display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-arrow-down" style="color:#fff;font-size:12px"></i>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);
+          text-transform:uppercase;letter-spacing:.08em">Ausgaben</span>
+      </div>
+      <div id="toolbar-aus-val" style="
+        font-size:22px;font-weight:800;color:#fff;font-family:var(--mono);
+        letter-spacing:-.5px;position:relative;line-height:1.1">0,00 €</div>
+      <div id="toolbar-aus-cnt" style="font-size:11px;color:rgba(255,255,255,.7);
+        margin-top:4px;position:relative">0 Einträge</div>
+    </div>
+
+  </div>
+
   <h1 style="font-size:20px;font-weight:700;margin-bottom:16px"><i class="fa-solid fa-plus"></i> Neuer Eintrag</h1>
 
   <!-- Desktop: 2 Spalten. Mobil: 1 Spalte -->

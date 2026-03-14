@@ -164,6 +164,7 @@ function nav(id, el){
   if(id==='kunden') renderKunden();
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
+  if(id==='neu') updateNeuToolbar(false);
 }
 
 // ── AUTOSAVE (облако — сохраняется автоматически через persist) ──────────
