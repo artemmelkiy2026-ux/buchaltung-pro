@@ -90,7 +90,7 @@ function wBuchenAlle(){
   // ИСПРАВЛЕНИЕ ТУТ: Переводим сообщение об успехе
   toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} ${'Zahlungen gebucht!'}`, 'ok');
 }
-function delWied(id){if(!confirm('Vorlage löschen?'))return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
+async function delWied(id){const _okW=await appConfirm('Vorlage wirklich löschen?',{title:'Vorlage löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_okW)return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
 
 
 

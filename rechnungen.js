@@ -129,21 +129,25 @@ function saveRechnung(){
   }
   renderRech();closeModal('rech-modal');toast('✓ Rechnung gespeichert!','ok');
 }
-function rechBezahlt(id){
+async function rechBezahlt(id){
   const r=data.rechnungen.find(x=>x.id===id);if(!r)return;
-  if(confirm(`Rechnung ${r.nr} als bezahlt markieren und automatisch als Einnahme buchen?`)){
+  const ok = await appConfirm(`Rechnung ${r.nr} als Einnahme buchen und bezahlt markieren?`,{title:'Rechnung bezahlt',icon:'✅',okLabel:'Ja, buchen',cancelLabel:'Nein'});
+  if(ok){
     r.status='bezahlt';
     const newE={id:Date.now()+'',datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:'Dienstleistung',zahlungsart:'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag};
     data.eintraege.unshift(newE);
     sbSaveRechnung(r); sbSaveEintrag(newE);
     renderAll();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');
-  } else if(confirm(`Nur als bezahlt markieren (ohne Einnahme buchen)?`)){
-    r.status='bezahlt';
-    sbSaveRechnung(r);
-    renderRech();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
+  } else {
+    const ok2 = await appConfirm('Nur als bezahlt markieren?',{title:'Nur markieren',icon:'✓',okLabel:'Ja',cancelLabel:'Nein'});
+    if(ok2){
+      r.status='bezahlt';
+      sbSaveRechnung(r);
+      renderRech();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
+    }
   }
 }
-function delRech(id){if(!confirm('Rechnung löschen?'))return;data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);sbDeleteRechnung(id);renderRech();toast('Gelöscht','err');}
+async function delRech(id){const _okR=await appConfirm('Rechnung wirklich löschen?',{title:'Rechnung löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_okR)return;data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);sbDeleteRechnung(id);renderRech();toast('Gelöscht','err');}
 // ── RECHNUNG POSITIONEN ───────────────────────────────────────────────────
 
 // Хелпер: округление до 2 знаков без ошибок float

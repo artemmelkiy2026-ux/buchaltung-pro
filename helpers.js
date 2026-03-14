@@ -219,8 +219,8 @@ function saveKunde(){
   toast('✓ Kunde gespeichert!','ok');
 }
 
-function delKunde(id){
-  if(!confirm('Kunde löschen?'))return;
+async function delKunde(id){
+  const _ok1=await appConfirm('Kunden wirklich löschen?',{title:'Kunde löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_ok1)return;
   data.kunden=(data.kunden||[]).filter(k=>k.id!==id);
   sbDeleteKunde(id); renderKunden(); toast('Gelöscht','err');
 }
@@ -1175,9 +1175,11 @@ function addUstEintrag(){
 }
 
 function delUstEintrag(id){
-  if(!confirm('Eintrag löschen?')) return;
-  data.ustEintraege = (data.ustEintraege||[]).filter(e=>e.id!==id);
-  sbDeleteUstEintrag(id);
-  renderUst();
-  toast('Gelöscht','err');
+  appConfirm('Eintrag wirklich löschen?',{title:'Eintrag löschen',icon:'🗑️',okLabel:'Löschen',danger:true}).then(ok=>{
+    if(!ok) return;
+    data.ustEintraege = (data.ustEintraege||[]).filter(e=>e.id!==id);
+    sbDeleteUstEintrag(id);
+    renderUst();
+    toast('Gelöscht','err');
+  });
 }
