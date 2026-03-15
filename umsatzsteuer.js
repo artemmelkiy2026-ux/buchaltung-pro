@@ -540,9 +540,17 @@ function stBerechnen() {
   const isKleinunternehmer = document.getElementById('st-kleinunternehmer-option')?.value === 'ja';
   // Правильная формула: выделяем НДС из брутто-суммы (обратный расчёт)
   // brutto = netto * 1.19 → MwSt = brutto * 19/119
-  let ustEingezogen = isKleinunternehmer ? 0 : r2(ein * 19 / 119);
-  let ustBezahlt    = isKleinunternehmer ? 0 : r2(aus * 19 / 119);
-  const ustSaldo = ustEingezogen - ustBezahlt; // Если положительно - платим государству
+  // USt: берём реальные данные из записей а не считаем паушально 19% от всей суммы
+  const _ustJahr = String(jahr);
+  const _yeUst = activeEintraege().filter(e=>e.datum.startsWith(_ustJahr));
+  const ustEingezogenReal = r2(_yeUst.filter(e=>e.typ==='Einnahme'&&e.mwstBetrag>0).reduce((s,e)=>s+(e.mwstBetrag||0),0));
+  const ustBezahltReal    = r2(_yeUst.filter(e=>e.typ==='Ausgabe'&&e.vorsteuerBet>0).reduce((s,e)=>s+(e.vorsteuerBet||0),0));
+  let ustEingezogen = isKleinunternehmer ? 0 : ustEingezogenReal;
+  let ustBezahlt    = isKleinunternehmer ? 0 : ustBezahltReal;
+  // Запасной вариант если нет явных MwSt-данных — паушальный расчёт
+  if(!isKleinunternehmer && ustEingezogen===0 && ein>0) ustEingezogen = r2(ein * 19 / 119);
+  if(!isKleinunternehmer && ustBezahlt===0 && aus>0)   ustBezahlt    = r2(aus * 19 / 119);
+  const ustSaldo = ustEingezogen - ustBezahlt;
   
   // Рекомендация по Kleinunternehmer
   const ustPercent = ein > 0 ? ((ustEingezogen / ein) * 100) : 0;

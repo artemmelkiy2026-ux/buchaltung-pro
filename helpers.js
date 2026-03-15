@@ -1,5 +1,5 @@
 // ── HELPERS ───────────────────────────────────────────────────────────────
-function fmt(n){return n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
+function fmt(n){const v=parseFloat(n);return(isNaN(v)?0:v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
 function fd(d){if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}.${m}.${y}`}
 // Мобильная дата: DD.MM.YY (год 2 цифры)
 function fdm(d){if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}.${m}.${y.slice(2)}`}
@@ -1066,20 +1066,16 @@ function renderUst(){
   // Все записи года — если MwSt не сохранён явно, считаем из betrag по 19%
   const eintrMwst = activeEintraege()
     .filter(e => e.datum.startsWith(yr))
+    .filter(e => {
+      // Только записи с явно сохранённым MwSt-Betrag — не считаем обратным методом для §19-лет
+      const isEin = e.typ==='Einnahme';
+      return isEin ? (e.mwstBetrag > 0) : (e.vorsteuerBet > 0);
+    })
     .map(e => {
       const isEin = e.typ==='Einnahme';
-      // Если поля MwSt уже есть — берём их, иначе считаем из betrag
-      const rate    = e.mwstRate || e.vorsteuerRate || 19;
-      const hasSaved = isEin ? (e.mwstBetrag > 0) : (e.vorsteuerBet > 0);
-      let mwstBetrag, netto;
-      if(hasSaved){
-        mwstBetrag = isEin ? e.mwstBetrag : e.vorsteuerBet;
-        netto      = r2(e.nettoBetrag || (e.betrag - mwstBetrag));
-      } else {
-        // betrag = Brutto → считаем MwSt обратным методом
-        mwstBetrag = r2(e.betrag * rate / (100 + rate));
-        netto      = r2(e.betrag - mwstBetrag);
-      }
+      const rate = e.mwstRate || e.vorsteuerRate || 19;
+      const mwstBetrag = isEin ? e.mwstBetrag : e.vorsteuerBet;
+      const netto = r2(e.nettoBetrag || (e.betrag - mwstBetrag));
       return {
         id:'e_'+e.id, datum:e.datum,
         beschreibung: e.beschreibung||e.kategorie,

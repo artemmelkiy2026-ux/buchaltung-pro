@@ -206,7 +206,7 @@ async function rechBezahlt(id){
   const ok = await appConfirm(`Rechnung ${r.nr} als Einnahme buchen und bezahlt markieren?`,{title:'Rechnung bezahlt',icon:'✅',okLabel:'Ja, buchen',cancelLabel:'Nein'});
   if(ok){
     r.status='bezahlt';
-    const newE={id:Date.now()+'',datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:'Dienstleistung',zahlungsart:'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag};
+    const newE={id:Date.now()+'',datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:r.kategorie||'Dienstleistung',zahlungsart:r.zahlungsart||'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag,nettoBetrag:r.netto||r.betrag,mwstBetrag:r.mwstBetrag||0,mwstRate:r.mwstRate||0};
     data.eintraege.unshift(newE);
     sbSaveRechnung(r); sbSaveEintrag(newE);
     renderAll();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');

@@ -121,10 +121,12 @@ function saveWied(){
   sbSaveWied(newW);
   renderWied();closeModal('wied-modal');toast('✓ Vorlage gespeichert!','ok');
 }
-function wBuchen(id){
-  const w=data.wiederkehrend.find(x=>x.id===id); if(!w) return;
+function wBuchenCore(id){
+  // Только данные — без renderAll/renderWied
+  const w=data.wiederkehrend.find(x=>x.id===id); if(!w) return null;
   const newE={
-    id:Date.now()+'', datum:w.naechste, typ:w.typ, kategorie:w.kategorie,
+    id:Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    datum:w.naechste, typ:w.typ, kategorie:w.kategorie,
     zahlungsart:w.zahlungsart, beschreibung:w.bezeichnung,
     notiz:'Wiederkehrend', betrag:w.betrag
   };
@@ -136,21 +138,26 @@ function wBuchen(id){
   else d.setFullYear(d.getFullYear()+1);
   w.naechste=d.toISOString().split('T')[0];
   sbSaveWied(w);
+  return newE;
+}
+
+function wBuchen(id){
+  const newE = wBuchenCore(id);
+  if(!newE) return;
   renderAll(); renderWied();
-  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${w.bezeichnung} ${'gebucht!'}`, 'ok');
+  const w=data.wiederkehrend.find(x=>x.id===id);
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${newE.beschreibung} gebucht!`, 'ok');
 }
 
 function wBuchenAlle(){
   const today=new Date().toISOString().split('T')[0];
   const faellig=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
-
-  // ИСПРАВЛЕНИЕ ТУТ: Переводим ошибку
   if(!faellig.length) return toast('Keine fälligen Zahlungen', 'err');
-
-  faellig.forEach(w=>wBuchen(w.id));
-
-  // ИСПРАВЛЕНИЕ ТУТ: Переводим сообщение об успехе
-  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} ${'Zahlungen gebucht!'}`, 'ok');
+  // Бронируем все без промежуточных renderAll
+  faellig.forEach(w=>wBuchenCore(w.id));
+  // Один рендер после всех
+  renderAll(); renderWied();
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} Zahlungen gebucht!`, 'ok');
 }
 async function delWied(id){const _okW=await appConfirm('Vorlage wirklich löschen?',{title:'Vorlage löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_okW)return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
 

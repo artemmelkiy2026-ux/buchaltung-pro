@@ -54,6 +54,20 @@ async function saveEdit(){
   if (!storno) return toast('Fehler beim Stornieren','err');
   // sbStornoEintrag уже пометил оригинал локально
   data.eintraege.push(storno);
+  // Пересчитываем MwSt если сумма изменилась и запись имела MwSt
+  const betragChanged = betrag !== origEntry.betrag;
+  let newMwstBetrag = origEntry.mwstBetrag || 0;
+  let newVorsteuerBet = origEntry.vorsteuerBet || 0;
+  let newNettoBetrag = origEntry.nettoBetrag || betrag;
+  if(betragChanged){
+    if(editTyp==='Einnahme' && origEntry.mwstRate > 0){
+      newMwstBetrag = r2(betrag * origEntry.mwstRate / (100 + origEntry.mwstRate));
+      newNettoBetrag = r2(betrag - newMwstBetrag);
+    } else if(editTyp==='Ausgabe' && origEntry.vorsteuerRate > 0){
+      newVorsteuerBet = r2(betrag * origEntry.vorsteuerRate / (100 + origEntry.vorsteuerRate));
+      newNettoBetrag = r2(betrag - newVorsteuerBet);
+    }
+  }
   // Создаём новую исправленную запись
   const newId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
   const newEntry = {...origEntry,
@@ -64,6 +78,9 @@ async function saveEdit(){
     zahlungsart: normZahl(document.getElementById('edit-zahl').value),
     beschreibung: document.getElementById('edit-dsc').value.trim()||normKat(document.getElementById('edit-kat').value),
     notiz: document.getElementById('edit-note').value.trim(),
+    mwstBetrag: newMwstBetrag,
+    vorsteuerBet: newVorsteuerBet,
+    nettoBetrag: newNettoBetrag,
     is_storno: false,
     storno_of: null,
     korrektur_von: chainRoot,
