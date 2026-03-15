@@ -273,7 +273,7 @@ function updateMwstFormVisibility(){
   // Color scheme: orange for Einnahme (USt), blue for Ausgabe (Vorsteuer)
   if(isEin){
     mwRow.style.background='rgba(249,115,22,.07)';
-    mwRow.style.border='1px solid rgba(249,115,22,.3)';
+  
     const title=document.getElementById('nf-mwst-title');
     if(title){title.textContent='● Umsatzsteuer auf diese Einnahme';title.style.color='#f97316';}
     const betLbl=document.getElementById('nf-mwst-bet-lbl');
@@ -284,7 +284,7 @@ function updateMwstFormVisibility(){
     if(info){info.textContent='= Brutto';info.style.color='#f97316';}
   } else {
     mwRow.style.background='rgba(59,130,246,.07)';
-    mwRow.style.border='1px solid rgba(59,130,246,.3)';
+    
     const title=document.getElementById('nf-mwst-title');
     if(title){title.textContent='● Vorsteuer aus dieser Ausgabe';title.style.color='var(--blue)';}
     const betLbl=document.getElementById('nf-mwst-bet-lbl');
