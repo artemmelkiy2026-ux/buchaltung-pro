@@ -215,20 +215,22 @@ function renderKat(){
         return seg;
       });
 
+      // Для каждого сегмента: начальный dashoffset = circumference (скрыт),
+      // финальный = -(s.offset). Анимация JS постепенно заполняет.
       const segPaths=segments.map(s=>{
-        const delay=s.i*40;
         const color=PIE_COLORS[s.i%PIE_COLORS.length];
+        const finalOffset=-(s.offset);
         return `<circle
           cx="${CX}" cy="${CY}" r="${R}"
           fill="none"
           stroke="${color}"
           stroke-width="${R-r}"
-          stroke-dasharray="${s.len} ${circumference}"
-          stroke-dashoffset="${-(s.offset)}"
+          stroke-dasharray="${s.len} ${circumference-s.len}"
+          stroke-dashoffset="${circumference}"
           transform="rotate(-90 ${CX} ${CY})"
           class="kat-seg"
+          data-final="${finalOffset}"
           data-idx="${s.i}"
-          style="animation-delay:${delay}ms"
           onmouseover="katSegHover(this,'${s.k}','${fmt(s.val)}','${Math.round(s.pct*100)}%')"
           onmouseout="katSegOut()"
         />`;
@@ -267,6 +269,28 @@ function renderKat(){
             ${sorted.length} Kategorien
           </text>
         </svg>`;
+
+      // Запускаем анимацию заполнения после рендера
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          const segs=[...donutWrap.querySelectorAll('.kat-seg')];
+          const DURATION=800;
+          const START=performance.now();
+          function ease(t){ return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; }
+          function tick(now){
+            const raw=Math.min((now-START)/DURATION,1);
+            const t=ease(raw);
+            segs.forEach(seg=>{
+              const final=parseFloat(seg.dataset.final);
+              // от circumference до final
+              const cur=circumference+(final-circumference)*t;
+              seg.style.strokeDashoffset=cur;
+            });
+            if(raw<1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        });
+      });
     }
   }
 
