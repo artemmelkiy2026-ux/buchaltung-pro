@@ -803,7 +803,7 @@ function renderEin(){
         +'<div style="margin-top:3px">'+(mwstBadge?mwstBadge:'<span style="font-size:10px;color:#f97316">Ohne MwSt</span>')+'</div>'
         +'</div>'
         +'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px;border-top:1px solid var(--border)">'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
         +'<span>'+e.kategorie+'</span>'
         +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
