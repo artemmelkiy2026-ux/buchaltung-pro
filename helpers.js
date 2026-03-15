@@ -171,25 +171,44 @@ function renderKunden(){
   }
   em.style.display='none';
 
-  const cards = filtered.map(k=>{
+  const header = `<div class="klist-header">
+    <div class="klist-col-name">Name / Firma</div>
+    <div class="klist-col-contact klist-desk">E-Mail</div>
+    <div class="klist-col-tel klist-desk">Telefon</div>
+    <div class="klist-col-ort klist-desk">Ort</div>
+    <div class="klist-col-ums klist-desk" style="text-align:right">Umsatz</div>
+    <div class="klist-col-act"></div>
+  </div>`;
+
+  const rows = filtered.map(k=>{
     const umsatz = getKundeUmsatz(k.id);
     const rechCount = (data.rechnungen||[]).filter(r=>r.kundeId===k.id).length;
     const initials = (k.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-    const hasContact = k.email || k.tel;
-    return `<div class="kunde-card" onclick="showKundeRechnungen('${k.id}')">
-      <div class="kunde-card-avatar">${initials}</div>
-      <div class="kunde-card-body">
-        <div class="kunde-card-name">${k.name||'—'}</div>
-        ${k.ansprechpartner?`<div class="kunde-card-role">${k.ansprechpartner}</div>`:''}
-        <div class="kunde-card-meta">
-          ${k.email?`<a href="mailto:${k.email}" onclick="event.stopPropagation()" class="kunde-meta-link"><i class="fas fa-envelope"></i> ${k.email}</a>`:''}
-          ${k.tel?`<span class="kunde-meta-item"><i class="fas fa-phone"></i> ${k.tel}</span>`:''}
-          ${k.ort?`<span class="kunde-meta-item"><i class="fas fa-map-marker-alt"></i> ${k.plz?k.plz+' ':''}${k.ort}</span>`:''}
+    return `<div class="klist-row" onclick="showKundeRechnungen('${k.id}')">
+      <div class="klist-col-name">
+        <div class="klist-avatar">${initials}</div>
+        <div class="klist-name-wrap">
+          <div class="klist-name">${k.name||'—'}</div>
+          ${k.ansprechpartner?`<div class="klist-role">${k.ansprechpartner}</div>`:''}
+          <!-- мобильная строка -->
+          <div class="klist-mob-meta">
+            ${k.email?`<span>${k.email}</span>`:''}
+            ${k.tel?`<span>${k.tel}</span>`:''}
+            ${k.ort?`<span>${k.plz?k.plz+' ':''}${k.ort}</span>`:''}
+          </div>
         </div>
       </div>
-      <div class="kunde-card-right">
-        ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div><div class="kunde-rech-cnt">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:'<div class="kunde-rech-cnt" style="color:var(--muted)">Keine Rechnungen</div>'}
-        <div class="kunde-card-actions" onclick="event.stopPropagation()">
+      <div class="klist-col-contact klist-desk klist-muted">
+        ${k.email?`<a href="mailto:${k.email}" onclick="event.stopPropagation()" class="klist-link">${k.email}</a>`:'—'}
+      </div>
+      <div class="klist-col-tel klist-desk klist-muted">${k.tel||'—'}</div>
+      <div class="klist-col-ort klist-desk klist-muted">${k.ort?`${k.plz?k.plz+' ':''}${k.ort}`:'—'}</div>
+      <div class="klist-col-ums klist-desk" style="text-align:right">
+        ${umsatz>0?`<div class="klist-umsatz">${fmt(umsatz)}</div><div class="klist-rcount">${rechCount} Rg.</div>`:'<span class="klist-muted">—</span>'}
+      </div>
+      <div class="klist-col-act" onclick="event.stopPropagation()">
+        <div class="klist-mob-ums">${umsatz>0?fmt(umsatz):''}</div>
+        <div class="klist-actions">
           <button class="rca-btn" onclick="editKunde('${k.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
           <button class="rca-btn" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen"><i class="fas fa-file-invoice"></i></button>
           <button class="rca-btn rca-red" onclick="delKunde('${k.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
@@ -198,8 +217,9 @@ function renderKunden(){
     </div>`;
   }).join('');
 
-  if(container) container.innerHTML = cards;
+  if(container) container.innerHTML = header + rows;
 }
+
 
 function getKundeUmsatz(id){
   return (data.rechnungen||[]).filter(r=>r.kundeId===id).reduce((s,r)=>s+r.betrag,0);
