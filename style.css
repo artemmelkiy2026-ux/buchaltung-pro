@@ -1347,3 +1347,57 @@ input, select, textarea {
   .prog-vj-row{ grid-template-columns:26px 1fr 60px }
   .prog-vj-delta-sm{ display:none }
 }
+
+/* ── UMSATZSTEUER — современный вид ── */
+
+/* Бейджи лет */
+.ust-yr-badge{
+  cursor:pointer;padding:10px 14px;border-radius:10px;
+  border:2px solid var(--border);background:var(--s2);
+  min-width:110px;transition:all .15s;text-align:center;
+}
+.ust-yr-badge:hover{border-color:var(--border2)}
+.ust-yr-badge--active.ust-yr-badge--klein{border-color:var(--green);background:rgba(93,157,105,.08)}
+.ust-yr-badge--active.ust-yr-badge--regel{border-color:var(--blue);background:rgba(26,69,120,.08)}
+.ust-yr-badge-year{font-size:18px;font-weight:800;color:var(--text);line-height:1}
+.ust-yr-badge-mode{font-size:10px;font-weight:700;margin-top:5px;padding:2px 8px;border-radius:20px;display:inline-block}
+.ust-yr-badge--klein .ust-yr-badge-mode{background:rgba(93,157,105,.15);color:var(--green)}
+.ust-yr-badge--regel .ust-yr-badge-mode{background:rgba(26,69,120,.15);color:var(--blue)}
+.ust-yr-badge-sum{font-size:11px;color:var(--sub);font-family:var(--mono);margin-top:4px}
+
+/* Mode-Labels */
+.ust-mode-lbl{
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;padding:12px 16px;border-radius:var(--r);
+  border:2px solid transparent;transition:border-color .15s,background .15s;
+  flex:1;min-width:200px;
+}
+.ust-mode-lbl:hover{background:var(--s3)}
+.ust-mode-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+
+/* §19 Banner */
+.ust-klein-banner{
+  display:flex;align-items:center;gap:16px;
+  padding:16px 20px;border-radius:var(--r2);
+  background:rgba(93,157,105,.07);border:1px solid rgba(93,157,105,.25);
+}
+.ust-klein-banner-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:rgba(93,157,105,.15);color:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+
+/* Адаптив */
+@media(max-width:768px){
+  .ust-mode-lbl{min-width:0;flex:none;width:100%}
+  #ust-quartal-list{grid-template-columns:repeat(3,1fr)!important}
+}
+@media(max-width:480px){
+  #ust-quartal-list{grid-template-columns:repeat(2,1fr)!important}
+  .ust-yr-badge{min-width:80px;padding:8px 10px}
+}

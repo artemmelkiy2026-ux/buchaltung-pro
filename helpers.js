@@ -961,19 +961,10 @@ function renderUst(){
       const isK = m==='§19';
       const active = y===yr;
       const einY = activeEintraege().filter(e=>e.datum.startsWith(y)&&e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
-      return `<div onclick="document.getElementById('ust-yr').value='${y}';renderUst()"
-        style="cursor:pointer;padding:12px 18px;border-radius:var(--r);border:2px solid ${active?(isK?'var(--green)':'var(--blue)'):'var(--border)'};
-        background:${active?(isK?'rgba(34,197,94,.08)':'rgba(59,130,246,.08)'):'var(--s2)'};
-        min-width:130px;transition:all .15s">
-        <div style="font-size:18px;font-weight:800;color:var(--text)">${y}</div>
-        <div style="margin-top:4px;display:flex;align-items:center;gap:6px">
-          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;
-            background:${isK?'rgba(34,197,94,.15)':'rgba(59,130,246,.15)'};
-            color:${isK?'var(--green)':'var(--blue)'}">
-            ${isK?'§19':'MwSt'}
-          </span>
-        </div>
-        <div style="font-size:12px;color:var(--sub);margin-top:4px;font-family:var(--mono)">${fmt(einY)}</div>
+      return `<div onclick="document.getElementById('ust-yr').value='${y}';renderUst()" class="ust-yr-badge${active?' ust-yr-badge--active':''}${isK?' ust-yr-badge--klein':' ust-yr-badge--regel'}">
+        <div class="ust-yr-badge-year">${y}</div>
+        <div class="ust-yr-badge-mode">${isK?'§19 KU':'MwSt'}</div>
+        <div class="ust-yr-badge-sum">${fmt(einY)}</div>
       </div>`;
     }).join('');
   }
@@ -1125,25 +1116,25 @@ function renderUst(){
 
   // ── Карточки 2x2 ──────────────────────────────────────────────────────────
   if(regelCards){
-    regelCards.style.cssText = 'display:grid!important;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px';
+    regelCards.style.cssText = 'display:grid!important;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px';
     regelCards.innerHTML = `
     <div class="sc b" style="cursor:default">
-      <div class="sc-lbl">Доходы нетто</div>
+      <div class="sc-lbl">Netto-Einnahmen</div>
       <div class="sc-val">${fmt(totNetto)}</div>
       <div class="sc-sub">ohne USt ${yr}</div>
     </div>
     <div class="sc r" style="cursor:default">
       <div class="sc-lbl">USt-Ausgang</div>
-      <div class="sc-val" style="color:var(--red)">${fmt(totUst)}</div>
+      <div class="sc-val">${fmt(totUst)}</div>
       <div class="sc-sub">schulde ich dem FA</div>
     </div>
     <div class="sc g" style="cursor:default">
-      <div class="sc-lbl">Входящий НДС</div>
-      <div class="sc-val" style="color:var(--green)">${fmt(totVorst)}</div>
+      <div class="sc-lbl">Vorsteuer</div>
+      <div class="sc-val">${fmt(totVorst)}</div>
       <div class="sc-sub">erhalte ich vom FA</div>
     </div>
     <div class="sc ${totZahl>0?'r':'g'}" style="cursor:default">
-      <div class="sc-lbl">Налоговое бремя</div>
+      <div class="sc-lbl">Zahllast</div>
       <div class="sc-val" style="color:${totZahl>0?'var(--red)':'var(--green)'}">
         ${totZahl>0?'+':''}${fmt(totZahl)}
       </div>
@@ -1219,7 +1210,7 @@ function renderUst(){
 
   // ── Таблица операций с пагинацией (20 строк) ─────────────────────────────
   const empty2  = document.getElementById('ust-empty');
-  const PER_PAGE = 20;
+  const PER_PAGE = 10;
   const totalPages = Math.max(1, Math.ceil(allMwst.length / PER_PAGE));
   if(ustPage > totalPages) ustPage = totalPages;
   if(ustPage < 1) ustPage = 1;
