@@ -383,59 +383,59 @@
   <!-- LINKE SPALTE: Formular -->
   <div>
 
-  <!-- Beleg scannen (nur bei Ausgabe, vor dem Formular) -->
-  <div id="scan-beleg-box" style="display:none;margin-bottom:16px">
-    <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBelegPreview(this)">
-
-    <!-- Scan-Button -->
-    <div id="scan-btn-area">
-      <button onclick="document.getElementById('scan-file-input').click()"
-        style="width:100%;padding:16px;background:var(--s2);border:2px dashed var(--border);color:var(--text);font-size:14px;font-weight:600;border-radius:var(--r2);cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .2s,background .2s;box-sizing:border-box;justify-content: center;"
-        onmouseover="this.style.borderColor='var(--blue)';this.style.background='rgba(59,130,246,.05)'"
-        onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--s2)'">
-        <i class="fas fa-camera" style="font-size:22px;color:var(--blue);opacity:.8;flex:0 0 auto"></i>
-        <span style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
-          <span>Beleg / Rechnung scannen</span>
-          <span style="font-size:11px;font-weight:400;color:var(--sub)">Foto hochladen oder Kamera öffnen</span>
-        </span>
-      </button>
-    </div>
-
-    <!-- Vorschau -->
-    <div id="scan-preview-box" style="display:none;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--s2);margin-top:10px">
-      <div style="position:relative">
-        <img id="scan-preview-img" style="width:100%;max-height:300px;object-fit:contain;display:block;transition:transform .15s ease;cursor:crosshair" onmousemove="if(window.innerWidth>900){const r=this.getBoundingClientRect();const x=((event.clientX-r.left)/r.width*100).toFixed(1);const y=((event.clientY-r.top)/r.height*100).toFixed(1);this.style.transformOrigin=x+'% '+y+'%';this.style.transform='scale(2)'}" onmouseleave="this.style.transform='';this.style.transformOrigin=''">
-        <button onclick="scanBelegCancel()"
-          style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div style="padding:8px 12px 12px;display:flex;gap:8px">
-        <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:10px;font-size:14px;z-index:1">
-         KI-Analyse starten
-        </button>
-      </div>
-    </div>
-
-    <!-- Status / Animation -->
-    <div id="scan-status" style="display:none;margin-top:12px">
-      <div id="scan-status-inner" style="padding:16px;border-radius:var(--r2);background:var(--s2);border:1px solid var(--border);text-align:center">
-      </div>
-    </div>
-
-    <!-- Hinweis-Box -->
-    <div id="scan-hinweis" style="margin-top:10px;padding:10px 12px;border-radius:var(--r);background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);font-size:12px;color:var(--sub);line-height:1.6">
-      <div style="font-weight:600;color:var(--blue);margin-bottom:4px"> KI-Belegerfassung</div>
-      Datum, Betrag, MwSt, Zahlungsart und Artikel werden automatisch erkannt und in die Felder eingetragen.
-    </div>
-  </div>
-
   <!-- USt-Mode Banner in Neuer Eintrag -->
   <div class="form-panel">
 
     <div class="typ-toggle">
       <button class="tt ae" id="btn-e" onclick="setTyp('Einnahme')">▲ Einnahme</button>
       <button class="tt" id="btn-a" onclick="setTyp('Ausgabe')">▼ Ausgabe</button>
+    </div>
+
+    <!-- Beleg scannen (nur bei Ausgabe, direkt unter Umschalter) -->
+    <div id="scan-beleg-box" style="display:none;margin-top:12px;margin-bottom:4px">
+      <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBelegPreview(this)">
+
+      <!-- Scan-Button -->
+      <div id="scan-btn-area">
+        <button onclick="document.getElementById('scan-file-input').click()"
+          style="width:100%;padding:12px 16px;background:rgba(59,130,246,.06);border:2px dashed rgba(59,130,246,.35);color:var(--text);font-size:13px;font-weight:600;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .2s,background .2s;box-sizing:border-box"
+          onmouseover="this.style.borderColor='var(--blue)';this.style.background='rgba(59,130,246,.1)'"
+          onmouseout="this.style.borderColor='rgba(59,130,246,.35)';this.style.background='rgba(59,130,246,.06)'">
+          <i class="fas fa-camera" style="font-size:20px;color:var(--blue);flex:0 0 auto"></i>
+          <span style="display:flex;flex-direction:column;align-items:flex-start;gap:1px">
+            <span>Beleg / Rechnung scannen</span>
+            <span style="font-size:11px;font-weight:400;color:var(--sub)">Foto hochladen oder Kamera öffnen</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Vorschau -->
+      <div id="scan-preview-box" style="display:none;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--s2);margin-top:10px">
+        <div style="position:relative">
+          <img id="scan-preview-img" style="width:100%;max-height:300px;object-fit:contain;display:block;transition:transform .15s ease;cursor:crosshair" onmousemove="if(window.innerWidth>900){const r=this.getBoundingClientRect();const x=((event.clientX-r.left)/r.width*100).toFixed(1);const y=((event.clientY-r.top)/r.height*100).toFixed(1);this.style.transformOrigin=x+'% '+y+'%';this.style.transform='scale(2)'}" onmouseleave="this.style.transform='';this.style.transformOrigin=''">
+          <button onclick="scanBelegCancel()"
+            style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div style="padding:8px 12px 12px;display:flex;gap:8px">
+          <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:10px;font-size:14px;z-index:1">
+            KI-Analyse starten
+          </button>
+        </div>
+      </div>
+
+      <!-- Status / Animation -->
+      <div id="scan-status" style="display:none;margin-top:10px">
+        <div id="scan-status-inner" style="padding:14px;border-radius:var(--r);background:var(--s2);border:1px solid var(--border);text-align:center">
+        </div>
+      </div>
+
+      <!-- Hinweis-Box -->
+      <div id="scan-hinweis" style="margin-top:8px;padding:8px 12px;border-radius:var(--r);background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);font-size:11px;color:var(--sub);line-height:1.5">
+        <span style="font-weight:600;color:var(--blue)"> KI-Belegerfassung — </span>
+        Datum, Betrag, MwSt und Zahlungsart werden automatisch erkannt.
+      </div>
     </div>
     <div class="fgrow c2">
       <div class="fg"><label>Datum</label><input type="date" id="nf-dat" max="2099-12-31" min="2000-01-01" onchange="updateMwstFormVisibility()"></div>
@@ -587,7 +587,7 @@
   <div style="display:none"><table><tbody id="rep-tbody"></tbody><tfoot id="rep-tfoot"></tfoot></table></div>
 
   <!-- Итоговый блок -->
-  <div id="rep-total-block"></div>
+  <div id="rep-total-block" style="margin-top:16px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:16px"></div>
 </div>
 </div>
 
