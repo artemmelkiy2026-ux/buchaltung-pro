@@ -1268,6 +1268,11 @@ function renderUst(){
         }
         const isUst=e.typ==='ust', canDel=e.quelle==='Manual';
         const shortDat=e.datum.substring(8,10)+'.'+e.datum.substring(5,7)+'.'+e.datum.substring(2,4);
+        const quelleBadge = e.quelle==='Manual'
+          ? `<span class="ust-src-badge ust-src-manual">Manuell</span>`
+          : e.quelle==='Rechnung'
+          ? `<span class="ust-src-badge ust-src-rechnung" title="Aus Offene Rechnungen — dort löschen">Rechnung</span>`
+          : `<span class="ust-src-badge ust-src-eintrag" title="Aus Einträge — dort löschen">Eintrag</span>`;
         html+=`<div class="ust-row">
           <div class="ust-row-left">
             <div class="ust-row-badge ${isUst?'ust-badge-ust':'ust-badge-vst'}">${isUst?'USt':'Vorst.'}</div>
@@ -1277,6 +1282,7 @@ function renderUst(){
                 <span>${shortDat}</span>
                 <span>${e.rate}%</span>
                 ${e.netto>0?`<span>Netto: ${fmt(e.netto)}</span>`:''}
+                ${quelleBadge}
               </div>
             </div>
           </div>
@@ -1285,7 +1291,10 @@ function renderUst(){
               ${isUst?'+':'−'}${fmt(e.mwstBetrag)}
             </div>
             <div class="ust-row-brutto">${e.brutto>0?fmt(e.brutto):'—'}</div>
-            ${canDel?`<button class="rca-btn rca-red" onclick="delUstEintrag('${e.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`:''}
+            ${canDel
+              ? `<button class="rca-btn rca-red" onclick="delUstEintrag('${e.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`
+              : `<span class="ust-src-lock" title="Aus ${e.quelle} — dort löschen"><i class="fas fa-lock"></i></span>`
+            }
           </div>
         </div>`;
       });

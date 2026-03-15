@@ -2065,3 +2065,16 @@ input, select, textarea {
 }
 .ku-hinweis-title{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px}
 .ku-hinweis-text{font-size:12px;color:var(--sub);font-style:italic;line-height:1.5}
+
+/* UST — бейджи источника записи */
+.ust-src-badge{
+  font-size:10px;font-weight:600;padding:1px 6px;
+  border-radius:4px;white-space:nowrap;
+}
+.ust-src-manual { background:var(--gdim);color:var(--green) }
+.ust-src-rechnung{ background:var(--bdim);color:var(--blue) }
+.ust-src-eintrag { background:var(--s3);color:var(--sub) }
+.ust-src-lock{
+  font-size:11px;color:var(--border2);
+  padding:4px 6px;cursor:help;
+}
