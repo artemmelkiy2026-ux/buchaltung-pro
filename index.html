@@ -696,10 +696,11 @@
   <div class="tbl-wrap">
     <table>
       <thead><tr>
-        <th>Name / Firma</th>
+        <th onclick="renderKunden()" style="cursor:default">Name / Firma</th>
         <th class="mob-hide">E-Mail</th>
         <th class="mob-hide">Telefon</th>
         <th class="mob-hide">Adresse</th>
+        <th class="mob-hide" style="text-align:right">Umsatz</th>
         <th></th>
       </tr></thead>
       <tbody id="kunden-tbody"></tbody>
@@ -722,19 +723,20 @@
   </div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="rech-cards"></div>
   <div class="tbl-wrap">
-    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:6px">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center">
       <button class="ftab active" onclick="setRechFilter('alle',this)">Alle</button>
       <button class="ftab" onclick="setRechFilter('offen',this)"><i class="fas fa-circle" style="color:var(--yellow)"></i> Offen</button>
       <button class="ftab" onclick="setRechFilter('ueberfaellig',this)"><i class="fas fa-circle" style="color:var(--red)"></i> Überfällig</button>
       <button class="ftab" onclick="setRechFilter('bezahlt',this)"><i class="fas fa-circle" style="color:var(--green)"></i> Bezahlt</button>
+      <input id="rech-search" type="text" placeholder="Nr. oder Kunde suchen..." oninput="renderRech()" style="margin-left:auto;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 12px;font-size:12px;outline:none;width:200px">
     </div>
     <table id="rech-table">
       <thead><tr>
-        <th>Nr.</th>
-        <th class="mob-hide">Kunde</th>
-        <th class="mob-hide">Datum</th>
-        <th class="mob-hide">Fällig am</th>
-        <th style="text-align:right">Betrag</th>
+        <th onclick="sortRech('nr')" style="cursor:pointer">Nr. ↕</th>
+        <th class="mob-hide" onclick="sortRech('kunde')" style="cursor:pointer">Kunde ↕</th>
+        <th class="mob-hide" onclick="sortRech('datum')" style="cursor:pointer">Datum ↕</th>
+        <th class="mob-hide" onclick="sortRech('faellig')" style="cursor:pointer">Fällig am ↕</th>
+        <th style="text-align:right;cursor:pointer" onclick="sortRech('betrag')">Betrag ↕</th>
         <th style="text-align:center">Status</th>
         <th></th>
       </tr></thead><tbody id="rech-tbody"></tbody></table>

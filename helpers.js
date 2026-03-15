@@ -146,13 +146,18 @@ let editKundeId = null;
 function renderKunden(){
   const kunden = data.kunden||[];
   const q = (document.getElementById('kunden-search')||{value:''}).value.toLowerCase();
-  const filtered = q ? kunden.filter(k=>(k.name||'').toLowerCase().includes(q)||(k.email||'').toLowerCase().includes(q)) : kunden;
+  const filtered = q ? kunden.filter(k=>(k.name||'').toLowerCase().includes(q)||(k.email||'').toLowerCase().includes(q)||(k.ort||'').toLowerCase().includes(q)) : kunden;
 
-  // Cards
+  // Считаем статистику
+  const totalUmsatz = kunden.reduce((s,k)=>s+getKundeUmsatz(k.id),0);
+  const mitRechnung = kunden.filter(k=>(data.rechnungen||[]).some(r=>r.kundeId===k.id)).length;
+  const offeneRech  = (data.rechnungen||[]).filter(r=>r.status==='offen'||r.status==='ueberfaellig').length;
 
   document.getElementById('kunden-cards').innerHTML=`
-    <div class="sc b" style="cursor:default"><div class="sc-lbl">Kunden gesamt</div><div class="sc-val">${kunden.length}</div><div class="sc-sub">in der Datenbank</div></div>
-`;
+    <div class="sc b" style="cursor:default"><div class="sc-lbl">Kunden gesamt</div><div class="sc-val">${kunden.length}</div><div class="sc-sub">${mitRechnung} mit Rechnungen</div></div>
+    <div class="sc g" style="cursor:default"><div class="sc-lbl">Gesamtumsatz</div><div class="sc-val">${fmt(totalUmsatz)}</div><div class="sc-sub">alle Rechnungen</div></div>
+    <div class="sc y" style="cursor:default"><div class="sc-lbl">Offene Rechnungen</div><div class="sc-val">${offeneRech}</div><div class="sc-sub">offen + überfällig</div></div>
+  `;
 
   const tb = document.getElementById('kunden-tbody');
   const em = document.getElementById('kunden-empty');
@@ -160,17 +165,23 @@ function renderKunden(){
   em.style.display='none';
   const mob = isMob();
   tb.innerHTML = filtered.map(k=>{
-    return `<tr>
+    const umsatz = getKundeUmsatz(k.id);
+    const rechCount = (data.rechnungen||[]).filter(r=>r.kundeId===k.id).length;
+    return `<tr style="cursor:pointer" onclick="showKundeRechnungen('${k.id}')" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
       <td>
         <div style="font-weight:600;font-size:13px">${k.name||'—'}</div>
         ${k.ansprechpartner?`<div style="font-size:11px;color:var(--sub)">${k.ansprechpartner}</div>`:''}
       </td>
-      <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.email||'—'}</td>
-      <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.tel||'—'}</td>
+      <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.email ? `<a href="mailto:${k.email}" onclick="event.stopPropagation()" style="color:var(--blue);text-decoration:none">${k.email}</a>` : '—'}</td>
+      <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.tel || '—'}</td>
       <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.plz?k.plz+' ':''} ${k.ort||''}</td>
-      <td style="white-space:nowrap">
+      <td class="mob-hide" style="font-family:var(--mono);font-size:12px;font-weight:600;color:${umsatz>0?'var(--green)':'var(--sub)'}">
+        ${umsatz>0?fmt(umsatz):'—'}
+        ${rechCount>0?`<div style="font-size:10px;font-weight:400;color:var(--sub)">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:''}
+      </td>
+      <td style="white-space:nowrap" onclick="event.stopPropagation()">
         <button class="del-btn edit-btn" style="opacity:1" onclick="editKunde('${k.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-        <button class="del-btn edit-btn" style="opacity:1;color:var(--blue)" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen anzeigen"><i class="fas fa-file-invoice"></i></button>
+        <button class="del-btn edit-btn" style="opacity:1;color:var(--blue)" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen"><i class="fas fa-file-invoice"></i></button>
         <button class="del-btn" style="opacity:1" onclick="delKunde('${k.id}')" title="Löschen">✕</button>
       </td>
     </tr>`;

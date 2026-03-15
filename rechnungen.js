@@ -1,53 +1,107 @@
 // ── RECHNUNGEN ───────────────────────────────────────────────────────────
-let rechFilter='alle', editRechId=null;
+let rechFilter='alle', editRechId=null, rechSort='datum', rechSortDir=-1;
 function renderRech(){
   const rech=data.rechnungen||[];
-  // Auto-update überfällig
   const today=new Date().toISOString().split('T')[0];
   rech.forEach(r=>{if(r.status==='offen'&&r.faellig&&r.faellig<today)r.status='ueberfaellig';});
 
-  const filtered=rechFilter==='alle'?rech:rech.filter(r=>r.status===rechFilter);
-  const offen=rech.filter(r=>r.status==='offen');
-  const uebf=rech.filter(r=>r.status==='ueberfaellig');
-  const bezahlt=rech.filter(r=>r.status==='bezahlt');
+  const q = (document.getElementById('rech-search')||{value:''}).value.toLowerCase();
+  let filtered = rechFilter==='alle' ? [...rech] : rech.filter(r=>r.status===rechFilter);
+  if(q) filtered = filtered.filter(r=>(r.nr||'').toLowerCase().includes(q)||(r.kunde||'').toLowerCase().includes(q));
+
+  const offen   = rech.filter(r=>r.status==='offen');
+  const uebf    = rech.filter(r=>r.status==='ueberfaellig');
+  const bezahlt = rech.filter(r=>r.status==='bezahlt');
 
   document.getElementById('rech-cards').innerHTML=`
-    <div class="sc y" style="cursor:default"><div class="sc-lbl">Offen</div><div class="sc-val">${fmt(offen.reduce((s,r)=>s+r.betrag,0))}</div><div class="sc-sub">${offen.length} Rechnungen</div></div>
-    <div class="sc r" style="cursor:default"><div class="sc-lbl">Überfällig</div><div class="sc-val">${fmt(uebf.reduce((s,r)=>s+r.betrag,0))}</div><div class="sc-sub">${uebf.length} Rechnungen</div></div>
-    <div class="sc g" style="cursor:default"><div class="sc-lbl">Bezahlt</div><div class="sc-val">${fmt(bezahlt.reduce((s,r)=>s+r.betrag,0))}</div><div class="sc-sub">${bezahlt.length} Rechnungen</div></div>`;
+    <div class="sc y" style="cursor:pointer" onclick="setRechFilter('offen',document.querySelector('.ftab[onclick*=offen]'))">
+      <div class="sc-lbl">Offen</div>
+      <div class="sc-val">${fmt(offen.reduce((s,r)=>s+r.betrag,0))}</div>
+      <div class="sc-sub">${offen.length} Rechnung${offen.length!==1?'en':''}</div>
+    </div>
+    <div class="sc r" style="cursor:pointer" onclick="setRechFilter('ueberfaellig',document.querySelector('.ftab[onclick*=ueberfaellig]'))">
+      <div class="sc-lbl">Überfällig</div>
+      <div class="sc-val">${fmt(uebf.reduce((s,r)=>s+r.betrag,0))}</div>
+      <div class="sc-sub">${uebf.length} Rechnung${uebf.length!==1?'en':''}</div>
+    </div>
+    <div class="sc g" style="cursor:pointer" onclick="setRechFilter('bezahlt',document.querySelector('.ftab[onclick*=bezahlt]'))">
+      <div class="sc-lbl">Bezahlt</div>
+      <div class="sc-val">${fmt(bezahlt.reduce((s,r)=>s+r.betrag,0))}</div>
+      <div class="sc-sub">${bezahlt.length} Rechnung${bezahlt.length!==1?'en':''}</div>
+    </div>`;
 
-  const tb=document.getElementById('rech-tbody'),em=document.getElementById('rech-empty');
+  const tb=document.getElementById('rech-tbody'), em=document.getElementById('rech-empty');
   if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  const smap={offen:'rs-offen <i class="fas fa-circle" style="color:var(--yellow)"></i> Offen',ueberfaellig:'rs-ueberfaellig <i class="fas fa-circle" style="color:var(--red)"></i> Überfällig',bezahlt:'rs-bezahlt <i class="fas fa-circle" style="color:var(--green)"></i> Bezahlt'};
-  const smapMob={offen:'<i class="fas fa-circle" style="color:var(--yellow)"></i>',ueberfaellig:'<i class="fas fa-circle" style="color:var(--red)"></i>',bezahlt:'<i class="fas fa-circle" style="color:var(--green)"></i>'};
+
+  // Сортировка
+  filtered.sort((a,b)=>{
+    let av = rechSort==='betrag' ? (a.betrag||0) : (a[rechSort]||'');
+    let bv = rechSort==='betrag' ? (b.betrag||0) : (b[rechSort]||'');
+    return av<bv ? rechSortDir : av>bv ? -rechSortDir : 0;
+  });
+
+  const smap={
+    offen:'rs-offen <i class="fas fa-clock" style="color:var(--yellow)"></i> Offen',
+    ueberfaellig:'rs-ueberfaellig <i class="fas fa-exclamation-circle" style="color:var(--red)"></i> Überfällig',
+    bezahlt:'rs-bezahlt <i class="fas fa-check-circle" style="color:var(--green)"></i> Bezahlt'
+  };
+  const smapMob={
+    offen:'<i class="fas fa-clock" style="color:var(--yellow)"></i>',
+    ueberfaellig:'<i class="fas fa-exclamation-circle" style="color:var(--red)"></i>',
+    bezahlt:'<i class="fas fa-check-circle" style="color:var(--green)"></i>'
+  };
   const mob=isMob();
-  tb.innerHTML=filtered.sort((a,b)=>b.datum.localeCompare(a.datum)).map(r=>`
-    <tr onclick="editRech('${r.id}')" style="cursor:pointer">
+
+  const rows = filtered.map(r=>{
+    let overdueDays = '';
+    if(r.status==='ueberfaellig'&&r.faellig){
+      const diff = Math.floor((new Date(today)-new Date(r.faellig))/(1000*86400));
+      if(diff>0) overdueDays = `<span style="font-size:10px;color:var(--red);font-weight:700;margin-left:4px">+${diff}T</span>`;
+    }
+    return `<tr onclick="editRech('${r.id}')" style="cursor:pointer" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
       <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-        <div style="font-family:var(--mono);font-size:11px;font-weight:600">${r.nr}</div>
+        <div style="font-family:var(--mono);font-size:12px;font-weight:700">${r.nr}</div>
         ${mob?`<div style="font-size:11px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px">${r.kunde||r.beschreibung||'—'}</div>`:''}
       </td>
-      <td class="mob-hide" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${r.kunde||r.beschreibung||''}">${r.kunde||r.beschreibung||'—'}</td>
-      <td class="mob-hide" style="font-family:var(--mono);font-size:11px;color:var(--sub)">${fd(r.datum)}</td>
-      <td class="mob-hide" style="font-family:var(--mono);font-size:11px;color:${r.status==='ueberfaellig'?'var(--red)':'var(--sub)'}">${r.faellig?fd(r.faellig):'—'}</td>
-      <td style="text-align:right;font-family:var(--mono);font-weight:600;font-size:12px;white-space:nowrap">${fmt(r.betrag)}</td>
+      <td class="mob-hide" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:500" title="${r.kunde||r.beschreibung||''}">${r.kunde||r.beschreibung||'—'}</td>
+      <td class="mob-hide" style="font-family:var(--mono);font-size:12px;color:var(--sub)">${fd(r.datum)}</td>
+      <td class="mob-hide" style="font-family:var(--mono);font-size:12px;color:${r.status==='ueberfaellig'?'var(--red)':'var(--sub)'}">
+        ${r.faellig?fd(r.faellig):'—'}${overdueDays}
+      </td>
+      <td style="text-align:right;font-family:var(--mono);font-weight:700;font-size:13px;white-space:nowrap">${fmt(r.betrag)}</td>
       <td style="text-align:center">
         ${mob
-          ? `<span style="font-size:15px">${smapMob[r.status]||'<i class="fas fa-question-circle" style="color:var(--sub)"></i>'}</span>`
+          ? `<span style="font-size:16px">${smapMob[r.status]||'<i class="fas fa-question-circle" style="color:var(--sub)"></i>'}</span>`
           : `<span class="rech-status ${smap[r.status].split(' ')[0]}">${smap[r.status].split(' ').slice(1).join(' ')}</span>`}
       </td>
-      <td style="white-space:nowrap;text-align:right">
-        ${mob?'':`<button class="del-btn edit-btn" style="opacity:1" onclick="event.stopPropagation();editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>`}
-        ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:var(--blue)" onclick="event.stopPropagation();druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>`}
-        ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:#1e3a5f" onclick="event.stopPropagation();downloadZUGFeRDId('${r.id}')" title="ZUGFeRD (PDF+XML)"><i class="fas fa-file-pdf"></i></button>`}
-        ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:#0d6b3b" onclick="event.stopPropagation();downloadXRechnungId('${r.id}')" title="XRechnung XML"><i class="fas fa-file-code"></i></button>`}
-        ${r.status!=='bezahlt'?`<button class="del-btn" style="opacity:1;color:var(--green)" onclick="event.stopPropagation();rechBezahlt('${r.id}')" title="✓">✓</button>`:''}
-        <button class="del-btn" style="opacity:1" onclick="event.stopPropagation();delRech('${r.id}')" title="✕">✕</button>
+      <td style="white-space:nowrap;text-align:right" onclick="event.stopPropagation()">
+        ${mob?'':`<button class="del-btn edit-btn" style="opacity:1" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>`}
+        ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:var(--blue)" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>`}
+        ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:#1e3a5f" onclick="downloadZUGFeRDId('${r.id}')" title="ZUGFeRD"><i class="fas fa-file-pdf"></i></button>`}
+        ${mob?'':`<button class="del-btn edit-btn" style="opacity:1;color:#0d6b3b" onclick="downloadXRechnungId('${r.id}')" title="XRechnung"><i class="fas fa-file-code"></i></button>`}
+        ${r.status!=='bezahlt'?`<button class="del-btn" style="opacity:1;color:var(--green)" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
+        <button class="del-btn" style="opacity:1" onclick="delRech('${r.id}')" title="Löschen">✕</button>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+
+  // Итоговая строка
+  const filtTotal = filtered.reduce((s,r)=>s+r.betrag,0);
+  const totalRow = `<tr style="background:var(--s2);border-top:2px solid var(--border2)">
+    <td colspan="4" style="padding:10px 14px;font-size:12px;color:var(--sub)">
+      <strong>${filtered.length}</strong> Rechnung${filtered.length!==1?'en':''}
+      ${rechFilter!=='alle'?` · <span style="text-transform:capitalize">${rechFilter}</span>`:''}
+    </td>
+    <td style="text-align:right;font-family:var(--mono);font-weight:700;font-size:14px;padding:10px 14px;color:var(--text)">${fmt(filtTotal)}</td>
+    <td colspan="2"></td>
+  </tr>`;
+
+  tb.innerHTML = rows + totalRow;
 }
-function setRechFilter(f,btn){rechFilter=f;document.querySelectorAll('#p-rechnungen .ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderRech();}
+function setRechFilter(f,btn){rechFilter=f;document.querySelectorAll('#p-rechnungen .ftab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderRech();}
+function sortRech(col){if(rechSort===col)rechSortDir*=-1;else{rechSort=col;rechSortDir=-1;}renderRech();}
+
 function openRechModal(){
   document.getElementById('rn-nr').value=autoRechNr();
   const _rnDatEl=document.getElementById('rn-dat');
