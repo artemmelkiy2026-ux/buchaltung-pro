@@ -29,8 +29,8 @@ function toast(msg,type='ok'){
   // через 2 сек начинаем плавное исчезновение
   t._toastTimer=setTimeout(()=>{
     t.classList.remove('show');
-    t._toastFadeTimer=setTimeout(()=>{ t.className='toast'; },400);
-  },2000);
+    t._toastFadeTimer=setTimeout(()=>{ t.className='toast'; },300);
+  },5000);
 }
 
 // ── МОБИЛЬНЫЙ DETAIL POPUP ─────────────────────────────────────────────────

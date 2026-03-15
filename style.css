@@ -351,9 +351,36 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
 .zk-prog-fill{height:100%;border-radius:2px;transition:width .4s}
 
 /* ── TOAST ── */
-.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.92);background:var(--s2);border:1px solid var(--border2);border-radius:14px;padding:18px 28px;font-size:15px;font-weight:500;color:var(--text);z-index:99999;opacity:0;transition:opacity .35s ease,transform .35s ease;pointer-events:none;max-width:340px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.25)}
-.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.toast.ok{border-top:3px solid var(--green)}.toast.err{border-top:3px solid var(--red)}
+/* ── Toast / Snackbar (Google Material style) ── */
+.toast{
+  position:fixed;
+  bottom:32px;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#323232;
+  color:#fff;
+  border-radius:6px;
+  padding:13px 20px;
+  font-size:14px;
+  font-weight:400;
+  font-family:'Google Sans','Roboto',system-ui,sans-serif;
+  letter-spacing:.01em;
+  line-height:1.5;
+  z-index:99999;
+  opacity:0;
+  transition:opacity .25s cubic-bezier(.4,0,.2,1), transform .25s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+  max-width:480px;
+  min-width:220px;
+  text-align:left;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,.28),0 1px 3px rgba(0,0,0,.18);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok::before{content:'✓';display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#34a853;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+.toast.err::before{content:'!';display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#ea4335;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
 
 /* ── MODAL ── */
 .modal-bg{position:fixed;inset:0;background:#00000088;z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -672,7 +699,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   /* Предотвращаем зум iOS при фокусе на input */
   #rech-modal input, #rech-modal select, #rech-modal textarea { font-size: 16px !important; }
 
-  /* ── Toast: modal по центру (все устройства) ── */
+  /* ── Toast: на мобильном чуть выше таббара ── */
+  .toast { bottom: 76px; max-width: 90vw; min-width: 0; }
 
   /* ── Disclaimer ── */
   #disclaimer-box { padding: 20px 16px; gap: 14px; }
