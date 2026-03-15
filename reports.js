@@ -191,48 +191,102 @@ function renderKat(){
   const total=sorted.reduce((s,[,v])=>s+v,0);
   const isEin=katTyp==='Einnahme';
 
-  // ── Donut Canvas (адаптивный размер) ─────────────────────────────────────
-  const canvas=document.getElementById('kat-canvas');
-  const SIZE=220;
-  canvas.width=SIZE; canvas.height=SIZE;
-  canvas.style.width=SIZE+'px'; canvas.style.height=SIZE+'px';
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,SIZE,SIZE);
-  const cx=SIZE/2,cy=SIZE/2,ro=SIZE/2-8,ri=SIZE/2-44;
-  let angle=-Math.PI/2;
-  const bg = getComputedStyle(document.documentElement).getPropertyValue('--s1').trim()||'#fff';
+  // ── SVG Donut с анимацией ────────────────────────────────────────────────
+  const donutWrap = document.getElementById('kat-donut-wrap');
+  if(donutWrap){
+    const R=90, r=58, CX=110, CY=110, SIZE=220;
+    const circumference=2*Math.PI*R;
+    const GAP=3; // gap between segments in px
 
-  if(sorted.length){
-    // Рисуем сегменты с небольшим gap
-    sorted.forEach(([,val],i)=>{
-      const slice=(val/total)*2*Math.PI;
-      ctx.beginPath();
-      ctx.moveTo(cx,cy);
-      ctx.arc(cx,cy,ro,angle+0.02,angle+slice-0.02);
-      ctx.closePath();
-      ctx.fillStyle=PIE_COLORS[i%PIE_COLORS.length];
-      ctx.fill();
-      angle+=slice;
-    });
-    // Центральное отверстие
-    ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);
-    ctx.fillStyle=bg||'#fff';ctx.fill();
-    // Текст по центру
-    ctx.fillStyle='var(--text)';
-    ctx.font='bold 13px Inter, sans-serif';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='#64748b';
-    ctx.font='11px Inter';
-    ctx.fillText(isEin?'Einnahmen':'Ausgaben',cx,cy-10);
-    ctx.fillStyle='#1a2332';
-    ctx.font='bold 14px Inter';
-    ctx.fillText(fmt(total),cx,cy+8);
-  } else {
-    ctx.beginPath();ctx.arc(cx,cy,ro,0,2*Math.PI);ctx.fillStyle='#f1f5f9';ctx.fill();
-    ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);ctx.fillStyle=bg||'#fff';ctx.fill();
-    ctx.fillStyle='#94a3b8';ctx.font='12px Inter';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('Keine Daten',cx,cy);
+    if(!sorted.length){
+      donutWrap.innerHTML=`<svg width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">
+        <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--border)" stroke-width="${R-r}"/>
+        <text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="middle"
+          font-size="12" fill="var(--sub)" font-family="Inter,sans-serif">Keine Daten</text>
+      </svg>`;
+    } else {
+      // Вычисляем дуги
+      let offset=0;
+      const segments=sorted.map(([k,val],i)=>{
+        const pct=val/total;
+        const len=pct*circumference - GAP;
+        const seg={k,val,i,pct,len,offset};
+        offset+=pct*circumference;
+        return seg;
+      });
+
+      const segPaths=segments.map(s=>{
+        const delay=s.i*40;
+        const color=PIE_COLORS[s.i%PIE_COLORS.length];
+        return `<circle
+          cx="${CX}" cy="${CY}" r="${R}"
+          fill="none"
+          stroke="${color}"
+          stroke-width="${R-r}"
+          stroke-dasharray="${s.len} ${circumference}"
+          stroke-dashoffset="${-(s.offset)}"
+          transform="rotate(-90 ${CX} ${CY})"
+          class="kat-seg"
+          data-idx="${s.i}"
+          style="animation-delay:${delay}ms"
+          onmouseover="katSegHover(this,'${s.k}','${fmt(s.val)}','${Math.round(s.pct*100)}%')"
+          onmouseout="katSegOut()"
+        />`;
+      }).join('');
+
+      // Уникальный ID для gradient
+      const gid='kg'+Date.now();
+
+      donutWrap.innerHTML=`
+        <svg width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}" class="kat-svg">
+          <defs>
+            <filter id="${gid}-shadow">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+            </filter>
+          </defs>
+          <!-- Фоновое кольцо -->
+          <circle cx="${CX}" cy="${CY}" r="${R}" fill="none"
+            stroke="var(--border)" stroke-width="${R-r}"/>
+          <!-- Сегменты -->
+          ${segPaths}
+          <!-- Центральный круг -->
+          <circle cx="${CX}" cy="${CY}" r="${r-4}" fill="var(--s1)"/>
+          <!-- Центральный текст -->
+          <text x="${CX}" y="${CY-10}" text-anchor="middle"
+            font-size="10" fill="var(--sub)" font-family="Inter,sans-serif"
+            font-weight="600" text-transform="uppercase" letter-spacing="0.5">
+            ${isEin?'EINNAHMEN':'AUSGABEN'}
+          </text>
+          <text id="kat-center-val" x="${CX}" y="${CY+10}" text-anchor="middle"
+            font-size="16" fill="var(--text)" font-family="JetBrains Mono,monospace"
+            font-weight="700">
+            ${fmt(total)}
+          </text>
+          <text id="kat-center-sub" x="${CX}" y="${CY+26}" text-anchor="middle"
+            font-size="10" fill="var(--sub)" font-family="Inter,sans-serif">
+            ${sorted.length} Kategorien
+          </text>
+        </svg>`;
+    }
   }
+
+  // Хелпер: hover на сегмент
+  window.katSegHover=function(el,name,val,pct){
+    const cv=document.getElementById('kat-center-val');
+    const cs=document.getElementById('kat-center-sub');
+    if(cv) cv.textContent=val;
+    if(cs) cs.textContent=name+' · '+pct;
+    document.querySelectorAll('.kat-seg').forEach(s=>{
+      s.style.opacity=s===el?'1':'0.35';
+    });
+  };
+  window.katSegOut=function(){
+    const cv=document.getElementById('kat-center-val');
+    const cs=document.getElementById('kat-center-sub');
+    if(cv) cv.textContent=fmt(total);
+    if(cs) cs.textContent=sorted.length+' Kategorien';
+    document.querySelectorAll('.kat-seg').forEach(s=>s.style.opacity='1');
+  };
 
   // ── Summary Stats ─────────────────────────────────────────────────────────
   const katStats = document.getElementById('kat-stats');

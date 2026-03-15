@@ -631,7 +631,7 @@
   <div id="prog-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px"></div>
 
   <!-- Vorjahresvergleich — на всю ширину -->
-  <div>
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:20px">
     <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><i class="fas fa-calendar-alt"></i> Vorjahresvergleich</div>
     <div id="prog-vergleich"></div>
   </div>
@@ -667,9 +667,7 @@
   <div class="kat-layout">
     <!-- Левая колонка — Donut -->
     <div class="kat-donut-col">
-      <div class="kat-donut-wrap">
-        <canvas id="kat-canvas" width="220" height="220"></canvas>
-      </div>
+      <div class="kat-donut-wrap" id="kat-donut-wrap"></div>
     </div>
     <!-- Правая колонка — Плитки Канва -->
     <div id="kat-grid" class="kat-grid"></div>
