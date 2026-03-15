@@ -656,22 +656,12 @@
       </div>
     </div>
   </div>
-  <div class="kat-2col" style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start">
+  <div class="kat-2col" style="display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start">
     <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:18px">
       <canvas id="kat-canvas" width="264" height="264" style="display:block;margin:0 auto 16px"></canvas>
       <div id="kat-legend"></div>
     </div>
-    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden">
-      <table style="width:100%;border-collapse:collapse">
-        <thead><tr>
-          <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:var(--s2);border-bottom:1px solid var(--border)">Kategorie</th>
-          <th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:var(--s2);border-bottom:1px solid var(--border)">Betrag</th>
-          <th class="mob-hide" style="padding:10px 14px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:var(--s2);border-bottom:1px solid var(--border)">Anteil</th>
-          <th style="padding:10px 14px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);background:var(--s2);border-bottom:1px solid var(--border)">Balken</th>
-        </tr></thead>
-        <tbody id="kat-tbody"></tbody>
-      </table>
-    </div>
+    <div id="kat-list" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
 </div>
 </div>
@@ -746,19 +736,8 @@
   <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px" id="wied-hint" style="display:none">
     <i class="fas fa-lightbulb"></i> Beim Programmstart werden fällige Zahlungen automatisch erkannt und können mit einem Klick gebucht werden.
   </div>
-  <div class="tbl-wrap">
-    <table><thead><tr>
-      <th>Bezeichnung</th>
-      <th class="mob-hide">Typ</th>
-      <th class="mob-hide">Kategorie</th>
-      <th>Betrag</th>
-      <th class="mob-hide">Intervall</th>
-      <th>Buchung</th>
-      <th class="mob-hide">Zahlungsart</th>
-      <th></th>
-    </tr></thead><tbody id="wied-tbody"></tbody></table>
-    <div id="wied-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-sync-alt"></i></div><p>Keine Vorlagen — erstelle wiederkehrende Zahlungen</p></div>
-  </div>
+  <div id="wied-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div id="wied-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-sync-alt"></i></div><p>Keine Vorlagen — erstelle wiederkehrende Zahlungen</p></div>
 </div>
 </div>
 

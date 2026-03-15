@@ -2,31 +2,56 @@
 let wiedTyp='Ausgabe';
 function renderWied(){
   const wied=data.wiederkehrend||[];
-  const tb=document.getElementById('wied-tbody'),em=document.getElementById('wied-empty');
-  if(!wied.length){tb.innerHTML='';em.style.display='block';return;}
+  const container=document.getElementById('wied-list');
+  const em=document.getElementById('wied-empty');
+  if(!wied.length){if(container)container.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
   const today=new Date().toISOString().split('T')[0];
   const faelligCount=wied.filter(w=>w.naechste<=today).length;
   const hint=document.getElementById('wied-hint');
-  if(faelligCount>0){hint.style.display='';hint.innerHTML=`⚡ <strong>${faelligCount} ${'fällige Zahlung'}${faelligCount>1?'en':''}`;}
+  if(faelligCount>0){hint.style.display='';hint.innerHTML=`⚡ <strong>${faelligCount} fällige Zahlung${faelligCount>1?'en':''}</strong> — jetzt buchen!`;}
   else hint.style.display='none';
 
-  tb.innerHTML=wied.map(w=>{
+  const intervallLabel={monatlich:'Monatlich',quartalsweise:'Quartalsweise',jaehrlich:'Jährlich'};
+  const cards=wied.map(w=>{
     const isFaellig=w.naechste<=today;
-    return`<tr style="${isFaellig?'background:var(--ydim)':''}">
-      <td style="font-weight:500">${w.bezeichnung}${isFaellig?` <span style="color:var(--yellow);font-size:10px">● fällig</span>`:''}</td>
-      <td class="mob-hide"><span class="badge ${w.typ==='Einnahme'?'b-ein':'b-aus'}">${w.typ==='Einnahme'?'▲':'▼'} ${w.typ}</span></td>
-      <td class="mob-hide" style="color:var(--sub);font-size:12px">${w.kategorie}</td>
-      <td style="font-family:var(--mono);font-weight:600;color:${w.typ==='Einnahme'?'var(--green)':'var(--red)'}">${fmt(w.betrag)}</td>
-      <td class="mob-hide" style="color:var(--sub);font-size:12px">${{monatlich:'Monatlich',quartalsweise:'Quartalsweise',jaehrlich:'Jährlich'}[w.intervall]}</td>
-      <td style="font-family:var(--mono);font-size:11px;color:${isFaellig?'var(--yellow)':'var(--sub)'}">${fdm(w.naechste)}</td>
-      <td class="mob-hide"><span class="badge ${ZBADGE[w.zahlungsart]||''}">${w.zahlungsart}</span></td>
-      <td style="white-space:nowrap">
-        <button class="del-btn" style="opacity:1;color:var(--green)" onclick="wBuchen('${w.id}')">▶</button>
-        <button class="del-btn" style="opacity:1" onclick="delWied('${w.id}')">✕</button>
-      </td>
-    </tr>`;
+    const isEin=w.typ==='Einnahme';
+    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}">
+      <div class="wied-card-avatar" style="background:${isEin?'var(--gdim)':'var(--rdim)'};color:${isEin?'var(--green)':'var(--red)'}">
+        <i class="fas fa-${isEin?'arrow-up':'arrow-down'}"></i>
+      </div>
+      <div class="wied-card-body">
+        <div class="wied-card-name">${w.bezeichnung}${isFaellig?` <span class="wied-faellig-badge">● Fällig</span>`:''}</div>
+        <div class="wied-card-meta">
+          <span><i class="fas fa-tag" style="font-size:10px;margin-right:2px"></i>${w.kategorie}</span>
+          <span><i class="fas fa-sync-alt" style="font-size:10px;margin-right:2px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
+          <span><i class="fas fa-credit-card" style="font-size:10px;margin-right:2px"></i>${w.zahlungsart}</span>
+        </div>
+        <div class="wied-card-next" style="color:${isFaellig?'var(--yellow)':'var(--sub)'}">
+          <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
+        </div>
+      </div>
+      <div class="wied-card-right">
+        <div class="wied-card-betrag" style="color:${isEin?'var(--green)':'var(--red)'}">
+          ${isEin?'+':'−'}${fmt(w.betrag)}
+        </div>
+        <div class="wied-card-actions">
+          <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
+          <button class="rca-btn" onclick="delWied('${w.id}')" title="Vorlage löschen"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    </div>`;
   }).join('');
+
+  // Сводка
+  const totalEin=wied.filter(w=>w.typ==='Einnahme').reduce((s,w)=>s+w.betrag,0);
+  const totalAus=wied.filter(w=>w.typ==='Ausgabe').reduce((s,w)=>s+w.betrag,0);
+  const summary=`<div class="wied-summary">
+    <span>${wied.length} Vorlage${wied.length!==1?'n':''}</span>
+    <span><span style="color:var(--green)">+${fmt(totalEin)}</span> / <span style="color:var(--red)">−${fmt(totalAus)}</span> pro Intervall</span>
+  </div>`;
+
+  if(container) container.innerHTML=cards+summary;
 }
 function setWiedTyp(t){
   wiedTyp=t;

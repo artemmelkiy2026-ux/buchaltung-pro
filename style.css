@@ -207,7 +207,7 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 /* ── STATS ── */
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
 .sc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;position:relative;overflow:hidden;transition:all .2s;cursor:default}
-.sc:hover{border-color:var(--border2);transform:translateY(-1px)}
+.sc:hover{border-color:var(--border2)}
 
 
 .sc-lbl{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -303,7 +303,7 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
 .rep-year-row h2{font-size:18px;font-weight:600}
 .month-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
 .mc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:all .2s;cursor:pointer}
-.mc:hover{border-color:var(--blue);transform:translateY(-1px)}
+.mc:hover{border-color:var(--blue)}
 .mc.current{border-color:var(--blue)}
 .mc-top{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .mc-name{font-size:13px;font-weight:600}
@@ -335,7 +335,7 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
 /* ── ZAHLUNGSARTEN ── */
 .zk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
 .zk{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:0;overflow:hidden;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.zk:hover{border-color:var(--border2);box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(-2px)}
+.zk:hover{border-color:var(--border2);box-shadow:0 4px 14px rgba(0,0,0,.08)}
 .zk-bar{height:4px;width:100%;flex-shrink:0}
 .zk-body{padding:18px 20px 16px}
 .zk-header{display:flex;align-items:center;gap:16px;margin-bottom:16px}
@@ -415,7 +415,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
   padding:14px 16px; cursor:pointer;
   transition:border-color .15s, box-shadow .15s, transform .1s;
 }
-.rech-card:hover{ border-color:var(--border2); box-shadow:0 4px 16px rgba(0,0,0,.07); transform:translateY(-1px); }
+.rech-card:hover{ border-color:var(--border2); box-shadow:0 4px 16px rgba(0,0,0,.07); }
 .rech-card-left{ display:flex; align-items:center; gap:14px; flex:1; min-width:0; }
 .rech-card-avatar{
   flex-shrink:0; width:44px; height:44px; border-radius:12px;
@@ -484,7 +484,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
   padding:14px 16px; cursor:pointer;
   transition:border-color .15s, box-shadow .15s, transform .1s;
 }
-.kunde-card:hover{ border-color:var(--border2); box-shadow:0 4px 16px rgba(0,0,0,.07); transform:translateY(-1px); }
+.kunde-card:hover{ border-color:var(--border2); box-shadow:0 4px 16px rgba(0,0,0,.07); }
 .kunde-card-avatar{
   flex-shrink:0; width:44px; height:44px; border-radius:12px;
   background:var(--bdim); border:1px solid var(--blue);
@@ -1130,4 +1130,73 @@ input, select, textarea {
   #rech-table th:nth-child(5) { width: 80px;  }  /* Betrag   */
   #rech-table th:nth-child(6) { width: 36px;  }  /* Status = nur Emoji */
   #rech-table th:nth-child(7) { width: 44px;  }  /* Aktionen = nur ✓ ✕ */
+}
+
+/* ── WIEDERKEHREND KARTEN ── */
+.wied-card{
+  display:flex;align-items:center;gap:14px;
+  background:var(--s1);border:1px solid var(--border);border-radius:14px;
+  padding:14px 16px;transition:border-color .15s,box-shadow .15s;
+}
+.wied-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.wied-card--faellig{border-color:rgba(224,140,26,.4);background:var(--ydim)}
+.wied-card-avatar{
+  flex-shrink:0;width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.wied-card-body{flex:1;min-width:0}
+.wied-card-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.wied-faellig-badge{font-size:10px;font-weight:700;color:var(--yellow);background:var(--ydim);padding:1px 7px;border-radius:20px;margin-left:6px}
+.wied-card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.wied-card-meta span{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:3px}
+.wied-card-next{font-size:11px}
+.wied-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.wied-card-betrag{font-family:var(--mono);font-size:16px;font-weight:700}
+.wied-card-actions{display:flex;gap:4px}
+.wied-summary{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;background:var(--s2);border-radius:12px;
+  margin-top:6px;font-size:12px;color:var(--sub);
+}
+
+/* ── KATEGORIEN KARTEN ── */
+.kat-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--s1);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;transition:border-color .15s;
+}
+.kat-card:hover{border-color:var(--border2)}
+.kat-card-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.kat-card-body{flex:1;min-width:0}
+.kat-card-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
+.kat-bar-wrap{display:flex;align-items:center;gap:8px}
+.kat-bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.kat-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.kat-pct{font-size:11px;font-family:var(--mono);color:var(--sub);width:32px;text-align:right;flex-shrink:0}
+.kat-card-val{font-family:var(--mono);font-size:14px;font-weight:700;flex-shrink:0;min-width:80px;text-align:right}
+@media(max-width:768px){.kat-2col{grid-template-columns:1fr!important}}
+
+/* ── PROGNOSE MONAT KARTEN ── */
+.prog-month-card{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:10px;border:1px solid transparent;
+  transition:border-color .15s,background .15s;
+}
+.prog-month-card:hover{background:var(--s2);border-color:var(--border)}
+.prog-month-future{opacity:.45}
+.prog-month-current{background:var(--bdim)!important;border-color:var(--blue)!important;opacity:1!important}
+.prog-month-label{font-size:11px;color:var(--sub);width:26px;font-family:var(--mono);flex-shrink:0}
+.prog-month-bars{flex:1;display:flex;flex-direction:column;gap:4px}
+.prog-bar-row{display:flex;align-items:center;gap:8px}
+.prog-bar-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.prog-bar-val{font-size:11px;font-family:var(--mono);width:82px;text-align:right;flex-shrink:0}
+.prog-month-gew{font-family:var(--mono);font-size:12px;font-weight:700;width:86px;text-align:right;flex-shrink:0}
+
+@media(max-width:768px){
+  .wied-card{flex-wrap:wrap}
+  .wied-card-right{flex-direction:row;width:100%;justify-content:space-between}
+  .kat-card-val{min-width:60px}
+  .prog-bar-val{width:60px}
+  .prog-month-gew{width:65px}
 }

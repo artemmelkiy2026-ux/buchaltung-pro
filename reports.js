@@ -36,24 +36,26 @@ function renderProg(){
     c('r','Prognose Ausgaben Jahr',fmt(progAus),`Ø ${fmt(avgAus)}/Monat`)+
     c(progEin-progAus>=0?'g':'r','Progn. Gewinn',fmt(progEin-progAus),`vs. Vorjahr: ${fmt(prevEin-prevAus)}`);
 
-  // Monat für Monat
+  // Monat für Monat — card blocks
+  const maxEin=Math.max(...einM,1), maxAus=Math.max(...ausM,1);
   document.getElementById('prog-monat').innerHTML=MS.map((m,i)=>{
     const ein=einM[i],aus=ausM[i],gew=ein-aus;
     const isFuture=i>curM&&yr===now.getFullYear()+'';
     const gc=gew>=0?'var(--green)':'var(--red)';
-    return`<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);${isFuture?'opacity:.45':''}">
-      <span style="font-size:11px;color:var(--sub);width:28px;font-family:var(--mono)">${m}</span>
-      <div style="flex:1">
-        <div class="prog-bar-wrap" style="margin-bottom:4px">
-          <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${ein>0?Math.min(100,Math.round(ein/(Math.max(...einM,1))*100)):0}%;background:var(--green)"></div></div>
-          <span style="font-size:11px;font-family:var(--mono);color:var(--green);width:90px;text-align:right">${ein>0?fmt(ein):'—'}</span>
+    const isCur=i===curM&&yr===now.getFullYear()+'';
+    return`<div class="prog-month-card${isFuture?' prog-month-future':''}${isCur?' prog-month-current':''}">
+      <div class="prog-month-label">${m}</div>
+      <div class="prog-month-bars">
+        <div class="prog-bar-row">
+          <div class="prog-bar-track"><div class="prog-bar-fill" style="width:${ein>0?Math.min(100,Math.round(ein/maxEin*100)):0}%;background:var(--green)"></div></div>
+          <span class="prog-bar-val" style="color:var(--green)">${ein>0?fmt(ein):'—'}</span>
         </div>
-        <div class="prog-bar-wrap" style="margin-bottom:0">
-          <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${aus>0?Math.min(100,Math.round(aus/(Math.max(...ausM,1))*100)):0}%;background:var(--red)"></div></div>
-          <span style="font-size:11px;font-family:var(--mono);color:var(--red);width:90px;text-align:right">${aus>0?fmt(aus):'—'}</span>
+        <div class="prog-bar-row">
+          <div class="prog-bar-track"><div class="prog-bar-fill" style="width:${aus>0?Math.min(100,Math.round(aus/maxAus*100)):0}%;background:var(--red)"></div></div>
+          <span class="prog-bar-val" style="color:var(--red)">${aus>0?fmt(aus):'—'}</span>
         </div>
       </div>
-      <span style="font-family:var(--mono);font-size:12px;font-weight:600;color:${gc};width:90px;text-align:right">${ein||aus?(gew>=0?'+':'')+fmt(gew):'—'}</span>
+      <div class="prog-month-gew" style="color:${gc}">${ein||aus?(gew>=0?'+':'')+fmt(gew):'—'}</div>
     </div>`;
   }).join('');
 
@@ -182,21 +184,28 @@ function renderKat(){
       <span style="font-family:var(--mono);font-size:14px">${Math.round(v/total*100)}%</span>
     </div>`).join('');
 
-  // Table
-  document.getElementById('kat-tbody').innerHTML=sorted.length?sorted.map(([k,v],i)=>`
-    <tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:10px 14px;display:flex;align-items:center;gap:8px">
-        <div style="width:10px;height:10px;border-radius:2px;background:${PIE_COLORS[i%PIE_COLORS.length]};flex-shrink:0"></div>
-        ${k}
-      </td>
-      <td style="padding:10px 14px;text-align:right;font-family:var(--mono);color:${katTyp==='Einnahme'?'var(--green)':'var(--red)'}">${fmt(v)}</td>
-      <td class="mob-hide" style="padding:10px 14px;text-align:right;font-family:var(--mono);color:var(--sub)">${Math.round(v/total*100)}%</td>
-      <td style="padding:10px 14px">
-        <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:50%">
-          <div style="height:100%;width:${Math.round(v/sorted[0][1]*100)}%;background:${PIE_COLORS[i%PIE_COLORS.length]};border-radius:3px"></div>
-        </div>
-      </td>
-    </tr>`).join('')
-    :'<tr><td colspan="4" style="padding:30px;text-align:center;color:var(--sub)">Keine Daten</td></tr>';
+  // Cards statt Tabelle
+  const katList = document.getElementById('kat-list');
+  if(katList){
+    if(!sorted.length){
+      katList.innerHTML='<div style="padding:30px;text-align:center;color:var(--sub)">Keine Daten</div>';
+    } else {
+      const valColor = katTyp==='Einnahme' ? 'var(--green)' : 'var(--red)';
+      katList.innerHTML = sorted.map(([k,v],i)=>`
+        <div class="kat-card">
+          <div class="kat-card-dot" style="background:${PIE_COLORS[i%PIE_COLORS.length]}"></div>
+          <div class="kat-card-body">
+            <div class="kat-card-name">${k}</div>
+            <div class="kat-bar-wrap">
+              <div class="kat-bar-track">
+                <div class="kat-bar-fill" style="width:${Math.round(v/sorted[0][1]*100)}%;background:${PIE_COLORS[i%PIE_COLORS.length]}"></div>
+              </div>
+              <span class="kat-pct">${Math.round(v/total*100)}%</span>
+            </div>
+          </div>
+          <div class="kat-card-val" style="color:${valColor}">${fmt(v)}</div>
+        </div>`).join('');
+    }
+  }
 }
 
