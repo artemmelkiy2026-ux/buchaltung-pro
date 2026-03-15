@@ -1799,3 +1799,61 @@ input, select, textarea {
   .dr-idx{display:none}
   .dr-bar-track{display:none}
 }
+
+/* ── Vorjahresvergleich — новые блочные карточки ── */
+.vjm-legend{
+  display:flex;gap:16px;align-items:center;flex-wrap:wrap;
+  margin-bottom:14px;padding:10px 14px;
+  background:var(--s2);border-radius:10px;
+  border:1px solid var(--border);
+}
+.vjm-legend span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub)}
+.vjm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.vjm-dot-cur {background:var(--blue)}
+.vjm-dot-prev{background:var(--border2)}
+
+.vjm-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.vjm{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:12px;padding:12px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.vjm:hover{border-color:var(--border2);box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.vjm-empty{opacity:.3}
+.vjm-future{opacity:.4}
+.vjm-cur{border-color:var(--blue);background:var(--bdim)}
+
+.vjm-name{
+  font-size:12px;font-weight:700;color:var(--text);
+  margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em;
+}
+.vjm-cur .vjm-name{color:var(--blue)}
+
+.vjm-body{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.vjm-row{display:flex;align-items:center;gap:8px}
+.vjm-bar-wrap{
+  flex:1;height:5px;background:var(--border);
+  border-radius:3px;overflow:hidden;
+}
+.vjm-bar{height:100%;border-radius:3px;transition:width .5s ease}
+.vjm-bar-cur {background:var(--blue)}
+.vjm-bar-prev{background:var(--border2)}
+.vjm-val{
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  white-space:nowrap;min-width:58px;text-align:right;
+}
+.vjm-val-cur {color:var(--text)}
+.vjm-val-prev{color:var(--sub);font-weight:400}
+
+.vjm-delta{
+  font-size:12px;font-weight:700;font-family:var(--mono);
+  padding-top:7px;border-top:1px solid var(--border);
+  min-height:20px;
+}
+
+@media(max-width:900px){.vjm-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.vjm-grid{grid-template-columns:repeat(2,1fr)}}

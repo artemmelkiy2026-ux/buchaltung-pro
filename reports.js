@@ -36,7 +36,7 @@ function renderProg(){
       <div class="sc-lbl">Prognose Einnahmen ${yr}</div>
       <div class="sc-val">${fmt(progEin)}</div>
       <div class="sc-sub">Bisher: ${fmt(istEin)} · Ø ${fmt(Math.round(avgEin))}/Monat</div>
-      ${deltaEin!==null?`<div class="pg-badge ${deltaEin>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px;display:inline-flex">${deltaEin>=0?'↑':'↓'} ${Math.abs(deltaEin)}% ggü. ${prevYr}</div>`:''}
+      ${deltaEin!==null?`<div class="pg-badge ${deltaEin>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px;display:inline-flex">${deltaEin>=0?'+':''}${deltaEin}% ggü. ${prevYr}</div>`:''}
     </div>
     <div class="sc r" style="cursor:default">
       <div class="sc-lbl">Prognose Ausgaben ${yr}</div>
@@ -47,7 +47,7 @@ function renderProg(){
       <div class="sc-lbl">Prognose Gewinn ${yr}</div>
       <div class="sc-val">${progGew>=0?'+':''}${fmt(progGew)}</div>
       <div class="sc-sub">Vorjahr: ${prevGew>=0?'+':''}${fmt(prevGew)}</div>
-      ${deltaGew!==null?`<div class="pg-badge ${deltaGew>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px;display:inline-flex">${deltaGew>=0?'↑':'↓'} ${Math.abs(deltaGew)}%</div>`:''}
+      ${deltaGew!==null?`<div class="pg-badge ${deltaGew>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px;display:inline-flex">${deltaGew>=0?'+':''}${deltaGew}%</div>`:''}
     </div>`;
 
   // ── 2. VORJAHRESVERGLEICH ────────────────────────────────────────────────
@@ -67,35 +67,57 @@ function renderProg(){
         <div class="pg-vj-label"><i class="fas ${p.icon}"></i> ${p.lbl}</div>
         <div class="pg-vj-cur" style="color:${p.col}">${p.cur>=0?'':'-'}${fmt(Math.abs(p.cur))}</div>
         <div class="pg-vj-prev">Vorjahr ${prevYr}:&nbsp;<strong>${fmt(p.prev)}</strong></div>
-        ${d!==null?`<div class="pg-badge ${d>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px">${d>=0?'↑':'↓'} ${Math.abs(d)}%</div>`:''}
+        ${d!==null?`<div class="pg-badge ${d>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px">${d>=0?'+':''+ d}%</div>`:''}
       </div>`;
     }).join('');
 
-    const monthRows=MS.map((m,i)=>{
-      const cur=einM[i],prev=einP[i];
-      const d=prev>0?Math.round((cur/prev-1)*100):cur>0?100:null;
+    const maxVal=Math.max(...einM,...einP,1);
+    const monthCards=MS.map((m,i)=>{
+      const cur=einM[i], prev=einP[i];
+      const diff=cur-prev;
+      const d=prev>0?Math.round((cur/prev-1)*100):null;
       const hasAny=cur>0||prev>0;
-      return `<div class="pg-vj-row${!hasAny?' pg-vj-row-empty':''}">
-        <div class="pg-vj-month">${m}</div>
-        <div class="pg-vj-val pg-vj-val-cur">${cur>0?fmt(cur):'—'}</div>
-        <div class="pg-vj-val pg-vj-val-prev">${prev>0?fmt(prev):'—'}</div>
-        <div class="pg-vj-delta ${d===null?'':d>=0?'pg-badge-up':'pg-badge-down'}">
-          ${d!==null?(d>=0?'↑':'↓')+' '+Math.abs(d)+'%':''}
+      const curPct=Math.round(cur/maxVal*100);
+      const prevPct=Math.round(prev/maxVal*100);
+      const isCurMonth=i===curM&&yr===now.getFullYear()+'';
+      const isFuture=i>curM&&yr===now.getFullYear()+'';
+
+      // Цвет и знак дельты
+      const dColor=d===null?'var(--sub)':d>0?'var(--green)':'var(--red)';
+      const dSign=d===null?'':d>=0?'+':'';
+      const dTxt=d!==null?`${dSign}${d}%`:'';
+
+      return `<div class="vjm${!hasAny?' vjm-empty':''}${isCurMonth?' vjm-cur':''}${isFuture?' vjm-future':''}">
+        <div class="vjm-name">${m}</div>
+        <div class="vjm-body">
+          <div class="vjm-row">
+            <div class="vjm-bar-wrap">
+              <div class="vjm-bar vjm-bar-cur" style="width:${curPct}%"></div>
+            </div>
+            <span class="vjm-val vjm-val-cur">${cur>0?fmt(Math.round(cur)):'—'}</span>
+          </div>
+          <div class="vjm-row">
+            <div class="vjm-bar-wrap">
+              <div class="vjm-bar vjm-bar-prev" style="width:${prevPct}%"></div>
+            </div>
+            <span class="vjm-val vjm-val-prev">${prev>0?fmt(Math.round(prev)):'—'}</span>
+          </div>
         </div>
+        ${hasAny&&d!==null?`<div class="vjm-delta" style="color:${dColor}">${dTxt}</div>`:'<div class="vjm-delta"></div>'}
       </div>`;
     }).join('');
+
+    // Легенда
+    const legend=`<div class="vjm-legend">
+      <span><span class="vjm-dot vjm-dot-cur"></span>${yr}</span>
+      <span><span class="vjm-dot vjm-dot-prev"></span>${prevYr}</span>
+      <span style="font-size:11px;color:var(--sub)">Δ = Veränderung ggü. Vorjahr</span>
+    </div>`;
 
     verglEl.innerHTML=`
       <div class="pg-vj-cards">${bigCards}</div>
-      <div class="pg-vj-table">
-        <div class="pg-vj-thead">
-          <div class="pg-vj-month">Monat</div>
-          <div class="pg-vj-val">${yr}</div>
-          <div class="pg-vj-val">${prevYr}</div>
-          <div class="pg-vj-delta">Δ</div>
-        </div>
-        <div class="pg-vj-body">${monthRows}</div>
-      </div>`;
+      ${legend}
+      <div class="vjm-grid">${monthCards}</div>`;
   }
 
   // ── 4. KU-GRENZEN ───────────────────────────────────────────────────────
