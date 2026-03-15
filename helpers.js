@@ -272,7 +272,7 @@ function saveKunde(){
     if(k){ Object.assign(k,obj); sbSaveKunde(k); }
     editKundeId=null;
   } else {
-    const newK={id:Date.now()+'', ...obj};
+    const newK={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj};
     data.kunden.push(newK);
     sbSaveKunde(newK);
   }

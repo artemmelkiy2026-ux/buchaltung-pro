@@ -111,7 +111,7 @@ function saveWied(){
   if(!bez||!betrag||!ab)return toast('Alle Felder ausfüllen!','err');
   if(!data.wiederkehrend)data.wiederkehrend=[];
   const newW={
-    id:Date.now()+'',bezeichnung:bez,typ:wiedTyp,betrag,
+    id:Date.now()+'_'+Math.random().toString(36).slice(2,6),bezeichnung:bez,typ:wiedTyp,betrag,
     kategorie:normKat(document.getElementById('wied-kat').value),
     zahlungsart:normZahl(document.getElementById('wied-zahl').value),
     intervall:document.getElementById('wied-int').value,
@@ -134,6 +134,7 @@ function wBuchenCore(id){
   sbSaveEintrag(newE);
   // Вычисляем следующую дату без переполнения месяца (31 янв → 28 фев, не 3 мар)
   const d=new Date(w.naechste);
+  if(isNaN(d.getTime())) return newE; // невалидная дата — не обновляем naechste
   const day=d.getDate();
   if(w.intervall==='monatlich'){
     d.setDate(1); d.setMonth(d.getMonth()+1);

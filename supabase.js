@@ -116,7 +116,11 @@ function dbToRechnung(r, allPos) {
   });
   let _extra={beschreibung:'',kategorie:'',zahlungsart:''};
   try{if(r.wa)_extra=JSON.parse(r.wa);}catch(e){}
-  return { id:r.id, nr:r.nr||'', datum:r.datum||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', tel:r.tel||'', betrag:parseFloat(r.betrag)||0, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', beschreibung:_extra.beschreibung||'', kategorie:_extra.kategorie||'', zahlungsart:_extra.zahlungsart||'', positionen:pos };
+  const _posNetto = r2(pos.reduce((s,p)=>s+(p.menge||1)*p.netto,0));
+  const _posBrutto = r2(pos.reduce((s,p)=>s+(p.menge||1)*p.brutto,0));
+  const _posMwst   = r2(_posBrutto - _posNetto);
+  const _posRate   = pos.length>0?(pos.find(p=>p.rate>0)?.rate||0):0;
+  return { id:r.id, nr:r.nr||'', datum:r.datum||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', tel:r.tel||'', betrag:parseFloat(r.betrag)||0, netto:_posNetto||parseFloat(r.betrag)||0, mwstBetrag:_posMwst, mwstRate:_posRate, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', beschreibung:_extra.beschreibung||'', kategorie:_extra.kategorie||'', zahlungsart:_extra.zahlungsart||'', positionen:pos };
 }
 function dbToWied(r) {
   return { id:r.id, typ:r.typ||'Ausgabe', kategorie:r.kategorie||'', bezeichnung:r.bezeichnung||r.beschreibung||'', beschreibung:r.beschreibung||r.bezeichnung||'', betrag:parseFloat(r.betrag)||0, zahlungsart:r.zahlungsart||'Sonstiges', intervall:r.intervall||'monatlich', naechste:r.naechste||'' };
