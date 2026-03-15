@@ -707,8 +707,8 @@ function getFiltered(){
     if(k!=='Alle'&&e.kategorie!==k)return false;
     if(z!=='Alle'&&(e.zahlungsart||'Sonstiges')!==z)return false;
     // Поиск по описанию, категории И ДАТЕ
-    if(q&&!e.beschreibung.toLowerCase().includes(q)
-       &&!e.kategorie.toLowerCase().includes(q)
+    if(q&&!(e.beschreibung||'').toLowerCase().includes(q)
+       &&!(e.kategorie||'').toLowerCase().includes(q)
        &&!e.datum.includes(q))return false;
     return true;
   });

@@ -55,7 +55,7 @@ function normZahl(v){ return ZAHL_NORM[v] || v; }
 function normKat(v){  return KE_NORM[v] || KA_NORM[v] || v; }
 
 // ── MATH HELPERS (must be early) ─────────────────────────────────────────
-function r2(n){ return Math.round(n*100)/100; }
+function r2(n){ const v=parseFloat(n); return isNaN(v)?0:Math.round(v*100)/100; }
 
 function calcBrutto(netto, rate){ return r2(netto * (1 + rate/100)); }
 
