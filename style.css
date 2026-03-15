@@ -226,7 +226,7 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 /* ── TOOLBAR ── */
 .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .toolbar-group{display:flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:4px 10px}
-.toolbar-group label{font-size:11px;color:var(--sub)}
+.toolbar-group label{font-size:14px;color:var(--sub)}
 .toolbar-group select,.toolbar-group input{background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:12px;padding:2px 0;outline:none;cursor:pointer}
 .toolbar-group select option{background:var(--s2)}
 .filter-tabs{display:flex;gap:2px}
