@@ -154,11 +154,12 @@ function nav(id, el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('p-'+id).classList.add('active');
   curPage=id;
-  if(id==='bericht'){ renderRep(); setTimeout(renderKat,50); }
+  if(id==='bericht') renderRep();
   if(id==='zahlungen') renderZ();
   if(id==='dashboard') renderDash();
   if(id==='journal') renderJournal();
   if(id==='prognose') renderProg();
+  if(id==='kategorien') renderKat();
   if(id==='rechnungen') renderRech();
   if(id==='kunden') renderKunden();
   if(id==='ust') renderUst();

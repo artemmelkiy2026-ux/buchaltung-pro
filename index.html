@@ -106,6 +106,7 @@
 
   <div class="mob-drawer-title">Analyse</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('prognose')"><span class="ic"><i class="fas fa-chart-line"></i></span> Prognose</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('kategorien')"><span class="ic"><i class="fas fa-chart-bar"></i></span> Kategorien</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('kunden')"><span class="ic"><i class="fas fa-address-book"></i></span> Kunden (CRM)</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('rechnungen')"><span class="ic"><i class="fas fa-receipt"></i></span> Rechnungen</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('journal')"><span class="ic"><i class="fas fa-book"></i></span> Journal (GoBD)</div>
@@ -587,29 +588,7 @@
 
   <!-- Итоговый блок -->
   <div id="rep-total-block" style="margin-top:16px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:16px"></div>
-
-
-  <!-- ── Kategorienanalyse ── -->
-  <div style="border-top:2px solid var(--border);margin-top:28px;padding-top:24px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-size:15px;font-weight:700;color:var(--text)"><i class="fas fa-chart-pie"></i> Kategorienanalyse</div>
-        <div style="font-size:11px;color:var(--sub);margin-top:2px">Ausgaben & Einnahmen nach Kategorien</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="kat-yr" onchange="renderKat()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;font-family:var(--sans)"></select>
-        <button class="ftab active" id="kat-tab-aus" onclick="setKatTab('Ausgabe',this)">▼ Ausgaben</button>
-        <button class="ftab" id="kat-tab-ein" onclick="setKatTab('Einnahme',this)">▲ Einnahmen</button>
-      </div>
-    </div>
-    <div id="kat-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
-    <div class="kat-layout">
-      <div class="kat-donut-col">
-        <div class="kat-donut-wrap" id="kat-donut-wrap"></div>
-      </div>
-      <div id="kat-grid" class="kat-grid"></div>
-    </div>
-  </div></div>
+</div>
 </div>
 
 <!-- ── ZAHLUNGSARTEN ── -->
@@ -664,6 +643,38 @@
   </div>
 </div>
 </div>
+
+<!-- ── KATEGORIEN ── -->
+<div class="page" id="p-kategorien">
+<div class="page-inner">
+  <!-- Заголовок -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-chart-bar"></i> Kategorienanalyse</h1>
+      <p style="color:var(--sub);font-size:12px;margin-top:3px">Ausgaben & Einnahmen nach Kategorien</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select id="kat-yr" onchange="renderKat()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;font-family:var(--sans)"></select>
+      <button class="ftab active" id="kat-tab-aus" onclick="setKatTab('Ausgabe',this)">▼ Ausgaben</button>
+      <button class="ftab" id="kat-tab-ein" onclick="setKatTab('Einnahme',this)">▲ Einnahmen</button>
+    </div>
+  </div>
+
+  <!-- Stat-карточки -->
+  <div id="kat-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
+
+  <!-- Donut + Плитки -->
+  <div class="kat-layout">
+    <!-- Левая колонка — Donut -->
+    <div class="kat-donut-col">
+      <div class="kat-donut-wrap" id="kat-donut-wrap"></div>
+    </div>
+    <!-- Правая колонка — Плитки Канва -->
+    <div id="kat-grid" class="kat-grid"></div>
+  </div>
+</div>
+</div>
+
 
 <!-- ── KUNDEN (CRM) ── -->
 <div class="page" id="p-kunden">
