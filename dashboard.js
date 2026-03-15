@@ -610,25 +610,70 @@ function renderDash(){
   } else { if(dashSortAsc) recent.reverse(); }
 
   const mob=isMob();
-  document.getElementById('d-recent').innerHTML = recent.length ? recent.map(e => {
-    const isEin=e.typ==='Einnahme', st=e.is_storno||e._storniert;
-    const click=mob?'showMobDetail('+JSON.stringify(e).replace(/"/g,"'")+')':'';
-    return '<div onclick="'+click+'"'
-      +' style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
-      +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
-      +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
-      +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
-      +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
-      +'<div style="flex:1;min-width:0">'
-      +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
-      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
-      +'<span style="font-family:var(--mono)">'+(mob?fdm(e.datum):fd(e.datum))+'</span>'
-      +'<span>&middot;</span><span>'+e.kategorie+'</span>'
-      +'<span>&middot;</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
-      +'</div></div>'
-      +'<div style="flex:0 0 auto;font-size:15px;font-weight:700;color:var(--'+(isEin?'green':'red')+');font-family:var(--mono);white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</div>'
-      +'</div>';
-  }).join('') : '<div style="text-align:center;padding:30px;color:var(--sub)">Keine Einträge</div>';
+
+  if(!recent.length){
+    document.getElementById('d-recent').innerHTML='<div style="text-align:center;padding:30px;color:var(--sub)">Keine Einträge</div>';
+    return;
+  }
+
+  // Мини-статистика по последним 10
+  const sumEin=recent.filter(e=>e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
+  const sumAus=recent.filter(e=>e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
+  const cntEin=recent.filter(e=>e.typ==='Einnahme').length;
+  const cntAus=recent.filter(e=>e.typ==='Ausgabe').length;
+  const maxBet=Math.max(...recent.map(e=>e.betrag),1);
+
+  const rows=recent.map((e,idx)=>{
+    const isEin=e.typ==='Einnahme';
+    const st=e.is_storno||e._storniert;
+    const barW=Math.round(e.betrag/maxBet*100);
+    const click=mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:`editE(event,'${e.id}')`;
+    const notiz=e.notiz?`<span title="${e.notiz}" style="color:var(--muted);font-size:11px;cursor:help">✎</span>`:'';
+    const mwst=isEin&&e.mwstBetrag>0?`<span style="font-size:10px;color:var(--sub);font-family:var(--mono)">MwSt ${fmt(e.mwstBetrag)}</span>`:'';
+    return `<div class="dr-row${st?' dr-row-storno':''}" onclick="${click}">
+      <div class="dr-idx">${idx+1}</div>
+      <div class="dr-icon ${isEin?'dr-icon-ein':'dr-icon-aus'}">
+        <i class="fas fa-arrow-${isEin?'up':'down'}"></i>
+      </div>
+      <div class="dr-body">
+        <div class="dr-name">${e.beschreibung||e.kategorie} ${notiz}</div>
+        <div class="dr-meta">
+          <span class="dr-date">${mob?fdm(e.datum):fd(e.datum)}</span>
+          <span class="dr-dot">·</span>
+          <span class="dr-kat">${e.kategorie}</span>
+          <span class="dr-dot">·</span>
+          <span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:10px">${e.zahlungsart||'—'}</span>
+          ${mwst?`<span class="dr-dot">·</span>${mwst}`:''}
+        </div>
+        <div class="dr-bar-track">
+          <div class="dr-bar-fill" style="width:${barW}%;background:${isEin?'var(--green)':'var(--red)'}"></div>
+        </div>
+      </div>
+      <div class="dr-amt ${isEin?'dr-amt-ein':'dr-amt-aus'}">${isEin?'+':'−'}${fmt(e.betrag)}</div>
+    </div>`;
+  }).join('');
+
+  const saldo=sumEin-sumAus;
+  const summary=`<div class="dr-summary">
+    <div class="dr-summary-item">
+      <span class="dr-summary-dot" style="background:var(--green)"></span>
+      <span>${cntEin} Einnahmen</span>
+      <strong style="color:var(--green);font-family:var(--mono)">+${fmt(sumEin)}</strong>
+    </div>
+    <div class="dr-summary-sep"></div>
+    <div class="dr-summary-item">
+      <span class="dr-summary-dot" style="background:var(--red)"></span>
+      <span>${cntAus} Ausgaben</span>
+      <strong style="color:var(--red);font-family:var(--mono)">−${fmt(sumAus)}</strong>
+    </div>
+    <div class="dr-summary-sep"></div>
+    <div class="dr-summary-item">
+      <span style="color:var(--sub);font-size:12px;font-weight:600">Saldo</span>
+      <strong style="font-family:var(--mono);font-size:14px;color:${saldo>=0?'var(--green)':'var(--red)'}">${saldo>=0?'+':''}${fmt(saldo)}</strong>
+    </div>
+  </div>`;
+
+  document.getElementById('d-recent').innerHTML = `<div class="dr-list">${rows}</div>${summary}`;
 }
 
 // ── EINTRÄGE ──────────────────────────────────────────────────────────────
