@@ -204,7 +204,12 @@ function saveRechnung(){
   };
   if(editRechId){
     const r=data.rechnungen.find(x=>x.id===editRechId);
-    if(r){Object.assign(r,obj); sbSaveRechnung(r);}
+    if(r){
+      const altWert={nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig};
+      Object.assign(r,obj);
+      sbSaveRechnung(r);
+      sbLogRechnung(r,'geaendert',altWert,{nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig});
+    }
     editRechId=null;
   } else {
     const dupNr = (data.rechnungen||[]).find(r=>r.nr===nr);
@@ -212,6 +217,7 @@ function saveRechnung(){
     const newR={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj};
     data.rechnungen.push(newR);
     sbSaveRechnung(newR);
+    sbLogRechnung(newR, 'erstellt', null, {nr:newR.nr, betrag:newR.betrag, kunde:newR.kunde, status:newR.status});
   }
   renderRech();closeModal('rech-modal');toast('✓ Rechnung gespeichert!','ok');
 }
@@ -226,17 +232,26 @@ async function rechBezahlt(id){
     const newE={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:r.kategorie||'Dienstleistung',zahlungsart:r.zahlungsart||'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag,nettoBetrag:_rNetto,mwstBetrag:_rMwst,mwstRate:_rRate};
     data.eintraege.unshift(newE);
     sbSaveRechnung(r); sbSaveEintrag(newE);
+    sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
     renderAll();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');
   } else {
     const ok2 = await appConfirm('Nur als bezahlt markieren?',{title:'Nur markieren',icon:'✓',okLabel:'Ja',cancelLabel:'Nein'});
     if(ok2){
       r.status='bezahlt';
       sbSaveRechnung(r);
+      sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
       renderRech();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
     }
   }
 }
-async function delRech(id){const _okR=await appConfirm('Rechnung wirklich löschen?',{title:'Rechnung löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_okR)return;data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);sbDeleteRechnung(id);renderRech();toast('Gelöscht','err');}
+async function delRech(id){
+  const _okR=await appConfirm('Rechnung wirklich löschen?',{title:'Rechnung löschen',icon:'🗑️',okLabel:'Löschen',danger:true});
+  if(!_okR)return;
+  const _rDel=data.rechnungen.find(r=>r.id===id);
+  if(_rDel) sbLogRechnung(_rDel,'geloescht',{nr:_rDel.nr,betrag:_rDel.betrag,status:_rDel.status,kunde:_rDel.kunde},null);
+  data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);
+  sbDeleteRechnung(id);renderRech();toast('Gelöscht','err');
+}
 // ── RECHNUNG POSITIONEN ───────────────────────────────────────────────────
 
 // Хелпер: округление до 2 знаков без ошибок float

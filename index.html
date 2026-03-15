@@ -297,19 +297,32 @@
   <div class="ph">
     <div class="ph-left">
       <div class="ph-title">Buchungsjournal</div>
-      <div class="ph-sub">GoBD-konforme Änderungshistorie · nur Storno-Ketten</div>
+      <div class="ph-sub">GoBD §146 · §147 AO — vollständige Änderungshistorie</div>
     </div>
     <div class="ph-right">
       <span id="journal-count" style="font-size:12px;color:var(--sub);font-family:var(--mono)"></span>
     </div>
   </div>
-  <div style="background:rgba(26,69,120,.06);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px">
-    <i class="fas fa-info-circle"></i> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
+  <!-- Вкладки -->
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <button id="jtab-eintraege" onclick="setJournalTab('eintraege')"
+      style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:var(--blue);color:#fff;transition:all .15s">
+      <i class="fas fa-list"></i> Einträge (GoBD-Storno)
+    </button>
+    <button id="jtab-rechnungen" onclick="setJournalTab('rechnungen')"
+      style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:;color:;transition:all .15s">
+      <i class="fas fa-file-invoice"></i> Rechnungen-Log
+    </button>
   </div>
-  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-    <button class="btn" id="jsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortJournal('datum')">Datum</button>
-    <button class="btn" id="jsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortJournal('betrag')">Betrag</button>
+  <div id="journal-eintraege-controls">
+    <div style="background:rgba(26,69,120,.06);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px">
+      <i class="fas fa-info-circle"></i> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+      <button class="btn" id="jsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortJournal('datum')">Datum</button>
+      <button class="btn" id="jsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortJournal('betrag')">Betrag</button>
+    </div>
   </div>
   <div id="journal-tbody"></div>
   <div id="journal-pagination"></div>

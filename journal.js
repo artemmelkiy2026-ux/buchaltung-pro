@@ -4,6 +4,20 @@ let journalSortCol = 'datum';
 let journalSortAsc = false;
 let journalPage = 1;
 const journalPerPage = 3;
+let journalTab = 'eintraege'; // 'eintraege' | 'rechnungen'
+
+function setJournalTab(tab) {
+  journalTab = tab;
+  journalPage = 1;
+  const btnE = document.getElementById('jtab-eintraege');
+  const btnR = document.getElementById('jtab-rechnungen');
+  if(btnE) { btnE.style.background = tab==='eintraege'?'var(--blue)':''; btnE.style.color = tab==='eintraege'?'#fff':''; }
+  if(btnR) { btnR.style.background = tab==='rechnungen'?'var(--blue)':''; btnR.style.color = tab==='rechnungen'?'#fff':''; }
+  // Показываем/скрываем сортировку Einträge
+  const ctrl = document.getElementById('journal-eintraege-controls');
+  if(ctrl) ctrl.style.display = tab==='eintraege' ? '' : 'none';
+  renderJournal();
+}
 
 function sortJournal(col) {
   if (journalSortCol === col) { journalSortAsc = !journalSortAsc; }
@@ -16,6 +30,8 @@ function renderJournal() {
   const tb = document.getElementById('journal-tbody');
   const em = document.getElementById('journal-empty');
   if (!tb) return;
+  // Dispatch по вкладке
+  if (journalTab === 'rechnungen') { renderRechnungenLog(); return; }
 
   const stornoIds = new Set(data.eintraege.filter(e => e.is_storno).map(e => e.storno_of).filter(Boolean));
   const korrIds   = new Set(data.eintraege.filter(e => e.korrektur_von).map(e => e.korrektur_von).filter(Boolean));
@@ -274,4 +290,77 @@ function renderJournal() {
 
   const el = document.getElementById('journal-count');
   if (el) el.textContent = `${totalChains} Storno-Kette${totalChains !== 1 ? 'n' : ''}`;
+}
+
+
+// ── RECHNUNGEN-LOG RENDERER ───────────────────────────────────────────────
+function renderRechnungenLog() {
+  const tb  = document.getElementById('journal-tbody');
+  const em  = document.getElementById('journal-empty');
+  const pg  = document.getElementById('journal-pagination');
+  if (!tb) return;
+
+  const log = (data.rechnungenLog || []).slice(); // уже отсортирован по created_at desc
+  const AKTION_LABEL = {
+    'erstellt':  { label:'Erstellt',       color:'var(--green)', icon:'fa-plus-circle' },
+    'geaendert': { label:'Geändert',        color:'var(--blue)',  icon:'fa-edit' },
+    'geloescht': { label:'Gelöscht',        color:'var(--red)',   icon:'fa-trash' },
+    'bezahlt':   { label:'Bezahlt + Einnahme', color:'var(--green)', icon:'fa-check-circle' },
+    'status':    { label:'Status geändert', color:'var(--yellow)', icon:'fa-exchange-alt' },
+  };
+
+  if (!log.length) {
+    tb.innerHTML = '';
+    em.style.display = 'block';
+    if(pg) pg.innerHTML = '';
+    return;
+  }
+  em.style.display = 'none';
+
+  const PER = 10;
+  const totalPages = Math.max(1, Math.ceil(log.length / PER));
+  if(journalPage > totalPages) journalPage = totalPages;
+  const items = log.slice((journalPage-1)*PER, journalPage*PER);
+
+  tb.innerHTML = items.map(e => {
+    const a = AKTION_LABEL[e.aktion] || { label:e.aktion, color:'var(--sub)', icon:'fa-circle' };
+    const dt = e.created_at ? e.created_at.replace('T',' ').substring(0,16) : '—';
+    let altNeu = '';
+    try {
+      const alt = e.alt_wert ? JSON.parse(e.alt_wert) : null;
+      const neu = e.neu_wert ? JSON.parse(e.neu_wert) : null;
+      if(alt && neu) {
+        // Показываем что изменилось
+        const changes = Object.keys({...alt,...neu}).filter(k => {
+          return JSON.stringify(alt?.[k]) !== JSON.stringify(neu?.[k]);
+        });
+        altNeu = changes.map(k => {
+          const av = alt?.[k] !== undefined ? alt[k] : '—';
+          const nv = neu?.[k] !== undefined ? neu[k] : '—';
+          const fmtV = v => typeof v === 'number' ? fmt(v) : String(v||'—');
+          return `<span style="font-size:11px;color:var(--sub)">${k}: <span style="color:var(--red);text-decoration:line-through">${fmtV(av)}</span> → <span style="color:var(--green)">${fmtV(nv)}</span></span>`;
+        }).join(' &nbsp;');
+      } else if(neu) {
+        const entries = Object.entries(neu).filter(([,v])=>v).slice(0,3);
+        altNeu = entries.map(([k,v])=>`<span style="font-size:11px;color:var(--sub)">${k}: <span style="color:var(--text)">${typeof v==='number'?fmt(v):v}</span></span>`).join(' &nbsp;');
+      }
+    } catch(ex){}
+
+    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:0 0 32px;height:32px;border-radius:50%;background:${a.color}22;display:flex;align-items:center;justify-content:center">
+        <i class="fas ${a.icon}" style="color:${a.color};font-size:12px"></i>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:700;color:${a.color}">${a.label}</span>
+          <span style="font-size:12px;font-weight:700;font-family:var(--mono);background:var(--s2);padding:2px 7px;border-radius:5px">Nr.${e.rechnung_nr||'—'}</span>
+          <span style="font-size:11px;color:var(--sub)">${dt}</span>
+        </div>
+        ${altNeu ? `<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:8px">${altNeu}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  window._rlPagerCb = function(p){ journalPage=p; renderRechnungenLog(); };
+  renderPager('journal-pagination', journalPage, totalPages, log.length, '_rlPagerCb');
 }

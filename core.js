@@ -87,6 +87,7 @@ window.addEventListener('supabase-ready', () => {
   if (!data.ustEintraege) data.ustEintraege = [];
   if (!data.ustModeByYear) data.ustModeByYear = {};
   if (!data.wiederkehrend) data.wiederkehrend = [];
+  if (!data.rechnungenLog) data.rechnungenLog = [];
   // Migrate old ustMode
   if (data.ustMode) {
     const oldMode = data.ustMode;

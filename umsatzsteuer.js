@@ -330,9 +330,9 @@ function calcGKVNachzahlung(gewinn, gkvGezahlt, isFamilienversichert) {
   // KV-Satz: 14,6% + Ø ZB 2,9% = ~17,5%
   // Mindestbeitrag: ~2.600€/год (если не Familienversicherung)
   
-  const bbg = 5812.50 * 12; // Jährlich
-  const kvRate = 0.175; // KV + Pflege
-  const mindestbeitrag = 2600; // Mindestbeitrag pro Jahr
+  const bbg = 5512.50 * 12; // BBG KV 2026: 5.512,50 €/Monat = 66.150 €/Jahr (GKV-Spitzenverband)
+  const kvRate = 0.175; // KV 14,6% + Ø Zusatzbeitrag 2,9% = 17,5%
+  const mindestbeitrag = 2474; // Mindestbeitrag KV 2026: 1.178,33 €/Monat × 17,5% × 12 (§240 SGB V)
   
   if (isFamilienversichert) {
     // Familienversichert = KOSTENLOS

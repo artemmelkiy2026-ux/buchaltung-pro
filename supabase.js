@@ -82,7 +82,10 @@ async function sbLoadAll() {
   const ustEintraege  = (ustE.data || []).map(dbToUstEintrag);
   const ustModeByYear = {};
   (ustM.data || []).forEach(r => { ustModeByYear[r.jahr] = r.mode; });
-  return { eintraege, kunden, rechnungen, wiederkehrend, ustModeByYear, ustEintraege };
+  // Загружаем журнал изменений рекоманд
+  const rechLog = await sb.from('rechnungen_log').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(500);
+  const rechnungenLog = (rechLog.data || []);
+  return { eintraege, kunden, rechnungen, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog };
 }
 
 // ФИХ: один запрос вместо двух (sbLoadPin + отдельный user_data)
@@ -211,6 +214,29 @@ async function sbDeleteKunde(id) {
   if (!currentUser) return;
   await sb.from('kunden').delete().eq('id',id).eq('user_id',currentUser.id);
 }
+// ── RECHNUNGEN-LOG (GoBD Variant B) ──────────────────────────────────────
+// Записывает каждое изменение рекоманды в отдельную таблицу rechnungen_log
+async function sbLogRechnung(rechnung, aktion, altWert, neuWert) {
+  if (!currentUser) return;
+  const entry = {
+    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2),
+    user_id: currentUser.id,
+    rechnung_id: rechnung.id,
+    rechnung_nr: rechnung.nr || '',
+    aktion,       // 'erstellt' | 'geaendert' | 'geloescht' | 'bezahlt' | 'status'
+    alt_wert: altWert ? JSON.stringify(altWert) : null,
+    neu_wert: neuWert ? JSON.stringify(neuWert) : null,
+    created_at: new Date().toISOString(),
+  };
+  // Lokal speichern
+  if (!data.rechnungenLog) data.rechnungenLog = [];
+  data.rechnungenLog.unshift(entry);
+  // In Supabase speichern (Fehler werden ignoriert — Log soll nie blockieren)
+  try {
+    await sb.from('rechnungen_log').insert(entry);
+  } catch(e) { console.warn('RechnungLog error:', e); }
+}
+
 async function sbSaveRechnung(r) {
   if (!currentUser) { console.warn('sbSaveRechnung: no user'); return; }
   const { error: rErr } = await sb.from('rechnungen').upsert(rechnungToDb(r), {onConflict:'id'});
