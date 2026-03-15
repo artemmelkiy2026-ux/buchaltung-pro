@@ -1051,26 +1051,22 @@ function renderZ(){
     const s=zkStats[z]||{ein:0,aus:0,cnt:0};
     const gew=s.ein-s.aus;
     const gc=gew>0?'var(--green)':gew<0?'var(--red)':'var(--sub)';
-    const col=ZCOLS[z]||'var(--blue)';
-    // Прогрессбар: доля einnahmen от общего оборота
     const total=s.ein+s.aus;
     const einPct=total>0?Math.round(s.ein/total*100):0;
-    // Иконка в круге с прозрачным фоном цвета
-    const iconBg=col.replace('var(--','').replace(')','');
-    const bgMap={'--blue':'rgba(26,69,120,.1)','--yellow':'rgba(224,140,26,.1)','--purple':'rgba(111,66,193,.1)','--cyan':'rgba(13,127,170,.1)','--green':'rgba(93,157,105,.1)','--muted':'rgba(132,150,170,.1)'};
-    const iconBgCol=bgMap[col]||'rgba(26,69,120,.1)';
-    return `<div class="zk">
+    const isEmpty=s.cnt===0;
+    return `<div class="zk${isEmpty?' zk-empty':''}">
       <div class="zk-header">
-        <div class="zk-name">${z}</div>
-        <div class="zk-icon-wrap" style="background:${iconBgCol};color:${col}">${ZICONS[z]||'€'}</div>
+        <div class="zk-lbl">${z}</div>
+        <div class="zk-icon">${ZICONS[z]||'<i class="fas fa-euro-sign"></i>'}</div>
       </div>
-      <div class="zk-val">${s.cnt>0?fmt(total):'—'}</div>
+      <div class="zk-val">${isEmpty?'—':fmt(total)}</div>
+      ${isEmpty?'<div class="zk-sub">Keine Einträge</div>':`
       <div class="zk-row">
-        <span class="zk-pill"><i class="fas fa-arrow-up" style="color:var(--green)"></i>${fmt(s.ein)}</span>
-        <span class="zk-pill"><i class="fas fa-arrow-down" style="color:var(--red)"></i>${fmt(s.aus)}</span>
+        <span class="zk-pill zk-ein"><i class="fas fa-arrow-up"></i>${fmt(s.ein)}</span>
+        <span class="zk-pill zk-aus"><i class="fas fa-arrow-down"></i>${fmt(s.aus)}</span>
       </div>
-      ${s.cnt>0?`<div class="zk-prog"><div class="zk-prog-fill" style="width:${einPct}%;background:${col}"></div></div>`:''}
-      <div class="zk-sub">${s.cnt} Einträge · Saldo: <strong style="color:${gc}">${gew>=0?'+':''}${fmt(gew)}</strong></div>
+      <div class="zk-prog"><div class="zk-prog-fill" style="width:${einPct}%"></div></div>
+      <div class="zk-sub">${s.cnt} Eintr. · <span style="color:${gc}">${gew>=0?'+':''}${fmt(gew)}</span></div>`}
     </div>`;
   }).join('');
 
