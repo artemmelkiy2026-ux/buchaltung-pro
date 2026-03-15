@@ -1020,7 +1020,7 @@ function renderUst(){
     if(kleinStats){
       const einY  = activeEintraege().filter(e=>e.datum.startsWith(yr)&&e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
       const ausY  = activeEintraege().filter(e=>e.datum.startsWith(yr)&&e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
-      const limit = 22000;
+      const limit = 25000;
       const pct   = Math.min(100, Math.round(einY/limit*100));
       const over  = einY > limit;
       kleinStats.innerHTML = `
@@ -1037,7 +1037,7 @@ function renderUst(){
           <div style="font-size:20px;font-weight:800;color:var(--green);font-family:var(--mono)">${fmt(einY-ausY)}</div>
         </div>
         <div style="flex:1;min-width:160px">
-          <div style="font-size:11px;color:var(--sub);margin-bottom:6px">KU-Grenze (22.000 €)</div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:6px">KU-Grenze (25.000 €)</div>
           <div style="background:var(--border);border-radius:4px;height:8px;overflow:hidden">
             <div style="height:8px;border-radius:4px;width:${pct}%;background:${over?'var(--red)':'var(--green)'};transition:width .4s"></div>
           </div>
