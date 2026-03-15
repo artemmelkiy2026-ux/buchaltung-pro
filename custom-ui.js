@@ -133,7 +133,7 @@ class CustomSelect {
       display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
       width:${isCompact ? 'auto' : '100%'};min-width:${isCompact ? '90px' : '0'};padding:7px 12px;
       background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
-      color:var(--text);font-size:13px;font-family:inherit;font-weight:500;
+      color:var(--text);font-size:14px;font-family:inherit;font-weight:500;
       cursor:pointer;text-align:left;outline:none;
       transition:border-color .15s,box-shadow .15s;`;
     if (isCompact) wrap.style.width = 'auto';
