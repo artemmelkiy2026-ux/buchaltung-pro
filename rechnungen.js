@@ -158,6 +158,36 @@ function editRech(id){
   setRechPositionen(posData);
   openModal('rech-modal');
 }
+
+// Создаёт Einnahme из Rechnung и сохраняет в БД
+// Возвращает созданный entry или null если уже существует
+function _buchRechnungAlsEinnahme(r) {
+  // Проверяем — нет ли уже Einnahme для этой Rechnung
+  const alreadyBooked = data.eintraege.some(e =>
+    e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`) && !e.is_storno && !e._storniert
+  );
+  if (alreadyBooked) return null;
+  const _rNetto = r.positionen&&r.positionen.length ? r2(r.positionen.reduce((s,p)=>s+(p.menge||1)*p.netto,0)) : (r.netto||r.betrag);
+  const _rMwst  = r.positionen&&r.positionen.length ? r2(r.positionen.reduce((s,p)=>s+(p.menge||1)*(p.brutto-p.netto),0)) : (r.mwstBetrag||0);
+  const _rRate  = r.positionen&&r.positionen.length ? (r.positionen.find(p=>p.rate>0)?.rate||0) : (r.mwstRate||0);
+  const newE = {
+    id: Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    datum: r.datum||new Date().toISOString().split('T')[0],
+    typ:'Einnahme',
+    kategorie: r.kategorie||'Dienstleistung',
+    zahlungsart: r.zahlungsart||'Überweisung',
+    beschreibung: `Rechnung ${r.nr}: ${r.beschreibung||r.kunde||''}`,
+    notiz: '',
+    betrag: r.betrag,
+    nettoBetrag: _rNetto,
+    mwstBetrag: _rMwst,
+    mwstRate: _rRate
+  };
+  data.eintraege.unshift(newE);
+  sbSaveEintrag(newE);
+  return newE;
+}
+
 function autoRechNr(){
   // §14 UStG — единая сквозная нумерация
   // Учитываем и Rechnungen и Einträge с Beleg-Nr.
@@ -206,9 +236,15 @@ function saveRechnung(){
     const r=data.rechnungen.find(x=>x.id===editRechId);
     if(r){
       const altWert={nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig};
+      const wasNotBezahlt = r.status !== 'bezahlt';
       Object.assign(r,obj);
       sbSaveRechnung(r);
       sbLogRechnung(r,'geaendert',altWert,{nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig});
+      // Wenn neu auf bezahlt gesetzt → Einnahme automatisch buchen
+      if(wasNotBezahlt && r.status==='bezahlt'){
+        const newE = _buchRechnungAlsEinnahme(r);
+        if(newE){ sbLogRechnung(r,'bezahlt',{status:altWert.status},{status:'bezahlt',einnahme_betrag:r.betrag}); renderAll(); }
+      }
     }
     editRechId=null;
   } else {
@@ -223,34 +259,52 @@ function saveRechnung(){
 }
 async function rechBezahlt(id){
   const r=data.rechnungen.find(x=>x.id===id);if(!r)return;
-  const ok = await appConfirm(`Rechnung ${r.nr} als Einnahme buchen und bezahlt markieren?`,{title:'Rechnung bezahlt',icon:'✅',okLabel:'Ja, buchen',cancelLabel:'Nein'});
-  if(ok){
-    r.status='bezahlt';
-    const _rNetto = r.positionen&&r.positionen.length ? r2(r.positionen.reduce((s,p)=>s+(p.menge||1)*p.netto,0)) : (r.netto||r.betrag);
-    const _rMwst  = r.positionen&&r.positionen.length ? r2(r.positionen.reduce((s,p)=>s+(p.menge||1)*(p.brutto-p.netto),0)) : (r.mwstBetrag||0);
-    const _rRate  = r.positionen&&r.positionen.length ? (r.positionen.find(p=>p.rate>0)?.rate||0) : (r.mwstRate||0);
-    const newE={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:r.kategorie||'Dienstleistung',zahlungsart:r.zahlungsart||'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag,nettoBetrag:_rNetto,mwstBetrag:_rMwst,mwstRate:_rRate};
-    data.eintraege.unshift(newE);
-    sbSaveRechnung(r); sbSaveEintrag(newE);
+  const ok = await appConfirm(
+    `Rechnung ${r.nr} auf bezahlt setzen und Einnahme ${fmt(r.betrag)} automatisch buchen?`,
+    {title:'Rechnung bezahlt', icon:'✅', okLabel:'Ja, bezahlt + Einnahme', cancelLabel:'Abbrechen'}
+  );
+  if(!ok) return;
+  r.status='bezahlt';
+  sbSaveRechnung(r);
+  const newE = _buchRechnungAlsEinnahme(r);
+  if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
-    renderAll();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');
+    renderAll();
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
-    const ok2 = await appConfirm('Nur als bezahlt markieren?',{title:'Nur markieren',icon:'✓',okLabel:'Ja',cancelLabel:'Nein'});
-    if(ok2){
-      r.status='bezahlt';
-      sbSaveRechnung(r);
-      sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
-      renderRech();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
-    }
+    // Einnahme existiert bereits
+    sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
+    renderRech();
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
 }
 async function delRech(id){
-  const _okR=await appConfirm('Rechnung wirklich löschen?',{title:'Rechnung löschen',icon:'🗑️',okLabel:'Löschen',danger:true});
+  const _rDel=data.rechnungen.find(r=>r.id===id); if(!_rDel) return;
+  const warBezahlt = _rDel.status==='bezahlt';
+  const confirmMsg = warBezahlt
+    ? `Rechnung ${_rDel.nr} löschen?
+⚠ Diese Rechnung ist bezahlt — die zugehörige Einnahme wird storniert!`
+    : `Rechnung ${_rDel.nr} wirklich löschen?`;
+  const _okR=await appConfirm(confirmMsg,{title:'Rechnung löschen',icon:'🗑️',okLabel:'Löschen',danger:true});
   if(!_okR)return;
-  const _rDel=data.rechnungen.find(r=>r.id===id);
-  if(_rDel) sbLogRechnung(_rDel,'geloescht',{nr:_rDel.nr,betrag:_rDel.betrag,status:_rDel.status,kunde:_rDel.kunde},null);
+  // Wenn bezahlt → zugehörige Einnahme stornieren (GoBD)
+  if(warBezahlt){
+    const linkedE = data.eintraege.find(e =>
+      e.beschreibung && e.beschreibung.includes(`Rechnung ${_rDel.nr}:`) && !e.is_storno && !e._storniert
+    );
+    if(linkedE){
+      const storno = await sbStornoEintrag(linkedE.id);
+      if(storno){
+        data.eintraege.push(storno);
+        toast(`↩️ Einnahme "${linkedE.beschreibung}" wurde storniert`,'ok');
+      }
+    }
+  }
+  sbLogRechnung(_rDel,'geloescht',{nr:_rDel.nr,betrag:_rDel.betrag,status:_rDel.status,kunde:_rDel.kunde},null);
   data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);
-  sbDeleteRechnung(id);renderRech();toast('Gelöscht','err');
+  sbDeleteRechnung(id);
+  renderAll();
+  toast(`Rechnung ${_rDel.nr} gelöscht`,'err');
 }
 // ── RECHNUNG POSITIONEN ───────────────────────────────────────────────────
 

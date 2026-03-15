@@ -97,6 +97,17 @@ window.addEventListener('supabase-ready', () => {
     }
     delete data.ustMode;
   }
+  // Синхронизация: создаём Einnahmen для bezahlt Rechnungen без Einnahme
+  if(data.rechnungen && data.eintraege !== undefined){
+    (data.rechnungen||[]).filter(r=>r.status==='bezahlt').forEach(r=>{
+      const exists = (data.eintraege||[]).some(e=>
+        e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`) && !e.is_storno && !e._storniert
+      );
+      if(!exists && typeof _buchRechnungAlsEinnahme === 'function'){
+        _buchRechnungAlsEinnahme(r);
+      }
+    });
+  }
   appInit();
 });
 let curTyp='Einnahme', fTyp='Alle', sortCol='datum', sortAsc=false;
