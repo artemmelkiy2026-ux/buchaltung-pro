@@ -151,12 +151,12 @@
 <!-- ── DASHBOARD ── -->
 <div class="page active" id="p-dashboard">
 <div class="page-inner">
-  <div style="display:flex;align-items: flex-start;justify-content:space-between;margin-bottom:20px;">
-    <div>
-      <h1 style="font-size:20px;font-weight:700"><i class="fas fa-home"></i> Dashboard</h1>
-      <p style="color:var(--sub);font-size:14px;margin-top:3px">Übersicht — <span id="dash-yr-lbl"></span></p>
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Dashboard</div>
+      <div class="ph-sub">Übersicht — <span id="dash-yr-lbl"></span></div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
+    <div class="ph-right">
       <select id="dash-yr" onchange="renderDash()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:12px;outline:none;font-family:var(--sans)">
         <option>Alle</option>
       </select>
@@ -204,7 +204,9 @@
 <div class="page" id="p-eintraege">
 <div class="page-inner">
 
-  <h1 style="font-size:20px;font-weight:700;margin-bottom:16px"><i class="fas fa-list"></i> Einträge</h1>
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Einträge</div></div>
+  </div>
 
   <div class="toolbar">
     <div class="filter-tabs">
@@ -292,12 +294,14 @@
 <!-- ── JOURNAL (GoBD) ── -->
 <div class="page" id="p-journal">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div>
-      <h1 style="font-size:20px;font-weight:700"><i class="fas fa-book"></i> Buchungsjournal</h1>
-      <p style="color:var(--sub);font-size:12px;margin-top:3px">GoBD-konforme Änderungshistorie · nur Storno-Ketten</p>
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Buchungsjournal</div>
+      <div class="ph-sub">GoBD-konforme Änderungshistorie · nur Storno-Ketten</div>
     </div>
-    <span id="journal-count" style="font-size:12px;color:var(--sub);font-family:var(--mono)"></span>
+    <div class="ph-right">
+      <span id="journal-count" style="font-size:12px;color:var(--sub);font-family:var(--mono)"></span>
+    </div>
   </div>
   <div style="background:rgba(26,69,120,.06);border:1px solid rgba(26,69,120,.2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px">
     <i class="fas fa-info-circle"></i> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
@@ -561,11 +565,11 @@
 <!-- ── MONATSBERICHT ── -->
 <div class="page" id="p-bericht">
 <div class="page-inner">
-  <div class="rep-year-row">
-    <h1 style="font-size:20px;font-weight:700"><i class="fas fa-calendar-alt"></i> Monatsbericht</h1>
-    <select id="rep-yr" onchange="renderRep()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-family:var(--mono);font-size:13px;outline:none;margin-left:12px"></select>
-    <div style="margin-left:auto;display:flex;gap:8px">
-<button class="csv" onclick="exportRepCSV()"><span class="mob-hide"> Jahresbericht </span>CSV <i class="fa-solid fa-download"></i></button>
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Monatsbericht</div></div>
+    <div class="ph-right">
+      <select id="rep-yr" onchange="renderRep()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:12px;outline:none;font-family:var(--mono)"></select>
+      <button class="csv" onclick="exportRepCSV()"><span class="mob-hide">Jahresbericht </span>CSV <i class="fa-solid fa-download"></i></button>
     </div>
   </div>
 
@@ -594,14 +598,16 @@
 <!-- ── ZAHLUNGSARTEN ── -->
 <div class="page" id="p-zahlungen">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-    <div>
-      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-credit-card"></i> Zahlungsarten</h1>
-      <p style="color:var(--sub);font-size:12px;margin-top:3px">Analyse nach Zahlungsart</p>
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Zahlungsarten</div>
+      <div class="ph-sub">Analyse nach Zahlungsart</div>
     </div>
-    <select id="z-yr" onchange="renderZ()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;font-family:var(--sans)">
-      <option>Alle</option>
-    </select>
+    <div class="ph-right">
+      <select id="z-yr" onchange="renderZ()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:12px;outline:none;font-family:var(--sans)">
+        <option>Alle</option>
+      </select>
+    </div>
   </div>
   <div class="zk-grid" id="zk-grid"></div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
@@ -619,12 +625,14 @@
 <!-- ── PROGNOSE ── -->
 <div class="page" id="p-prognose">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-    <div>
-      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-chart-line"></i> Prognose & Vorjahresvergleich</h1>
-      <p style="color:var(--sub);font-size:12px;margin-top:3px">Hochrechnung auf Basis der laufenden Monate</p>
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Prognose & Vorjahresvergleich</div>
+      <div class="ph-sub">Hochrechnung auf Basis der laufenden Monate</div>
     </div>
-    <select id="prog-yr" onchange="renderProg()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 14px;font-size:13px;font-weight:600;outline:none;font-family:var(--sans)"></select>
+    <div class="ph-right">
+      <select id="prog-yr" onchange="renderProg()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:12px;outline:none;font-family:var(--sans)"></select>
+    </div>
   </div>
 
   <!-- Hero-карточки прогноза -->
@@ -647,14 +655,13 @@
 <!-- ── KATEGORIEN ── -->
 <div class="page" id="p-kategorien">
 <div class="page-inner">
-  <!-- Заголовок -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div>
-      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-chart-bar"></i> Kategorienanalyse</h1>
-      <p style="color:var(--sub);font-size:12px;margin-top:3px">Ausgaben & Einnahmen nach Kategorien</p>
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Kategorienanalyse</div>
+      <div class="ph-sub">Ausgaben & Einnahmen nach Kategorien</div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <select id="kat-yr" onchange="renderKat()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;font-family:var(--sans)"></select>
+    <div class="ph-right">
+      <select id="kat-yr" onchange="renderKat()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:12px;outline:none;font-family:var(--sans)"></select>
       <button class="ftab active" id="kat-tab-aus" onclick="setKatTab('Ausgabe',this)">▼ Ausgaben</button>
       <button class="ftab" id="kat-tab-ein" onclick="setKatTab('Einnahme',this)">▲ Einnahmen</button>
     </div>
@@ -679,14 +686,10 @@
 <!-- ── KUNDEN (CRM) ── -->
 <div class="page" id="p-kunden">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div>
-      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-users"></i> Kunden (CRM)</h1>
-      <p style="color:var(--sub);font-size:12px;margin-top:3px">Kundenverwaltung · Adressen · Kontakte</p>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="kunden-search" type="text" placeholder="Suchen..." oninput="renderKunden()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;width:180px">
-      <button class="btn primary" onclick="openKundeModal()"><i class="fas fa-plus"></i> Neuer Kunde</button>
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Kunden (CRM)</div>
+      <div class="ph-sub">Kundenverwaltung · Umsatz · Rechnungen</div>
     </div>
   </div>
   <!-- Statistik-Cards -->
@@ -708,12 +711,15 @@
 <!-- ── RECHNUNGEN ── -->
 <div class="page" id="p-rechnungen">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div><h1 style="font-size:18px;font-weight:700"><i class="fas fa-file-invoice"></i> Offene Rechnungen</h1>
-    <p style="color:var(--sub);font-size:12px;margin-top:3px">Status: offen · bezahlt · überfällig</p></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Offene Rechnungen</div>
+    </div>
+    <div class="ph-right">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i> Firmenprofil</button>
       <button class="btn primary" onclick="openRechModal()">＋ Rechnung erstellen</button>
+    </div>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="rech-cards"></div>
@@ -743,12 +749,10 @@
 <!-- ── WIEDERKEHREND ── -->
 <div class="page" id="p-wiederkehrend">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div><h1 style="font-size:18px;font-weight:700"><i class="fas fa-sync-alt"></i> Wiederkehrende Zahlungen</h1>
-    <p style="color:var(--sub);font-size:12px;margin-top:3px">Automatisch jeden Monat / Quartal / Jahr buchen</p></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn primary" onclick="openWiedModal()">Neue Vorlage</button>
-      <button class="btn success" onclick="wBuchenAlle()">Alle fälligen buchen</button>
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Wiederkehrende Zahlungen</div>
+      <div class="ph-sub">Automatisch je Monat / Quartal / Jahr</div>
     </div>
   </div>
   <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px" id="wied-hint" style="display:none">
@@ -773,12 +777,11 @@
 <div class="page-inner">
 
   <!-- Заголовок -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div>
-      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-percentage"></i> Umsatzsteuer</h1>
-      <p style="color:var(--sub);font-size:12px;margin-top:3px">USt-Modus je Jahr · Zahllast · Voranmeldung</p>
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Umsatzsteuer</div>
+      <div class="ph-sub">USt-Modus je Jahr · Zahllast · Voranmeldung</div>
     </div>
-    <select id="ust-yr" onchange="ustPage=1;renderUst()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 14px;font-size:13px;font-weight:600;outline:none;cursor:pointer"></select>
   </div>
 
   <!-- Два столбца -->
