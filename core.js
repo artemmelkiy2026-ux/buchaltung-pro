@@ -173,32 +173,38 @@ function nav(id, el){
 function renderPager(containerId, page, totalPages, total, onPageChange){
   const el = document.getElementById(containerId);
   if(!el) return;
-  // Счётчик всегда показывается
-  const from = total===0 ? 0 : (page-1)*Math.ceil(total/totalPages)+1;
-  const to   = total===0 ? 0 : Math.min(page*Math.ceil(total/totalPages), total);
+
+  const perPage = totalPages>0 ? Math.ceil(total/totalPages) : total;
+  const from = total===0 ? 0 : (page-1)*perPage+1;
+  const to   = total===0 ? 0 : Math.min(page*perPage, total);
   const counter = `<span class="pager-count">${total===0?'0':from+'–'+to} / ${total}</span>`;
 
-  if(totalPages<=1){
-    // Кнопки скрыты но счётчик держит высоту
-    el.innerHTML=`<div class="pager"><div class="pager-btns pager-btns-hidden"></div>${counter}</div>`;
-    return;
-  }
-  const btn=(label,pg,disabled,title='')=>
-    `<button class="btn pager-btn${disabled?' pager-btn-dis':''}" ${disabled?'disabled':''} onclick="${onPageChange}(${pg})" title="${title}">${label}</button>`;
+  // Всегда 5 слотов для цифр — фиксированная ширина, без сдвигов
+  const SLOTS = 5;
+  let startPage = Math.max(1, page - Math.floor(SLOTS/2));
+  let endPage   = startPage + SLOTS - 1;
+  if(endPage > totalPages){ endPage = totalPages; startPage = Math.max(1, endPage - SLOTS + 1); }
 
-  let pages='';
-  const start=Math.max(1,page-2), end=Math.min(totalPages,page+2);
-  if(start>1) pages+=btn('1',1,false);
-  if(start>2) pages+=`<span class="pager-ellipsis">…</span>`;
-  for(let i=start;i<=end;i++) pages+=`<button class="btn pager-btn${i===page?' pager-btn-cur':''}" onclick="${onPageChange}(${i})">${i}</button>`;
-  if(end<totalPages-1) pages+=`<span class="pager-ellipsis">…</span>`;
-  if(end<totalPages) pages+=btn(totalPages,totalPages,false);
+  const prevDis = page===1;
+  const nextDis = page===totalPages || totalPages===0;
+
+  let slots = '';
+  for(let s=0; s<SLOTS; s++){
+    const pg = startPage + s;
+    if(pg > totalPages){
+      // Пустой слот — держит место
+      slots += `<button class="btn pager-btn pager-slot-empty" disabled></button>`;
+    } else {
+      const cur = pg===page;
+      slots += `<button class="btn pager-btn${cur?' pager-btn-cur':''}" onclick="${onPageChange}(${pg})">${pg}</button>`;
+    }
+  }
 
   el.innerHTML=`<div class="pager">
     <div class="pager-btns">
-      ${btn('‹',page-1,page===1,'Zurück')}
-      ${pages}
-      ${btn('›',page+1,page===totalPages,'Weiter')}
+      <button class="btn pager-btn pager-nav${prevDis?' pager-btn-dis':''}" ${prevDis?'disabled':''} onclick="${onPageChange}(${page-1})">‹</button>
+      ${slots}
+      <button class="btn pager-btn pager-nav${nextDis?' pager-btn-dis':''}" ${nextDis?'disabled':''} onclick="${onPageChange}(${page+1})">›</button>
     </div>
     ${counter}
   </div>`;
