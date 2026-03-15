@@ -174,11 +174,13 @@ const PIE_COLORS=['#3b82f6','#22c55e','#ef4444','#f59e0b','#a855f7','#06b6d4','#
 
 function setKatTab(t,btn){
   katTyp=t;
-  document.querySelectorAll('#p-kategorien .ftab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[id^="kat-tab-"]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  window._katSel=null;
   renderKat();
 }
 function renderKat(){
+  // ── данные ────────────────────────────────────────────────────────────────
   const years=[...new Set(data.eintraege.map(e=>e.datum.substring(0,4)))].sort().reverse();
   const sel=document.getElementById('kat-yr');
   if(!sel.innerHTML) sel.innerHTML='<option value="Alle">Alle Jahre</option>'+years.map(y=>`<option>${y}</option>`).join('');
@@ -191,174 +193,188 @@ function renderKat(){
   const total=sorted.reduce((s,[,v])=>s+v,0);
   const isEin=katTyp==='Einnahme';
 
-  // ── SVG Donut с анимацией ────────────────────────────────────────────────
-  const donutWrap = document.getElementById('kat-donut-wrap');
+  // ── сброс состояния выделения ─────────────────────────────────────────────
+  window._katSel=null; // null = всё активно
+
+  // ── SVG Donut ─────────────────────────────────────────────────────────────
+  const donutWrap=document.getElementById('kat-donut-wrap');
   if(donutWrap){
-    const R=90, r=58, CX=110, CY=110, SIZE=220;
-    const circumference=2*Math.PI*R;
-    const GAP=3; // gap between segments in px
+    const R=90, ri=54, CX=110, CY=110, SZ=220;
+    const CIRC=2*Math.PI*R;
+    const GAP=sorted.length>1?2.5:0; // gap только если несколько сегментов
 
     if(!sorted.length){
-      donutWrap.innerHTML=`<svg width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">
-        <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--border)" stroke-width="${R-r}"/>
+      donutWrap.innerHTML=`<svg width="${SZ}" height="${SZ}" viewBox="0 0 ${SZ} ${SZ}">
+        <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--border)" stroke-width="${R-ri}"/>
         <text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="middle"
           font-size="12" fill="var(--sub)" font-family="Inter,sans-serif">Keine Daten</text>
       </svg>`;
     } else {
-      // Вычисляем дуги
-      let offset=0;
-      const segments=sorted.map(([k,val],i)=>{
-        const pct=val/total;
-        const len=pct*circumference - GAP;
-        const seg={k,val,i,pct,len,offset};
-        offset+=pct*circumference;
-        return seg;
+      // Правильная математика:
+      // Каждый сегмент — отдельный <circle> с dasharray=[segLen, CIRC]
+      // dashoffset смещает начало дуги: offset в единицах circumference
+      // Начальная точка (12 часов) = rotate(-90) на SVG
+      let angleAcc=0;
+      const segs=sorted.map(([k,val],i)=>{
+        const frac=val/total;
+        const segLen=Math.max(frac*CIRC-GAP, 0.1);
+        const offset=angleAcc; // накопленный сдвиг
+        angleAcc+=frac*CIRC;
+        return {k,val,i,frac,segLen,offset,
+          color:PIE_COLORS[i%PIE_COLORS.length],
+          pct:Math.round(frac*100)};
       });
 
-      // Для каждого сегмента: начальный dashoffset = circumference (скрыт),
-      // финальный = -(s.offset). Анимация JS постепенно заполняет.
-      const segPaths=segments.map(s=>{
-        const color=PIE_COLORS[s.i%PIE_COLORS.length];
-        const finalOffset=-(s.offset);
-        return `<circle
-          cx="${CX}" cy="${CY}" r="${R}"
-          fill="none"
-          stroke="${color}"
-          stroke-width="${R-r}"
-          stroke-dasharray="${s.len} ${circumference-s.len}"
-          stroke-dashoffset="${circumference}"
-          transform="rotate(-90 ${CX} ${CY})"
-          class="kat-seg"
-          data-final="${finalOffset}"
-          data-idx="${s.i}"
-          onmouseover="katSegHover(this,'${s.k}','${fmt(s.val)}','${Math.round(s.pct*100)}%')"
-          onmouseout="katSegOut()"
-        />`;
-      }).join('');
+      // Рисуем круги: каждый показывает свой кусок через dasharray + dashoffset
+      // dasharray = [len, CIRC] — показываем len, прячем остаток
+      // dashoffset = -offset — сдвигаем начало дуги
+      const paths=segs.map(s=>`<circle
+        cx="${CX}" cy="${CY}" r="${R}"
+        fill="none" stroke="${s.color}" stroke-width="${R-ri}"
+        stroke-dasharray="${s.segLen} ${CIRC}"
+        stroke-dashoffset="${-s.offset}"
+        transform="rotate(-90 ${CX} ${CY})"
+        class="kat-seg" data-idx="${s.i}"
+        data-name="${s.k.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}"
+        data-val="${fmt(s.val)}" data-pct="${s.pct}%"
+        style="opacity:0;cursor:pointer"
+      />`).join('');
 
-      // Уникальный ID для gradient
-      const gid='kg'+Date.now();
+      donutWrap.innerHTML=`<svg width="${SZ}" height="${SZ}" viewBox="0 0 ${SZ} ${SZ}" class="kat-svg">
+        <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--border)" stroke-width="${R-ri}"/>
+        ${paths}
+        <circle cx="${CX}" cy="${CY}" r="${ri-2}" fill="var(--s1)" style="pointer-events:none"/>
+        <text x="${CX}" y="${CY-10}" text-anchor="middle" dominant-baseline="middle"
+          font-size="10" fill="var(--sub)" font-family="Inter,sans-serif" font-weight="600"
+          style="pointer-events:none">${isEin?'EINNAHMEN':'AUSGABEN'}</text>
+        <text id="kat-cv" x="${CX}" y="${CY+8}" text-anchor="middle" dominant-baseline="middle"
+          font-size="15" fill="var(--text)" font-family="JetBrains Mono,monospace" font-weight="700"
+          style="pointer-events:none">${fmt(total)}</text>
+        <text id="kat-cs" x="${CX}" y="${CY+26}" text-anchor="middle" dominant-baseline="middle"
+          font-size="10" fill="var(--sub)" font-family="Inter,sans-serif"
+          style="pointer-events:none">${sorted.length} Kategorien</text>
+      </svg>`;
 
-      donutWrap.innerHTML=`
-        <svg width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}" class="kat-svg">
-          <defs>
-            <filter id="${gid}-shadow">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
-            </filter>
-          </defs>
-          <!-- Фоновое кольцо -->
-          <circle cx="${CX}" cy="${CY}" r="${R}" fill="none"
-            stroke="var(--border)" stroke-width="${R-r}"/>
-          <!-- Сегменты -->
-          ${segPaths}
-          <!-- Центральный круг -->
-          <circle cx="${CX}" cy="${CY}" r="${r-4}" fill="var(--s1)"/>
-          <!-- Центральный текст -->
-          <text x="${CX}" y="${CY-10}" text-anchor="middle"
-            font-size="10" fill="var(--sub)" font-family="Inter,sans-serif"
-            font-weight="600" text-transform="uppercase" letter-spacing="0.5">
-            ${isEin?'EINNAHMEN':'AUSGABEN'}
-          </text>
-          <text id="kat-center-val" x="${CX}" y="${CY+10}" text-anchor="middle"
-            font-size="16" fill="var(--text)" font-family="JetBrains Mono,monospace"
-            font-weight="700">
-            ${fmt(total)}
-          </text>
-          <text id="kat-center-sub" x="${CX}" y="${CY+26}" text-anchor="middle"
-            font-size="10" fill="var(--sub)" font-family="Inter,sans-serif">
-            ${sorted.length} Kategorien
-          </text>
-        </svg>`;
-
-      // Запускаем анимацию заполнения после рендера
-      requestAnimationFrame(()=>{
-        requestAnimationFrame(()=>{
-          const segs=[...donutWrap.querySelectorAll('.kat-seg')];
-          const DURATION=800;
-          const START=performance.now();
-          function ease(t){ return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; }
-          function tick(now){
-            const raw=Math.min((now-START)/DURATION,1);
-            const t=ease(raw);
-            segs.forEach(seg=>{
-              const final=parseFloat(seg.dataset.final);
-              // от circumference до final
-              const cur=circumference+(final-circumference)*t;
-              seg.style.strokeDashoffset=cur;
+      // ── Анимация появления — opacity 0→1 + плавный dashoffset ────────────
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const circles=[...donutWrap.querySelectorAll('.kat-seg')];
+        const DUR=600, T0=performance.now();
+        const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+        (function tick(now){
+          const t=ease(Math.min((now-T0)/DUR,1));
+          circles.forEach(c=>{ c.style.opacity=t; });
+          if(t<1) requestAnimationFrame(tick);
+          else {
+            // После анимации — вешаем события
+            circles.forEach(c=>{
+              c.onmouseenter=()=>_katHL(parseInt(c.dataset.idx),c.dataset.name,c.dataset.val,c.dataset.pct,segs,total,sorted.length);
+              c.onmouseleave=()=>_katReset(segs,total,sorted.length);
+              c.onclick=()=>_katClick(parseInt(c.dataset.idx),segs,total,sorted.length);
             });
-            if(raw<1) requestAnimationFrame(tick);
           }
-          requestAnimationFrame(tick);
-        });
-      });
+        })(performance.now());
+      }));
     }
   }
 
-  // Хелпер: hover на сегмент
-  window.katSegHover=function(el,name,val,pct){
-    const cv=document.getElementById('kat-center-val');
-    const cs=document.getElementById('kat-center-sub');
-    if(cv) cv.textContent=val;
-    if(cs) cs.textContent=name+' · '+pct;
-    document.querySelectorAll('.kat-seg').forEach(s=>{
-      s.style.opacity=s===el?'1':'0.35';
-    });
-  };
-  window.katSegOut=function(){
-    const cv=document.getElementById('kat-center-val');
-    const cs=document.getElementById('kat-center-sub');
-    if(cv) cv.textContent=fmt(total);
-    if(cs) cs.textContent=sorted.length+' Kategorien';
-    document.querySelectorAll('.kat-seg').forEach(s=>s.style.opacity='1');
-  };
+  // ── Stats карточки ────────────────────────────────────────────────────────
+  const katStats=document.getElementById('kat-stats');
+  if(katStats) katStats.innerHTML=`
+    <div class="kat-stat-card">
+      <div class="kat-stat-label">Gesamt</div>
+      <div class="kat-stat-val" style="color:${isEin?'var(--green)':'var(--red)'}">${fmt(total)}</div>
+      <div class="kat-stat-sub">${sorted.length} Kategorien</div>
+    </div>
+    <div class="kat-stat-card">
+      <div class="kat-stat-label">Top 1</div>
+      <div class="kat-stat-val">${sorted[0]?fmt(sorted[0][1]):'—'}</div>
+      <div class="kat-stat-sub">${sorted[0]?sorted[0][0]:'—'}</div>
+    </div>
+    <div class="kat-stat-card">
+      <div class="kat-stat-label">Ø Kategorie</div>
+      <div class="kat-stat-val">${sorted.length?fmt(Math.round(total/sorted.length)):'—'}</div>
+      <div class="kat-stat-sub">Durchschnitt</div>
+    </div>`;
 
-  // ── Summary Stats ─────────────────────────────────────────────────────────
-  const katStats = document.getElementById('kat-stats');
-  if(katStats){
-    const top3=sorted.slice(0,3);
-    const top3sum=top3.reduce((s,[,v])=>s+v,0);
-    const restPct=total>0?Math.round((total-top3sum)/total*100):0;
-    katStats.innerHTML=`
-      <div class="kat-stat-card">
-        <div class="kat-stat-label">Gesamt</div>
-        <div class="kat-stat-val" style="color:${isEin?'var(--green)':'var(--red)'}">${fmt(total)}</div>
-        <div class="kat-stat-sub">${sorted.length} Kategorien</div>
-      </div>
-      <div class="kat-stat-card">
-        <div class="kat-stat-label">Top 1</div>
-        <div class="kat-stat-val">${sorted[0]?fmt(sorted[0][1]):'—'}</div>
-        <div class="kat-stat-sub">${sorted[0]?sorted[0][0]:'—'}</div>
-      </div>
-      <div class="kat-stat-card">
-        <div class="kat-stat-label">Ø pro Kategorie</div>
-        <div class="kat-stat-val">${sorted.length?fmt(Math.round(total/sorted.length)):'—'}</div>
-        <div class="kat-stat-sub">Durchschnitt</div>
-      </div>`;
-  }
-
-  // ── Категории — плитки в стиле Канва ─────────────────────────────────────
-  const katGrid = document.getElementById('kat-grid');
+  // ── Плитки ────────────────────────────────────────────────────────────────
+  const katGrid=document.getElementById('kat-grid');
   if(katGrid){
     if(!sorted.length){
-      katGrid.innerHTML='<div style="padding:40px;text-align:center;color:var(--sub);grid-column:1/-1">Keine Daten für diesen Zeitraum</div>';
+      katGrid.innerHTML='<div style="padding:40px;text-align:center;color:var(--sub);grid-column:1/-1">Keine Daten</div>';
     } else {
-      katGrid.innerHTML = sorted.map(([k,v],i)=>{
-        const pct=total>0?Math.round(v/total*100):0;
-        const pctOfTop=Math.round(v/sorted[0][1]*100);
+      // Строим segs для плиток (нужен тот же массив что и для SVG)
+      let angleAcc2=0;
+      const tilesSegs=sorted.map(([k,v],i)=>{
+        const frac=v/total;
+        const s={k,v,i,frac,segLen:Math.max(frac*(2*Math.PI*90)-2.5,0.1),
+          offset:angleAcc2, color:PIE_COLORS[i%PIE_COLORS.length], pct:Math.round(frac*100)};
+        angleAcc2+=frac*(2*Math.PI*90);
+        return s;
+      });
+
+      katGrid.innerHTML=sorted.map(([k,v],i)=>{
+        const pct=Math.round(v/total*100);
+        const bar=Math.round(v/sorted[0][1]*100);
         const color=PIE_COLORS[i%PIE_COLORS.length];
-        return `<div class="kat-tile" onclick="this.classList.toggle('kat-tile-active')">
+        return `<div class="kat-tile" data-katidx="${i}"
+          onmouseenter="_katHL(${i},'${k.replace(/'/g,"\'")}','${fmt(v)}','${pct}%',null,${total},${sorted.length})"
+          onmouseleave="_katReset(null,${total},${sorted.length})"
+          onclick="_katClick(${i},null,${total},${sorted.length})">
           <div class="kat-tile-top">
             <div class="kat-tile-dot" style="background:${color}"></div>
             <div class="kat-tile-name">${k}</div>
             <div class="kat-tile-pct">${pct}%</div>
           </div>
           <div class="kat-tile-val" style="color:${isEin?'var(--green)':'var(--red)'}">${fmt(v)}</div>
-          <div class="kat-tile-bar">
-            <div class="kat-tile-bar-fill" style="width:${pctOfTop}%;background:${color}"></div>
-          </div>
+          <div class="kat-tile-bar"><div class="kat-tile-bar-fill" style="width:${bar}%;background:${color}"></div></div>
         </div>`;
       }).join('');
     }
   }
 }
 
+// ── Highlight / Reset / Toggle ─────────────────────────────────────────────
+window._katSel=null; // Set выбранных idx, null = все
+
+function _katSetCenter(txt, sub){
+  const cv=document.getElementById('kat-cv');
+  const cs=document.getElementById('kat-cs');
+  if(cv) cv.textContent=txt;
+  if(cs) cs.textContent=sub;
+}
+
+function _katHL(idx, name, val, pct, segs, total, count){
+  _katSetCenter(val, name+' · '+pct);
+  document.querySelectorAll('.kat-seg').forEach((c,i)=>{
+    c.style.opacity= i===idx ? '1' : '0.2';
+    c.style.transform= i===idx ? 'scale(1.03)' : '';
+  });
+  document.querySelectorAll('.kat-tile').forEach((t,i)=>{
+    t.style.opacity= i===idx ? '1' : '0.4';
+  });
+}
+
+function _katReset(segs, total, count){
+  const sel=window._katSel;
+  _katSetCenter(sel?'':fmt(total), sel?sel.size+' ausgewählt':count+' Kategorien');
+  document.querySelectorAll('.kat-seg').forEach((c,i)=>{
+    c.style.opacity= (!sel||sel.has(i)) ? '1' : '0.2';
+    c.style.transform='';
+  });
+  document.querySelectorAll('.kat-tile').forEach((t,i)=>{
+    t.classList.toggle('kat-tile-active', !!sel&&sel.has(i));
+    t.style.opacity= (!sel||sel.has(i)) ? '1' : '0.45';
+  });
+}
+
+function _katClick(idx, segs, total, count){
+  if(!window._katSel){
+    window._katSel=new Set([idx]);
+  } else if(window._katSel.has(idx)){
+    window._katSel.delete(idx);
+    if(window._katSel.size===0) window._katSel=null;
+  } else {
+    window._katSel.add(idx);
+  }
+  _katReset(segs, total, count);
+}
