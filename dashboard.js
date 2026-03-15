@@ -943,7 +943,7 @@ function renderRep(){
     totBlock.innerHTML=`
     <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Jahresübersicht ${yr}</div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-      <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px">
+      <div style="background:rgba(34,197,94,.06);border-radius:12px;padding:14px">
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">${fmt(tEin)}</div>
       </div>
