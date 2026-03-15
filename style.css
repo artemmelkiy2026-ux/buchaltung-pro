@@ -1422,7 +1422,7 @@ input, select, textarea {
 .ust-klein-banner{
   display:flex;align-items:center;gap:16px;
   padding:16px 20px;border-radius:var(--r2);
-  background:rgba(93,157,105,.07);border:1px solid rgba(93,157,105,.25);
+  background:rgba(93,157,105,.07);
 }
 .ust-klein-banner-icon{
   width:44px;height:44px;border-radius:12px;
