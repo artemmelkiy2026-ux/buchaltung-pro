@@ -75,14 +75,12 @@ function _showAppDialog({ icon='⚠️', title='', message='', buttons=[] }) {
   });
 }
 
-// Заменяем window.confirm
+// Сохраняем оригинальный confirm ДО переопределения
+window._nativeConfirm = window.confirm;
+// Заменяем window.confirm — проксируем на нативный
 window.confirm = function(message) {
-  // Синхронный confirm нельзя заменить на async без рефакторинга всего кода
-  // Поэтому используем кастомную версию appConfirm() для новых вызовов
-  // Старые confirm() оставляем как есть (работают)
   return window._nativeConfirm(message);
 };
-window._nativeConfirm = window.confirm;
 
 // Новая глобальная функция для async confirm
 window.appConfirm = function(message, { title='Bestätigung', icon='❓', okLabel='Ja', cancelLabel='Abbrechen', danger=false }={}) {
