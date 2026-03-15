@@ -50,37 +50,7 @@ function renderProg(){
       ${deltaGew!==null?`<div class="pg-badge ${deltaGew>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px;display:inline-flex">${deltaGew>=0?'↑':'↓'} ${Math.abs(deltaGew)}%</div>`:''}
     </div>`;
 
-  // ── 2. MONAT FÜR MONAT ──────────────────────────────────────────────────
-  document.getElementById('prog-monat').innerHTML=`
-    <div class="pg-months">
-      ${MS.map((m,i)=>{
-        const ein=einM[i],aus=ausM[i],gew=ein-aus;
-        const isFuture=i>curM&&yr===now.getFullYear()+'';
-        const isCur=i===curM&&yr===now.getFullYear()+'';
-        const hasData=ein>0||aus>0;
-        const gc=gew>=0?'var(--green)':'var(--red)';
-        return `<div class="pg-month${isFuture?' pg-month-future':''}${isCur?' pg-month-cur':''}">
-          <div class="pg-month-name">${m}</div>
-          <div class="pg-month-body">
-            <div class="pg-month-row">
-              <span class="pg-month-dot" style="background:var(--green)"></span>
-              <span class="pg-month-num pg-month-ein">${ein>0?fmt(Math.round(ein)):'—'}</span>
-            </div>
-            <div class="pg-month-row">
-              <span class="pg-month-dot" style="background:var(--red)"></span>
-              <span class="pg-month-num pg-month-aus">${aus>0?fmt(Math.round(aus)):'—'}</span>
-            </div>
-          </div>
-          ${hasData?`<div class="pg-month-gew" style="color:${gc}">${(gew>=0?'+':'')+fmt(Math.round(Math.abs(gew)))}</div>`:''}
-        </div>`;
-      }).join('')}
-    </div>
-    <div class="pg-legend">
-      <span><span class="pg-legend-dot" style="background:var(--green)"></span>Einnahmen</span>
-      <span><span class="pg-legend-dot" style="background:var(--red)"></span>Ausgaben</span>
-    </div>`;
-
-  // ── 3. VORJAHRESVERGLEICH ────────────────────────────────────────────────
+  // ── 2. VORJAHRESVERGLEICH ────────────────────────────────────────────────
   const verglEl=document.getElementById('prog-vergleich');
   const hasVorjahr=pe.length>0;
   if(!hasVorjahr){
