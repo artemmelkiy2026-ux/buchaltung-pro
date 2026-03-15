@@ -54,27 +54,27 @@ function renderProg(){
   // ── 2. МЕСЯЦЫ — горизонтальный ряд ───────────────────────────────────
   const maxEin=Math.max(...einM,1), maxAus=Math.max(...ausM,1);
   document.getElementById('prog-monat').innerHTML = `
-    <div class="prog-months-grid">
+    <div class="prog-months-row">
       ${MS.map((m,i)=>{
         const ein=einM[i],aus=ausM[i],gew=ein-aus;
         const isFuture=i>curM&&yr===now.getFullYear()+'';
         const isCur=i===curM&&yr===now.getFullYear()+'';
         const gc=gew>=0?'var(--green)':'var(--red)';
-        const einPct=ein>0?Math.min(100,Math.round(ein/maxEin*100)):0;
-        const ausPct=aus>0?Math.min(100,Math.round(aus/maxAus*100)):0;
-        return `<div class="prog-mc${isFuture?' prog-mc-future':''}${isCur?' prog-mc-cur':''}">
-          <div class="prog-mc-name">${m}</div>
-          <div class="prog-mc-bars">
-            <div class="prog-mc-bar" style="height:${einPct}%;background:var(--green)"></div>
-            <div class="prog-mc-bar" style="height:${ausPct}%;background:var(--red)"></div>
-          </div>
-          <div class="prog-mc-gew" style="color:${gc}">${ein||aus?(gew>=0?'+':'')+fmt(Math.round(gew/100)*100):'—'}</div>
+        const hasData=ein>0||aus>0;
+        return `<div class="pmth${isFuture?' pmth-future':''}${isCur?' pmth-cur':''}">
+          <div class="pmth-name">${m}</div>
+          ${hasData?`
+            <div class="pmth-ein">${fmt(Math.round(ein))}</div>
+            <div class="pmth-aus">${fmt(Math.round(aus))}</div>
+            <div class="pmth-gew" style="color:${gc}">${(gew>=0?'+':'')+fmt(Math.round(Math.abs(gew)))}</div>
+          `:`<div class="pmth-empty">—</div>`}
         </div>`;
       }).join('')}
     </div>
-    <div class="prog-months-legend">
+    <div class="prog-months-legend" style="margin-top:12px">
       <span><span class="prog-legend-dot" style="background:var(--green)"></span>Einnahmen</span>
       <span><span class="prog-legend-dot" style="background:var(--red)"></span>Ausgaben</span>
+      <span><span class="prog-legend-dot" style="background:var(--blue)"></span>Gewinn/Verlust</span>
     </div>`;
 
   // ── 3. VORJAHRESVERGLEICH ─────────────────────────────────────────────
@@ -98,25 +98,16 @@ function renderProg(){
       </div>`;
     }).join('');
 
+    // Таблица месяцев — без баров, читаемые цифры
     const monthRows = MS.map((m,i)=>{
       const cur=einM[i], prev=einP[i];
       const d=prev>0?Math.round((cur/prev-1)*100):cur>0?100:null;
-      const maxVal=Math.max(cur,prev,1);
-      return `<div class="prog-vj-row">
-        <div class="prog-vj-month">${m}</div>
-        <div class="prog-vj-bars">
-          <div class="prog-vj-bar-wrap" title="${yr}: ${fmt(cur)}">
-            <div class="prog-vj-bar-fill" style="width:${Math.round(cur/maxVal*100)}%;background:var(--blue)"></div>
-          </div>
-          <div class="prog-vj-bar-wrap" title="${prevYr}: ${fmt(prev)}">
-            <div class="prog-vj-bar-fill" style="width:${Math.round(prev/maxVal*100)}%;background:var(--border2)"></div>
-          </div>
-        </div>
-        <div class="prog-vj-vals">
-          <span style="color:var(--blue);font-family:var(--mono);font-size:11px">${cur>0?fmt(cur):'—'}</span>
-          <span style="color:var(--sub);font-family:var(--mono);font-size:10px">${prev>0?fmt(prev):'—'}</span>
-        </div>
-        <div class="prog-vj-delta-sm ${d===null?'':''}${d!==null&&d>=0?'delta-up':'delta-down'}">
+      const hasAny=cur>0||prev>0;
+      return `<div class="pvj-row${!hasAny?' pvj-row-empty':''}">
+        <div class="pvj-month">${m}</div>
+        <div class="pvj-cur">${cur>0?fmt(cur):'—'}</div>
+        <div class="pvj-prev">${prev>0?fmt(prev):'—'}</div>
+        <div class="pvj-delta ${d===null?'pvj-delta-na':d>=0?'delta-up':'delta-down'}">
           ${d!==null?(d>=0?'+':'')+d+'%':''}
         </div>
       </div>`;
@@ -124,11 +115,15 @@ function renderProg(){
 
     verglEl.innerHTML = `
       <div class="prog-vj-big">${bigCards}</div>
-      <div class="prog-vj-legend">
-        <span><span class="prog-legend-dot" style="background:var(--blue)"></span>${yr}</span>
-        <span><span class="prog-legend-dot" style="background:var(--border2)"></span>${prevYr}</span>
-      </div>
-      <div class="prog-vj-months">${monthRows}</div>`;
+      <div class="pvj-table">
+        <div class="pvj-header">
+          <div class="pvj-month">Monat</div>
+          <div class="pvj-cur">${yr}</div>
+          <div class="pvj-prev">${prevYr}</div>
+          <div class="pvj-delta">Δ</div>
+        </div>
+        ${monthRows}
+      </div>`;
   }
 
   // ── 4. HOCHRECHNUNG / KU-LIMITE ──────────────────────────────────────

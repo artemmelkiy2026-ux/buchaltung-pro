@@ -99,6 +99,7 @@ function renderRech(){
   </div>`;
 
   if(container) container.innerHTML = cards + summary;
+  _updateRechSortBtns();
 }
 function setRechFilter(f,btn){rechFilter=f;rechPage=1;document.querySelectorAll('#p-rechnungen .ftab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderRech();}
 function sortRech(col){

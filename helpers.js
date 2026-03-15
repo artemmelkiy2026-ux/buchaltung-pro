@@ -221,6 +221,7 @@ function renderKunden(){
   }).join('');
 
   if(container) container.innerHTML = cards;
+  _updateKundenSortBtns();
 }
 
 function getKundeUmsatz(id){

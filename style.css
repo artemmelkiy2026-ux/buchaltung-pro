@@ -1401,3 +1401,59 @@ input, select, textarea {
   #ust-quartal-list{grid-template-columns:repeat(2,1fr)!important}
   .ust-yr-badge{min-width:80px;padding:8px 10px}
 }
+
+/* ── PROGNOSE — Monat für Monat (новый вид) ── */
+.prog-months-row{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:6px;
+}
+.pmth{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:10px;padding:8px 6px;text-align:center;
+  transition:border-color .15s,background .15s;
+}
+.pmth:hover{border-color:var(--border2);background:var(--s1)}
+.pmth-future{opacity:.4}
+.pmth-cur{background:var(--bdim)!important;border-color:var(--blue)!important;opacity:1!important}
+.pmth-name{font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase;margin-bottom:6px}
+.pmth-ein{font-family:var(--mono);font-size:10px;color:var(--green);font-weight:600;margin-bottom:2px}
+.pmth-aus{font-family:var(--mono);font-size:10px;color:var(--red);margin-bottom:4px}
+.pmth-gew{font-family:var(--mono);font-size:11px;font-weight:700;padding-top:4px;border-top:1px solid var(--border)}
+.pmth-empty{font-size:12px;color:var(--border2);padding:8px 0}
+
+/* ── PROGNOSE — Vorjahresvergleich (таблица) ── */
+.pvj-table{
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;
+  margin-top:14px;
+}
+.pvj-header{
+  display:grid;grid-template-columns:60px 1fr 1fr 70px;
+  padding:8px 14px;background:var(--s2);
+  font-size:10px;font-weight:700;color:var(--sub);
+  text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);
+}
+.pvj-row{
+  display:grid;grid-template-columns:60px 1fr 1fr 70px;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  transition:background .12s;
+}
+.pvj-row:last-child{border-bottom:none}
+.pvj-row:hover{background:var(--s2)}
+.pvj-row-empty{opacity:.35}
+.pvj-month{font-size:12px;color:var(--sub);font-family:var(--mono)}
+.pvj-cur{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--blue)}
+.pvj-prev{font-family:var(--mono);font-size:12px;color:var(--sub)}
+.pvj-delta{font-size:11px;font-weight:700;text-align:right}
+.pvj-delta-na{color:var(--border2)}
+
+@media(max-width:768px){
+  .prog-months-row{grid-template-columns:repeat(6,1fr)}
+  .pvj-header,.pvj-row{grid-template-columns:40px 1fr 1fr 55px;padding:8px 10px}
+  .pvj-cur,.pvj-prev{font-size:11px}
+}
+@media(max-width:480px){
+  .prog-months-row{grid-template-columns:repeat(4,1fr)}
+  .pmth-aus{display:none}
+}
