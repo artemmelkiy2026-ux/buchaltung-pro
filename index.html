@@ -58,7 +58,7 @@
 
 <!-- HEADER -->
 <header>
-  <div class="logo" onclick="lockApp()" style="cursor:pointer"><img src="MelaLogic-logo.svg" width="140px" height="auto" alt="mini logo MelaLogic"> <span style="margin: 28px 0px 20px 3px; font-size:10px; text-align:left; line-height: 1;">Zeit<br> gewinnen</span> </div>
+  <div class="logo" onclick="lockApp()" style="cursor:pointer"><img src="MelaLogic-logo.svg" width="140px" height="auto" alt="mini logo MelaLogic"> <span style="margin: 20px 0px 20px 10px;">Einfach so:)</span> </div>
   
 
   <div class="hd">
@@ -699,6 +699,9 @@
       <div class="ph-title">Kunden (CRM)</div>
       <div class="ph-sub">Kundenverwaltung · Umsatz · Rechnungen</div>
     </div>
+    <div class="ph-right">
+      <button class="btn primary" onclick="openKundeModal()"><i class="fas fa-plus"></i> Neuer Kunde</button>
+    </div>
   </div>
   <!-- Statistik-Cards -->
   <div id="kunden-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
@@ -761,6 +764,10 @@
     <div class="ph-left">
       <div class="ph-title">Wiederkehrende Zahlungen</div>
       <div class="ph-sub">Automatisch je Monat / Quartal / Jahr</div>
+    </div>
+    <div class="ph-right">
+      <button class="btn success" onclick="wBuchenAlle()"><i class="fas fa-bolt"></i> Alle fälligen buchen</button>
+      <button class="btn primary" onclick="openWiedModal()"><i class="fas fa-plus"></i> Neue Vorlage</button>
     </div>
   </div>
   <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px" id="wied-hint" style="display:none">
