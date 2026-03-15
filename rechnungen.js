@@ -159,11 +159,17 @@ function editRech(id){
   openModal('rech-modal');
 }
 function autoRechNr(){
-  const yr=new Date().getFullYear();
   const rech=data.rechnungen||[];
-  const prefix=yr+'-';
-  const n=rech.filter(r=>r.nr.startsWith(prefix)).length+1;
-  return`${yr}-${String(n).padStart(3,'0')}`;
+  // §14 UStG — сквозная нумерация без года
+  // Совместимость со старым форматом '2026-001': берём часть после последнего тире
+  let maxN=0;
+  rech.forEach(r=>{
+    const raw=(r.nr||'');
+    const part=raw.includes('-')?raw.split('-').pop():raw;
+    const n=parseInt(part,10);
+    if(!isNaN(n)&&n>maxN) maxN=n;
+  });
+  return String(maxN+1);
 }
 function saveRechnung(){
   const nr=document.getElementById('rn-nr').value.trim();
