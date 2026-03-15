@@ -357,7 +357,7 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
   color:var(--sub);
   border:1px solid rgba(100,116,139,.12);
 }
-.zk-val{font-family:var(--mono);font-size:var(--fs-xl);font-weight:600;color:var(--text);line-height:1;margin-bottom:8px}
+.zk-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text);line-height:1;margin-bottom:8px}
 .zk-row{display:flex;gap:10px;margin-bottom:7px}
 .zk-pill{display:flex;align-items:center;gap:4px;font-size:11px;font-family:var(--mono);color:var(--sub)}
 .zk-pill i{font-size:9px}
