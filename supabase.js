@@ -178,13 +178,9 @@ async function sbStornoEintrag(id) {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
-  // Помечаем оригинал как сторнированный (скрывается из расчётов)
-  // Оригинал помечаем через notiz — is_storno остаётся false (is_storno=true только у Gegenbuchung)
-  // Для Journal достаточно что сторно-запись ссылается на оригинал через storno_of
-  await sb.from('eintraege').update({ is_storno: false }).eq('id', id).eq('user_id', currentUser.id);
-  // Помечаем локально
+  // Помечаем оригинал локально как сторнированный (_storniert восстанавливается из БД по наличию сторно-записи)
   const origLocal = data.eintraege.find(x => x.id === id);
-  if (origLocal) { origLocal._storniert = true; } // is_storno остаётся false — только Gegenbuchung имеет is_storno=true
+  if (origLocal) { origLocal._storniert = true; }
   // Сохраняем сторно-запись
   const { error } = await sb.from('eintraege').insert(eintragToDb(storno));
   if (error) { console.error('Storno error:', error); return null; }

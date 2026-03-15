@@ -2117,12 +2117,13 @@ input, select, textarea {
 .pager-btns{
   display:flex;align-items:center;gap:4px;
 }
-/* Все кнопки одинаковой ширины — ничего не прыгает */
+/* Все кнопки одинаковой ширины и высоты — никакого сдвига */
 .pager-btn{
   width:34px;height:32px;padding:0;
   font-size:13px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;
+  box-sizing:border-box;
 }
 .pager-nav{ width:32px }
 .pager-btn-cur{
@@ -2130,10 +2131,9 @@ input, select, textarea {
   border-color:var(--blue)!important;
   color:#fff!important;
 }
-.pager-btn-dis{opacity:.3;cursor:default;pointer-events:none}
-/* Пустые слоты — невидимы но держат место */
+/* Пустые слоты — полностью прозрачны, не кликабельны, но место занимают */
 .pager-slot-empty{
-  visibility:hidden;pointer-events:none;
+  opacity:0;pointer-events:none;
 }
 .pager-count{
   font-size:12px;color:var(--sub);

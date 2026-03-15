@@ -177,35 +177,34 @@ function renderPager(containerId, page, totalPages, total, onPageChange){
   const perPage = totalPages>0 ? Math.ceil(total/totalPages) : total;
   const from = total===0 ? 0 : (page-1)*perPage+1;
   const to   = total===0 ? 0 : Math.min(page*perPage, total);
-  const counter = `<span class="pager-count">${total===0?'0':from+'–'+to} / ${total}</span>`;
 
-  // Всегда 5 слотов для цифр — фиксированная ширина, без сдвигов
+  // Всегда 5 цифровых слотов фиксированной ширины
   const SLOTS = 5;
   let startPage = Math.max(1, page - Math.floor(SLOTS/2));
   let endPage   = startPage + SLOTS - 1;
   if(endPage > totalPages){ endPage = totalPages; startPage = Math.max(1, endPage - SLOTS + 1); }
 
-  const prevDis = page===1;
-  const nextDis = page===totalPages || totalPages===0;
+  // Стрелки — всегда одинаковые визуально, просто onclick=noop на границах
+  const prevCb = page > 1        ? `${onPageChange}(${page-1})` : 'void(0)';
+  const nextCb = page < totalPages ? `${onPageChange}(${page+1})` : 'void(0)';
 
   let slots = '';
   for(let s=0; s<SLOTS; s++){
     const pg = startPage + s;
-    if(pg > totalPages){
-      // Пустой слот — держит место
-      slots += `<button class="btn pager-btn pager-slot-empty" disabled></button>`;
+    if(pg < 1 || pg > totalPages){
+      // Пустой слот — невидим, но полностью такой же элемент
+      slots += `<button class="btn pager-btn pager-slot-empty" onclick="void(0)"></button>`;
     } else {
-      const cur = pg===page;
-      slots += `<button class="btn pager-btn${cur?' pager-btn-cur':''}" onclick="${onPageChange}(${pg})">${pg}</button>`;
+      slots += `<button class="btn pager-btn${pg===page?' pager-btn-cur':''}" onclick="${onPageChange}(${pg})">${pg}</button>`;
     }
   }
 
   el.innerHTML=`<div class="pager">
     <div class="pager-btns">
-      <button class="btn pager-btn pager-nav${prevDis?' pager-btn-dis':''}" ${prevDis?'disabled':''} onclick="${onPageChange}(${page-1})">‹</button>
+      <button class="btn pager-btn pager-nav" onclick="${prevCb}">‹</button>
       ${slots}
-      <button class="btn pager-btn pager-nav${nextDis?' pager-btn-dis':''}" ${nextDis?'disabled':''} onclick="${onPageChange}(${page+1})">›</button>
+      <button class="btn pager-btn pager-nav" onclick="${nextCb}">›</button>
     </div>
-    ${counter}
+    <span class="pager-count">${total===0?'0':from+'–'+to} / ${total}</span>
   </div>`;
 }

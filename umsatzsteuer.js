@@ -144,26 +144,44 @@ function estGrundtarif(zvE, jahr=2026) {
   if (zvE <= 0) return 0;
   if (zvE <= sw.grundfb) return 0;
   if (zvE <= sw.zone1end) { const y=(zvE-sw.grundfb)/10000; return Math.round((980*y+1400)*y); }
-  if (zvE <= sw.zone2end) { const z=(zvE-sw.zone1end)/10000; return Math.round((180*z+2397)*z+1025); }
-  if (zvE <= sw.zone3end) return Math.round(zvE*0.42 - Math.round(sw.zone2end*0.42 - (180*(sw.zone2end-sw.zone1end)/10000/10000 + 2397*(sw.zone2end-sw.zone1end)/10000 + 1025)));
-  return Math.round(zvE*0.45 - Math.round(sw.zone3end*0.45 - sw.zone3end*0.42 + Math.round(sw.zone3end*0.42 - (180*(sw.zone2end-sw.zone1end)/10000/10000 + 2397*(sw.zone2end-sw.zone1end)/10000 + 1025))));
+  const y1=(sw.zone1end-sw.grundfb)/10000; const est1=Math.round((980*y1+1400)*y1);
+  if (zvE <= sw.zone2end) { const z=(zvE-sw.zone1end)/10000; return Math.round((180*z+2397)*z+est1); }
+  const z2=(sw.zone2end-sw.zone1end)/10000; const est2=Math.round((180*z2+2397)*z2+est1);
+  const d42=Math.round(sw.zone2end*0.42-est2);
+  if (zvE <= sw.zone3end) return Math.round(zvE*0.42-d42);
+  const est3=Math.round(sw.zone3end*0.42-d42);
+  return Math.round(zvE*0.45-Math.round(sw.zone3end*0.45-est3));
 }
 
-// Vereinfachte, akkurate Formel nach §32a EStG
+// Точная формула §32a EStG — полностью динамическая, без hardcoded вычетов
 function calcESt(zvE, jahr=2026) {
   const sw = getSteuerwerte(jahr);
+  if (zvE <= 0) return 0;
   if (zvE <= sw.grundfb) return 0;
+  // Zone 1
   if (zvE <= sw.zone1end) {
     const y = (zvE - sw.grundfb) / 10000;
     return Math.round((980 * y + 1400) * y);
   }
+  // Zone 1 граница — база для Zone 2
+  const y1 = (sw.zone1end - sw.grundfb) / 10000;
+  const est1 = Math.round((980 * y1 + 1400) * y1);
+  // Zone 2
   if (zvE <= sw.zone2end) {
     const z = (zvE - sw.zone1end) / 10000;
-    const grenze1 = calcESt(sw.zone1end, jahr);
-    return Math.round((180 * z + 2397) * z + grenze1);
+    return Math.round((180 * z + 2397) * z + est1);
   }
-  if (zvE <= sw.zone3end) return Math.round(zvE * 0.42 - (jahr === 2026 ? 10353 : 10436));
-  return Math.round(zvE * 0.45 - (jahr === 2026 ? 18693 : 18772));
+  // Zone 2 граница — база для Zone 3
+  const z2 = (sw.zone2end - sw.zone1end) / 10000;
+  const est2 = Math.round((180 * z2 + 2397) * z2 + est1);
+  const deduct42 = Math.round(sw.zone2end * 0.42 - est2);
+  // Zone 3
+  if (zvE <= sw.zone3end) return Math.round(zvE * 0.42 - deduct42);
+  // Zone 3 граница — база для Zone 4
+  const est3 = Math.round(sw.zone3end * 0.42 - deduct42);
+  const deduct45 = Math.round(sw.zone3end * 0.45 - est3);
+  // Zone 4
+  return Math.round(zvE * 0.45 - deduct45);
 }
 
 function estGrundtarifY(zvE, jahr=2026) { return calcESt(Math.max(0, Math.round(zvE)), jahr); }
