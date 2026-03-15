@@ -961,7 +961,7 @@ function renderUst(){
       const isK = m==='§19';
       const active = y===yr;
       const einY = activeEintraege().filter(e=>e.datum.startsWith(y)&&e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
-      return `<div onclick="document.getElementById('ust-yr').value='${y}';renderUst()" class="ust-yr-badge${active?' ust-yr-badge--active':''}${isK?' ust-yr-badge--klein':' ust-yr-badge--regel'}">
+      return `<div onclick="ustSetYear('${y}')" class="ust-yr-badge${active?' ust-yr-badge--active':''}${isK?' ust-yr-badge--klein':' ust-yr-badge--regel'}">
         <div class="ust-yr-badge-year">${y}</div>
         <div class="ust-yr-badge-mode">${isK?'§19 KU':'MwSt'}</div>
         <div class="ust-yr-badge-sum">${fmt(einY)}</div>
@@ -1159,6 +1159,18 @@ function renderUst(){
     });
     // Quartal als Karten
     const qtContainer = document.getElementById('ust-quartal-list');
+    // Добавляем заголовок прямо перед сеткой через соседний элемент
+    const qtSection = document.getElementById('ust-quartal-section');
+    if(qtSection){
+      let lbl = qtSection.querySelector('.ust-q-section-lbl');
+      if(!lbl){
+        lbl = document.createElement('div');
+        lbl.className = 'ust-q-section-lbl';
+        lbl.style.cssText = 'font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px';
+        qtSection.insertBefore(lbl, qtContainer);
+      }
+      lbl.textContent = 'Quartalsübersicht ' + yr;
+    }
     if(qtContainer){
       qtContainer.innerHTML = quarters.map(q=>`
         <div class="ust-q-card${!q.any?' ust-q-empty':''}">
@@ -1376,4 +1388,12 @@ function kuCalc(){
   set('ku-r-mwst',  mwst);
   set('ku-r-brutto',brutto);
   set('ku-r-diff',  mwst);       // экономия = сумма MwSt которую не платишь
+}
+
+// Переключение года в UST — безопасно находит select
+function ustSetYear(yr){
+  const sel = document.getElementById('ust-yr');
+  if(sel){ sel.value = yr; }
+  ustPage = 1;
+  renderUst();
 }
