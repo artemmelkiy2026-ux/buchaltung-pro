@@ -95,6 +95,17 @@ function setTyp(t){
   document.getElementById('btn-a').className='tt'+(t==='Ausgabe'?' aa':'');
   updateKatSel();
   updateMwstFormVisibility();
+  // Beleg-Nr nur bei Einnahme sichtbar
+  const _bnRow=document.getElementById('nf-belegnr-row');
+  if(_bnRow) _bnRow.style.display = t==='Einnahme' ? '' : 'none';
+  // Bei Einnahme: nächste Beleg-Nr vorschlagen
+  if(t==='Einnahme'){
+    const _bnEl=document.getElementById('nf-belegnr');
+    if(_bnEl && !_bnEl.value) _bnEl.value=autoRechNr();
+  } else {
+    const _bnEl=document.getElementById('nf-belegnr');
+    if(_bnEl) _bnEl.value='';
+  }
   const isMobile = window.innerWidth <= 900;
   const layout   = document.getElementById('neu-layout');
   const scanBox  = document.getElementById('scan-beleg-box');
@@ -302,7 +313,9 @@ function clearForm(){
   document.getElementById('nf-bet').value='';
   document.getElementById('nf-dsc').value='';
   document.getElementById('nf-note').value='';
-  const _bnEl=document.getElementById('nf-belegnr'); if(_bnEl) _bnEl.value='';
+  // Beleg-Nr: для Einnahme ставим следующий номер, для Ausgabe очищаем
+  const _bnEl=document.getElementById('nf-belegnr');
+  if(_bnEl) _bnEl.value = curTyp==='Einnahme' ? autoRechNr() : '';
   // Дату НЕ сбрасываем — пользователь мог выбрать другой год
   setMwstRate(19); // Сбрасываем MwSt на 19%
 }
@@ -313,7 +326,7 @@ function addEintrag(){
   const zahl=document.getElementById('nf-zahl').value;
   const dsc=document.getElementById('nf-dsc').value.trim();
   const note=document.getElementById('nf-note').value.trim();
-  const belegnr=document.getElementById('nf-belegnr')?.value.trim()||'';
+  const belegnr=curTyp==='Einnahme'?(document.getElementById('nf-belegnr')?.value.trim()||''):'';
   calcNfVorsteuer(); // пересчёт при изменении суммы
   if(!datum)return toast('Datum eingeben!','err');
   // Валидация даты
@@ -370,8 +383,12 @@ function addEintrag(){
   const mwLabel = !isKleinunternehmer(datum.substring(0,4))&&mwBet>0 ? ` (Netto: ${netBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €, MwSt: ${mwBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €)` : '';
   toast(`${curTyp} gespeichert: ${fmt(betrag)}${mwLabel}`, 'ok');
   // Мигание новой строки в боковой колонке
-  if(curTyp==='Einnahme') { renderLetzteEinnahmen(entry.id); }
-  else { renderLetzteAusgaben(entry.id); }
+  if(curTyp==='Einnahme') {
+    renderLetzteEinnahmen(entry.id);
+    // Автозаполняем следующий номер для Einnahme
+    const _bnElAfter=document.getElementById('nf-belegnr');
+    if(_bnElAfter) _bnElAfter.value=autoRechNr();
+  } else { renderLetzteAusgaben(entry.id); }
 }
 
 function calcNfVorsteuer(){
