@@ -1795,9 +1795,32 @@ input, select, textarea {
 }
 
 @media(max-width:768px){
-  .dr-row{grid-template-columns:24px 32px 1fr auto;gap:8px;padding:10px 12px}
-  .dr-idx{display:none}
-  .dr-bar-track{display:none}
+  .dr-list{ border-radius:12px; }
+  .dr-row{
+    grid-template-columns:36px 1fr auto;
+    gap:10px;padding:12px 14px;
+    align-items:flex-start;
+  }
+  .dr-idx{ display:none }
+  .dr-bar-track{ display:none }
+  .dr-meta{ gap:4px;margin-bottom:0 }
+  .dr-dot{ display:none }
+  /* Метаданные в одну строку: дата · категория */
+  .dr-kat::before{ content:'· ';color:var(--border2) }
+  .dr-name{ font-size:13px;margin-bottom:2px }
+  .dr-amt{ font-size:13px;padding-top:2px }
+  .dr-summary{ padding:10px 14px;gap:6px }
+  .dr-summary-sep{ display:none }
+  .dr-summary-item{ font-size:11px }
+  /* Скрываем способ оплаты и MwSt на мобиле */
+  .dr-meta .badge{ display:none }
+}
+@media(max-width:480px){
+  .dr-row{ padding:10px 12px;gap:8px }
+  .dr-icon{ width:28px;height:28px;font-size:10px }
+  .dr-name{ font-size:12px }
+  .dr-amt{ font-size:12px }
+  .dr-meta{ font-size:10px }
 }
 
 /* ── Vorjahresvergleich — новые блочные карточки ── */
