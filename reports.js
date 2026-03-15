@@ -33,28 +33,22 @@ function renderProg(){
   const deltaGew = prevGew!==0 ? Math.round((progGew/Math.abs(prevGew)-1)*100) : null;
 
   document.getElementById('prog-cards').innerHTML = `
-    <div class="prog-hero-card prog-hero-ein">
-      <div class="prog-hero-label">Prognose Einnahmen ${yr}</div>
-      <div class="prog-hero-val">${fmt(progEin)}</div>
-      <div class="prog-hero-sub">
-        Aktuell: <strong>${fmt(istEin)}</strong> · Ø ${fmt(Math.round(avgEin))}/Monat
-      </div>
-      ${deltaEin!==null?`<div class="prog-hero-delta ${deltaEin>=0?'delta-up':'delta-down'}">${deltaEin>=0?'▲':'▼'} ${Math.abs(deltaEin)}% ggü. ${prevYr}</div>`:''}
+    <div class="sc g" style="cursor:default">
+      <div class="sc-lbl">Prognose Einnahmen ${yr}</div>
+      <div class="sc-val">${fmt(progEin)}</div>
+      <div class="sc-sub">Aktuell: ${fmt(istEin)} · Ø ${fmt(Math.round(avgEin))}/Monat</div>
+      ${deltaEin!==null?`<div class="prog-hero-delta ${deltaEin>=0?'delta-up':'delta-down'}" style="margin-top:8px">${deltaEin>=0?'▲':'▼'} ${Math.abs(deltaEin)}% ggü. ${prevYr}</div>`:''}
     </div>
-    <div class="prog-hero-card prog-hero-aus">
-      <div class="prog-hero-label">Prognose Ausgaben ${yr}</div>
-      <div class="prog-hero-val">${fmt(progAus)}</div>
-      <div class="prog-hero-sub">
-        Aktuell: <strong>${fmt(istAus)}</strong> · Ø ${fmt(Math.round(avgAus))}/Monat
-      </div>
+    <div class="sc r" style="cursor:default">
+      <div class="sc-lbl">Prognose Ausgaben ${yr}</div>
+      <div class="sc-val">${fmt(progAus)}</div>
+      <div class="sc-sub">Aktuell: ${fmt(istAus)} · Ø ${fmt(Math.round(avgAus))}/Monat</div>
     </div>
-    <div class="prog-hero-card ${progGew>=0?'prog-hero-gew':'prog-hero-loss'}">
-      <div class="prog-hero-label">Prognose Gewinn ${yr}</div>
-      <div class="prog-hero-val">${progGew>=0?'+':''}${fmt(progGew)}</div>
-      <div class="prog-hero-sub">
-        Vorjahr: <strong>${prevGew>=0?'+':''}${fmt(prevGew)}</strong>
-      </div>
-      ${deltaGew!==null?`<div class="prog-hero-delta ${deltaGew>=0?'delta-up':'delta-down'}">${deltaGew>=0?'▲':'▼'} ${Math.abs(deltaGew)}% ggü. ${prevYr}</div>`:''}
+    <div class="sc ${progGew>=0?'g':'r'}" style="cursor:default">
+      <div class="sc-lbl">Prognose Gewinn ${yr}</div>
+      <div class="sc-val">${progGew>=0?'+':''}${fmt(progGew)}</div>
+      <div class="sc-sub">Vorjahr: ${prevGew>=0?'+':''}${fmt(prevGew)}</div>
+      ${deltaGew!==null?`<div class="prog-hero-delta ${deltaGew>=0?'delta-up':'delta-down'}" style="margin-top:8px">${deltaGew>=0?'▲':'▼'} ${Math.abs(deltaGew)}% ggü. ${prevYr}</div>`:''}
     </div>`;
 
   // ── 2. МЕСЯЦЫ — горизонтальный ряд ───────────────────────────────────

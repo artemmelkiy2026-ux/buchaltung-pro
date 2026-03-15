@@ -1263,21 +1263,7 @@ input, select, textarea {
    PROGNOSE — новый современный дизайн
    ═══════════════════════════════════════ */
 
-/* Hero-карточки */
-.prog-hero-card{
-  border-radius:16px; padding:22px 24px;
-  border:1px solid var(--border);
-  background:var(--s1);
-  position:relative; overflow:hidden;
-}
-.prog-hero-ein { border-top:3px solid var(--green); }
-.prog-hero-aus { border-top:3px solid var(--red); }
-.prog-hero-gew { border-top:3px solid var(--blue); }
-.prog-hero-loss{ border-top:3px solid var(--red); }
-.prog-hero-label{ font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:10px }
-.prog-hero-val{ font-family:var(--mono);font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1 }
-.prog-hero-sub{ font-size:12px;color:var(--sub);margin-top:8px }
-.prog-hero-delta{ display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700 }
+/* Hero-карточки — используют стандартные .sc */
 .delta-up  { background:rgba(93,157,105,.12); color:var(--green); }
 .delta-down{ background:rgba(220,53,69,.12);  color:var(--red); }
 
