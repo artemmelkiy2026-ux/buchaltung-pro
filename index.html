@@ -188,8 +188,8 @@
   <div id="d-recent-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
       <div style="font-size:13px;font-weight:700;color:var(--text)">Letzte 10 Einträge</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
-        <span style="font-size:11px;color:var(--sub)">Sortieren:</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
         <button class="btn" id="dsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortDash('datum')">Datum</button>
         <button class="btn" id="dsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortDash('betrag')">Betrag</button>
         <button class="btn" id="dsort-typ"    style="padding:4px 10px;font-size:11px" onclick="sortDash('typ')">Typ</button>
@@ -302,9 +302,9 @@
   <div style="background:rgba(26,69,120,.06);border:1px solid rgba(26,69,120,.2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px">
     <i class="fas fa-info-circle"></i> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
   </div>
-  <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sort:</span>
-    <button class="btn" id="jsort-datum" style="padding:4px 10px;font-size:11px" onclick="sortJournal('datum')">Datum ↓</button>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" id="jsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortJournal('datum')">Datum</button>
     <button class="btn" id="jsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortJournal('betrag')">Betrag</button>
   </div>
   <div id="journal-tbody"></div>
@@ -709,7 +709,7 @@
     <input id="rech-search" type="text" placeholder="Nr. oder Kunde..." oninput="renderRech()" style="margin-left:auto;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;width:200px">
   </div>
   <!-- Sort bar -->
-  <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px">
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
     <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('datum')">Datum</button>
     <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('faellig')">Fällig</button>
