@@ -781,116 +781,130 @@
     <select id="ust-yr" onchange="ustPage=1;renderUst()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 14px;font-size:13px;font-weight:600;outline:none;cursor:pointer"></select>
   </div>
 
-  <!-- Обзор лет -->
-  <div id="ust-years-overview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+  <!-- Два столбца -->
+  <div class="ust-two-col">
 
-  <!-- Режим года -->
-  <div id="ust-mode-card" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;margin-bottom:20px">
-    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
-      Besteuerungsform — <span id="ust-mode-yr-label" style="color:var(--text)"></span>
-    </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <label id="ust-lbl-klein" class="ust-mode-lbl" onclick="document.getElementById('ust-mode-klein').checked=true;saveUstMode()">
-        <input type="radio" name="ust-mode" value="§19" id="ust-mode-klein" style="accent-color:var(--green)" onclick="saveUstMode()">
-        <div class="ust-mode-icon" style="background:var(--gdim);color:var(--green)"><i class="fas fa-store"></i></div>
-        <div>
-          <div style="font-weight:700;font-size:13px">§19 UStG</div>
-          <div style="font-size:11px;color:var(--sub);margin-top:2px">Kleinunternehmer</div>
+    <!-- ── ЛЕВЫЙ столбец: обзор, режим, карточки, кварталы ── -->
+    <div class="ust-col-left">
+
+      <!-- Обзор лет -->
+      <div id="ust-years-overview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+
+      <!-- Режим года -->
+      <div id="ust-mode-card" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
+          Besteuerungsform — <span id="ust-mode-yr-label" style="color:var(--text)"></span>
         </div>
-      </label>
-      <label id="ust-lbl-regel" class="ust-mode-lbl" onclick="document.getElementById('ust-mode-regel').checked=true;saveUstMode()">
-        <input type="radio" name="ust-mode" value="regel" id="ust-mode-regel" style="accent-color:var(--blue)" onclick="saveUstMode()">
-        <div class="ust-mode-icon" style="background:var(--bdim);color:var(--blue)"><i class="fas fa-receipt"></i></div>
-        <div>
-          <div style="font-weight:700;font-size:13px">MwSt-Regelbesteuerung</div>
-          <div style="font-size:11px;color:var(--sub);margin-top:2px">USt 19% / 7%</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <label id="ust-lbl-klein" class="ust-mode-lbl" onclick="document.getElementById('ust-mode-klein').checked=true;saveUstMode()">
+            <input type="radio" name="ust-mode" value="§19" id="ust-mode-klein" style="accent-color:var(--green)" onclick="saveUstMode()">
+            <div class="ust-mode-icon" style="background:var(--gdim);color:var(--green)"><i class="fas fa-store"></i></div>
+            <div>
+              <div style="font-weight:700;font-size:13px">§19 UStG</div>
+              <div style="font-size:11px;color:var(--sub);margin-top:2px">Kleinunternehmer</div>
+            </div>
+          </label>
+          <label id="ust-lbl-regel" class="ust-mode-lbl" onclick="document.getElementById('ust-mode-regel').checked=true;saveUstMode()">
+            <input type="radio" name="ust-mode" value="regel" id="ust-mode-regel" style="accent-color:var(--blue)" onclick="saveUstMode()">
+            <div class="ust-mode-icon" style="background:var(--bdim);color:var(--blue)"><i class="fas fa-receipt"></i></div>
+            <div>
+              <div style="font-weight:700;font-size:13px">MwSt-Regelbesteuerung</div>
+              <div style="font-size:11px;color:var(--sub);margin-top:2px">USt 19% / 7%</div>
+            </div>
+          </label>
         </div>
-      </label>
-    </div>
-    <div id="ust-mode-hint" style="margin-top:10px;font-size:12px"></div>
-  </div>
-
-  <!-- Stat-карточки 4 в ряд (только Regelbesteuerung) -->
-  <div id="ust-cards" style="display:none;gap:12px;margin-bottom:20px"></div>
-
-  <!-- Квартальная сводка -->
-  <div id="ust-quartal-section" style="display:none;margin-bottom:20px">
-    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Quartalsübersicht</div>
-    <div id="ust-quartal-list" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px"></div>
-  </div>
-
-  <!-- Операции -->
-  <div id="ust-buchungen-section" style="display:none">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Buchungen mit USt / Vorsteuer</div>
-      <!-- Квартальные переключатели -->
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Quartal:</span>
-        <button id="ust-q-filter-0" class="btn" style="padding:4px 10px;font-size:11px;background:var(--blue);border-color:var(--blue);color:#fff" onclick="ustQuartalFilter=0;ustPage=1;renderUst()">Alle</button>
-        <button id="ust-q-filter-1" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=1;ustPage=1;renderUst()">Q1</button>
-        <button id="ust-q-filter-2" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=2;ustPage=1;renderUst()">Q2</button>
-        <button id="ust-q-filter-3" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=3;ustPage=1;renderUst()">Q3</button>
-        <button id="ust-q-filter-4" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=4;ustPage=1;renderUst()">Q4</button>
+        <div id="ust-mode-hint" style="margin-top:10px;font-size:12px"></div>
       </div>
-    </div>
-    <div id="ust-detail-list" style="display:flex;flex-direction:column;gap:8px"></div>
-    <div id="ust-empty" class="empty-state" style="display:none"><div class="ei">%</div><p>Keine USt-Buchungen für dieses Jahr</p></div>
-    <div id="ust-detail-pager" style="display:none;margin-top:12px"></div>
-    <div id="ust-detail-summary" class="rech-summary" style="margin-top:8px"></div>
-  </div>
 
-  <!-- Manueller Eintrag -->
-  <div id="ust-add-section" style="display:none;margin-top:20px">
-    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Manuellen Eintrag hinzufügen</div>
-    <div class="form-panel" style="padding:16px">
-      <div class="fgrow c2" style="margin-bottom:10px">
-        <div class="fg" style="margin:0">
-          <label>Datum</label>
-          <input type="date" id="ust-new-dat" max="2099-12-31" min="2000-01-01">
+      <!-- Stat-карточки -->
+      <div id="ust-cards" style="display:none;gap:12px;margin-bottom:20px"></div>
+
+      <!-- Квартальная сводка -->
+      <div id="ust-quartal-section" style="display:none;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Quartalsübersicht</div>
+        <div id="ust-quartal-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+      </div>
+
+      <!-- §19 Info -->
+      <div id="ust-klein-info" style="display:none">
+        <div class="ust-klein-banner">
+          <div class="ust-klein-banner-icon"><i class="fas fa-check-circle"></i></div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px">§19 UStG — kein USt-Ausweis nötig</div>
+            <div style="font-size:13px;color:var(--text);line-height:1.6">
+              Rechnungen <strong>ohne Umsatzsteuer</strong> · Keine Voranmeldung erforderlich
+            </div>
+          </div>
         </div>
-        <div class="fg" style="margin:0">
-          <label>Betrag (€)</label>
-          <input type="number" id="ust-new-bet" placeholder="0,00" step="0.01" min="0.01" inputmode="decimal" style="width:100%">
+        <div style="margin-top:14px;padding:16px 18px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2)">
+          <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">Einnahmen dieses Jahres</div>
+          <div id="ust-klein-stats" style="display:flex;gap:20px;flex-wrap:wrap"></div>
         </div>
       </div>
-      <div class="fgrow c2" style="margin-bottom:10px">
-        <div class="fg" style="margin:0"><label>Typ</label>
-          <select id="ust-new-typ" style="width:100%">
-            <option value="ust">Ausgangs-USt (Einnahme)</option>
-            <option value="vorsteuer">Vorsteuer (Ausgabe)</option>
-          </select>
-        </div>
-        <div class="fg" style="margin:0"><label>USt-Satz (%)</label>
-          <select id="ust-new-rate" style="width:100%">
-            <option value="19">19%</option>
-            <option value="7">7%</option>
-            <option value="0">0%</option>
-          </select>
-        </div>
-      </div>
-      <div class="fg" style="margin-bottom:12px"><label>Beschreibung (optional)</label>
-        <input type="text" id="ust-new-dsc" placeholder="z.B. Rechnung Nr. 2025-001...">
-      </div>
-      <button class="btn primary" style="width:100%;padding:11px;font-size:14px" onclick="addUstEintrag()">＋ Eintrag hinzufügen</button>
-    </div>
-  </div>
 
-  <!-- §19 Info -->
-  <div id="ust-klein-info" style="display:none">
-    <div class="ust-klein-banner">
-      <div class="ust-klein-banner-icon"><i class="fas fa-check-circle"></i></div>
-      <div>
-        <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px">§19 UStG — kein USt-Ausweis nötig</div>
-        <div style="font-size:13px;color:var(--text);line-height:1.6">
-          Rechnungen <strong>ohne Umsatzsteuer</strong> · Keine Voranmeldung erforderlich
+    </div><!-- /ust-col-left -->
+
+    <!-- ── ПРАВЫЙ столбец: операции + добавление ── -->
+    <div class="ust-col-right">
+
+      <!-- Операции -->
+      <div id="ust-buchungen-section" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Buchungen mit USt / Vorsteuer</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Quartal:</span>
+            <button id="ust-q-filter-0" class="btn" style="padding:4px 10px;font-size:11px;background:var(--blue);border-color:var(--blue);color:#fff" onclick="ustQuartalFilter=0;ustPage=1;renderUst()">Alle</button>
+            <button id="ust-q-filter-1" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=1;ustPage=1;renderUst()">Q1</button>
+            <button id="ust-q-filter-2" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=2;ustPage=1;renderUst()">Q2</button>
+            <button id="ust-q-filter-3" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=3;ustPage=1;renderUst()">Q3</button>
+            <button id="ust-q-filter-4" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=4;ustPage=1;renderUst()">Q4</button>
+          </div>
+        </div>
+        <div id="ust-detail-list" style="display:flex;flex-direction:column;gap:8px"></div>
+        <div id="ust-empty" class="empty-state" style="display:none"><div class="ei">%</div><p>Keine USt-Buchungen für dieses Jahr</p></div>
+        <div id="ust-detail-pager" style="display:none;margin-top:12px"></div>
+        <div id="ust-detail-summary" class="rech-summary" style="margin-top:8px"></div>
+      </div>
+
+      <!-- Manueller Eintrag -->
+      <div id="ust-add-section" style="display:none;margin-top:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Manuellen Eintrag hinzufügen</div>
+        <div class="form-panel" style="padding:16px">
+          <div class="fgrow c2" style="margin-bottom:10px">
+            <div class="fg" style="margin:0">
+              <label>Datum</label>
+              <input type="date" id="ust-new-dat" max="2099-12-31" min="2000-01-01">
+            </div>
+            <div class="fg" style="margin:0">
+              <label>Betrag (€)</label>
+              <input type="number" id="ust-new-bet" placeholder="0,00" step="0.01" min="0.01" inputmode="decimal" style="width:100%">
+            </div>
+          </div>
+          <div class="fgrow c2" style="margin-bottom:10px">
+            <div class="fg" style="margin:0"><label>Typ</label>
+              <select id="ust-new-typ" style="width:100%">
+                <option value="ust">Ausgangs-USt (Einnahme)</option>
+                <option value="vorsteuer">Vorsteuer (Ausgabe)</option>
+              </select>
+            </div>
+            <div class="fg" style="margin:0"><label>USt-Satz (%)</label>
+              <select id="ust-new-rate" style="width:100%">
+                <option value="19">19%</option>
+                <option value="7">7%</option>
+                <option value="0">0%</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg" style="margin-bottom:12px"><label>Beschreibung (optional)</label>
+            <input type="text" id="ust-new-dsc" placeholder="z.B. Rechnung Nr. 2025-001...">
+          </div>
+          <button class="btn primary" style="width:100%;padding:11px;font-size:14px" onclick="addUstEintrag()">＋ Eintrag hinzufügen</button>
         </div>
       </div>
-    </div>
-    <div style="margin-top:14px;padding:16px 18px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2)">
-      <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">Einnahmen dieses Jahres</div>
-      <div id="ust-klein-stats" style="display:flex;gap:20px;flex-wrap:wrap"></div>
-    </div>
-  </div>
+
+    </div><!-- /ust-col-right -->
+
+  </div><!-- /ust-two-col -->
 
 </div>
 </div>
