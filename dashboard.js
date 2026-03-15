@@ -792,9 +792,11 @@ function renderEin(){
         +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center;margin-top:2px">'
         +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:11px"></i></div>'
         +'<div style="flex:1;min-width:0">'
-        +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">'
         +(stLbl?stLbl:'')
         +'<span style="font-size:11px;color:var(--sub);font-family:var(--mono)">'+fd(e.datum)+'</span>'
+        +'<span style="color:var(--border2)">·</span>'
+        +'<span style="font-size:11px;color:var(--sub)">'+e.kategorie+'</span>'
         +'</div>'
         +'<div style="font-size:14px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3;margin-bottom:'+(mwstBadge?'4px':'0px')+'">'
         +(e.beschreibung||e.kategorie)
@@ -805,8 +807,7 @@ function renderEin(){
         +'</div>'
         +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px;border-top:1px solid var(--border)">'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
-        +'<span>'+e.kategorie+'</span>'
-        +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
+        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
         +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
