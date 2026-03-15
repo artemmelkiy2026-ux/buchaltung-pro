@@ -1017,9 +1017,50 @@ function renderZ(){
     const end = start + zPerPage;
     const pageEntries = sorted.slice(start, end);
     
+    // ── Статистика для трендов ──────────────────────────────────────────────
+    const _maxBet=Math.max(...pageEntries.map(e=>e.betrag),1);
+    const _mNow=(()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');})();
+    const _mPrev=(()=>{const d=new Date();d.setMonth(d.getMonth()-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');})();
+    const _trendMap={};
+    ye.forEach(e=>{
+      const z=e.zahlungsart||'Sonstiges';
+      if(!_trendMap[z]) _trendMap[z]={now:0,prev:0};
+      if(e.datum.startsWith(_mNow))  _trendMap[z].now +=e.betrag;
+      if(e.datum.startsWith(_mPrev)) _trendMap[z].prev+=e.betrag;
+    });
+    const _betCnt={};
+    ye.forEach(e=>{const k=e.betrag.toFixed(2)+'|'+(e.zahlungsart||'');_betCnt[k]=(_betCnt[k]||0)+1;});
+
     ztb.innerHTML=pageEntries.map(e=>{
       const isEin=e.typ==='Einnahme';
-      return '<div class="ein-row">'        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'        +'<div class="ein-row-body">'        +'<div class="ein-row-desc" style="margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'        +'<div class="ein-row-meta">'        +'<span class="ein-row-date">'+fd(e.datum)+'</span>'        +'<span class="ein-row-sep">·</span>'        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(ZICONS[e.zahlungsart]||'')+' '+(e.zahlungsart||'Sonstiges')+'</span>'        +'</div></div>'        +'<div class="ein-row-right">'        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap;font-family:var(--mono)">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'        +'</div>'        +'</div>';
+      const z=e.zahlungsart||'Sonstiges';
+      const barW=Math.round(e.betrag/_maxBet*100);
+      const tr=_trendMap[z]||{now:0,prev:0};
+      const isRep=(_betCnt[e.betrag.toFixed(2)+'|'+z]||0)>1;
+      let trendHtml='';
+      if(tr.prev>0&&tr.now>0){
+        const diff=Math.round((tr.now/tr.prev-1)*100);
+        trendHtml='<span class="zrow-trend '+(diff>=0?'zrow-up':'zrow-dn')+'">'+(diff>=0?'↑':'↓')+Math.abs(diff)+'%</span>';
+      }
+      return '<div class="ein-row">'
+        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'
+        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'
+        +'<div class="ein-row-body">'
+        +'<div class="ein-row-desc" style="margin-bottom:3px">'+(e.beschreibung||e.kategorie)+(isRep?' <span class="zrow-rep" title="Wiederkehrende Summe">↺</span>':'')+'</div>'
+        +'<div class="ein-row-meta">'
+        +'<span class="ein-row-date">'+fd(e.datum)+'</span>'
+        +'<span class="ein-row-sep">·</span>'
+        +'<span class="ein-row-kat">'+e.kategorie+'</span>'
+        +'<span class="ein-row-sep">·</span>'
+        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'Sonstiges')+'</span>'
+        +'</div>'
+        +'<div class="zrow-bar"><div class="zrow-bar-fill" style="width:'+barW+'%;background:var(--'+(isEin?'green':'red')+')"></div></div>'
+        +'</div>'
+        +'<div class="ein-row-right">'
+        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap;font-family:var(--mono)">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+        +trendHtml
+        +'</div>'
+        +'</div>';
     }).join('');
     
     window._zPagerCb=function(p){zPage=p;renderZ();}
