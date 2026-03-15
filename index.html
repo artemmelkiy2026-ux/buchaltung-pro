@@ -850,7 +850,7 @@
     <!-- ── ПРАВЫЙ столбец: операции + добавление ── -->
     <div class="ust-col-right">
 
-      <!-- Операции -->
+      <!-- Операции (Regelbesteuerung) -->
       <div id="ust-buchungen-section" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
           <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Buchungen mit USt / Vorsteuer</div>
@@ -867,6 +867,66 @@
         <div id="ust-empty" class="empty-state" style="display:none"><div class="ei">%</div><p>Keine USt-Buchungen für dieses Jahr</p></div>
         <div id="ust-detail-pager" style="display:none;margin-top:12px"></div>
         <div id="ust-detail-summary" class="rech-summary" style="margin-top:8px"></div>
+      </div>
+
+      <!-- Schnellrechner (§19 Kleinunternehmer) -->
+      <div id="ust-rechner" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Schnellrechner — §19 Kleinunternehmer</div>
+
+        <!-- Ввод суммы -->
+        <div class="form-panel" style="padding:16px 18px;margin-bottom:14px">
+          <div style="font-size:12px;color:var(--sub);margin-bottom:8px">Betrag eingeben</div>
+          <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
+            <input id="ku-input" type="number" placeholder="0,00" step="0.01" min="0" inputmode="decimal"
+              oninput="kuCalc()"
+              style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+                     color:var(--text);padding:10px 14px;font-size:18px;font-family:var(--mono);
+                     font-weight:700;outline:none;width:100%">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <button class="ku-rate-btn active" id="ku-btn-19" onclick="kuSetRate(19)" style="padding:5px 12px;font-size:12px;font-weight:600">19%</button>
+              <button class="ku-rate-btn" id="ku-btn-7"  onclick="kuSetRate(7)"  style="padding:5px 12px;font-size:12px;font-weight:600">7%</button>
+            </div>
+          </div>
+          <!-- Переключатель брутто/нетто -->
+          <div style="display:flex;gap:4px;margin-bottom:0">
+            <button class="ku-mode-btn active" id="ku-m-brutto" onclick="kuSetMode('brutto')">Brutto eingegeben</button>
+            <button class="ku-mode-btn" id="ku-m-netto"  onclick="kuSetMode('netto')">Netto eingegeben</button>
+          </div>
+        </div>
+
+        <!-- Результаты -->
+        <div id="ku-results" class="ku-results">
+          <div class="ku-res-row ku-res-main">
+            <div class="ku-res-label">Als §19 — Rechnungsbetrag</div>
+            <div class="ku-res-val" id="ku-r-ku">—</div>
+          </div>
+          <div class="ku-res-divider"></div>
+          <div class="ku-res-row">
+            <div class="ku-res-label">Nettobetrag</div>
+            <div class="ku-res-val ku-res-sub" id="ku-r-netto">—</div>
+          </div>
+          <div class="ku-res-row">
+            <div class="ku-res-label">MwSt-Betrag (bei Regelbesteuerung)</div>
+            <div class="ku-res-val ku-res-mwst" id="ku-r-mwst">—</div>
+          </div>
+          <div class="ku-res-row">
+            <div class="ku-res-label">Bruttobetrag</div>
+            <div class="ku-res-val ku-res-sub" id="ku-r-brutto">—</div>
+          </div>
+          <div class="ku-res-divider"></div>
+          <div class="ku-res-row ku-res-hint">
+            <div class="ku-res-label" style="color:var(--green)">Du sparst als §19</div>
+            <div class="ku-res-val" id="ku-r-diff" style="color:var(--green)">—</div>
+          </div>
+        </div>
+
+        <!-- Pflichthinweis -->
+        <div style="margin-top:14px;padding:10px 14px;background:var(--bdim);border-radius:var(--r);border:1px solid rgba(30,80,150,.15)">
+          <div style="font-size:11px;color:var(--blue);line-height:1.6">
+            <strong>Pflichthinweis auf §19:</strong><br>
+            <span style="color:var(--sub);font-style:italic">„Gemäß §19 UStG wird keine Umsatzsteuer berechnet."</span>
+          </div>
+        </div>
       </div>
 
     </div><!-- /ust-col-right -->

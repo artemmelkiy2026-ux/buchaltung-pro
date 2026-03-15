@@ -1009,8 +1009,10 @@ function renderUst(){
   if(regelCards) regelCards.style.display = isRegel ? 'grid' : 'none';
   if(quartalSec) quartalSec.style.display = isRegel ? '' : 'none';
   if(buchSec)    buchSec.style.display    = isRegel ? '' : 'none';
-  const addSec = document.getElementById('ust-add-section');
-  if(addSec) addSec.style.display = isRegel ? '' : 'none';
+  const addSec   = document.getElementById('ust-add-section');
+  const rechnerEl = document.getElementById('ust-rechner');
+  if(addSec)    addSec.style.display    = isRegel ? '' : 'none';
+  if(rechnerEl) rechnerEl.style.display = isRegel ? 'none' : '';
 
   // ── §19 — показываем статистику Einnahmen ─────────────────────────────────
   if(!isRegel){
@@ -1331,4 +1333,47 @@ function delUstEintrag(id){
     renderUst();
     toast('Gelöscht','err');
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCHNELLRECHNER §19
+// ═══════════════════════════════════════════════════════════════
+let _kuRate=19, _kuMode='brutto';
+
+function kuSetRate(r){
+  _kuRate=r;
+  document.querySelectorAll('.ku-rate-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ku-btn-'+r)?.classList.add('active');
+  kuCalc();
+}
+function kuSetMode(m){
+  _kuMode=m;
+  document.querySelectorAll('.ku-mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ku-m-'+m)?.classList.add('active');
+  kuCalc();
+}
+function kuCalc(){
+  const raw=parseFloat(document.getElementById('ku-input')?.value)||0;
+  if(!raw){
+    ['ku-r-ku','ku-r-netto','ku-r-mwst','ku-r-brutto','ku-r-diff'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.textContent='—';
+    });
+    return;
+  }
+  let netto, brutto, mwst;
+  if(_kuMode==='brutto'){
+    brutto=raw;
+    mwst=r2(brutto*_kuRate/(100+_kuRate));
+    netto=r2(brutto-mwst);
+  } else {
+    netto=raw;
+    mwst=r2(netto*_kuRate/100);
+    brutto=r2(netto+mwst);
+  }
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=fmt(v);};
+  set('ku-r-ku',   netto);       // §19 — выставляется нетто без НДС
+  set('ku-r-netto', netto);
+  set('ku-r-mwst',  mwst);
+  set('ku-r-brutto',brutto);
+  set('ku-r-diff',  mwst);       // экономия = сумма MwSt которую не платишь
 }

@@ -1952,3 +1952,38 @@ input, select, textarea {
   .ph-title{ font-size:18px }
   .ph-right{ width:100% }
 }
+
+/* ── Schnellrechner §19 ── */
+.ku-rate-btn{
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+  color:var(--sub);cursor:pointer;font-family:var(--mono);
+  transition:all .12s;white-space:nowrap;
+}
+.ku-rate-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.ku-rate-btn:hover:not(.active){border-color:var(--border2)}
+
+.ku-mode-btn{
+  flex:1;padding:7px 10px;font-size:11px;font-weight:600;
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+  color:var(--sub);cursor:pointer;transition:all .12s;
+}
+.ku-mode-btn:first-child{border-radius:var(--r) 0 0 var(--r);border-right:none}
+.ku-mode-btn:last-child{border-radius:0 var(--r) var(--r) 0}
+.ku-mode-btn.active{background:var(--s1);border-color:var(--border2);color:var(--text)}
+
+.ku-results{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r2);overflow:hidden;
+}
+.ku-res-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 16px;border-bottom:1px solid var(--border);
+}
+.ku-res-row:last-child{border-bottom:none}
+.ku-res-main{background:var(--s2)}
+.ku-res-hint{background:rgba(78,144,96,.05)}
+.ku-res-divider{height:1px;background:var(--border2)}
+.ku-res-label{font-size:12px;color:var(--sub)}
+.ku-res-val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text)}
+.ku-res-val.ku-res-sub{font-size:13px;font-weight:500;color:var(--sub)}
+.ku-res-val.ku-res-mwst{color:var(--red)}
