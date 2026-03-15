@@ -159,14 +159,19 @@ function editRech(id){
   openModal('rech-modal');
 }
 function autoRechNr(){
-  const rech=data.rechnungen||[];
-  // §14 UStG — сквозная нумерация без года
-  // Совместимость со старым форматом '2026-001': берём часть после последнего тире
+  // §14 UStG — единая сквозная нумерация
+  // Учитываем и Rechnungen и Einträge с Beleg-Nr.
   let maxN=0;
-  rech.forEach(r=>{
+  // Из Rechnungen — поле nr
+  (data.rechnungen||[]).forEach(r=>{
     const raw=(r.nr||'');
     const part=raw.includes('-')?raw.split('-').pop():raw;
     const n=parseInt(part,10);
+    if(!isNaN(n)&&n>maxN) maxN=n;
+  });
+  // Из Einträge — поле belegnr
+  (data.eintraege||[]).forEach(e=>{
+    const n=parseInt(e.belegnr||'',10);
     if(!isNaN(n)&&n>maxN) maxN=n;
   });
   return String(maxN+1);

@@ -302,6 +302,7 @@ function clearForm(){
   document.getElementById('nf-bet').value='';
   document.getElementById('nf-dsc').value='';
   document.getElementById('nf-note').value='';
+  const _bnEl=document.getElementById('nf-belegnr'); if(_bnEl) _bnEl.value='';
   // Дату НЕ сбрасываем — пользователь мог выбрать другой год
   setMwstRate(19); // Сбрасываем MwSt на 19%
 }
@@ -312,6 +313,7 @@ function addEintrag(){
   const zahl=document.getElementById('nf-zahl').value;
   const dsc=document.getElementById('nf-dsc').value.trim();
   const note=document.getElementById('nf-note').value.trim();
+  const belegnr=document.getElementById('nf-belegnr')?.value.trim()||'';
   calcNfVorsteuer(); // пересчёт при изменении суммы
   if(!datum)return toast('Datum eingeben!','err');
   // Валидация даты
@@ -332,7 +334,7 @@ function addEintrag(){
   const mwRate=mwRateRaw===null||mwRateRaw===undefined?19:parseFloat(mwRateRaw);
   const mwBet=r2(parseFloat(document.getElementById('nf-mwst-bet')?.value)||0);
   const netBet=r2(parseFloat(document.getElementById('nf-netto-bet')?.value)||betrag);
-  const entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,betrag};
+  const entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,belegnr,betrag};
   const entryYrMode=datum.substring(0,4);
   if(!isKleinunternehmer(entryYrMode)&&mwBet>0){
     if(curTyp==='Einnahme'){
@@ -787,7 +789,7 @@ function renderEin(){
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      return '<div class="ein-row'+(st?' ein-row-st':'')+'">'        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'        +'<div class="ein-row-body">'        +'<div class="ein-row-meta">'        +(stLbl?stLbl:'')        +'<span class="ein-row-date">'+fd(e.datum)+'</span>'        +'<span class="ein-row-sep">·</span>'        +'<span class="ein-row-kat">'+e.kategorie+'</span>'        +'</div>'        +'<div class="ein-row-desc">'        +(e.beschreibung||e.kategorie)        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')        +'</div>'        +(mwstBadge?'<div class="ein-row-mwst">'+mwstBadge+'</div>':'')        +'</div>'        +'<div class="ein-row-right">'        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'        +'<div class="ein-row-sub">'        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'        +(!st          ?'<div style="display:flex;gap:2px">'           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="event.stopPropagation();editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'           +'<button class="del-btn" onclick="event.stopPropagation();delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')        +'</div>'        +'</div>'        +'</div>';
+      return '<div class="ein-row'+(st?' ein-row-st':'')+'">'        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'        +'<div class="ein-row-body">'        +'<div class="ein-row-meta">'        +(stLbl?stLbl:'')        +(e.belegnr?'<span class="ein-row-nr" title="Beleg-Nr.">Nr.'+e.belegnr+'</span><span class="ein-row-sep">·</span>':'')+'<span class="ein-row-date">'+fd(e.datum)+'</span>'        +'<span class="ein-row-sep">·</span>'        +'<span class="ein-row-kat">'+e.kategorie+'</span>'        +'</div>'        +'<div class="ein-row-desc">'        +(e.beschreibung||e.kategorie)        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')        +'</div>'        +(mwstBadge?'<div class="ein-row-mwst">'+mwstBadge+'</div>':'')        +'</div>'        +'<div class="ein-row-right">'        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'        +'<div class="ein-row-sub">'        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'        +(!st          ?'<div style="display:flex;gap:2px">'           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="event.stopPropagation();editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'           +'<button class="del-btn" onclick="event.stopPropagation();delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')        +'</div>'        +'</div>'        +'</div>';
     }).join('');
     
     window._einPagerCb=function(p){einPage=p;renderEin();}
