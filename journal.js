@@ -3,7 +3,7 @@
 let journalSortCol = 'datum';
 let journalSortAsc = false;
 let journalPage = 1;
-const journalPerPage = 5;
+const journalPerPage = 3;
 
 function sortJournal(col) {
   if (journalSortCol === col) { journalSortAsc = !journalSortAsc; }
