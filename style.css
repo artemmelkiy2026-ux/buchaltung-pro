@@ -449,7 +449,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 .rech-card-meta span{ font-size:11px; color:var(--sub); }
 .rech-overdue{ font-size:11px; font-weight:700; color:var(--red); background:var(--rdim); padding:1px 7px; border-radius:20px; }
 .rech-card-right{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
-.rech-card-betrag{ font-family:var(--mono); font-size:20px; font-weight:600; color:var(--text); }
+.rech-card-betrag{ font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text); }
 .rech-badge-offen-pill,.rech-badge-ueber-pill,.rech-badge-bezahlt-pill{
   display:inline-flex; align-items:center; gap:4px;
   padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
@@ -1190,7 +1190,7 @@ input, select, textarea {
 .wied-card-meta span{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:3px}
 .wied-card-next{font-size:11px}
 .wied-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
-.wied-card-betrag{font-family:var(--mono);font-size:20px;font-weight:600}
+.wied-card-betrag{font-family:var(--mono);font-size:15px;font-weight:600}
 .wied-card-actions{display:flex;gap:4px}
 .wied-summary{
   display:flex;justify-content:space-between;align-items:center;
