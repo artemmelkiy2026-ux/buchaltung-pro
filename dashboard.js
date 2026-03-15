@@ -332,7 +332,7 @@ function addEintrag(){
   const mwRate=mwRateRaw===null||mwRateRaw===undefined?19:parseFloat(mwRateRaw);
   const mwBet=r2(parseFloat(document.getElementById('nf-mwst-bet')?.value)||0);
   const netBet=r2(parseFloat(document.getElementById('nf-netto-bet')?.value)||betrag);
-  const entry={id:Date.now()+'',datum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,betrag};
+  const entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,betrag};
   const entryYrMode=datum.substring(0,4);
   if(!isKleinunternehmer(entryYrMode)&&mwBet>0){
     if(curTyp==='Einnahme'){

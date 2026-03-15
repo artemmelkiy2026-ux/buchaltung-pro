@@ -161,7 +161,8 @@ function editRech(id){
 function autoRechNr(){
   const yr=new Date().getFullYear();
   const rech=data.rechnungen||[];
-  const n=rech.filter(r=>r.nr.startsWith(yr+'')).length+1;
+  const prefix=yr+'-';
+  const n=rech.filter(r=>r.nr.startsWith(prefix)).length+1;
   return`${yr}-${String(n).padStart(3,'0')}`;
 }
 function saveRechnung(){
@@ -195,7 +196,9 @@ function saveRechnung(){
     if(r){Object.assign(r,obj); sbSaveRechnung(r);}
     editRechId=null;
   } else {
-    const newR={id:Date.now()+'', ...obj};
+    const dupNr = (data.rechnungen||[]).find(r=>r.nr===nr);
+    if(dupNr) return toast(`Rechnungs-Nr. ${nr} bereits vergeben!`,'err');
+    const newR={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj};
     data.rechnungen.push(newR);
     sbSaveRechnung(newR);
   }
