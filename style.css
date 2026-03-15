@@ -1667,9 +1667,10 @@ input, select, textarea {
 .pg-vj-delta{font-size:12px;font-weight:700;text-align:right}
 
 /* KU-Grenzen */
+
 .pg-limits{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .pg-limit{
-  background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;
+  background:var(--s2);border-radius:12px;padding:18px 20px;
 }
 .pg-limit-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
 .pg-limit-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
