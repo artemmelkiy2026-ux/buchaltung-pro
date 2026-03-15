@@ -1987,3 +1987,81 @@ input, select, textarea {
 .ku-res-val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text)}
 .ku-res-val.ku-res-sub{font-size:13px;font-weight:500;color:var(--sub)}
 .ku-res-val.ku-res-mwst{color:var(--red)}
+
+/* ═══════════════════════════════════════════════════
+   SCHNELLRECHNER §19 — блочный дизайн
+   ═══════════════════════════════════════════════════ */
+
+/* Карточка ввода */
+.ku-card{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:16px;
+}
+.ku-card-lbl{
+  font-size:10px;font-weight:700;color:var(--sub);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;
+}
+.ku-input{
+  width:100%;background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);color:var(--text);
+  padding:12px 14px;font-size:22px;font-family:var(--mono);
+  font-weight:700;outline:none;box-sizing:border-box;
+  transition:border-color .15s;
+}
+.ku-input:focus{border-color:var(--blue)}
+.ku-row-btns{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ku-rb{
+  padding:5px 14px;font-size:12px;font-weight:600;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);color:var(--sub);cursor:pointer;
+  transition:all .12s;
+}
+.ku-rb.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.ku-rb:hover:not(.active){border-color:var(--border2);color:var(--text)}
+
+/* Блоки результатов */
+.ku-blocks{display:flex;flex-direction:column;gap:8px}
+.ku-block-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ku-block{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:14px 16px;
+}
+.ku-block-main{
+  background:var(--s1);border-color:var(--blue);
+  border-width:2px;
+}
+.ku-block-sm{padding:12px 14px}
+.ku-block-lbl{
+  font-size:10px;font-weight:700;color:var(--sub);
+  text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;
+}
+.ku-block-val{
+  font-family:var(--mono);font-size:var(--fs-xl);font-weight:700;
+  color:var(--text);line-height:1;
+}
+.ku-val-sm{font-size:var(--fs-l)}
+.ku-block-sub{font-size:10px;color:var(--sub);margin-top:4px}
+
+/* Grenzen */
+.ku-limits-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.ku-limit-block{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:14px;
+}
+.ku-limit-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ku-limit-title{font-size:11px;font-weight:600;color:var(--sub)}
+.ku-limit-badge{
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;
+  background:var(--bdim);color:var(--blue);
+}
+.ku-limit-badge-red{background:var(--rdim);color:var(--red)}
+.ku-limit-num{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
+.ku-limit-desc{font-size:10px;color:var(--sub);line-height:1.4}
+
+/* Pflichthinweis */
+.ku-hinweis{
+  background:var(--bdim);border:1px solid rgba(30,80,150,.15);
+  border-radius:var(--r2);padding:12px 14px;
+}
+.ku-hinweis-title{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px}
+.ku-hinweis-text{font-size:12px;color:var(--sub);font-style:italic;line-height:1.5}

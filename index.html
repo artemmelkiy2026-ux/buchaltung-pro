@@ -874,64 +874,89 @@
 
       <!-- Schnellrechner (§19 Kleinunternehmer) -->
       <div id="ust-rechner" style="display:none">
-        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Schnellrechner — §19 Kleinunternehmer</div>
 
-        <!-- Ввод суммы -->
-        <div class="form-panel" style="padding:16px 18px;margin-bottom:14px">
-          <div style="font-size:12px;color:var(--sub);margin-bottom:8px">Betrag eingeben</div>
-          <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
-            <input id="ku-input" type="number" placeholder="0,00" step="0.01" min="0" inputmode="decimal"
-              oninput="kuCalc()"
-              style="flex:1;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
-                     color:var(--text);padding:10px 14px;font-size:18px;font-family:var(--mono);
-                     font-weight:700;outline:none;width:100%">
-            <div style="display:flex;flex-direction:column;gap:4px">
-              <button class="ku-rate-btn active" id="ku-btn-19" onclick="kuSetRate(19)" style="padding:5px 12px;font-size:12px;font-weight:600">19%</button>
-              <button class="ku-rate-btn" id="ku-btn-7"  onclick="kuSetRate(7)"  style="padding:5px 12px;font-size:12px;font-weight:600">7%</button>
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">Schnellrechner §19</div>
+
+        <!-- Ввод -->
+        <div class="ku-card" style="margin-bottom:12px">
+          <div class="ku-card-lbl">Betrag eingeben</div>
+          <input id="ku-input" type="number" placeholder="0,00" step="0.01" min="0"
+            inputmode="decimal" oninput="kuCalc()" class="ku-input">
+          <div class="ku-row-btns" style="margin-top:12px">
+            <span class="ku-card-lbl" style="margin:0;align-self:center">MwSt-Satz</span>
+            <div style="display:flex;gap:4px">
+              <button class="ku-rb active" id="ku-btn-19" onclick="kuSetRate(19)">19 %</button>
+              <button class="ku-rb" id="ku-btn-7"  onclick="kuSetRate(7)">7 %</button>
             </div>
           </div>
-          <!-- Переключатель брутто/нетто -->
-          <div style="display:flex;gap:4px;margin-bottom:0">
-            <button class="ku-mode-btn active" id="ku-m-brutto" onclick="kuSetMode('brutto')">Brutto eingegeben</button>
-            <button class="ku-mode-btn" id="ku-m-netto"  onclick="kuSetMode('netto')">Netto eingegeben</button>
+          <div class="ku-row-btns" style="margin-top:8px">
+            <span class="ku-card-lbl" style="margin:0;align-self:center">Eingabe ist</span>
+            <div style="display:flex;gap:4px">
+              <button class="ku-rb active" id="ku-m-brutto" onclick="kuSetMode('brutto')">Brutto</button>
+              <button class="ku-rb" id="ku-m-netto"  onclick="kuSetMode('netto')">Netto</button>
+            </div>
           </div>
         </div>
 
-        <!-- Результаты -->
-        <div id="ku-results" class="ku-results">
-          <div class="ku-res-row ku-res-main">
-            <div class="ku-res-label">Als §19 — Rechnungsbetrag</div>
-            <div class="ku-res-val" id="ku-r-ku">—</div>
+        <!-- Результаты — блоки -->
+        <div class="ku-blocks" id="ku-results">
+          <div class="ku-block ku-block-main">
+            <div class="ku-block-lbl">Rechnungsbetrag §19</div>
+            <div class="ku-block-val" id="ku-r-ku">—</div>
+            <div class="ku-block-sub">Ohne Umsatzsteuer ausgestellt</div>
           </div>
-          <div class="ku-res-divider"></div>
-          <div class="ku-res-row">
-            <div class="ku-res-label">Nettobetrag</div>
-            <div class="ku-res-val ku-res-sub" id="ku-r-netto">—</div>
+          <div class="ku-block-row">
+            <div class="ku-block ku-block-sm">
+              <div class="ku-block-lbl">Netto</div>
+              <div class="ku-block-val ku-val-sm" id="ku-r-netto">—</div>
+            </div>
+            <div class="ku-block ku-block-sm">
+              <div class="ku-block-lbl">Brutto</div>
+              <div class="ku-block-val ku-val-sm" id="ku-r-brutto">—</div>
+            </div>
           </div>
-          <div class="ku-res-row">
-            <div class="ku-res-label">MwSt-Betrag (bei Regelbesteuerung)</div>
-            <div class="ku-res-val ku-res-mwst" id="ku-r-mwst">—</div>
+          <div class="ku-block-row">
+            <div class="ku-block ku-block-sm">
+              <div class="ku-block-lbl">MwSt-Betrag</div>
+              <div class="ku-block-val ku-val-sm" id="ku-r-mwst" style="color:var(--red)">—</div>
+              <div class="ku-block-sub">Bei Regelbesteuerung</div>
+            </div>
+            <div class="ku-block ku-block-sm" style="background:var(--gdim);border-color:rgba(78,144,96,.2)">
+              <div class="ku-block-lbl" style="color:var(--green)">Du sparst</div>
+              <div class="ku-block-val ku-val-sm" id="ku-r-diff" style="color:var(--green)">—</div>
+              <div class="ku-block-sub">Als §19 KU</div>
+            </div>
           </div>
-          <div class="ku-res-row">
-            <div class="ku-res-label">Bruttobetrag</div>
-            <div class="ku-res-val ku-res-sub" id="ku-r-brutto">—</div>
+        </div>
+
+        <!-- KU Grenzen -->
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px">Kleinunternehmer-Grenzen</div>
+        <div class="ku-limits-grid">
+          <div class="ku-limit-block">
+            <div class="ku-limit-top">
+              <span class="ku-limit-title">Vorjahresumsatz</span>
+              <span class="ku-limit-badge">2025</span>
+            </div>
+            <div class="ku-limit-num">25.000 €</div>
+            <div class="ku-limit-desc">Netto-Grenze — Überschreitung = kein §19 im Folgejahr</div>
           </div>
-          <div class="ku-res-divider"></div>
-          <div class="ku-res-row ku-res-hint">
-            <div class="ku-res-label" style="color:var(--green)">Du sparst als §19</div>
-            <div class="ku-res-val" id="ku-r-diff" style="color:var(--green)">—</div>
+          <div class="ku-limit-block">
+            <div class="ku-limit-top">
+              <span class="ku-limit-title">Laufendes Jahr</span>
+              <span class="ku-limit-badge ku-limit-badge-red">Fallbeil!</span>
+            </div>
+            <div class="ku-limit-num">100.000 €</div>
+            <div class="ku-limit-desc">Sofort wirksam — §19 endet beim Überschreiten</div>
           </div>
         </div>
 
         <!-- Pflichthinweis -->
-        <div style="margin-top:14px;padding:10px 14px;background:var(--bdim);border-radius:var(--r);border:1px solid rgba(30,80,150,.15)">
-          <div style="font-size:11px;color:var(--blue);line-height:1.6">
-            <strong>Pflichthinweis auf §19:</strong><br>
-            <span style="color:var(--sub);font-style:italic">„Gemäß §19 UStG wird keine Umsatzsteuer berechnet."</span>
-          </div>
+        <div class="ku-hinweis">
+          <div class="ku-hinweis-title"><i class="fas fa-info-circle"></i> Pflichthinweis auf Rechnung</div>
+          <div class="ku-hinweis-text">„Gemäß §19 UStG wird keine Umsatzsteuer berechnet."</div>
         </div>
-      </div>
 
+      </div>
     </div><!-- /ust-col-right -->
 
   </div><!-- /ust-two-col -->
