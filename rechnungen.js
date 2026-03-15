@@ -62,16 +62,25 @@ function renderRech(){
       if(diff>0) overdueTxt = `<span class="rech-overdue">+${diff} Tag${diff!==1?'e':''} überfällig</span>`;
     }
     const dueColor = r.status==='ueberfaellig' ? 'color:var(--red)' : 'color:var(--sub)';
-    return `<div class="rech-card" onclick="editRech('${r.id}')">
+    // Проверяем есть ли сторно для Einnahme этой рекоманды
+    const _rechStorno = (data.eintraege||[]).filter(e =>
+      e.is_storno && (data.eintraege||[]).some(orig =>
+        !orig.is_storno && orig.beschreibung && orig.beschreibung.includes(`Rechnung ${r.nr}:`) && e.storno_of===orig.id
+      )
+    );
+    const stornoBadge = _rechStorno.length > 0
+      ? `<span class="badge-storno" style="font-size:10px;padding:2px 6px;border-radius:4px">↩ Storniert</span>` : '';
+    return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" onclick="editRech('${r.id}')">
       <div class="rech-card-left">
         <div class="rech-card-avatar ${st.cls}">
           <i class="${st.icon}"></i>
         </div>
         <div class="rech-card-info">
-          <div class="rech-card-nr">${r.nr}</div>
+          <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
           <div class="rech-card-meta">
             <span>${fd(r.datum)}</span>
+            ${r.created_at ? `<span style="color:var(--sub);opacity:.5">·</span><span style="font-size:10px;color:var(--sub);font-family:var(--mono)">${fdt(r.created_at).slice(11)}</span>` : ''}
             ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}">Fällig ${fd(r.faellig)}</span>` : ''}
             ${overdueTxt}
           </div>
@@ -222,8 +231,7 @@ function saveRechnung(){
     beschreibung:dsc,
     datum,
     faellig:document.getElementById('rn-faellig').value,
-    // Статус: при редактировании сохраняем, при создании всегда 'offen'
-    status: editRechId ? (data.rechnungen.find(x=>x.id===editRechId)?.status||'offen') : 'offen',
+    status:document.getElementById('rn-status').value,
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),

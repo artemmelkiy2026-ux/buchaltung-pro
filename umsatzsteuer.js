@@ -247,7 +247,7 @@ function stKinderChange() {
 
 function stFillEUR() {
   const yr=document.getElementById('st-eur-yr').value;
-  const ye=yr==='Alle'?activeEintraege():activeEintraege().filter(e=>e.datum.startsWith(yr));
+  const ye=activeEintraegeMitRech(yr==='Alle'?null:yr);
   const ein=sum(ye,'Einnahme'), aus=sum(ye,'Ausgabe');
   document.getElementById('st-ein').value=ein.toFixed(2);
   document.getElementById('st-aus').value=aus.toFixed(2);

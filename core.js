@@ -157,6 +157,44 @@ function activeEintraege() {
   return (data.eintraege || []).filter(e => !e.is_storno && !e._storniert);
 }
 
+// Bezahlte Rechnungen als virtuelle Einnahmen —
+// gibt nur solche zurück die KEINEN echten Einnahme-Eintrag haben
+function rechAlsEinnahmen(filterDatum) {
+  const rech = (data.rechnungen || []).filter(r => r.status === 'bezahlt');
+  const aktiveE = activeEintraege();
+  return rech
+    .filter(r => {
+      // Kein echter Einnahme-Eintrag für diese Rechnung vorhanden
+      const hat = aktiveE.some(e =>
+        e.typ === 'Einnahme' &&
+        e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`)
+      );
+      if (hat) return false;
+      if (filterDatum && r.datum && !r.datum.startsWith(filterDatum)) return false;
+      return true;
+    })
+    .map(r => ({
+      id: '__rech__' + r.id,
+      datum: r.datum || '',
+      typ: 'Einnahme',
+      kategorie: r.kategorie || 'Dienstleistung',
+      zahlungsart: r.zahlungsart || 'Überweisung',
+      beschreibung: `Rechnung ${r.nr}: ${r.beschreibung || r.kunde || ''}`,
+      betrag: r.betrag,
+      nettoBetrag: r.netto || r.betrag,
+      mwstBetrag: r.mwstBetrag || 0,
+      mwstRate: r.mwstRate || 0,
+      _fromRechnung: true,
+    }));
+}
+
+// Einträge + bezahlte Rechnungen (ohne Doppelzählung)
+function activeEintraegeMitRech(yr) {
+  const eintr = yr ? activeEintraege().filter(e => e.datum && e.datum.startsWith(yr)) : activeEintraege();
+  const rVirt = rechAlsEinnahmen(yr);
+  return [...eintr, ...rVirt];
+}
+
 // ── NAV ───────────────────────────────────────────────────────────────────
 function nav(id, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));

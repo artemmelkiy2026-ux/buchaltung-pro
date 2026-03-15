@@ -3,6 +3,20 @@ function fmt(n){const v=parseFloat(n);return(isNaN(v)?0:v).toLocaleString('de-DE
 function fd(d){if(!d)return'';const p=d.split('-');if(p.length<3)return d;const[y,m,dd]=p;return`${dd}.${m}.${y}`}
 // Мобильная дата: DD.MM.YY (год 2 цифры)
 function fdm(d){if(!d)return'';const p=d.split('-');if(p.length<3)return d;const[y,m,dd]=p;return`${dd}.${m}.${y.slice(2)}`}
+// Дата + время из ISO строки (created_at)
+function fdt(iso){
+  if(!iso)return'';
+  try{
+    const d=new Date(iso);
+    if(isNaN(d.getTime()))return'';
+    const dd=String(d.getDate()).padStart(2,'0');
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    const yy=String(d.getFullYear());
+    const hh=String(d.getHours()).padStart(2,'0');
+    const mn=String(d.getMinutes()).padStart(2,'0');
+    return`${dd}.${mm}.${yy} ${hh}:${mn}`;
+  }catch{return'';}
+}
 function isMob(){return window.innerWidth<=768}
 function sum(arr,t){return arr.filter(e=>e.typ===t).reduce((s,e)=>s+(parseFloat(e.betrag)||0),0)}
 

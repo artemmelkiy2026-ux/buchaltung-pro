@@ -443,7 +443,7 @@ function renderDash(){
   buildYearFilters();
   const yr=document.getElementById('dash-yr').value;
   document.getElementById('dash-yr-lbl').textContent=yr==='Alle'?'Alle Jahre':yr;
-  const ye=(yr==='Alle'?activeEintraege():activeEintraege().filter(e=>e.datum.startsWith(yr)));
+  const ye=(yr==='Alle'?activeEintraegeMitRech():activeEintraegeMitRech(yr==='Alle'?null:yr));
   const ein=sum(ye,'Einnahme'),aus=sum(ye,'Ausgabe'),gew=ein-aus;
   // MwSt Dashboard-Berechnung
   const mwstTotal = ye.filter(e=>e.mwstBetrag>0).reduce((s,e)=>s+e.mwstBetrag,0);
@@ -808,7 +808,7 @@ function renderEin(){
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      return '<div class="ein-row'+(st?' ein-row-st':'')+'">'        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'        +'<div class="ein-row-body">'        +'<div class="ein-row-meta">'        +(stLbl?stLbl:'')        +(e.belegnr?'<span class="ein-row-nr" title="Beleg-Nr.">Nr.'+e.belegnr+'</span><span class="ein-row-sep">·</span>':'')+'<span class="ein-row-date">'+fd(e.datum)+'</span>'        +'<span class="ein-row-sep">·</span>'        +'<span class="ein-row-kat">'+e.kategorie+'</span>'        +'</div>'        +'<div class="ein-row-desc">'        +(e.beschreibung||e.kategorie)        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')        +'</div>'        +(mwstBadge?'<div class="ein-row-mwst">'+mwstBadge+'</div>':'')        +'</div>'        +'<div class="ein-row-right">'        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'        +'<div class="ein-row-sub">'        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'        +(!st          ?'<div style="display:flex;gap:2px">'           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="event.stopPropagation();editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'           +'<button class="del-btn" onclick="event.stopPropagation();delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')        +'</div>'        +'</div>'        +'</div>';
+      return '<div class="ein-row'+(st?' ein-row-st':'')+'">'        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'        +'<div class="ein-row-body">'        +'<div class="ein-row-meta">'        +(stLbl?stLbl:'')        +(e.belegnr?'<span class="ein-row-nr" title="Beleg-Nr.">Nr.'+e.belegnr+'</span><span class="ein-row-sep">·</span>':'')+'<span class="ein-row-date">'+fd(e.datum)+'</span>'+(e.created_at?'<span class="ein-row-sep" style="opacity:.4">·</span><span style="font-size:10px;color:var(--sub);font-family:var(--mono)">'+fdt(e.created_at).slice(11)+'</span>':'')        +'<span class="ein-row-sep">·</span>'        +'<span class="ein-row-kat">'+e.kategorie+'</span>'        +'</div>'        +'<div class="ein-row-desc">'        +(e.beschreibung||e.kategorie)        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')        +'</div>'        +(mwstBadge?'<div class="ein-row-mwst">'+mwstBadge+'</div>':'')        +'</div>'        +'<div class="ein-row-right">'        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'        +'<div class="ein-row-sub">'        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'        +(!st          ?'<div style="display:flex;gap:2px">'           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="event.stopPropagation();editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'           +'<button class="del-btn" onclick="event.stopPropagation();delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')        +'</div>'        +'</div>'        +'</div>';
     }).join('');
     
     window._einPagerCb=function(p){einPage=p;renderEin();}
@@ -832,7 +832,7 @@ function renderRep(){
   buildYearFilters();
   const repYr=document.getElementById('rep-yr');
   const yr=repYr.value||new Date().getFullYear()+'';
-  const ye=activeEintraege().filter(e=>e.datum.startsWith(yr));
+  const ye=activeEintraegeMitRech(yr);
 
   const repJahr=document.getElementById('rep-yr')?.value||new Date().getFullYear()+'';
   const isRegel=!isKleinunternehmer(repJahr);
@@ -975,7 +975,7 @@ function sortZ(col){
 function renderZ(){
   buildYearFilters();
   const yr=document.getElementById('z-yr').value;
-  const ye=(yr==='Alle'?activeEintraege():activeEintraege().filter(e=>e.datum.startsWith(yr)));
+  const ye=(yr==='Alle'?activeEintraegeMitRech():activeEintraegeMitRech(yr==='Alle'?null:yr));
   const mob=isMob();
 
   const zkStats={};

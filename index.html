@@ -1111,8 +1111,13 @@
     <!-- Rechnungskopf -->
     <div class="fgrow c2">
       <div class="fg"><label>Rechnungs-Nr.</label><input type="text" id="rn-nr" placeholder="2025-001"></div>
-      <!-- Status nur über Bezahlt-Button änderbar — kein manuelles Dropdown -->
-      <input type="hidden" id="rn-status" value="offen">
+      <div class="fg"><label>Status</label>
+        <select id="rn-status">
+          <option value="offen">Offen</option>
+          <option value="bezahlt">Bezahlt</option>
+          <option value="ueberfaellig">Überfällig</option>
+        </select>
+      </div>
     </div>
     <div class="fgrow c2">
       <div class="fg"><label>Rechnungsdatum</label><input type="date" id="rn-dat"></div>

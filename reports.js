@@ -8,8 +8,8 @@ function renderProg(){
   const yr=sel.value||new Date().getFullYear()+'';
   const prevYr=String(parseInt(yr)-1);
   const now=new Date(); const curM=yr===now.getFullYear()+''?now.getMonth():11;
-  const ye=activeEintraege().filter(e=>e.datum.startsWith(yr));
-  const pe=activeEintraege().filter(e=>e.datum.startsWith(prevYr));
+  const ye=activeEintraegeMitRech(yr);
+  const pe=activeEintraegeMitRech(prevYr);
 
   const einM=Array(12).fill(0),ausM=Array(12).fill(0);
   const einP=Array(12).fill(0),ausP=Array(12).fill(0);
@@ -185,7 +185,7 @@ function renderKat(){
   const sel=document.getElementById('kat-yr');
   if(!sel.innerHTML) sel.innerHTML='<option value="Alle">Alle Jahre</option>'+years.map(y=>`<option>${y}</option>`).join('');
   const yr=sel.value||'Alle';
-  const ye=yr==='Alle'?activeEintraege():activeEintraege().filter(e=>e.datum.startsWith(yr));
+  const ye=activeEintraegeMitRech(yr==='Alle'?null:yr);
   const filtered=ye.filter(e=>e.typ===katTyp);
   const byKat={};
   filtered.forEach(e=>{byKat[e.kategorie]=(byKat[e.kategorie]||0)+e.betrag;});
