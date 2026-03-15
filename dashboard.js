@@ -775,11 +775,11 @@ function renderEin(){
       let stLbl='';
       if(e.is_storno&&e.storno_of){
         const orig=data.eintraege.find(x=>x.id===e.storno_of);
-        stLbl='<span style="font-size:9px;font-weight:700;color:#94a3b8;background:rgba(148,163,184,0.15);padding:2px 5px;border-radius:3px;margin-right:4px">↩ Storno</span>';
+        stLbl='<span style="font-size:9px;font-weight:700;color:#94a3b8;background:rgba(148,163,184,0.15);padding:2px 5px;border-radius:3px;margin-right:4px; border:none">↩ Storno</span>';
       } else if(st){
-        stLbl='<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✗ Storniert</span>';
+        stLbl='<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:3px;margin-right:4px; border:none">✗ Storniert</span>';
       } else if(e.korrektur_von){
-        stLbl='<span style="font-size:9px;font-weight:700;color:#1d9047;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✎ Korrektur</span>';
+        stLbl='<span style="font-size:9px;font-weight:700;color:#1d9047;background:rgba(34,197,94,0.1);padding:2px 5px;border-radius:3px;margin-right:4px; border:none">✎ Korrektur</span>';
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
