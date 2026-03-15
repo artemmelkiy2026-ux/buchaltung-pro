@@ -15,7 +15,23 @@ function isKleinunternehmer(yr){ return getUstModeForYear(yr)==='§19'; }
 
 function g(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
 function dl(csv,name){const b=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click()}
-function toast(msg,type='ok'){const t=document.getElementById('toast');t.innerHTML=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3200)}
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  if(!t) return;
+  // сбрасываем предыдущий таймер
+  if(t._toastTimer) clearTimeout(t._toastTimer);
+  if(t._toastFadeTimer) clearTimeout(t._toastFadeTimer);
+  t.innerHTML=msg;
+  t.className=`toast ${type}`;
+  // принудительный reflow для перезапуска анимации
+  void t.offsetWidth;
+  t.classList.add('show');
+  // через 2 сек начинаем плавное исчезновение
+  t._toastTimer=setTimeout(()=>{
+    t.classList.remove('show');
+    t._toastFadeTimer=setTimeout(()=>{ t.className='toast'; },400);
+  },2000);
+}
 
 // ── МОБИЛЬНЫЙ DETAIL POPUP ─────────────────────────────────────────────────
 function showMobDetail(entry){

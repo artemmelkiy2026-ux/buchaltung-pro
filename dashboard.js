@@ -97,29 +97,31 @@ function setTyp(t){
   updateKatSel();
   updateMwstFormVisibility();
   const isMobile = window.innerWidth <= 900;
-  const layout = document.getElementById('neu-layout');
-  const scanBox = document.getElementById('scan-beleg-box');
-  const einBox  = document.getElementById('letzte-einnahmen-box');
+  const layout   = document.getElementById('neu-layout');
+  const scanBox  = document.getElementById('scan-beleg-box');
+  const einBox   = document.getElementById('letzte-einnahmen-box');
+  const ausBox   = document.getElementById('letzte-ausgaben-box');
+
+  // Scan-Block: nur bei Ausgabe sichtbar (jetzt in linker Spalte)
+  if(scanBox) scanBox.style.display = t === 'Ausgabe' ? 'block' : 'none';
 
   if(isMobile) {
-    // Mobil: scan nur bei Ausgabe, einnahmen-box nie
-    if(scanBox) { scanBox.style.display = t === 'Ausgabe' ? 'block' : 'none'; scanBox.style.visibility = ''; }
-    if(einBox)  einBox.style.display = 'none';
-    if(layout)  layout.style.gridTemplateColumns = '1fr';
+    if(einBox) einBox.style.display = 'none';
+    if(ausBox) ausBox.style.display = 'none';
+    if(layout) layout.style.gridTemplateColumns = '1fr';
   } else {
-    // Desktop: rechte Spalte immer 380px — wechselt Inhalt
     if(layout) layout.style.gridTemplateColumns = '1fr 380px';
     if(t === 'Ausgabe') {
-      if(scanBox) { scanBox.style.display = 'block'; scanBox.style.visibility = 'visible'; }
-      if(einBox)  einBox.style.display = 'none';
+      if(einBox) einBox.style.display = 'none';
+      if(ausBox) { ausBox.style.display = 'block'; renderLetzteAusgaben(); }
     } else {
-      if(scanBox) { scanBox.style.display = 'none'; scanBox.style.visibility = ''; }
-      if(einBox)  { einBox.style.display = 'block'; renderLetzteEinnahmen(); }
+      if(ausBox) ausBox.style.display = 'none';
+      if(einBox) { einBox.style.display = 'block'; renderLetzteEinnahmen(); }
     }
   }
 }
 
-function renderLetzteEinnahmen() {
+function renderLetzteEinnahmen(flashId=null) {
   const list = document.getElementById('letzte-ein-list');
   const sumEl = document.getElementById('letzte-ein-summe');
   if (!list) return;
@@ -135,7 +137,7 @@ function renderLetzteEinnahmen() {
   const total = recent.reduce((s,e) => s + e.betrag, 0);
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
   list.innerHTML = recent.map(e => `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:#fff;border-radius:12px;margin-bottom: 10px;">
+    <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:#fff;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='#fff'">
       <div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center">
         <i class="fas fa-arrow-up" style="color:var(--green);font-size:11px"></i>
       </div>
@@ -149,6 +151,60 @@ function renderLetzteEinnahmen() {
       </div>
       <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)">+${fmt(e.betrag)}</div>
     </div>`).join('');
+  if(flashId) flashRow('lein-row-'+flashId);
+}
+
+function renderLetzteAusgaben(flashId=null) {
+  const list = document.getElementById('letzte-aus-list');
+  const sumEl = document.getElementById('letzte-aus-summe');
+  if (!list) return;
+  const recent = activeEintraege()
+    .filter(e => e.typ === 'Ausgabe')
+    .sort((a,b) => b.datum.localeCompare(a.datum))
+    .slice(0, 7);
+  if (!recent.length) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">Noch keine Ausgaben</div>';
+    if(sumEl) sumEl.textContent = '';
+    return;
+  }
+  const total = recent.reduce((s,e) => s + e.betrag, 0);
+  if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
+  list.innerHTML = recent.map(e => `
+    <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:#fff;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='#fff'">
+      <div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center">
+        <i class="fas fa-arrow-down" style="color:var(--red);font-size:11px"></i>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
+        <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px">
+          <span>${fd(e.datum)}</span>
+          <span>·</span>
+          <span>${e.kategorie}</span>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--red);font-family:var(--mono)">−${fmt(e.betrag)}</div>
+    </div>`).join('');
+  if(flashId) flashRow('laus-row-'+flashId);
+}
+
+function flashRow(rowId) {
+  const el = document.getElementById(rowId);
+  if (!el) return;
+  let count = 0;
+  const base = el.style.background || '#fff';
+  const color = rowId.startsWith('lein') ? 'rgba(34,197,94,.25)' : 'rgba(239,68,68,.25)';
+  const interval = setInterval(() => {
+    el.style.background = count % 2 === 0 ? color : base;
+    el.style.transition = 'background .2s';
+    count++;
+    if (count >= 6) { clearInterval(interval); el.style.background = base; }
+  }, 220);
+}
+
+function openEditFromList(id) {
+  const entry = (data.eintraege||[]).find(e=>e.id===id);
+  if(!entry) return;
+  openEdit(id);
 }
 function toggleMwstDropdown() {
   const panel   = document.getElementById('nf-mwst-panel');
@@ -313,6 +369,9 @@ function addEintrag(){
   calcNfMwst(); // reset summary
   const mwLabel = !isKleinunternehmer(datum.substring(0,4))&&mwBet>0 ? ` (Netto: ${netBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €, MwSt: ${mwBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €)` : '';
   toast(`${curTyp} gespeichert: ${fmt(betrag)}${mwLabel}`, 'ok');
+  // Мигание новой строки в боковой колонке
+  if(curTyp==='Einnahme') { renderLetzteEinnahmen(entry.id); }
+  else { renderLetzteAusgaben(entry.id); }
 }
 
 function calcNfVorsteuer(){

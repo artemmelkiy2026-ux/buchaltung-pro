@@ -37,6 +37,9 @@ function setEditTyp(t, skipKat=false){
   const opts=[...document.getElementById('edit-kat').options].map(o=>o.value);
   if(opts.includes(prev)) document.getElementById('edit-kat').value=prev;
 }
+// алиас для вызова из боковой колонки
+function openEdit(id){ editE(null, id); }
+
 async function saveEdit(){
   const datum=document.getElementById('edit-dat').value;
   const betrag=parseFloat(document.getElementById('edit-bet').value);
@@ -70,7 +73,12 @@ async function saveEdit(){
   };
   data.eintraege.push(newEntry);
   sbSaveEintrag(newEntry);
-  renderAll(); closeModal('edit-modal'); toast('✓ Korrektur gespeichert (GoBD-konform)','ok');
+  renderAll();
+  closeModal('edit-modal');
+  toast('✓ Korrektur gespeichert (GoBD-konform)','ok');
+  // Мигание обновлённой строки в боковой колонке
+  if(editTyp==='Einnahme' && typeof renderLetzteEinnahmen==='function') renderLetzteEinnahmen(newId);
+  else if(editTyp==='Ausgabe' && typeof renderLetzteAusgaben==='function') renderLetzteAusgaben(newId);
 }
 
 // ── DELETE FROM EDIT MODAL ───────────────────────────────────────────────
