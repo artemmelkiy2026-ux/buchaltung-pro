@@ -18,115 +18,175 @@ function renderProg(){
 
   const istEin=einM.slice(0,curM+1).reduce((s,v)=>s+v,0);
   const istAus=ausM.slice(0,curM+1).reduce((s,v)=>s+v,0);
-  // Среднее только по месяцам с данными (не делим на пустые месяцы)
   const aktMonate=einM.slice(0,curM+1).filter(v=>v>0).length||1;
   const aktMonateAus=ausM.slice(0,curM+1).filter(v=>v>0).length||1;
   const avgEin=istEin/aktMonate, avgAus=istAus/aktMonateAus;
-  // Прогноз: факт + среднее × оставшиеся месяцы
   const progEin=Math.round((istEin+avgEin*(11-curM))*100)/100;
   const progAus=Math.round((istAus+avgAus*(11-curM))*100)/100;
-  const prevEin=einP.reduce((s,v)=>s+v,0), prevAus=ausP.reduce((s,v)=>s+v,0);
-  const delta=e=>prevEin>0?Math.round((e/prevEin-1)*100):0;
+  const progGew=progEin-progAus;
+  const prevEin=einP.reduce((s,v)=>s+v,0);
+  const prevAus=ausP.reduce((s,v)=>s+v,0);
+  const prevGew=prevEin-prevAus;
 
-  // Cards
-  const c=(cls,lbl,val,sub)=>`<div class="sc ${cls}" style="cursor:default"><div class="sc-lbl">${lbl}</div><div class="sc-val">${val}</div><div class="sc-sub">${sub}</div></div>`;
-  document.getElementById('prog-cards').innerHTML=
-    c('b','Ist Einnahmen',fmt(istEin),`${aktMonate} aktive Monate (${curM+1} vergangen)`)+
-    c('g','Prognose Einnahmen Jahr',fmt(progEin),`Ø ${fmt(avgEin)}/Monat × ${11-curM} Monate`)+
-    c('r','Prognose Ausgaben Jahr',fmt(progAus),`Ø ${fmt(avgAus)}/Monat`)+
-    c(progEin-progAus>=0?'g':'r','Progn. Gewinn',fmt(progEin-progAus),`vs. Vorjahr: ${fmt(prevEin-prevAus)}`);
+  // ── 1. HERO-КАРТОЧКИ ПРОГНОЗА ─────────────────────────────────────────
+  const deltaEin = prevEin>0 ? Math.round((progEin/prevEin-1)*100) : null;
+  const deltaGew = prevGew!==0 ? Math.round((progGew/Math.abs(prevGew)-1)*100) : null;
 
-  // Monat für Monat — card blocks
-  const maxEin=Math.max(...einM,1), maxAus=Math.max(...ausM,1);
-  document.getElementById('prog-monat').innerHTML=MS.map((m,i)=>{
-    const ein=einM[i],aus=ausM[i],gew=ein-aus;
-    const isFuture=i>curM&&yr===now.getFullYear()+'';
-    const gc=gew>=0?'var(--green)':'var(--red)';
-    const isCur=i===curM&&yr===now.getFullYear()+'';
-    return`<div class="prog-month-card${isFuture?' prog-month-future':''}${isCur?' prog-month-current':''}">
-      <div class="prog-month-label">${m}</div>
-      <div class="prog-month-bars">
-        <div class="prog-bar-row">
-          <div class="prog-bar-track"><div class="prog-bar-fill" style="width:${ein>0?Math.min(100,Math.round(ein/maxEin*100)):0}%;background:var(--green)"></div></div>
-          <span class="prog-bar-val" style="color:var(--green)">${ein>0?fmt(ein):'—'}</span>
-        </div>
-        <div class="prog-bar-row">
-          <div class="prog-bar-track"><div class="prog-bar-fill" style="width:${aus>0?Math.min(100,Math.round(aus/maxAus*100)):0}%;background:var(--red)"></div></div>
-          <span class="prog-bar-val" style="color:var(--red)">${aus>0?fmt(aus):'—'}</span>
-        </div>
+  document.getElementById('prog-cards').innerHTML = `
+    <div class="prog-hero-card prog-hero-ein">
+      <div class="prog-hero-label">Prognose Einnahmen ${yr}</div>
+      <div class="prog-hero-val">${fmt(progEin)}</div>
+      <div class="prog-hero-sub">
+        Aktuell: <strong>${fmt(istEin)}</strong> · Ø ${fmt(Math.round(avgEin))}/Monat
       </div>
-      <div class="prog-month-gew" style="color:${gc}">${ein||aus?(gew>=0?'+':'')+fmt(gew):'—'}</div>
+      ${deltaEin!==null?`<div class="prog-hero-delta ${deltaEin>=0?'delta-up':'delta-down'}">${deltaEin>=0?'▲':'▼'} ${Math.abs(deltaEin)}% ggü. ${prevYr}</div>`:''}
+    </div>
+    <div class="prog-hero-card prog-hero-aus">
+      <div class="prog-hero-label">Prognose Ausgaben ${yr}</div>
+      <div class="prog-hero-val">${fmt(progAus)}</div>
+      <div class="prog-hero-sub">
+        Aktuell: <strong>${fmt(istAus)}</strong> · Ø ${fmt(Math.round(avgAus))}/Monat
+      </div>
+    </div>
+    <div class="prog-hero-card ${progGew>=0?'prog-hero-gew':'prog-hero-loss'}">
+      <div class="prog-hero-label">Prognose Gewinn ${yr}</div>
+      <div class="prog-hero-val">${progGew>=0?'+':''}${fmt(progGew)}</div>
+      <div class="prog-hero-sub">
+        Vorjahr: <strong>${prevGew>=0?'+':''}${fmt(prevGew)}</strong>
+      </div>
+      ${deltaGew!==null?`<div class="prog-hero-delta ${deltaGew>=0?'delta-up':'delta-down'}">${deltaGew>=0?'▲':'▼'} ${Math.abs(deltaGew)}% ggü. ${prevYr}</div>`:''}
     </div>`;
-  }).join('');
 
-  // Vorjahresvergleich
-  const hasVorjahr=pe.length>0;
-  if(!hasVorjahr){
-    document.getElementById('prog-vergleich').innerHTML='<p style="color:var(--sub);font-size:12px">'+'Keine Vorjahresdaten für '+prevYr+' vorhanden.'+'</p>';
-  } else {
-    document.getElementById('prog-vergleich').innerHTML=`
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        ${[['Einnahmen',istEin,prevEin,'var(--green)'],['Ausgaben',istAus,prevAus,'var(--red)']].map(([lbl,cur,prev,col])=>{
-          const d=prev>0?Math.round((cur/prev-1)*100):0;
-          return`<div style="background:var(--s2);border-radius:var(--r);padding:12px">
-            <div style="font-size:10px;color:var(--sub);margin-bottom:5px">${lbl}</div>
-            <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:${col}">${fmt(cur)}</div>
-            <div style="font-size:10px;color:var(--sub);margin-top:3px">${'Vj:'} ${fmt(prev)}</div>
-            <div style="font-size:11px;font-weight:600;margin-top:4px;color:${d>=0?'var(--green)':'var(--red)'}">${d>=0?'+':''}${d}% ${'ggü.'} ${prevYr}</div>
-          </div>`;
-        }).join('')}
-      </div>
+  // ── 2. МЕСЯЦЫ — горизонтальный ряд ───────────────────────────────────
+  const maxEin=Math.max(...einM,1), maxAus=Math.max(...ausM,1);
+  document.getElementById('prog-monat').innerHTML = `
+    <div class="prog-months-grid">
       ${MS.map((m,i)=>{
-        const dE=einP[i]>0?Math.round((einM[i]/einP[i]-1)*100):einM[i]>0?100:0;
-        return`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px">
-          <span style="color:var(--sub);width:28px;font-family:var(--mono)">${m}</span>
-          <span style="font-family:var(--mono);width:80px">${einM[i]>0?fmt(einM[i]):'—'}</span>
-          <span style="color:var(--sub);width:80px;font-size:10px">${'Vj:'} ${einP[i]>0?fmt(einP[i]):'—'}</span>
-          <span style="font-weight:600;color:${dE>=0?'var(--green)':'var(--red)'}">${einM[i]||einP[i]?(dE>=0?'+':'')+dE+'%':'—'}</span>
+        const ein=einM[i],aus=ausM[i],gew=ein-aus;
+        const isFuture=i>curM&&yr===now.getFullYear()+'';
+        const isCur=i===curM&&yr===now.getFullYear()+'';
+        const gc=gew>=0?'var(--green)':'var(--red)';
+        const einPct=ein>0?Math.min(100,Math.round(ein/maxEin*100)):0;
+        const ausPct=aus>0?Math.min(100,Math.round(aus/maxAus*100)):0;
+        return `<div class="prog-mc${isFuture?' prog-mc-future':''}${isCur?' prog-mc-cur':''}">
+          <div class="prog-mc-name">${m}</div>
+          <div class="prog-mc-bars">
+            <div class="prog-mc-bar" style="height:${einPct}%;background:var(--green)"></div>
+            <div class="prog-mc-bar" style="height:${ausPct}%;background:var(--red)"></div>
+          </div>
+          <div class="prog-mc-gew" style="color:${gc}">${ein||aus?(gew>=0?'+':'')+fmt(Math.round(gew/100)*100):'—'}</div>
         </div>`;
-      }).join('')}`;
+      }).join('')}
+    </div>
+    <div class="prog-months-legend">
+      <span><span class="prog-legend-dot" style="background:var(--green)"></span>Einnahmen</span>
+      <span><span class="prog-legend-dot" style="background:var(--red)"></span>Ausgaben</span>
+    </div>`;
+
+  // ── 3. VORJAHRESVERGLEICH ─────────────────────────────────────────────
+  const hasVorjahr=pe.length>0;
+  const verglEl=document.getElementById('prog-vergleich');
+  if(!hasVorjahr){
+    verglEl.innerHTML=`<div class="prog-no-data"><i class="fas fa-database"></i><span>Keine Daten für ${prevYr}</span></div>`;
+  } else {
+    const pairs=[
+      {lbl:'Einnahmen', cur:istEin, prev:prevEin, col:'var(--green)'},
+      {lbl:'Ausgaben',  cur:istAus, prev:prevAus, col:'var(--red)'},
+      {lbl:'Gewinn',    cur:istEin-istAus, prev:prevEin-prevAus, col:istEin-istAus>=0?'var(--green)':'var(--red)'},
+    ];
+    const bigCards = pairs.map(p=>{
+      const d=p.prev!==0?Math.round((p.cur/Math.abs(p.prev)-1)*100):null;
+      return `<div class="prog-vj-card">
+        <div class="prog-vj-label">${p.lbl}</div>
+        <div class="prog-vj-cur" style="color:${p.col}">${p.cur>=0?'':'-'}${fmt(Math.abs(p.cur))}</div>
+        <div class="prog-vj-prev">Vorjahr ${prevYr}: ${fmt(p.prev)}</div>
+        ${d!==null?`<div class="prog-vj-delta ${d>=0?'delta-up':'delta-down'}">${d>=0?'▲':'▼'} ${Math.abs(d)}%</div>`:''}
+      </div>`;
+    }).join('');
+
+    const monthRows = MS.map((m,i)=>{
+      const cur=einM[i], prev=einP[i];
+      const d=prev>0?Math.round((cur/prev-1)*100):cur>0?100:null;
+      const maxVal=Math.max(cur,prev,1);
+      return `<div class="prog-vj-row">
+        <div class="prog-vj-month">${m}</div>
+        <div class="prog-vj-bars">
+          <div class="prog-vj-bar-wrap" title="${yr}: ${fmt(cur)}">
+            <div class="prog-vj-bar-fill" style="width:${Math.round(cur/maxVal*100)}%;background:var(--blue)"></div>
+          </div>
+          <div class="prog-vj-bar-wrap" title="${prevYr}: ${fmt(prev)}">
+            <div class="prog-vj-bar-fill" style="width:${Math.round(prev/maxVal*100)}%;background:var(--border2)"></div>
+          </div>
+        </div>
+        <div class="prog-vj-vals">
+          <span style="color:var(--blue);font-family:var(--mono);font-size:11px">${cur>0?fmt(cur):'—'}</span>
+          <span style="color:var(--sub);font-family:var(--mono);font-size:10px">${prev>0?fmt(prev):'—'}</span>
+        </div>
+        <div class="prog-vj-delta-sm ${d===null?'':''}${d!==null&&d>=0?'delta-up':'delta-down'}">
+          ${d!==null?(d>=0?'+':'')+d+'%':''}
+        </div>
+      </div>`;
+    }).join('');
+
+    verglEl.innerHTML = `
+      <div class="prog-vj-big">${bigCards}</div>
+      <div class="prog-vj-legend">
+        <span><span class="prog-legend-dot" style="background:var(--blue)"></span>${yr}</span>
+        <span><span class="prog-legend-dot" style="background:var(--border2)"></span>${prevYr}</span>
+      </div>
+      <div class="prog-vj-months">${monthRows}</div>`;
   }
 
-  // Hochrechnung
-  const klimit=25000;   // Vorjahres-Grenze (§19 UStG ab 2025)
-  const klimit100=100000; // Laufendes Jahr HARD LIMIT (§19 UStG ab 2025)
-  const pctNow=Math.min(100,Math.round(istEin/klimit*100));
+  // ── 4. HOCHRECHNUNG / KU-LIMITE ──────────────────────────────────────
+  const klimit=25000, klimit100=100000;
   const pctProg=Math.min(100,Math.round(progEin/klimit*100));
   const pct100=Math.min(100,Math.round(istEin/klimit100*100));
-  document.getElementById('prog-hochrechnung').innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
-      <div style="background:var(--s2);border-radius:var(--r);padding:12px">
-        <div style="font-size:10px;color:var(--sub);margin-bottom:5px">Progn. Jahreseinnahmen</div>
-        <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--green)">${fmt(progEin)}</div>
+  const col25=pctProg>90?'var(--red)':pctProg>70?'var(--yellow)':'var(--green)';
+  const col100=pct100>80?'var(--red)':pct100>50?'var(--yellow)':'var(--blue)';
+
+  const statusMsg = pct100>=100
+    ? `<div class="prog-alert prog-alert-red"><i class="fas fa-exclamation-triangle"></i> <strong>100.000 € überschritten!</strong> Regelbesteuerung gilt sofort — USt-Pflicht! (§19 Fallbeil-Effekt)</div>`
+    : pctProg>80
+    ? `<div class="prog-alert prog-alert-yellow"><i class="fas fa-exclamation-circle"></i> Vorjahresgrenze in Sicht — bei Überschreitung 25.000 € entfällt §19 UStG im Folgejahr</div>`
+    : `<div class="prog-alert prog-alert-green"><i class="fas fa-check-circle"></i> Kleinunternehmer-Status (§19 UStG) voraussichtlich sicher</div>`;
+
+  document.getElementById('prog-hochrechnung').innerHTML = `
+    <div class="prog-limit-grid">
+      <div class="prog-limit-card">
+        <div class="prog-limit-header">
+          <div>
+            <div class="prog-limit-title">Vorjahresgrenze §19</div>
+            <div class="prog-limit-desc">25.000 € — Vorjahresumsatz netto</div>
+          </div>
+          <div class="prog-limit-pct" style="color:${col25}">${pctProg}%</div>
+        </div>
+        <div class="prog-limit-bar-track">
+          <div class="prog-limit-bar-fill" style="width:${pctProg}%;background:${col25}"></div>
+        </div>
+        <div class="prog-limit-footer">
+          <span>Prognose: <strong>${fmt(progEin)}</strong></span>
+          <span style="color:var(--sub)">von 25.000 €</span>
+        </div>
       </div>
-      <div style="background:var(--s2);border-radius:var(--r);padding:12px">
-        <div style="font-size:10px;color:var(--sub);margin-bottom:5px">Progn. Jahresgewinn</div>
-        <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:${progEin-progAus>=0?'var(--green)':'var(--red)'}">${fmt(progEin-progAus)}</div>
+      <div class="prog-limit-card">
+        <div class="prog-limit-header">
+          <div>
+            <div class="prog-limit-title">HARD LIMIT §19</div>
+            <div class="prog-limit-desc">100.000 € — laufendes Jahr (Fallbeil!)</div>
+          </div>
+          <div class="prog-limit-pct" style="color:${col100}">${pct100}%</div>
+        </div>
+        <div class="prog-limit-bar-track">
+          <div class="prog-limit-bar-fill" style="width:${pct100}%;background:${col100}"></div>
+        </div>
+        <div class="prog-limit-footer">
+          <span>Aktuell: <strong>${fmt(istEin)}</strong></span>
+          <span style="color:var(--sub)">von 100.000 €</span>
+        </div>
       </div>
-      <div style="background:var(--s2);border-radius:var(--r);padding:12px">
-        <div style="font-size:10px;color:var(--sub);margin-bottom:5px">KU-Vorjahresgrenze</div>
-        <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:${pctProg>90?'var(--red)':pctProg>70?'var(--yellow)':'var(--green)'}">${pctProg}%</div>
-        <div style="font-size:10px;color:var(--sub);margin-top:3px">${fmt(progEin)} von 25.000 € (§19)</div>
-      </div>
     </div>
-    <div style="margin-bottom:4px;font-size:11px;color:var(--sub);display:flex;justify-content:space-between">
-      <span>${' Vorjahresgrenze-Prognose (25.000 €)'}</span><span style="font-family:var(--mono)">${pctProg}%</span>
-    </div>
-    <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:12px">
-      <div style="height:100%;width:${pctProg}%;background:${pctProg>90?'var(--red)':pctProg>70?'var(--yellow)':'var(--green)'};border-radius:6px;transition:width .6s"></div>
-    </div>
-    <div style="margin-bottom:4px;font-size:11px;color:var(--sub);display:flex;justify-content:space-between">
-      <span>${'⚡ Laufendes Jahr — HARD LIMIT (100.000 €) Fallbeil-Effekt!'}</span><span style="font-family:var(--mono)">${pct100}%</span>
-    </div>
-    <div style="height:10px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:10px">
-      <div style="height:100%;width:${pct100}%;background:${pct100>80?'var(--red)':pct100>50?'var(--yellow)':'var(--blue)'};border-radius:6px;transition:width .6s"></div>
-    </div>
-    ${pct100>=100?`<div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r);padding:10px;font-size:12px;color:var(--red)">⚠ <strong>100.000 € überschritten!</strong> Ab diesem Moment gilt Regelbesteuerung — sofortige USt-Pflicht! (§19 UStG Fallbeil-Effekt)</div>`
-    :pctProg>80?`<div style="color:var(--yellow);font-size:12px">${'⚠ Vorjahresgrenze in Sicht — bei Überschreitung 25.000 € entfällt §19 UStG im Folgejahr!'}</div>`
-    :'<div style="color:var(--green);font-size:12px">✓ Kleinunternehmer-Status (§19 UStG) voraussichtlich sicher</div>'}
-    <div style="margin-top:10px;font-size:10px;color:var(--sub);background:var(--s3);padding:8px 10px;border-radius:var(--r);border:1px solid var(--border)">
-      ${'ℹ️ Neu ab 01.01.2025 (JStG 2024): Vorjahresgrenze 25.000 € (netto) + laufendes Jahr max. 100.000 € (harte Grenze, sofort wirksam bei Überschreitung).'}
-    </div>`;
+    ${statusMsg}
+    <div class="prog-limit-note">ab 01.01.2025 (JStG 2024): Vorjahresgrenze 25.000 € + laufendes Jahr max. 100.000 € (sofort wirksam bei Überschreitung)</div>`;
 }
 
 // ── KATEGORIEN ───────────────────────────────────────────────────────────

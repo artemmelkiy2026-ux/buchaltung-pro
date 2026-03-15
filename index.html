@@ -619,24 +619,32 @@
 <!-- ── PROGNOSE ── -->
 <div class="page" id="p-prognose">
 <div class="page-inner">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div><h1 style="font-size:18px;font-weight:700"><i class="fas fa-chart-line"></i> Prognose & Vorjahresvergleich</h1>
-    <p style="color:var(--sub);font-size:12px;margin-top:3px">Hochrechnung auf Basis der laufenden Monate</p></div>
-    <select id="prog-yr" onchange="renderProg()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;font-family:var(--sans)"></select>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="prog-cards"></div>
-  <div class="prog-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:18px">
-      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:14px"><i class="fas fa-chart-bar"></i> Monat für Monat</div>
-      <div id="prog-monat"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-chart-line"></i> Prognose & Vorjahresvergleich</h1>
+      <p style="color:var(--sub);font-size:12px;margin-top:3px">Hochrechnung auf Basis der laufenden Monate</p>
     </div>
-    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:18px">
-      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:14px"><i class="fas fa-calendar-alt"></i> Vorjahresvergleich</div>
-      <div id="prog-vergleich"></div>
-    </div>
+    <select id="prog-yr" onchange="renderProg()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 14px;font-size:13px;font-weight:600;outline:none;font-family:var(--sans)"></select>
   </div>
-  <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:18px">
-    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:14px"><i class="fas fa-chart-line" style="transform:scaleY(-1)"></i> Hochrechnung Jahresende</div>
+
+  <!-- Hero-карточки прогноза -->
+  <div id="prog-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px"></div>
+
+  <!-- Месяцы -->
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:20px">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><i class="fas fa-chart-bar"></i> Monat für Monat</div>
+    <div id="prog-monat"></div>
+  </div>
+
+  <!-- Vorjahresvergleich — на всю ширину -->
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:20px">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><i class="fas fa-calendar-alt"></i> Vorjahresvergleich</div>
+    <div id="prog-vergleich"></div>
+  </div>
+
+  <!-- Hochrechnung KU-Limiten -->
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><i class="fas fa-tachometer-alt"></i> Kleinunternehmer-Grenzen (§19 UStG)</div>
     <div id="prog-hochrechnung"></div>
   </div>
 </div>
