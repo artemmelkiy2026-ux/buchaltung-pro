@@ -1828,14 +1828,14 @@ input, select, textarea {
 .drc-sum-item{display:flex;align-items:center;gap:8px}
 .drc-sum-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .drc-sum-lbl{font-size:11px;color:var(--sub)}
-.drc-sum-val{font-family:var(--mono);font-size:13px;font-weight:700;margin-left:4px}
+.drc-sum-val{font-family:var(--mono);font-size:15px;font-weight:700;margin-left:4px}
 .drc-sum-sep{width:1px;height:14px;background:var(--border);flex-shrink:0}
 .drc-sum-saldo{
   margin-left:auto;
   display:flex;align-items:center;gap:8px;
 }
-.drc-sum-saldo .drc-sum-lbl{font-size:11px;color:var(--sub)}
-.drc-sum-saldo .drc-sum-val{font-size:14px;font-weight:700}
+.drc-sum-saldo .drc-sum-lbl{font-size:12px;color:var(--sub)}
+.drc-sum-saldo .drc-sum-val{font-size:15px;font-weight:700}
 
 @media(max-width:900px){
   .drc-grid{grid-template-columns:repeat(2,1fr)}
