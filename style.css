@@ -1687,7 +1687,7 @@ input, select, textarea {
   margin-bottom:12px;
 }
 .pg-alert-green{background:rgba(93,157,105,.1);color:var(--green);border:1px solid rgba(93,157,105,.2)}
-.pg-alert-yellow{background:var(--ydim);color:var(--yellow);border:1px solid rgba(224,140,26,.2)}
+.pg-alert-yellow{background:var(--ydim);color:var(--yellow)}
 .pg-alert-red{background:var(--rdim);color:var(--red);border:1px solid rgba(220,53,69,.2)}
 .pg-note{font-size:12px;color:var(--muted);background:var(--s3);padding:10px 14px;border-radius:8px;line-height:1.5}
 
