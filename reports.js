@@ -32,39 +32,22 @@ function renderProg(){
 
   // ── 1. SUMMARY CARDS ────────────────────────────────────────────────────
   document.getElementById('prog-cards').innerHTML=`
-    <div class="pg-card pg-card-ein">
-      <div class="pg-card-icon"><i class="fas fa-arrow-trend-up"></i></div>
-      <div class="pg-card-body">
-        <div class="pg-card-label">Prognose Einnahmen ${yr}</div>
-        <div class="pg-card-val">${fmt(progEin)}</div>
-        <div class="pg-card-row">
-          <span class="pg-card-sub">Bisher: <strong>${fmt(istEin)}</strong></span>
-          ${deltaEin!==null?`<span class="pg-badge ${deltaEin>=0?'pg-badge-up':'pg-badge-down'}">${deltaEin>=0?'↑':'↓'} ${Math.abs(deltaEin)}% ggü. ${prevYr}</span>`:''}
-        </div>
-        <div class="pg-card-sub">Ø ${fmt(Math.round(avgEin))}/Monat · noch ${11-curM} Monate</div>
-      </div>
+    <div class="sc g" style="cursor:default">
+      <div class="sc-lbl">Prognose Einnahmen ${yr}</div>
+      <div class="sc-val">${fmt(progEin)}</div>
+      <div class="sc-sub">Bisher: ${fmt(istEin)} · Ø ${fmt(Math.round(avgEin))}/Monat</div>
+      ${deltaEin!==null?`<div class="pg-badge ${deltaEin>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px;display:inline-flex">${deltaEin>=0?'↑':'↓'} ${Math.abs(deltaEin)}% ggü. ${prevYr}</div>`:''}
     </div>
-    <div class="pg-card pg-card-aus">
-      <div class="pg-card-icon"><i class="fas fa-arrow-trend-down"></i></div>
-      <div class="pg-card-body">
-        <div class="pg-card-label">Prognose Ausgaben ${yr}</div>
-        <div class="pg-card-val">${fmt(progAus)}</div>
-        <div class="pg-card-row">
-          <span class="pg-card-sub">Bisher: <strong>${fmt(istAus)}</strong></span>
-        </div>
-        <div class="pg-card-sub">Ø ${fmt(Math.round(avgAus))}/Monat</div>
-      </div>
+    <div class="sc r" style="cursor:default">
+      <div class="sc-lbl">Prognose Ausgaben ${yr}</div>
+      <div class="sc-val">${fmt(progAus)}</div>
+      <div class="sc-sub">Bisher: ${fmt(istAus)} · Ø ${fmt(Math.round(avgAus))}/Monat</div>
     </div>
-    <div class="pg-card ${progGew>=0?'pg-card-gew':'pg-card-loss'}">
-      <div class="pg-card-icon"><i class="fas fa-wallet"></i></div>
-      <div class="pg-card-body">
-        <div class="pg-card-label">Prognose Gewinn ${yr}</div>
-        <div class="pg-card-val">${progGew>=0?'+':''}${fmt(progGew)}</div>
-        <div class="pg-card-row">
-          <span class="pg-card-sub">Vorjahr: <strong>${prevGew>=0?'+':''}${fmt(prevGew)}</strong></span>
-          ${deltaGew!==null?`<span class="pg-badge ${deltaGew>=0?'pg-badge-up':'pg-badge-down'}">${deltaGew>=0?'↑':'↓'} ${Math.abs(deltaGew)}%</span>`:''}
-        </div>
-      </div>
+    <div class="sc ${progGew>=0?'g':'r'}" style="cursor:default">
+      <div class="sc-lbl">Prognose Gewinn ${yr}</div>
+      <div class="sc-val">${progGew>=0?'+':''}${fmt(progGew)}</div>
+      <div class="sc-sub">Vorjahr: ${prevGew>=0?'+':''}${fmt(prevGew)}</div>
+      ${deltaGew!==null?`<div class="pg-badge ${deltaGew>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px;display:inline-flex">${deltaGew>=0?'↑':'↓'} ${Math.abs(deltaGew)}%</div>`:''}
     </div>`;
 
   // ── 2. MONAT FÜR MONAT ──────────────────────────────────────────────────
