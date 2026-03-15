@@ -783,8 +783,8 @@ function renderEin(){
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      const rowBg=isEin?'rgba(78,144,96,.06)':'rgba(201,64,79,.06)';
-      const rowBgHover=isEin?'rgba(78,144,96,.11)':'rgba(201,64,79,.11)';
+      const rowBg=isEin?'var(--s2)':'var(--s2)';
+      const rowBgHover=isEin?'var(--s3)':'var(--s3)';
       return '<div style="display:flex;flex-direction:column;padding:12px 14px;background:'+rowBg+';border-radius:12px;margin-bottom:8px;transition:background .15s;'+(st?'opacity:0.45;':'')+'"'
         +' onmouseover="this.style.background=\''+rowBgHover+'\'"'
         +' onmouseout="this.style.background=\''+rowBg+'\'">'
@@ -1053,8 +1053,8 @@ function renderZ(){
     
     ztb.innerHTML=pageEntries.map(e=>{
       const isEin=e.typ==='Einnahme';
-      const zBg=isEin?'rgba(78,144,96,.06)':'rgba(201,64,79,.06)';
-      const zBgH=isEin?'rgba(78,144,96,.11)':'rgba(201,64,79,.11)';
+      const zBg=isEin?'var(--s2)':'var(--s2)';
+      const zBgH=isEin?'var(--s3)':'var(--s3)';
       return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:'+zBg+';border-radius:12px;margin-bottom:8px;transition:background .15s"'
         +' onmouseover="this.style.background=\''+zBgH+'\'"'
         +' onmouseout="this.style.background=\''+zBg+'\'">'
