@@ -2204,3 +2204,13 @@ input, select, textarea {
   font-size:10px;color:var(--sub);margin-left:4px;
   cursor:help;opacity:.7;
 }
+
+/* Фикс кнопки выбора MwSt-Satz — убираем outline при фокусе */
+#nf-mwst-rate-trigger{
+  outline:none;
+  box-sizing:border-box;
+}
+#nf-mwst-rate-trigger:focus{
+  outline:none;
+  border-color:var(--blue);
+}
