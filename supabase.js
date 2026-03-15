@@ -212,9 +212,9 @@ async function sbDeleteRechnung(id) {
   await sb.from('rechnungen_pos').delete().eq('rechnung_id',id).eq('user_id',currentUser.id);
   await sb.from('rechnungen').delete().eq('id',id).eq('user_id',currentUser.id);
 }
-async function sbSaveWied(w)       { await sb.from('wiederkehrend').upsert(wiedToDb(w), {onConflict:'id'}); }
-async function sbDeleteWied(id)    { await sb.from('wiederkehrend').delete().eq('id',id).eq('user_id',currentUser.id); }
-async function sbSaveUstMode(j,m)  { await sb.from('ust_mode').upsert({user_id:currentUser.id,jahr:j,mode:m},{onConflict:'user_id,jahr'}); }
+async function sbSaveWied(w)       { if(!currentUser) return; await sb.from('wiederkehrend').upsert(wiedToDb(w), {onConflict:'id'}); }
+async function sbDeleteWied(id)    { if(!currentUser) return; await sb.from('wiederkehrend').delete().eq('id',id).eq('user_id',currentUser.id); }
+async function sbSaveUstMode(j,m)  { if(!currentUser) return; await sb.from('ust_mode').upsert({user_id:currentUser.id,jahr:j,mode:m},{onConflict:'user_id,jahr'}); }
 async function sbSaveUstEintrag(e) {
   if (!currentUser) return;
   const {error} = await sb.from('ust_eintraege').upsert(ustEintragToDb(e), {onConflict:'id'});
