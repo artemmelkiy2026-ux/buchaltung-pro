@@ -941,7 +941,7 @@ function renderUst(){
 
   // ── Список лет ────────────────────────────────────────────────────────────
   const years = [...new Set([
-    ...data.eintraege.map(e=>e.datum.substring(0,4)),
+    ...(data.eintraege||[]).filter(e=>e.datum).map(e=>e.datum.substring(0,4)),
     ...data.ustEintraege.map(e=>e.datum.substring(0,4)),
     new Date().getFullYear()+''
   ])].sort().reverse();

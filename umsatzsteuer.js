@@ -208,7 +208,7 @@ const GEW_FREIBETRAG     = 24500;   // Gewerbesteuer-Freibetrag (unverändert)
 const GEW_MESSZAHL       = 0.035;   // Gewerbesteuer-Messzahl 3,5%
 
 function stInit() {
-  const je=[...new Set(data.eintraege.map(e=>e.datum.substring(0,4)))].sort().reverse();
+  const je=[...new Set((data.eintraege||[]).filter(e=>e.datum).map(e=>e.datum.substring(0,4)))].sort().reverse();
   const sel=document.getElementById('st-eur-yr');
   sel.innerHTML='<option value="Alle">Alle Jahre</option>'+je.map(j=>`<option>${j}</option>`).join('');
   stSyncJahr();

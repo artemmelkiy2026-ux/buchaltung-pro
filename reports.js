@@ -181,7 +181,7 @@ function setKatTab(t,btn){
 }
 function renderKat(){
   // ── данные ────────────────────────────────────────────────────────────────
-  const years=[...new Set(data.eintraege.map(e=>e.datum.substring(0,4)))].sort().reverse();
+  const years=[...new Set((data.eintraege||[]).filter(e=>e.datum).map(e=>e.datum.substring(0,4)))].sort().reverse();
   const sel=document.getElementById('kat-yr');
   if(!sel.innerHTML) sel.innerHTML='<option value="Alle">Alle Jahre</option>'+years.map(y=>`<option>${y}</option>`).join('');
   const yr=sel.value||'Alle';
