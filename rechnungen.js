@@ -48,52 +48,42 @@ function renderRech(){
   });
 
   const statusCfg = {
-    offen:       {cls:'rpill-offen',   label:'Offen',      color:'var(--yellow)'},
-    ueberfaellig:{cls:'rpill-ueber',   label:'Überfällig', color:'var(--red)'},
-    bezahlt:     {cls:'rpill-bezahlt', label:'Bezahlt',    color:'var(--green)'}
+    offen:       {cls:'rech-badge-offen',    icon:'fas fa-clock',              label:'Offen',      color:'var(--yellow)'},
+    ueberfaellig:{cls:'rech-badge-ueber',    icon:'fas fa-exclamation-circle', label:'Überfällig', color:'var(--red)'},
+    bezahlt:     {cls:'rech-badge-bezahlt',  icon:'fas fa-check-circle',       label:'Bezahlt',    color:'var(--green)'}
   };
 
-  // Шапка
-  const header = `<div class="rlist-header">
-    <div class="rlist-col-kunde" onclick="sortRech('kunde')" style="cursor:pointer">Kunde / Beschreibung</div>
-    <div class="rlist-col-nr"   onclick="sortRech('nr')"    style="cursor:pointer">Nr.</div>
-    <div class="rlist-col-dat"  onclick="sortRech('datum')" style="cursor:pointer">Datum</div>
-    <div class="rlist-col-fae"  onclick="sortRech('faellig')" style="cursor:pointer">Fällig</div>
-    <div class="rlist-col-bet"  onclick="sortRech('betrag')" style="cursor:pointer;text-align:right">Betrag</div>
-    <div class="rlist-col-st">Status</div>
-    <div class="rlist-col-act"></div>
-  </div>`;
-
-  const rows = filtered.map(r=>{
+  const cards = filtered.map(r=>{
     const st = statusCfg[r.status] || statusCfg.offen;
     let overdueTxt = '';
     if(r.status==='ueberfaellig'&&r.faellig){
       const diff = Math.floor((new Date(today)-new Date(r.faellig))/(1000*86400));
-      if(diff>0) overdueTxt = `<span class="rlist-overdue">+${diff}T</span>`;
+      if(diff>0) overdueTxt = `<span class="rech-overdue">+${diff} Tag${diff!==1?'e':''} überfällig</span>`;
     }
-    return `<div class="rlist-row" onclick="editRech('${r.id}')">
-      <div class="rlist-col-kunde">
-        <div class="rlist-name">${r.kunde||r.beschreibung||'—'}</div>
-        <div class="rlist-sub">${r.beschreibung&&r.kunde&&r.beschreibung!==r.kunde?r.beschreibung:''}</div>
-        <!-- мобильная строка -->
-        <div class="rlist-mob-meta">
-          <span class="rlist-mono">${r.nr}</span>
-          <span>${fd(r.datum)}</span>
-          <span class="${st.cls}">${st.label}</span>
+    const dueColor = r.status==='ueberfaellig' ? 'color:var(--red)' : 'color:var(--sub)';
+    return `<div class="rech-card" onclick="editRech('${r.id}')">
+      <div class="rech-card-left">
+        <div class="rech-card-avatar ${st.cls}">
+          <i class="${st.icon}"></i>
+        </div>
+        <div class="rech-card-info">
+          <div class="rech-card-nr">${r.nr}</div>
+          <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
+          <div class="rech-card-meta">
+            <span>${fd(r.datum)}</span>
+            ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}">Fällig ${fd(r.faellig)}</span>` : ''}
+            ${overdueTxt}
+          </div>
         </div>
       </div>
-      <div class="rlist-col-nr rlist-mono rlist-desk">${r.nr}</div>
-      <div class="rlist-col-dat rlist-mono rlist-muted rlist-desk">${fd(r.datum)}</div>
-      <div class="rlist-col-fae rlist-mono rlist-desk" style="color:${r.status==='ueberfaellig'?'var(--red)':'var(--sub)'}">
-        ${r.faellig?fd(r.faellig):'—'} ${overdueTxt}
-      </div>
-      <div class="rlist-col-bet rlist-mono rlist-bold rlist-desk" style="text-align:right">${fmt(r.betrag)}</div>
-      <div class="rlist-col-st rlist-desk"><span class="${st.cls}">${st.label}</span></div>
-      <div class="rlist-col-act" onclick="event.stopPropagation()">
-        <div class="rlist-mob-bet rlist-mono rlist-bold">${fmt(r.betrag)}</div>
-        <div class="rlist-actions">
-          ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Bezahlt"><i class="fas fa-check"></i></button>`:''}
-          <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="PDF"><i class="fas fa-print"></i></button>
+      <div class="rech-card-right">
+        <div class="rech-card-betrag">${fmt(r.betrag)}</div>
+        <div class="rech-card-status ${st.cls}-pill">
+          <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
+        </div>
+        <div class="rech-card-actions" onclick="event.stopPropagation()">
+          ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
+          <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
           <button class="rca-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
           <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
         </div>
@@ -102,12 +92,12 @@ function renderRech(){
   }).join('');
 
   const filtTotal = filtered.reduce((s,r)=>s+r.betrag,0);
-  const footer = `<div class="rlist-footer">
+  const summary = `<div class="rech-summary">
     <span>${filtered.length} Rechnung${filtered.length!==1?'en':''}</span>
-    <span class="rlist-mono rlist-bold">${fmt(filtTotal)}</span>
+    <span class="rech-summary-total">${fmt(filtTotal)}</span>
   </div>`;
 
-  if(container) container.innerHTML = header + rows + footer;
+  if(container) container.innerHTML = cards + summary;
 }
 function setRechFilter(f,btn){rechFilter=f;document.querySelectorAll('#p-rechnungen .ftab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderRech();}
 function sortRech(col){if(rechSort===col)rechSortDir*=-1;else{rechSort=col;rechSortDir=-1;}renderRech();}
