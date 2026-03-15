@@ -127,7 +127,7 @@ function renderJournal() {
         rowBg = 'background:rgba(148,163,184,.03);';
         opacity = '0.6';
       } else if (e.korrektur_von) {
-        badge = `<span class="badge-korrektur">✎ Korrektur</span>`;
+        badge = `<span class="badge-korrektur">● Korrektur</span>`;
         rowBg = 'background:rgba(93,157,105,.03);';
       }
 
@@ -213,7 +213,7 @@ function renderJournal() {
         badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
         rowBg = 'background:rgba(148,163,184,.03);'; opacity = '0.6';
       } else if (e.korrektur_von) {
-        badge = `<span class="badge-korrektur">✎ Korrektur</span>`;
+        badge = `<span class="badge-korrektur">● Korrektur</span>`;
         rowBg = 'background:rgba(93,157,105,.03);';
       }
       let link = '';

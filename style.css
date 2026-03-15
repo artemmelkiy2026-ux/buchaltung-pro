@@ -2094,17 +2094,13 @@ input, select, textarea {
 /* ── Korrektur / Storno бейджи — единый стиль везде ── */
 .badge-storno{
   display:inline-flex;align-items:center;gap:3px;
-  font-size:10px;font-weight:600;
-  padding:2px 7px;border-radius:4px;
-  background:rgba(100,116,139,.1);
-  color:var(--sub);
-  border:1px solid rgba(100,116,139,.15);
+  padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:600;font-family:var(--mono);white-space:nowrap;
+  background:var(--rdim);color:var(--red);
 }
 .badge-korrektur{
   display:inline-flex;align-items:center;gap:3px;
-  font-size:10px;font-weight:600;
-  padding:2px 7px;border-radius:4px;
-  background:rgba(78,144,96,.1);
-  color:var(--green);
-  border:1px solid rgba(78,144,96,.2);
+  padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:600;font-family:var(--mono);white-space:nowrap;
+  background:var(--gdim);color:var(--green);
 }

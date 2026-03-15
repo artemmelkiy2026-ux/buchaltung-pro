@@ -775,11 +775,11 @@ function renderEin(){
       let stLbl='';
       if(e.is_storno&&e.storno_of){
         const orig=data.eintraege.find(x=>x.id===e.storno_of);
-        stLbl='<span class="badge-storno">↩ Storno</span>';
+        stLbl='<span class="badge-storno">● Storno</span>';
       } else if(st){
-        stLbl='<span style="font-size:9px;font-weight:700;color:#f97316;background:rgba(249,115,22,0.1);padding:2px 5px;border-radius:3px;margin-right:4px">✗ Storniert</span>';
+        stLbl='<span class="badge-storno">● Storniert</span>';
       } else if(e.korrektur_von){
-        stLbl='<span class="badge-korrektur">✎ Korrektur</span>';
+        stLbl='<span class="badge-korrektur">● Korrektur</span>';
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
