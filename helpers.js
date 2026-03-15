@@ -146,6 +146,25 @@ function closeMobDrawer() {
 // ═══════════════════════════════════════════════════════════════
 let editKundeId = null;
 
+let kundenSort='name', kundenSortAsc=true, kundenPage=1;
+const KUNDEN_PER_PAGE=10;
+
+function sortKunden(col){
+  if(kundenSort===col) kundenSortAsc=!kundenSortAsc; else{kundenSort=col;kundenSortAsc=true;}
+  kundenPage=1;
+  renderKunden();
+}
+function _updateKundenSortBtns(){
+  [['name','Name'],['ort','Ort'],['umsatz','Umsatz']].forEach(([col,lbl])=>{
+    document.querySelectorAll(`#p-kunden button[onclick*="sortKunden('${col}')"]`).forEach(btn=>{
+      const active=kundenSort===col;
+      btn.style.background=active?'var(--blue)':'';
+      btn.style.borderColor=active?'var(--blue)':'';
+      btn.style.color=active?'#fff':'';
+      btn.textContent=lbl+(active?(kundenSortAsc?' ↑':' ↓'):'');
+    });
+  });
+}
 function renderKunden(){
   const kunden = data.kunden||[];
   const q = (document.getElementById('kunden-search')||{value:''}).value.toLowerCase();

@@ -1,19 +1,51 @@
 // ── WIEDERKEHREND ────────────────────────────────────────────────────────
 let wiedTyp='Ausgabe';
+let wiedSort='naechste', wiedSortAsc=true, wiedPage=1;
+const WIED_PER_PAGE=10;
+
+function sortWied(col){
+  if(wiedSort===col) wiedSortAsc=!wiedSortAsc; else{wiedSort=col;wiedSortAsc=true;}
+  wiedPage=1;
+  renderWied();
+}
+function _updateWiedSortBtns(){
+  [['bezeichnung','Bezeichnung'],['betrag','Betrag'],['naechste','Nächste'],['intervall','Intervall']].forEach(([col,lbl])=>{
+    document.querySelectorAll(`#p-wiederkehrend button[onclick*="sortWied('${col}')"]`).forEach(btn=>{
+      const active=wiedSort===col;
+      btn.style.background=active?'var(--blue)':'';
+      btn.style.borderColor=active?'var(--blue)':'';
+      btn.style.color=active?'#fff':'';
+      btn.textContent=lbl+(active?(wiedSortAsc?' ↑':' ↓'):'');
+    });
+  });
+}
 function renderWied(){
   const wied=data.wiederkehrend||[];
   const container=document.getElementById('wied-list');
   const em=document.getElementById('wied-empty');
-  if(!wied.length){if(container)container.innerHTML='';em.style.display='block';return;}
+  const pagination=document.getElementById('wied-pagination');
+  if(!wied.length){if(container)container.innerHTML='';em.style.display='block';if(pagination)pagination.innerHTML='';return;}
   em.style.display='none';
   const today=new Date().toISOString().split('T')[0];
   const faelligCount=wied.filter(w=>w.naechste<=today).length;
   const hint=document.getElementById('wied-hint');
-  if(faelligCount>0){hint.style.display='';hint.innerHTML=`⚡ <strong>${faelligCount} fällige Zahlung${faelligCount>1?'en':''}</strong> — jetzt buchen!`;}
+  if(faelligCount>0){hint.style.display='';hint.innerHTML=`<strong>${faelligCount} fällige Zahlung${faelligCount>1?'en':''}</strong> — jetzt buchen!`;}
   else hint.style.display='none';
 
+  // Сортировка
+  const sorted=[...wied].sort((a,b)=>{
+    let av=a[wiedSort]||'', bv=b[wiedSort]||'';
+    if(wiedSort==='betrag'){av=a.betrag;bv=b.betrag;}
+    return av<bv?(wiedSortAsc?-1:1):av>bv?(wiedSortAsc?1:-1):0;
+  });
+
+  // Пагинация
+  const totalPages=Math.max(1,Math.ceil(sorted.length/WIED_PER_PAGE));
+  if(wiedPage>totalPages)wiedPage=totalPages;
+  const pageItems=sorted.slice((wiedPage-1)*WIED_PER_PAGE, wiedPage*WIED_PER_PAGE);
+
   const intervallLabel={monatlich:'Monatlich',quartalsweise:'Quartalsweise',jaehrlich:'Jährlich'};
-  const cards=wied.map(w=>{
+  const cards=pageItems.map(w=>{
     const isFaellig=w.naechste<=today;
     const isEin=w.typ==='Einnahme';
     return`<div class="wied-card${isFaellig?' wied-card--faellig':''}">
@@ -52,6 +84,25 @@ function renderWied(){
   </div>`;
 
   if(container) container.innerHTML=cards+summary;
+
+  // Пагинация
+  if(pagination){
+    if(totalPages<=1){pagination.innerHTML='';} 
+    else {
+      let ph=`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:12px">`;
+      ph+=`<button class="btn" style="padding:6px 10px;font-size:11px" onclick="wiedPage=1;renderWied()" ${wiedPage===1?'disabled':''}>«</button>`;
+      ph+=`<button class="btn" style="padding:6px 10px;font-size:11px" onclick="wiedPage--;renderWied()" ${wiedPage===1?'disabled':''}>‹</button>`;
+      for(let i=Math.max(1,wiedPage-2);i<=Math.min(totalPages,wiedPage+2);i++){
+        ph+=`<button class="btn" style="padding:6px 10px;font-size:11px${i===wiedPage?';background:var(--blue);color:#fff;border-color:var(--blue)':''}" onclick="wiedPage=${i};renderWied()">${i}</button>`;
+      }
+      ph+=`<button class="btn" style="padding:6px 10px;font-size:11px" onclick="wiedPage++;renderWied()" ${wiedPage===totalPages?'disabled':''}>›</button>`;
+      ph+=`<button class="btn" style="padding:6px 10px;font-size:11px" onclick="wiedPage=${totalPages};renderWied()" ${wiedPage===totalPages?'disabled':''}>»</button>`;
+      ph+=`<span style="font-size:12px;color:var(--sub)">${(wiedPage-1)*WIED_PER_PAGE+1}–${Math.min(wiedPage*WIED_PER_PAGE,wied.length)} / ${wied.length}</span>`;
+      ph+=`</div>`;
+      pagination.innerHTML=ph;
+    }
+  }
+  _updateWiedSortBtns();
 }
 function setWiedTyp(t){
   wiedTyp=t;

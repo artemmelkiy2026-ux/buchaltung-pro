@@ -1,5 +1,6 @@
 // ── RECHNUNGEN ───────────────────────────────────────────────────────────
-let rechFilter='alle', editRechId=null, rechSort='datum', rechSortDir=-1;
+let rechFilter='alle', editRechId=null, rechSort='datum', rechSortDir=-1, rechPage=1;
+const RECH_PER_PAGE=10;
 function renderRech(){
   const rech=data.rechnungen||[];
   const today=new Date().toISOString().split('T')[0];
@@ -99,8 +100,23 @@ function renderRech(){
 
   if(container) container.innerHTML = cards + summary;
 }
-function setRechFilter(f,btn){rechFilter=f;document.querySelectorAll('#p-rechnungen .ftab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderRech();}
-function sortRech(col){if(rechSort===col)rechSortDir*=-1;else{rechSort=col;rechSortDir=-1;}renderRech();}
+function setRechFilter(f,btn){rechFilter=f;rechPage=1;document.querySelectorAll('#p-rechnungen .ftab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderRech();}
+function sortRech(col){
+  if(rechSort===col) rechSortDir*=-1; else{rechSort=col;rechSortDir=-1;}
+  rechPage=1;
+  renderRech();
+}
+function _updateRechSortBtns(){
+  [['datum','Datum'],['faellig','Fällig'],['betrag','Betrag'],['kunde','Kunde']].forEach(([col,lbl])=>{
+    document.querySelectorAll(`#p-rechnungen button[onclick*="sortRech('${col}')"]`).forEach(btn=>{
+      const active = rechSort===col;
+      btn.style.background = active ? 'var(--blue)' : '';
+      btn.style.borderColor = active ? 'var(--blue)' : '';
+      btn.style.color = active ? '#fff' : '';
+      btn.textContent = lbl + (active ? (rechSortDir===1?' ↑':' ↓') : '');
+    });
+  });
+}
 
 
 function openRechModal(){

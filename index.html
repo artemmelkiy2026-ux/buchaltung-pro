@@ -690,8 +690,16 @@
   </div>
   <!-- Statistik-Cards -->
   <div id="kunden-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
+  <!-- Sort bar -->
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('name')">Name</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('ort')">Ort</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('umsatz')">Umsatz</button>
+  </div>
   <!-- Kunden Karten -->
   <div id="kunden-list" class="kunden-list"></div>
+  <div id="kunden-pagination"></div>
   <div id="kunden-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-users"></i></div><p>Keine Kunden vorhanden</p></div>
 </div>
 </div>
@@ -726,6 +734,7 @@
   </div>
   <!-- Rechnungen Karten -->
   <div id="rech-list"></div>
+  <div id="rech-pagination"></div>
   <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungen</p></div>
 </div>
 </div>
@@ -744,7 +753,16 @@
   <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px" id="wied-hint" style="display:none">
     <i class="fas fa-lightbulb"></i> Beim Programmstart werden fällige Zahlungen automatisch erkannt und können mit einem Klick gebucht werden.
   </div>
+  <!-- Sort bar -->
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('naechste')">Nächste</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('bezeichnung')">Bezeichnung</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('betrag')">Betrag</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('intervall')">Intervall</button>
+  </div>
   <div id="wied-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div id="wied-pagination"></div>
   <div id="wied-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-sync-alt"></i></div><p>Keine Vorlagen — erstelle wiederkehrende Zahlungen</p></div>
 </div>
 </div>
