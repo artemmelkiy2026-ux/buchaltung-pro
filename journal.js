@@ -177,6 +177,7 @@ function renderJournal() {
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
                 ${badge}
                 <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${fd(e.datum)}</span>
+                ${e.created_at ? `<span style="font-size:10px;color:var(--sub);opacity:.6;font-family:var(--mono)">${fdt(e.created_at).slice(11)}</span>` : ''}
               </div>
               <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3${link?';margin-bottom:4px':''}">
                 ${e.belegnr?`<span style="font-size:10px;font-weight:700;font-family:var(--mono);background:var(--blue);color:#fff;padding:1px 5px;border-radius:4px;margin-right:5px">Nr.${e.belegnr}</span>`:''}
@@ -322,41 +323,62 @@ function renderRechnungenLog() {
   if(journalPage > totalPages) journalPage = totalPages;
   const items = log.slice((journalPage-1)*PER, journalPage*PER);
 
-  tb.innerHTML = items.map(e => {
+  tb.innerHTML = items.map((e,i) => {
     const a = AKTION_LABEL[e.aktion] || { label:e.aktion, color:'var(--sub)', icon:'fa-circle' };
-    const dt = e.created_at ? e.created_at.replace('T',' ').substring(0,16) : '—';
-    let altNeu = '';
-    try {
-      const alt = e.alt_wert ? JSON.parse(e.alt_wert) : null;
-      const neu = e.neu_wert ? JSON.parse(e.neu_wert) : null;
-      if(alt && neu) {
-        // Показываем что изменилось
-        const changes = Object.keys({...alt,...neu}).filter(k => {
-          return JSON.stringify(alt?.[k]) !== JSON.stringify(neu?.[k]);
-        });
-        altNeu = changes.map(k => {
-          const av = alt?.[k] !== undefined ? alt[k] : '—';
-          const nv = neu?.[k] !== undefined ? neu[k] : '—';
-          const fmtV = v => typeof v === 'number' ? fmt(v) : String(v||'—');
-          return `<span style="font-size:11px;color:var(--sub)">${k}: <span style="color:var(--red);text-decoration:line-through">${fmtV(av)}</span> → <span style="color:var(--green)">${fmtV(nv)}</span></span>`;
-        }).join(' &nbsp;');
-      } else if(neu) {
-        const entries = Object.entries(neu).filter(([,v])=>v).slice(0,3);
-        altNeu = entries.map(([k,v])=>`<span style="font-size:11px;color:var(--sub)">${k}: <span style="color:var(--text)">${typeof v==='number'?fmt(v):v}</span></span>`).join(' &nbsp;');
-      }
-    } catch(ex){}
+    const dt = e.created_at ? fdt(e.created_at) : '—';
 
-    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
-      <div style="flex:0 0 32px;height:32px;border-radius:50%;background:${a.color}22;display:flex;align-items:center;justify-content:center">
-        <i class="fas ${a.icon}" style="color:${a.color};font-size:12px"></i>
-      </div>
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span style="font-size:13px;font-weight:700;color:${a.color}">${a.label}</span>
-          <span style="font-size:12px;font-weight:700;font-family:var(--mono);background:var(--s2);padding:2px 7px;border-radius:5px">Nr.${e.rechnung_nr||'—'}</span>
-          <span style="font-size:11px;color:var(--sub)">${dt}</span>
+    // Парсим alt/neu значения
+    let alt = null, neu = null;
+    try { alt = e.alt_wert ? JSON.parse(e.alt_wert) : null; } catch(ex){}
+    try { neu = e.neu_wert ? JSON.parse(e.neu_wert) : null; } catch(ex){}
+
+    // Строим строки изменений
+    let changeRows = '';
+    if(alt && neu) {
+      const FIELD_LABELS = { nr:'Nr.', betrag:'Betrag', status:'Status', kunde:'Kunde', faellig:'Fällig', einnahme_betrag:'Einnahme', datum_bezahlt:'Datum' };
+      const changes = Object.keys({...alt,...neu}).filter(k => JSON.stringify(alt?.[k]) !== JSON.stringify(neu?.[k]));
+      changeRows = changes.map(k => {
+        const av = alt?.[k] !== undefined ? alt[k] : null;
+        const nv = neu?.[k] !== undefined ? neu[k] : null;
+        const fmtV = v => v===null||v===undefined ? '—' : (typeof v==='number' ? fmt(v) : String(v));
+        const label = FIELD_LABELS[k] || k;
+        return `<div style="display:flex;align-items:center;gap:6px;font-size:11px;padding:3px 0">
+          <span style="color:var(--sub);min-width:50px">${label}</span>
+          ${av!==null ? `<span style="color:var(--red);text-decoration:line-through;font-family:var(--mono)">${fmtV(av)}</span><span style="color:var(--sub)">→</span>` : ''}
+          <span style="color:var(--green);font-weight:600;font-family:var(--mono)">${fmtV(nv)}</span>
+        </div>`;
+      }).join('');
+    } else if(neu) {
+      const FIELD_LABELS = { nr:'Nr.', betrag:'Betrag', status:'Status', kunde:'Kunde' };
+      changeRows = Object.entries(neu).filter(([,v])=>v!=null).slice(0,4).map(([k,v])=>{
+        const label = FIELD_LABELS[k] || k;
+        return `<div style="font-size:11px;color:var(--sub);padding:2px 0"><span style="min-width:50px;display:inline-block">${label}</span> <span style="color:var(--text);font-family:var(--mono);font-weight:600">${typeof v==='number'?fmt(v):v}</span></div>`;
+      }).join('');
+    }
+
+    // Цвет фона строки
+    const rowBg = e.aktion==='geloescht' ? 'background:rgba(239,68,68,.03)' :
+                  e.aktion==='bezahlt'   ? 'background:rgba(34,197,94,.03)'  :
+                  e.aktion==='erstellt'  ? 'background:rgba(34,197,94,.02)'  : '';
+
+    const sep = i > 0 ? '' : '';
+    return `<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 14px;${rowBg}">
+        <!-- Иконка -->
+        <div style="flex:0 0 38px;height:38px;border-radius:50%;background:${a.color}18;display:flex;align-items:center;justify-content:center;margin-top:1px">
+          <i class="fas ${a.icon}" style="color:${a.color};font-size:13px"></i>
         </div>
-        ${altNeu ? `<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:8px">${altNeu}</div>` : ''}
+        <!-- Контент -->
+        <div style="flex:1;min-width:0">
+          <!-- Бейдж + Nr + дата+время -->
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px">
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;background:${a.color}18;color:${a.color};border:1px solid ${a.color}33">${a.label}</span>
+            <span style="font-size:12px;font-weight:800;font-family:var(--mono);background:var(--s2);padding:2px 8px;border-radius:6px;border:1px solid var(--border)">Nr.${e.rechnung_nr||'—'}</span>
+            <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${dt}</span>
+          </div>
+          <!-- Изменения -->
+          ${changeRows ? `<div style="border-top:1px solid var(--border);padding-top:7px;margin-top:3px">${changeRows}</div>` : ''}
+        </div>
       </div>
     </div>`;
   }).join('');
