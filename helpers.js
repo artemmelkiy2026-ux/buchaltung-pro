@@ -1116,7 +1116,7 @@ function renderUst(){
 
   // ── Карточки 2x2 ──────────────────────────────────────────────────────────
   if(regelCards){
-    regelCards.style.cssText = 'display:grid!important;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px';
+    regelCards.style.cssText = 'display:grid!important;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px';
     regelCards.innerHTML = `
     <div class="sc b" style="cursor:default">
       <div class="sc-lbl">Netto-Einnahmen</div>
@@ -1210,7 +1210,7 @@ function renderUst(){
 
   // ── Таблица операций с пагинацией (20 строк) ─────────────────────────────
   const empty2  = document.getElementById('ust-empty');
-  const PER_PAGE = 10;
+  const PER_PAGE = 5;
 
   // Фильтр по кварталу
   const filteredMwst = ustQuartalFilter > 0
