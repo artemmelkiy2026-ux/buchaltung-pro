@@ -1354,18 +1354,18 @@ let _kuRate=19, _kuMode='brutto';
 
 function kuSetRate(r){
   _kuRate=r;
-  document.querySelectorAll('.ku-rate-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#ku-btn-19, #ku-btn-7').forEach(b=>b.classList.remove('active'));
   document.getElementById('ku-btn-'+r)?.classList.add('active');
   kuCalc();
 }
 function kuSetMode(m){
   _kuMode=m;
-  document.querySelectorAll('.ku-mode-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#ku-m-brutto, #ku-m-netto').forEach(b=>b.classList.remove('active'));
   document.getElementById('ku-m-'+m)?.classList.add('active');
   kuCalc();
 }
 function kuCalc(){
-  const raw=parseFloat(document.getElementById('ku-input')?.value)||0;
+  const raw=parseFloat(String(document.getElementById('ku-input')?.value||'').replace(',','.'))||0;
   if(!raw){
     ['ku-r-ku','ku-r-netto','ku-r-mwst','ku-r-brutto','ku-r-diff'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.textContent='—';
@@ -1382,12 +1382,12 @@ function kuCalc(){
     mwst=r2(netto*_kuRate/100);
     brutto=r2(netto+mwst);
   }
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=fmt(v);};
-  set('ku-r-ku',   netto);       // §19 — выставляется нетто без НДС
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(v); };
+  set('ku-r-ku',    netto);   // §19 — выставляется нетто
   set('ku-r-netto', netto);
   set('ku-r-mwst',  mwst);
   set('ku-r-brutto',brutto);
-  set('ku-r-diff',  mwst);       // экономия = сумма MwSt которую не платишь
+  set('ku-r-diff',  mwst);   // экономия = MwSt которую не платишь
 }
 
 // Переключение года в UST — безопасно находит select
