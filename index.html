@@ -1111,12 +1111,42 @@
     <!-- Rechnungskopf -->
     <div class="fgrow c2">
       <div class="fg"><label>Rechnungs-Nr.</label><input type="text" id="rn-nr" placeholder="2025-001"></div>
-      <div class="fg"><label>Status</label>
-        <select id="rn-status">
-          <option value="offen">Offen</option>
-          <option value="bezahlt">Bezahlt</option>
-          <option value="ueberfaellig">Überfällig</option>
-        </select>
+      <div class="fg">
+        <label>Status</label>
+        <input type="hidden" id="rn-status" value="offen">
+        <div style="position:relative">
+          <button type="button" id="rn-status-btn" onclick="toggleRechStatusDropdown()"
+            style="display:flex;align-items:center;justify-content:space-between;gap:8px;
+                   width:100%;padding:8px 12px;border-radius:var(--r);margin-top:4px;
+                   border:1px solid var(--border);background:var(--s2);
+                   color:var(--text);font-size:13px;font-weight:600;cursor:pointer;
+                   font-family:inherit;transition:border-color .15s">
+            <span id="rn-status-label" style="display:flex;align-items:center;gap:7px">
+              <i class="fas fa-clock" id="rn-status-icon" style="color:var(--yellow);font-size:11px"></i>
+              <span id="rn-status-text">Offen</span>
+            </span>
+            <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
+          </button>
+          <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);
+            background:var(--s1);border:1px solid var(--border);border-radius:10px;
+            box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
+            <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;
+              padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+              onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+              <i class="fas fa-clock" style="color:var(--yellow);font-size:12px;width:14px"></i> Offen
+            </div>
+            <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;
+              padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+              onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+              <i class="fas fa-check-circle" style="color:var(--green);font-size:12px;width:14px"></i> Bezahlt
+            </div>
+            <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;
+              padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+              onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+              <i class="fas fa-exclamation-circle" style="color:var(--red);font-size:12px;width:14px"></i> Überfällig
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="fgrow c2">

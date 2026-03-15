@@ -1,3 +1,40 @@
+// ── RECHNUNG STATUS DROPDOWN ─────────────────────────────────────────────
+const _RECH_ST_CFG = {
+  'offen':       {icon:'fas fa-clock',              color:'var(--yellow)', label:'Offen'},
+  'bezahlt':     {icon:'fas fa-check-circle',       color:'var(--green)',  label:'Bezahlt'},
+  'ueberfaellig':{icon:'fas fa-exclamation-circle', color:'var(--red)',    label:'Überfällig'},
+};
+
+function setRechStatus(val){
+  const cfg = _RECH_ST_CFG[val] || _RECH_ST_CFG['offen'];
+  const inp  = document.getElementById('rn-status');
+  const icon = document.getElementById('rn-status-icon');
+  const txt  = document.getElementById('rn-status-text');
+  if(inp)  inp.value = val;
+  if(icon) { icon.className = cfg.icon; icon.style.color = cfg.color; }
+  if(txt)  txt.textContent = cfg.label;
+  const panel = document.getElementById('rn-status-panel');
+  if(panel) panel.style.display = 'none';
+}
+
+function toggleRechStatusDropdown(){
+  const panel = document.getElementById('rn-status-panel');
+  if(!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  // Закрываем все другие dropdown
+  document.querySelectorAll('[id$="-panel"]').forEach(p => { if(p !== panel) p.style.display = 'none'; });
+  panel.style.display = isOpen ? 'none' : 'block';
+  if(!isOpen){
+    const close = (e) => {
+      if(!panel.contains(e.target) && e.target.id !== 'rn-status-btn'){
+        panel.style.display = 'none';
+        document.removeEventListener('click', close);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', close), 0);
+  }
+}
+
 // ── RECHNUNGEN ───────────────────────────────────────────────────────────
 let rechFilter='alle', editRechId=null, rechSort='datum', rechSortDir=-1, rechPage=1;
 const RECH_PER_PAGE=10;
@@ -138,7 +175,7 @@ function openRechModal(){
   document.getElementById('rn-faellig').value=faellig.toISOString().split('T')[0];
   document.getElementById('rn-bet').value='';
   ['rn-kunde','rn-adresse','rn-email','rn-tel','rn-notiz'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('rn-status').value='offen';
+  setRechStatus('offen');
   editRechId=null;
   document.getElementById('rn-nr').dataset.kundeId='';
   updateRechBanner();
@@ -155,7 +192,7 @@ function editRech(id){
   _rnDatEl2.oninput=()=>{updateRechBanner();reRenderRechPos();};
   document.getElementById('rn-faellig').value=r.faellig||'';
   document.getElementById('rn-bet').value=r.betrag;
-  document.getElementById('rn-status').value=r.status;
+  setRechStatus(r.status||'offen');
   document.getElementById('rn-kunde').value=r.kunde||'';
   document.getElementById('rn-adresse').value=r.adresse||'';
   document.getElementById('rn-email').value=r.email||'';
