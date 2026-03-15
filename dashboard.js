@@ -1060,25 +1060,17 @@ function renderZ(){
     const bgMap={'--blue':'rgba(26,69,120,.1)','--yellow':'rgba(224,140,26,.1)','--purple':'rgba(111,66,193,.1)','--cyan':'rgba(13,127,170,.1)','--green':'rgba(93,157,105,.1)','--muted':'rgba(132,150,170,.1)'};
     const iconBgCol=bgMap[col]||'rgba(26,69,120,.1)';
     return `<div class="zk">
-
-      <div class="zk-body">
-        <div class="zk-header">
-          <div class="zk-icon-wrap" style="background:${iconBgCol};color:${col}">
-            ${ZICONS[z]||'€'}
-          </div>
-          <div>
-            <div class="zk-name">${z}</div>
-            <div class="zk-name-sub">${s.cnt} Einträge</div>
-          </div>
-        </div>
-        <div class="zk-val">${s.cnt>0?fmt(total):'—'}</div>
-        <div class="zk-row">
-          <span class="zk-pill"><i class="fas fa-arrow-up" style="color:var(--green)"></i>${fmt(s.ein)}</span>
-          <span class="zk-pill"><i class="fas fa-arrow-down" style="color:var(--red)"></i>${fmt(s.aus)}</span>
-        </div>
-        ${s.cnt>0?`<div class="zk-prog"><div class="zk-prog-fill" style="width:${einPct}%;background:${col}"></div></div>`:''}
-        <div class="zk-sub">Gewinn: <strong style="color:${gc}">${gew>=0?'+':''}${fmt(gew)}</strong></div>
+      <div class="zk-header">
+        <div class="zk-name">${z}</div>
+        <div class="zk-icon-wrap" style="background:${iconBgCol};color:${col}">${ZICONS[z]||'€'}</div>
       </div>
+      <div class="zk-val">${s.cnt>0?fmt(total):'—'}</div>
+      <div class="zk-row">
+        <span class="zk-pill"><i class="fas fa-arrow-up" style="color:var(--green)"></i>${fmt(s.ein)}</span>
+        <span class="zk-pill"><i class="fas fa-arrow-down" style="color:var(--red)"></i>${fmt(s.aus)}</span>
+      </div>
+      ${s.cnt>0?`<div class="zk-prog"><div class="zk-prog-fill" style="width:${einPct}%;background:${col}"></div></div>`:''}
+      <div class="zk-sub">${s.cnt} Einträge · Saldo: <strong style="color:${gc}">${gew>=0?'+':''}${fmt(gew)}</strong></div>
     </div>`;
   }).join('');
 
