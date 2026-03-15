@@ -1322,7 +1322,7 @@ function addUstEintrag(){
   if(!datum) return toast('Datum eingeben!','err');
   if(!bet||bet<=0) return toast('Betrag eingeben!','err');
   if(!data.ustEintraege) data.ustEintraege=[];
-  const entry = { id: Date.now()+'', datum, typ, betrag: bet, rate, beschreibung: dsc };
+  const entry = { id: Date.now()+'_'+Math.random().toString(36).slice(2,6), datum, typ, betrag: bet, rate, beschreibung: dsc };
   data.ustEintraege.push(entry);
   sbSaveUstEintrag(entry);
   // Переключаем год на год созданной записи, чтобы она была видна

@@ -452,9 +452,15 @@ function renderDash(){
     gewCard.classList.remove('g','r','b','y','p');
     gewCard.classList.add(gew>=0?'g':'r');
   }
-  g('d-lim',pct+'%');g('d-lim-s',fmt(ein)+' von 25.000 €');
-  document.getElementById('d-lim-bar').style.width=pct+'%';
-  document.getElementById('d-lim-bar').style.background=pct>80?'var(--red)':pct>60?'var(--yellow)':'var(--yellow)';
+  // KU-лимит карточка: скрываем при Regelbesteuerung и при Alle Jahre
+  const limCard = document.getElementById('d-lim')?.closest('.sc');
+  const showLim = !isRegel && yr !== 'Alle';
+  if(limCard) limCard.style.display = showLim ? '' : 'none';
+  if(showLim){
+    g('d-lim',pct+'%');g('d-lim-s',fmt(ein)+' von 25.000 €');
+    document.getElementById('d-lim-bar').style.width=pct+'%';
+    document.getElementById('d-lim-bar').style.background=pct>80?'var(--red)':pct>60?'var(--yellow)':'var(--yellow)';
+  }
   document.getElementById('d-ein-bar').style.width=ein>0?Math.min(100,Math.round(ein/(ein+aus)*100))+'%':'0%';
   document.getElementById('d-aus-bar').style.width=aus>0?Math.min(100,Math.round(aus/(ein+aus)*100))+'%':'0%';
   g('d-cnt',ye.length+'');g('d-cnt-s',`${ye.filter(e=>e.typ==='Einnahme').length} ${'Ein.'} / ${ye.filter(e=>e.typ==='Ausgabe').length} ${'Aus.'}`);

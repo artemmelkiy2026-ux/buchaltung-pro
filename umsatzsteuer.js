@@ -319,7 +319,7 @@ function calcGewerbesteuer(gewinn) {
   const messbasis = Math.max(0, gewinn - freibetrag);
   const messbetrag = messbasis * 0.035;
   const gewst = messbetrag * (hebesatz / 100);
-  const verrechenbar = Math.min(gewst, gewinn * 0.40); // Max 40% von Gewinn
+  const verrechenbar = Math.min(gewst, 3.8 * messbetrag); // §35 EStG: max 3.8-fache des Messbetrags
   
   return { gewst, messbasis, messbetrag, verrechenbar, hebesatz };
 }
