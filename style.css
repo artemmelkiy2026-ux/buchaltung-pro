@@ -1780,7 +1780,7 @@ input, select, textarea {
   align-items:center;
   gap:10px;
 }
-.drc:hover{box-shadow:0 2px 12px rgba(0,0,0,.08);border-color:var(--border2)}
+.drc:hover{border-color:var(--border2)}
 .drc-storno{opacity:.4}
 .drc-icon{
   width:28px;height:28px;border-radius:50%;
