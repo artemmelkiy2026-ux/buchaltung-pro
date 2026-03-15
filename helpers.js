@@ -41,9 +41,7 @@ function showMobDetail(entry){
   const modal=document.getElementById('mob-detail-modal');
   if(!modal)return;
   const isEin=entry.typ==='Einnahme';
-  document.getElementById('mdm-title').innerHTML=`<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> '+'Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> '+'Ausgabe'}</span>`;
-  // Добавляем крестик в кнопку
-  modal.querySelector('.mdm-close-btn').innerHTML='✕';
+  document.getElementById('mdm-title').innerHTML=`<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`;
   document.getElementById('mdm-body').innerHTML=`
     <div class="mdm-row">
       <span class="mdm-key">Betrag</span>
