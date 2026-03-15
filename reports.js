@@ -1,6 +1,6 @@
 // ── PROGNOSE ─────────────────────────────────────────────────────────────
 function renderProg(){
-  const years=[...new Set(data.eintraege.map(e=>e.datum.substring(0,4)))].sort().reverse();
+  const years=[...new Set((data.eintraege||[]).filter(e=>e.datum).map(e=>e.datum.substring(0,4)))].sort().reverse();
   const sel=document.getElementById('prog-yr');
   if(!sel.innerHTML||!sel.value){
     sel.innerHTML=years.map((y,i)=>`<option${i===0?' selected':''}>${y}</option>`).join('');

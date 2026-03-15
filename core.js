@@ -122,7 +122,7 @@ function appInit(){
 }
 
 function buildYearFilters(){
-  const js=[...new Set(data.eintraege.map(e=>e.datum.substring(0,4)))].sort().reverse();
+  const js=[...new Set((data.eintraege||[]).filter(e=>e.datum).map(e=>e.datum.substring(0,4)))].sort().reverse();
   const cur=new Date().getFullYear()+'';
   ['dash-yr','f-jahr','z-yr'].forEach(id=>{    const el=document.getElementById(id); if(!el)return;
     const prev=el.value;

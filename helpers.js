@@ -2,7 +2,7 @@
 function fmt(n){const v=parseFloat(n);return(isNaN(v)?0:v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
 function fd(d){if(!d)return'';const p=d.split('-');if(p.length<3)return d;const[y,m,dd]=p;return`${dd}.${m}.${y}`}
 // Мобильная дата: DD.MM.YY (год 2 цифры)
-function fdm(d){if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}.${m}.${y.slice(2)}`}
+function fdm(d){if(!d)return'';const p=d.split('-');if(p.length<3)return d;const[y,m,dd]=p;return`${dd}.${m}.${y.slice(2)}`}
 function isMob(){return window.innerWidth<=768}
 function sum(arr,t){return arr.filter(e=>e.typ===t).reduce((s,e)=>s+(parseFloat(e.betrag)||0),0)}
 
