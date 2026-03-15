@@ -222,7 +222,8 @@ function saveRechnung(){
     beschreibung:dsc,
     datum,
     faellig:document.getElementById('rn-faellig').value,
-    status:document.getElementById('rn-status').value,
+    // Статус: при редактировании сохраняем, при создании всегда 'offen'
+    status: editRechId ? (data.rechnungen.find(x=>x.id===editRechId)?.status||'offen') : 'offen',
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),
     email:document.getElementById('rn-email').value.trim(),

@@ -98,15 +98,13 @@ window.addEventListener('supabase-ready', () => {
     delete data.ustMode;
   }
   // Синхронизация: создаём Einnahmen для bezahlt Rechnungen без Einnahme
-  if(data.rechnungen && data.eintraege !== undefined){
+  if(data.rechnungen && data.eintraege !== undefined && typeof _buchRechnungAlsEinnahme === 'function'){
+    let _synced = 0;
     (data.rechnungen||[]).filter(r=>r.status==='bezahlt').forEach(r=>{
-      const exists = (data.eintraege||[]).some(e=>
-        e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`) && !e.is_storno && !e._storniert
-      );
-      if(!exists && typeof _buchRechnungAlsEinnahme === 'function'){
-        _buchRechnungAlsEinnahme(r);
-      }
+      const e = _buchRechnungAlsEinnahme(r);
+      if(e) _synced++;
     });
+    if(_synced > 0) console.log(`[Sync] ${_synced} Rechnung(en) als Einnahme nachgebucht`);
   }
   appInit();
 });
