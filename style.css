@@ -1770,7 +1770,8 @@ input, select, textarea {
   margin-bottom:10px;
 }
 .drc{
-  border:1px solid var(--border);border-radius:12px;
+
+  
   padding:10px 12px;cursor:pointer;
   transition:box-shadow .15s,border-color .15s;
   position:relative;overflow:hidden;
