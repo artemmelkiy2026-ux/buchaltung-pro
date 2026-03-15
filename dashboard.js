@@ -783,9 +783,11 @@ function renderEin(){
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      return '<div style="display:flex;flex-direction:column;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s;'+(st?'opacity:0.45;':'')+'"'
-        +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
-        +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
+      const rowBg=isEin?'rgba(78,144,96,.06)':'rgba(201,64,79,.06)';
+      const rowBgHover=isEin?'rgba(78,144,96,.11)':'rgba(201,64,79,.11)';
+      return '<div style="display:flex;flex-direction:column;padding:12px 14px;background:'+rowBg+';border-radius:12px;margin-bottom:8px;transition:background .15s;'+(st?'opacity:0.45;':'')+'"'
+        +' onmouseover="this.style.background=\''+rowBgHover+'\'"'
+        +' onmouseout="this.style.background=\''+rowBg+'\'">'
         +'<div style="display:flex;align-items:flex-start;gap:10px">'
         +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center;margin-top:2px">'
         +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:11px"></i></div>'
@@ -801,7 +803,7 @@ function renderEin(){
         +'<div style="margin-top:3px">'+(mwstBadge?mwstBadge:'<span style="font-size:10px;color:#f97316">Ohne MwSt</span>')+'</div>'
         +'</div>'
         +'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px;border-top:1px solid var(--border)">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px">'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
         +'<span>'+e.kategorie+'</span>'
         +'<span>·</span><span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
@@ -1104,9 +1106,11 @@ function renderZ(){
     
     ztb.innerHTML=pageEntries.map(e=>{
       const isEin=e.typ==='Einnahme';
-      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:box-shadow .15s,background .15s"'
-        +' onmouseover="this.style.background=\'var(--s2)\';this.style.boxShadow=\'0 2px 10px rgba(0,0,0,.07)\'"'
-        +' onmouseout="this.style.background=\'#fff\';this.style.boxShadow=\'\'">'
+      const zBg=isEin?'rgba(78,144,96,.06)':'rgba(201,64,79,.06)';
+      const zBgH=isEin?'rgba(78,144,96,.11)':'rgba(201,64,79,.11)';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:'+zBg+';border-radius:12px;margin-bottom:8px;transition:background .15s"'
+        +' onmouseover="this.style.background=\''+zBgH+'\'"'
+        +' onmouseout="this.style.background=\''+zBg+'\'">'
         +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
         +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
         +'<div style="flex:1;min-width:0">'
