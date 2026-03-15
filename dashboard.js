@@ -783,42 +783,7 @@ function renderEin(){
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      const rowBg=isEin?'var(--s2)':'var(--s2)';
-      const rowBgHover=isEin?'var(--s3)':'var(--s3)';
-      return '<div style="display:flex;flex-direction:column;padding:12px 14px;background:'+rowBg+';border-radius:12px;margin-bottom:8px;transition:background .15s;'+(st?'opacity:0.45;':'')+'"'
-        +' onmouseover="this.style.background=\''+rowBgHover+'\'"'
-        +' onmouseout="this.style.background=\''+rowBg+'\'">'
-        +'<div style="display:flex;align-items:flex-start;gap:10px">'
-        +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center;margin-top:2px">'
-        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:11px"></i></div>'
-        +'<div style="flex:1;min-width:0">'
-        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">'
-        +(stLbl?stLbl:'')
-        +'<span style="font-size:11px;color:var(--sub);font-family:var(--mono)">'+fd(e.datum)+'</span>'
-        +'<span style="color:var(--border2)">·</span>'
-        +'<span style="font-size:11px;color:var(--sub)">'+e.kategorie+'</span>'
-        +'</div>'
-        +'<div style="font-size:14px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3;margin-bottom:'+(mwstBadge?'4px':'0px')+'">'
-        +(e.beschreibung||e.kategorie)
-        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
-        +'</div>'
-        +'<div style="margin-top:3px">'+(mwstBadge?mwstBadge:'<span style="font-size:10px;color:#f97316">Ohne MwSt</span>')+'</div>'
-        +'</div>'
-        +'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;margin-top:8px;border-top:1px solid var(--border)">'
-        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
-        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
-        +'</div>'
-        +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
-        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
-        +(!st
-          ?'<div style="display:flex;gap:2px">'
-           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'
-           +'<button class="del-btn" onclick="delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'
-          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')
-        +'</div>'
-        +'</div>'
-        +'</div>';
+      return '<div class="ein-row'+(st?' ein-row-st':'')+'">'        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'        +'<div class="ein-row-body">'        +'<div class="ein-row-meta">'        +(stLbl?stLbl:'')        +'<span class="ein-row-date">'+fd(e.datum)+'</span>'        +'<span class="ein-row-sep">·</span>'        +'<span class="ein-row-kat">'+e.kategorie+'</span>'        +'</div>'        +'<div class="ein-row-desc">'        +(e.beschreibung||e.kategorie)        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')        +'</div>'        +(mwstBadge?'<div class="ein-row-mwst">'+mwstBadge+'</div>':'')        +'</div>'        +'<div class="ein-row-right">'        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'        +'<div class="ein-row-sub">'        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'        +(!st          ?'<div style="display:flex;gap:2px">'           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="event.stopPropagation();editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'           +'<button class="del-btn" onclick="event.stopPropagation();delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')        +'</div>'        +'</div>'        +'</div>';
     }).join('');
     
     window._einPagerCb=function(p){einPage=p;renderEin();}
@@ -1054,22 +1019,7 @@ function renderZ(){
     
     ztb.innerHTML=pageEntries.map(e=>{
       const isEin=e.typ==='Einnahme';
-      const zBg=isEin?'var(--s2)':'var(--s2)';
-      const zBgH=isEin?'var(--s3)':'var(--s3)';
-      return '<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:'+zBg+';border-radius:12px;margin-bottom:8px;transition:background .15s"'
-        +' onmouseover="this.style.background=\''+zBgH+'\'"'
-        +' onmouseout="this.style.background=\''+zBg+'\'">'
-        +'<div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:'+(isEin?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)')+';display:flex;align-items:center;justify-content:center">'
-        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'" style="color:var(--'+(isEin?'green':'red')+');font-size:12px"></i></div>'
-        +'<div style="flex:1;min-width:0">'
-        +'<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'
-        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub)">'
-        +'<span style="font-family:var(--mono)">'+fd(e.datum)+'</span>'
-        +'<span>&middot;</span>'
-        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(ZICONS[e.zahlungsart]||'')+' '+(e.zahlungsart||'Sonstiges')+'</span>'
-        +'</div></div>'
-        +'<div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--'+(isEin?'green':'red')+');font-family:var(--mono);white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</div>'
-        +'</div>';
+      return '<div class="ein-row">'        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'        +'<div class="ein-row-body">'        +'<div class="ein-row-desc" style="margin-bottom:3px">'+(e.beschreibung||e.kategorie)+'</div>'        +'<div class="ein-row-meta">'        +'<span class="ein-row-date">'+fd(e.datum)+'</span>'        +'<span class="ein-row-sep">·</span>'        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(ZICONS[e.zahlungsart]||'')+' '+(e.zahlungsart||'Sonstiges')+'</span>'        +'</div></div>'        +'<div class="ein-row-right">'        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:14px;font-weight:700;white-space:nowrap;font-family:var(--mono)">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'        +'</div>'        +'</div>';
     }).join('');
     
     window._zPagerCb=function(p){zPage=p;renderZ();}
