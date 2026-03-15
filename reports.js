@@ -329,7 +329,7 @@ function renderKat(){
         const pct=Math.round(v/total*100);
         const bar=Math.round(v/sorted[0][1]*100);
         const color=PIE_COLORS[i%PIE_COLORS.length];
-        return `<div class="kat-tile" data-katidx="${i}"
+        return `<div class="kat-tile" data-katidx="${i}" data-rawval="${v}"
           onmouseenter="_katHL(${i},'${k.replace(/'/g,"\'")}','${fmt(v)}','${pct}%',null,${total},${sorted.length})"
           onmouseleave="_katReset(null,${total},${sorted.length})"
           onclick="_katClick(${i},null,${total},${sorted.length})">
@@ -368,7 +368,15 @@ function _katHL(idx, name, val, pct, segs, total, count){
 
 function _katReset(segs, total, count){
   const sel=window._katSel;
-  _katSetCenter(sel?'':fmt(total), sel?sel.size+' ausgewählt':count+' Kategorien');
+  if(sel){
+    let selSum=0;
+    document.querySelectorAll('.kat-tile').forEach((t,i)=>{
+      if(sel.has(i)) selSum+=parseFloat(t.dataset.rawval)||0;
+    });
+    _katSetCenter(fmt(selSum), sel.size+' ausgewählt');
+  } else {
+    _katSetCenter(fmt(total), count+' Kategorien');
+  }
   document.querySelectorAll('.kat-seg').forEach((c,i)=>{
     c.style.opacity= (!sel||sel.has(i)) ? '1' : '0.2';
   });
@@ -389,5 +397,3 @@ function _katClick(idx, segs, total, count){
   }
   _katReset(segs, total, count);
 }
-
-
