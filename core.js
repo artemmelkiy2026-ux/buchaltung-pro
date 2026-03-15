@@ -104,7 +104,7 @@ let fileHandle=null, asOn=false, asTimer=null, curPage='dashboard';
 let dashSortCol='datum', dashSortAsc=false;
 // <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для пагинации Einträge
 let einPage=1, einPerPage=10;
-let zPage=1, zPerPage=50;  // Пагинация для Zahlungsarten
+let zPage=1, zPerPage=10;  // Пагинация für Zahlungsarten
 let zSortCol='datum', zSortAsc=false;  // Сортировка Zahlungsarten
 let ustPage=1;              // Пагинация для USt-Buchungen
 
