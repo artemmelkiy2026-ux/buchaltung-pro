@@ -1296,22 +1296,21 @@ function renderUst(){
       });
       detContainer.innerHTML = html;
     }
+  }
 
-    // Pagination + summary
-    window._ustPagerCb=function(p){ustPage=p;renderUst();}
-    renderPager('ust-detail-pager', ustPage, totalPages, filteredMwst.length, '_ustPagerCb');
-    const detSummary = document.getElementById('ust-detail-summary');
-    if(detSummary){
-      // Считаем итоги только по отфильтрованным записям
-      const filtUst  = r2(filteredMwst.filter(e=>e.typ==='ust').reduce((s,e)=>s+e.mwstBetrag,0));
-      const filtVorst= r2(filteredMwst.filter(e=>e.typ==='vorsteuer').reduce((s,e)=>s+e.mwstBetrag,0));
-      const filtZahl = r2(filtUst-filtVorst);
-      const label = ustQuartalFilter>0 ? `Q${ustQuartalFilter} — ${filteredMwst.length} Buchungen` : `${filteredMwst.length} Buchungen`;
-      detSummary.innerHTML=`<span>${label}</span>
-        <span class="ust-summary-zahl" style="color:${filtZahl>0?'var(--red)':'var(--green)'}">
-          Zahllast: ${filtZahl>0?'+':''}${fmt(filtZahl)}
-        </span>`;
-    }
+  // Pagination + summary — всегда рендерится, вне зависимости от количества записей
+  window._ustPagerCb=function(p){ustPage=p;renderUst();}
+  renderPager('ust-detail-pager', ustPage, totalPages, filteredMwst.length, '_ustPagerCb');
+  const detSummary = document.getElementById('ust-detail-summary');
+  if(detSummary){
+    const filtUst  = r2(filteredMwst.filter(e=>e.typ==='ust').reduce((s,e)=>s+e.mwstBetrag,0));
+    const filtVorst= r2(filteredMwst.filter(e=>e.typ==='vorsteuer').reduce((s,e)=>s+e.mwstBetrag,0));
+    const filtZahl = r2(filtUst-filtVorst);
+    const label = ustQuartalFilter>0 ? `Q${ustQuartalFilter} — ${filteredMwst.length} Buchungen` : `${filteredMwst.length} Buchungen`;
+    detSummary.innerHTML=`<span>${label}</span>
+      <span class="ust-summary-zahl" style="color:${filtZahl>0?'var(--red)':'var(--green)'}">
+        Zahllast: ${filtZahl>0?'+':''}${fmt(filtZahl)}
+      </span>`;
   }
 }
 function addUstEintrag(){

@@ -19,7 +19,6 @@ function onLoad(ev){
       if(e.kategorie)   e.kategorie=normKat(e.kategorie);
     });
     renderAll();
-    renderDash();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Загружено ${data.eintraege.length} записей`,'ok');
   }catch{
     toast('✗ Неверный файл','err');
@@ -137,7 +136,7 @@ function renderLetzteEinnahmen(flashId=null) {
   const total = recent.reduce((s,e) => s + e.betrag, 0);
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
   list.innerHTML = recent.map(e => `
-    <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:#fff;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='#fff'">
+    <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
       <div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center">
         <i class="fas fa-arrow-up" style="color:var(--green);font-size:11px"></i>
       </div>
@@ -170,7 +169,7 @@ function renderLetzteAusgaben(flashId=null) {
   const total = recent.reduce((s,e) => s + e.betrag, 0);
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
   list.innerHTML = recent.map(e => `
-    <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:#fff;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='#fff'">
+    <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
       <div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center">
         <i class="fas fa-arrow-down" style="color:var(--red);font-size:11px"></i>
       </div>
@@ -856,7 +855,7 @@ function renderRep(){
     const cc=cumul2>=0?'var(--green)':'var(--red)';
     const hasData=m.count>0;
     return`<div onclick="openMonatDetail('${yr}','${m.mi}')"
-      style="background:#fff;border:${isCur?'2px solid var(--blue)':'1px solid var(--border)'};border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;opacity:${hasData?'1':'0.45'}"
+      style="background:var(--s1);border:${isCur?'2px solid var(--blue)':'1px solid var(--border)'};border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;opacity:${hasData?'1':'0.45'}"
       onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
       onmouseout="this.style.boxShadow=''">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
