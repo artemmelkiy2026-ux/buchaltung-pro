@@ -912,6 +912,7 @@ ${f2.email||''}`);
 // ═══════════════════════════════════════════════════════════════
 
 let _ustSaving = false;
+let ustQuartalFilter = 0; // 0 = все, 1-4 = квартал
 function saveUstMode(){
   if(_ustSaving) return;
   const sel = document.querySelector('input[name="ust-mode"]:checked');
@@ -1212,15 +1213,34 @@ function renderUst(){
   // ── Таблица операций с пагинацией (20 строк) ─────────────────────────────
   const empty2  = document.getElementById('ust-empty');
   const PER_PAGE = 10;
-  const totalPages = Math.max(1, Math.ceil(allMwst.length / PER_PAGE));
+
+  // Фильтр по кварталу
+  const filteredMwst = ustQuartalFilter > 0
+    ? allMwst.filter(e=>{
+        const m=parseInt(e.datum.substring(5,7));
+        return Math.ceil(m/3)===ustQuartalFilter;
+      })
+    : allMwst;
+
+  // Обновляем кнопки квартального фильтра
+  [0,1,2,3,4].forEach(q=>{
+    const btn=document.getElementById('ust-q-filter-'+q);
+    if(btn){
+      const active=ustQuartalFilter===q;
+      btn.style.background=active?'var(--blue)':'';
+      btn.style.borderColor=active?'var(--blue)':'';
+      btn.style.color=active?'#fff':'';
+    }
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredMwst.length / PER_PAGE));
   if(ustPage > totalPages) ustPage = totalPages;
   if(ustPage < 1) ustPage = 1;
 
-  if(!allMwst.length){
+  if(!filteredMwst.length){
     if(empty2) empty2.style.display='';
   } else {
     if(empty2) empty2.style.display='none';
-    const pageItems = allMwst.slice((ustPage-1)*PER_PAGE, ustPage*PER_PAGE);
+    const pageItems = filteredMwst.slice((ustPage-1)*PER_PAGE, ustPage*PER_PAGE);
 
     // Блочный рендер строк
     const detContainer = document.getElementById('ust-detail-list');
@@ -1264,7 +1284,7 @@ function renderUst(){
     const detPager = document.getElementById('ust-detail-pager');
     const detSummary = document.getElementById('ust-detail-summary');
     if(detPager && totalPages>1){
-      const from=(ustPage-1)*PER_PAGE+1, to=Math.min(ustPage*PER_PAGE,allMwst.length);
+      const from=(ustPage-1)*PER_PAGE+1, to=Math.min(ustPage*PER_PAGE,filteredMwst.length);
       detPager.innerHTML=`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=1;renderUst()" ${ustPage===1?'disabled':''}>«</button>
         <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage--;renderUst()" ${ustPage===1?'disabled':''}>‹</button>
@@ -1275,7 +1295,7 @@ function renderUst(){
       detPager.style.display='';
     } else if(detPager){ detPager.style.display='none'; }
     if(detSummary){
-      detSummary.innerHTML=`<span>${allMwst.length} Buchungen</span>
+      detSummary.innerHTML=`<span>${filteredMwst.length} Buchungen${ustQuartalFilter>0?' (Q'+ustQuartalFilter+')':''}</span>
         <span class="ust-summary-zahl" style="color:${totZahl>0?'var(--red)':'var(--green)'}">
           Zahllast: ${totZahl>0?'+':''}${fmt(totZahl)}
         </span>`;

@@ -653,23 +653,32 @@
 <!-- ── KATEGORIEN ── -->
 <div class="page" id="p-kategorien">
 <div class="page-inner">
+  <!-- Заголовок -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div><h1 style="font-size:18px;font-weight:700"><i class="fas fa-chart-bar"></i> Kategorienanalyse</h1>
-    <p style="color:var(--sub);font-size:12px;margin-top:3px">Ausgaben & Einnahmen nach Kategorien</p></div>
+    <div>
+      <h1 style="font-size:18px;font-weight:700"><i class="fas fa-chart-bar"></i> Kategorienanalyse</h1>
+      <p style="color:var(--sub);font-size:12px;margin-top:3px">Ausgaben & Einnahmen nach Kategorien</p>
+    </div>
     <div style="display:flex;gap:8px;align-items:center">
       <select id="kat-yr" onchange="renderKat()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;font-family:var(--sans)"></select>
-      <div style="display:flex;gap:3px">
-        <button class="ftab active" id="kat-tab-aus" onclick="setKatTab('Ausgabe',this)">▼ Ausgaben</button>
-        <button class="ftab" id="kat-tab-ein" onclick="setKatTab('Einnahme',this)">▲ Einnahmen</button>
-      </div>
+      <button class="ftab active" id="kat-tab-aus" onclick="setKatTab('Ausgabe',this)">▼ Ausgaben</button>
+      <button class="ftab" id="kat-tab-ein" onclick="setKatTab('Einnahme',this)">▲ Einnahmen</button>
     </div>
   </div>
-  <div class="kat-2col" style="display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start">
-    <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:18px">
-      <canvas id="kat-canvas" width="264" height="264" style="display:block;margin:0 auto 16px"></canvas>
-      <div id="kat-legend"></div>
+
+  <!-- Stat-карточки -->
+  <div id="kat-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
+
+  <!-- Donut + Плитки -->
+  <div class="kat-layout">
+    <!-- Левая колонка — Donut -->
+    <div class="kat-donut-col">
+      <div class="kat-donut-wrap">
+        <canvas id="kat-canvas" width="220" height="220"></canvas>
+      </div>
     </div>
-    <div id="kat-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    <!-- Правая колонка — Плитки Канва -->
+    <div id="kat-grid" class="kat-grid"></div>
   </div>
 </div>
 </div>
@@ -820,7 +829,18 @@
 
   <!-- Операции -->
   <div id="ust-buchungen-section" style="display:none">
-    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Buchungen mit USt / Vorsteuer</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Buchungen mit USt / Vorsteuer</div>
+      <!-- Квартальные переключатели -->
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Quartal:</span>
+        <button id="ust-q-filter-0" class="btn" style="padding:4px 10px;font-size:11px;background:var(--blue);border-color:var(--blue);color:#fff" onclick="ustQuartalFilter=0;ustPage=1;renderUst()">Alle</button>
+        <button id="ust-q-filter-1" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=1;ustPage=1;renderUst()">Q1</button>
+        <button id="ust-q-filter-2" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=2;ustPage=1;renderUst()">Q2</button>
+        <button id="ust-q-filter-3" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=3;ustPage=1;renderUst()">Q3</button>
+        <button id="ust-q-filter-4" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=4;ustPage=1;renderUst()">Q4</button>
+      </div>
+    </div>
     <div id="ust-detail-list" style="display:flex;flex-direction:column;gap:8px"></div>
     <div id="ust-empty" class="empty-state" style="display:none"><div class="ei">%</div><p>Keine USt-Buchungen für dieses Jahr</p></div>
     <div id="ust-detail-pager" style="display:none;margin-top:12px"></div>

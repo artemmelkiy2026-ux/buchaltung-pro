@@ -199,60 +199,97 @@ function renderKat(){
   filtered.forEach(e=>{byKat[e.kategorie]=(byKat[e.kategorie]||0)+e.betrag;});
   const sorted=Object.entries(byKat).sort((a,b)=>b[1]-a[1]);
   const total=sorted.reduce((s,[,v])=>s+v,0);
+  const isEin=katTyp==='Einnahme';
 
-  // Canvas donut
+  // ── Donut Canvas (адаптивный размер) ─────────────────────────────────────
   const canvas=document.getElementById('kat-canvas');
+  const SIZE=220;
+  canvas.width=SIZE; canvas.height=SIZE;
+  canvas.style.width=SIZE+'px'; canvas.style.height=SIZE+'px';
   const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,264,264);
-  const cx=132,cy=132,ro=120,ri=70;
+  ctx.clearRect(0,0,SIZE,SIZE);
+  const cx=SIZE/2,cy=SIZE/2,ro=SIZE/2-8,ri=SIZE/2-44;
   let angle=-Math.PI/2;
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--s1').trim()||'#fff';
+
   if(sorted.length){
+    // Рисуем сегменты с небольшим gap
     sorted.forEach(([,val],i)=>{
       const slice=(val/total)*2*Math.PI;
-      ctx.beginPath();ctx.moveTo(cx,cy);
-      ctx.arc(cx,cy,ro,angle,angle+slice);
-      ctx.closePath();ctx.fillStyle=PIE_COLORS[i%PIE_COLORS.length];ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,ro,angle+0.02,angle+slice-0.02);
+      ctx.closePath();
+      ctx.fillStyle=PIE_COLORS[i%PIE_COLORS.length];
+      ctx.fill();
       angle+=slice;
     });
-    // hole
-    ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);ctx.fillStyle='#1a1e28';ctx.fill();
-    // center text
-    ctx.fillStyle='#f1f5f9';ctx.font='bold 14px Inter';ctx.textAlign='center';
-    ctx.fillText(fmt(total),cx,cy+5);
+    // Центральное отверстие
+    ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);
+    ctx.fillStyle=bg||'#fff';ctx.fill();
+    // Текст по центру
+    ctx.fillStyle='var(--text)';
+    ctx.font='bold 13px Inter, sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#64748b';
+    ctx.font='11px Inter';
+    ctx.fillText(isEin?'Einnahmen':'Ausgaben',cx,cy-10);
+    ctx.fillStyle='#1a2332';
+    ctx.font='bold 14px Inter';
+    ctx.fillText(fmt(total),cx,cy+8);
   } else {
-    ctx.beginPath();ctx.arc(cx,cy,ro,0,2*Math.PI);ctx.fillStyle='#2c3147';ctx.fill();
-    ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);ctx.fillStyle='#1a1e28';ctx.fill();
-    ctx.fillStyle='#64748b';ctx.font='13px Inter';ctx.textAlign='center';ctx.fillText('Keine Daten',cx,cy+5);
+    ctx.beginPath();ctx.arc(cx,cy,ro,0,2*Math.PI);ctx.fillStyle='#f1f5f9';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);ctx.fillStyle=bg||'#fff';ctx.fill();
+    ctx.fillStyle='#94a3b8';ctx.font='12px Inter';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('Keine Daten',cx,cy);
   }
 
-  // Legend
-  document.getElementById('kat-legend').innerHTML=sorted.slice(0,8).map(([k,v],i)=>`
-    <div class="donut-leg-item">
-      <div class="donut-dot" style="background:${PIE_COLORS[i%PIE_COLORS.length]}"></div>
-      <span style="flex:1;color:var(--sub);font-size:14px">${k}</span>
-      <span style="font-family:var(--mono);font-size:14px">${Math.round(v/total*100)}%</span>
-    </div>`).join('');
+  // ── Summary Stats ─────────────────────────────────────────────────────────
+  const katStats = document.getElementById('kat-stats');
+  if(katStats){
+    const top3=sorted.slice(0,3);
+    const top3sum=top3.reduce((s,[,v])=>s+v,0);
+    const restPct=total>0?Math.round((total-top3sum)/total*100):0;
+    katStats.innerHTML=`
+      <div class="kat-stat-card">
+        <div class="kat-stat-label">Gesamt</div>
+        <div class="kat-stat-val" style="color:${isEin?'var(--green)':'var(--red)'}">${fmt(total)}</div>
+        <div class="kat-stat-sub">${sorted.length} Kategorien</div>
+      </div>
+      <div class="kat-stat-card">
+        <div class="kat-stat-label">Top 1</div>
+        <div class="kat-stat-val">${sorted[0]?fmt(sorted[0][1]):'—'}</div>
+        <div class="kat-stat-sub">${sorted[0]?sorted[0][0]:'—'}</div>
+      </div>
+      <div class="kat-stat-card">
+        <div class="kat-stat-label">Ø pro Kategorie</div>
+        <div class="kat-stat-val">${sorted.length?fmt(Math.round(total/sorted.length)):'—'}</div>
+        <div class="kat-stat-sub">Durchschnitt</div>
+      </div>`;
+  }
 
-  // Cards statt Tabelle
-  const katList = document.getElementById('kat-list');
-  if(katList){
+  // ── Категории — плитки в стиле Канва ─────────────────────────────────────
+  const katGrid = document.getElementById('kat-grid');
+  if(katGrid){
     if(!sorted.length){
-      katList.innerHTML='<div style="padding:30px;text-align:center;color:var(--sub)">Keine Daten</div>';
+      katGrid.innerHTML='<div style="padding:40px;text-align:center;color:var(--sub);grid-column:1/-1">Keine Daten für diesen Zeitraum</div>';
     } else {
-      const valColor = katTyp==='Einnahme' ? 'var(--green)' : 'var(--red)';
-      katList.innerHTML = sorted.map(([k,v],i)=>`
-        <div class="kat-card">
-          <div class="kat-card-dot" style="background:${PIE_COLORS[i%PIE_COLORS.length]}"></div>
-          <div class="kat-card-body">
-            <div class="kat-card-name">${k}</div>
-            <div class="kat-bar-wrap">
-              <div class="kat-bar-track">
-                <div class="kat-bar-fill" style="width:${Math.round(v/sorted[0][1]*100)}%;background:${PIE_COLORS[i%PIE_COLORS.length]}"></div>
-              </div>
-            </div>
+      katGrid.innerHTML = sorted.map(([k,v],i)=>{
+        const pct=total>0?Math.round(v/total*100):0;
+        const pctOfTop=Math.round(v/sorted[0][1]*100);
+        const color=PIE_COLORS[i%PIE_COLORS.length];
+        return `<div class="kat-tile" onclick="this.classList.toggle('kat-tile-active')">
+          <div class="kat-tile-top">
+            <div class="kat-tile-dot" style="background:${color}"></div>
+            <div class="kat-tile-name">${k}</div>
+            <div class="kat-tile-pct">${pct}%</div>
           </div>
-          <div class="kat-card-val" style="color:${valColor}">${fmt(v)}</div>
-        </div>`).join('');
+          <div class="kat-tile-val" style="color:${isEin?'var(--green)':'var(--red)'}">${fmt(v)}</div>
+          <div class="kat-tile-bar">
+            <div class="kat-tile-bar-fill" style="width:${pctOfTop}%;background:${color}"></div>
+          </div>
+        </div>`;
+      }).join('');
     }
   }
 }
