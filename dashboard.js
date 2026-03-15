@@ -947,25 +947,25 @@ function renderRep(){
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">${fmt(tEin)}</div>
       </div>
-      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px">
+      <div style="background:rgba(239,68,68,.06);border-radius:12px;padding:14px">
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Ausgaben</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--red)">${fmt(tAus)}</div>
       </div>
-      <div style="background:${tg>=0?'rgba(26,69,120,.06)':'rgba(239,68,68,.06)'};border:1px solid ${tg>=0?'rgba(26,69,120,.2)':'rgba(239,68,68,.2)'};border-radius:12px;padding:14px">
+      <div style="background:${tg>=0?'rgba(26,69,120,.06)':'rgba(239,68,68,.06)'};border:0px solid ${tg>=0?'rgba(26,69,120,.2)':'rgba(239,68,68,.2)'};border-radius:12px;padding:14px">
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Jahresgewinn</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:${tg>=0?'var(--blue)':'var(--red)'}">${tg>=0?'+':''}${fmt(tg)}</div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:14px">
+      <div style="background:var(--s2);border-radius:12px;padding:14px">
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einträge</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono)">${totCnt}</div>
       </div>
       ${isRegel?`
-      <div style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-radius:12px;padding:14px">
+      <div style="background:rgba(249,115,22,.06);border-radius:12px;padding:14px">
         <div style="font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">MwSt gesamt</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f97316">${fmt(totMwst2)}</div>
         <div style="font-size:11px;color:var(--sub);margin-top:3px">Netto: ${fmt(totNetto2)}</div>
       </div>
-      <div style="background:rgba(13,127,170,.06);border:1px solid rgba(13,127,170,.2);border-radius:12px;padding:14px">
+      <div style="background:rgba(13,127,170,.06);border-radius:12px;padding:14px">
         <div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Zahllast</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--cyan)">${totZl2>0?'+':''}${fmt(totZl2)}</div>
         <div style="font-size:11px;color:var(--sub);margin-top:3px">USt − VoSt</div>
