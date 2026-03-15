@@ -168,3 +168,38 @@ function nav(id, el){
 }
 
 // ── AUTOSAVE (облако — сохраняется автоматически через persist) ──────────
+
+// ── Единая функция пагинации — всегда занимает место ──────────────────────
+function renderPager(containerId, page, totalPages, total, onPageChange){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  // Счётчик всегда показывается
+  const from = total===0 ? 0 : (page-1)*Math.ceil(total/totalPages)+1;
+  const to   = total===0 ? 0 : Math.min(page*Math.ceil(total/totalPages), total);
+  const counter = `<span class="pager-count">${total===0?'0':from+'–'+to} / ${total}</span>`;
+
+  if(totalPages<=1){
+    // Кнопки скрыты но счётчик держит высоту
+    el.innerHTML=`<div class="pager"><div class="pager-btns pager-btns-hidden"></div>${counter}</div>`;
+    return;
+  }
+  const btn=(label,pg,disabled,title='')=>
+    `<button class="btn pager-btn${disabled?' pager-btn-dis':''}" ${disabled?'disabled':''} onclick="${onPageChange}(${pg})" title="${title}">${label}</button>`;
+
+  let pages='';
+  const start=Math.max(1,page-2), end=Math.min(totalPages,page+2);
+  if(start>1) pages+=btn('1',1,false);
+  if(start>2) pages+=`<span class="pager-ellipsis">…</span>`;
+  for(let i=start;i<=end;i++) pages+=`<button class="btn pager-btn${i===page?' pager-btn-cur':''}" onclick="${onPageChange}(${i})">${i}</button>`;
+  if(end<totalPages-1) pages+=`<span class="pager-ellipsis">…</span>`;
+  if(end<totalPages) pages+=btn(totalPages,totalPages,false);
+
+  el.innerHTML=`<div class="pager">
+    <div class="pager-btns">
+      ${btn('‹',page-1,page===1,'Zurück')}
+      ${pages}
+      ${btn('›',page+1,page===totalPages,'Weiter')}
+    </div>
+    ${counter}
+  </div>`;
+}

@@ -754,7 +754,7 @@ function renderEin(){
   if(!entries.length){
     document.getElementById('e-tbody').innerHTML='';
     em.style.display='block';
-    document.getElementById('e-pagination').innerHTML='';
+    renderPager('e-pagination',1,1,0,'_einPagerCb');
   } else {
     em.style.display='none';
     const totalPages = Math.ceil(entries.length / einPerPage);
@@ -820,61 +820,8 @@ function renderEin(){
         +'</div>';
     }).join('');
     
-    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
-    let paginationHTML = '';
-    if(totalPages > 1) {
-      paginationHTML += `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap">`;
-      
-      // Кнопка "на первую страницу"
-      if(einPage > 1) {
-        paginationHTML += `<button class="btn" onclick="einPage=1;renderEin()" style="padding:6px 10px" title="На первую"><i class="fas fa-step-backward"></i></button>`;
-      }
-      
-      // Кнопка "назад на 10 страниц"
-      if(einPage > 10) {
-        paginationHTML += `<button class="btn" onclick="prevTenPages()" style="padding:6px 10px" title="-10 страниц"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>`;
-      }
-      
-      // Кнопка "назад"
-      if(einPage > 1) {
-        paginationHTML += `<button class="btn" onclick="einPage--;renderEin()" style="padding:6px 10px" title="Назад"><i class="fas fa-chevron-left"></i></button>`;
-      }
-      
-      // Номера страниц
-      const maxPagesToShow = 5;
-      let startPage = Math.max(1, einPage - Math.floor(maxPagesToShow / 2));
-      let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-      if(endPage - startPage < maxPagesToShow - 1) {
-        startPage = Math.max(1, endPage - maxPagesToShow + 1);
-      }
-      
-      for(let i = startPage; i <= endPage; i++) {
-        if(i === einPage) {
-          paginationHTML += `<button class="btn" style="background:var(--blue);color:#fff;padding:6px 10px">${i}</button>`;
-        } else {
-          paginationHTML += `<button class="btn" onclick="einPage=${i};renderEin()" style="padding:6px 10px">${i}</button>`;
-        }
-      }
-      
-      // Кнопка "вперёд"
-      if(einPage < totalPages) {
-        paginationHTML += `<button class="btn" onclick="einPage++;renderEin()" style="padding:6px 10px" title="Вперёд"><i class="fas fa-chevron-right"></i></button>`;
-      }
-      
-      // Кнопка "вперёд на 10 страниц"
-      if(einPage < totalPages - 9) {
-        paginationHTML += `<button class="btn" onclick="nextTenPages(${totalPages})" style="padding:6px 10px" title="+10 страниц"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>`;
-      }
-      
-      // Кнопка "на последнюю страницу"
-      if(einPage < totalPages) {
-        paginationHTML += `<button class="btn" onclick="einPage=${totalPages};renderEin()" style="padding:6px 10px" title="На последнюю"><i class="fas fa-step-forward"></i></button>`;
-      }
-      
-      paginationHTML += `<span style="font-size:11px;color:var(--sub);margin-left:12px">${start+1}-${Math.min(end, entries.length)} / ${entries.length}</span>`;
-      paginationHTML += `</div>`;
-    }
-    document.getElementById('e-pagination').innerHTML = paginationHTML;
+    window._einPagerCb=function(p){einPage=p;renderEin();}
+    renderPager('e-pagination', einPage, totalPages, entries.length, '_einPagerCb');
   }
   
   // Im Journal: nur aktive Buchungen für Summen
@@ -1124,54 +1071,8 @@ function renderZ(){
         +'</div>';
     }).join('');
     
-    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Пагинация навигация
-    let paginationHTML = '';
-    if(totalPages > 1) {
-      paginationHTML += `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap">`;
-      
-      if(zPage > 1) {
-        paginationHTML += `<button class="btn" onclick="zPage=1;renderZ()" style="padding:6px 10px" title="На первую"><i class="fas fa-step-backward"></i></button>`;
-      }
-      
-      if(zPage > 10) {
-        paginationHTML += `<button class="btn" onclick="zPage=Math.max(1,zPage-10);renderZ()" style="padding:6px 10px" title="-10"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>`;
-      }
-      
-      if(zPage > 1) {
-        paginationHTML += `<button class="btn" onclick="zPage--;renderZ()" style="padding:6px 10px" title="Назад"><i class="fas fa-chevron-left"></i></button>`;
-      }
-      
-      const maxPagesToShow = 5;
-      let startPage = Math.max(1, zPage - Math.floor(maxPagesToShow / 2));
-      let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-      if(endPage - startPage < maxPagesToShow - 1) {
-        startPage = Math.max(1, endPage - maxPagesToShow + 1);
-      }
-      
-      for(let i = startPage; i <= endPage; i++) {
-        if(i === zPage) {
-          paginationHTML += `<button class="btn" style="background:var(--blue);color:#fff;padding:6px 10px">${i}</button>`;
-        } else {
-          paginationHTML += `<button class="btn" onclick="zPage=${i};renderZ()" style="padding:6px 10px">${i}</button>`;
-        }
-      }
-      
-      if(zPage < totalPages) {
-        paginationHTML += `<button class="btn" onclick="zPage++;renderZ()" style="padding:6px 10px" title="Вперёд"><i class="fas fa-chevron-right"></i></button>`;
-      }
-      
-      if(zPage <= totalPages - 10) {
-        paginationHTML += `<button class="btn" onclick="zPage=Math.min(${totalPages},zPage+10);renderZ()" style="padding:6px 10px" title="+10"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>`;
-      }
-      
-      if(zPage < totalPages) {
-        paginationHTML += `<button class="btn" onclick="zPage=${totalPages};renderZ()" style="padding:6px 10px" title="На последнюю"><i class="fas fa-step-forward"></i></button>`;
-      }
-      
-      paginationHTML += `<span style="font-size:11px;color:var(--sub);margin-left:12px">${start+1}-${Math.min(end, sorted.length)} / ${sorted.length}</span>`;
-      paginationHTML += `</div>`;
-    }
-    if(zpag) zpag.innerHTML = paginationHTML;
+    window._zPagerCb=function(p){zPage=p;renderZ();}
+    renderPager('z-pagination', zPage, totalPages, sorted.length, '_zPagerCb');
   }
 }
 

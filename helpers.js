@@ -1302,19 +1302,9 @@ function renderUst(){
     }
 
     // Pagination + summary
-    const detPager = document.getElementById('ust-detail-pager');
+    window._ustPagerCb=function(p){ustPage=p;renderUst();}
+    renderPager('ust-detail-pager', ustPage, totalPages, filteredMwst.length, '_ustPagerCb');
     const detSummary = document.getElementById('ust-detail-summary');
-    if(detPager && totalPages>1){
-      const from=(ustPage-1)*PER_PAGE+1, to=Math.min(ustPage*PER_PAGE,filteredMwst.length);
-      detPager.innerHTML=`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=1;renderUst()" ${ustPage===1?'disabled':''}>«</button>
-        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage--;renderUst()" ${ustPage===1?'disabled':''}>‹</button>
-        <span style="font-size:12px;color:var(--sub)">${from}–${to} von ${filteredMwst.length}</span>
-        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage++;renderUst()" ${ustPage===totalPages?'disabled':''}>›</button>
-        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=${totalPages};renderUst()" ${ustPage===totalPages?'disabled':''}>»</button>
-      </div>`;
-      detPager.style.display='';
-    } else if(detPager){ detPager.style.display='none'; }
     if(detSummary){
       // Считаем итоги только по отфильтрованным записям
       const filtUst  = r2(filteredMwst.filter(e=>e.typ==='ust').reduce((s,e)=>s+e.mwstBetrag,0));

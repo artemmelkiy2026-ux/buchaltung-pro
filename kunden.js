@@ -86,22 +86,8 @@ function renderWied(){
   if(container) container.innerHTML=cards+summary;
 
   // Пагинация
-  if(pagination){
-    if(totalPages<=1){pagination.innerHTML='';} 
-    else {
-      let ph=`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:12px">`;
-      ph+=`<button class="btn" style="padding:6px 10px;font-size:11px" onclick="wiedPage=1;renderWied()" ${wiedPage===1?'disabled':''}>«</button>`;
-      ph+=`<button class="btn" style="padding:6px 10px;font-size:11px" onclick="wiedPage--;renderWied()" ${wiedPage===1?'disabled':''}>‹</button>`;
-      for(let i=Math.max(1,wiedPage-2);i<=Math.min(totalPages,wiedPage+2);i++){
-        ph+=`<button class="btn" style="padding:6px 10px;font-size:11px${i===wiedPage?';background:var(--blue);color:#fff;border-color:var(--blue)':''}" onclick="wiedPage=${i};renderWied()">${i}</button>`;
-      }
-      ph+=`<button class="btn" style="padding:6px 10px;font-size:11px" onclick="wiedPage++;renderWied()" ${wiedPage===totalPages?'disabled':''}>›</button>`;
-      ph+=`<button class="btn" style="padding:6px 10px;font-size:11px" onclick="wiedPage=${totalPages};renderWied()" ${wiedPage===totalPages?'disabled':''}>»</button>`;
-      ph+=`<span style="font-size:12px;color:var(--sub)">${(wiedPage-1)*WIED_PER_PAGE+1}–${Math.min(wiedPage*WIED_PER_PAGE,wied.length)} / ${wied.length}</span>`;
-      ph+=`</div>`;
-      pagination.innerHTML=ph;
-    }
-  }
+  window._wiedPagerCb=function(p){wiedPage=p;renderWied();}
+  renderPager('wied-pagination', wiedPage, totalPages, sorted.length, '_wiedPagerCb');
   _updateWiedSortBtns();
 }
 function setWiedTyp(t){

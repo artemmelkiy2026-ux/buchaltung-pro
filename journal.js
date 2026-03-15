@@ -267,29 +267,9 @@ function renderJournal() {
     pageHtml += `</div>`;
   });
 
-  // Пагинация навигация
-  let paginationHtml = '';
-  if (totalPages > 1) {
-    paginationHtml = `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap">`;
-    if (journalPage > 1) paginationHtml += `<button class="btn" onclick="journalPage=1;renderJournal()" style="padding:6px 10px"><i class="fas fa-step-backward"></i></button>`;
-    if (journalPage > 1) paginationHtml += `<button class="btn" onclick="journalPage--;renderJournal()" style="padding:6px 10px"><i class="fas fa-chevron-left"></i></button>`;
-    const maxShow = 5;
-    let sp = Math.max(1, journalPage - Math.floor(maxShow/2));
-    let ep = Math.min(totalPages, sp + maxShow - 1);
-    if (ep - sp < maxShow - 1) sp = Math.max(1, ep - maxShow + 1);
-    for (let i = sp; i <= ep; i++) {
-      if (i === journalPage) paginationHtml += `<button class="btn" style="background:var(--blue);color:#fff;padding:6px 10px">${i}</button>`;
-      else paginationHtml += `<button class="btn" onclick="journalPage=${i};renderJournal()" style="padding:6px 10px">${i}</button>`;
-    }
-    if (journalPage < totalPages) paginationHtml += `<button class="btn" onclick="journalPage++;renderJournal()" style="padding:6px 10px"><i class="fas fa-chevron-right"></i></button>`;
-    if (journalPage < totalPages) paginationHtml += `<button class="btn" onclick="journalPage=${totalPages};renderJournal()" style="padding:6px 10px"><i class="fas fa-step-forward"></i></button>`;
-    paginationHtml += `<span style="font-size:11px;color:var(--sub);margin-left:8px">${pgStart+1}–${Math.min(pgEnd,totalChains)} / ${totalChains}</span>`;
-    paginationHtml += `</div>`;
-  }
-
   tb.innerHTML = pageHtml;
-  const jpag = document.getElementById('journal-pagination');
-  if (jpag) jpag.innerHTML = paginationHtml;
+  window._journalPagerCb=function(p){journalPage=p;renderJournal();}
+  renderPager('journal-pagination', journalPage, totalPages, totalChains, '_journalPagerCb');
 
   const el = document.getElementById('journal-count');
   if (el) el.textContent = `${totalChains} Storno-Kette${totalChains !== 1 ? 'n' : ''}`;
