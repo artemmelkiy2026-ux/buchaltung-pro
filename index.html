@@ -692,21 +692,9 @@
   </div>
   <!-- Statistik-Cards -->
   <div id="kunden-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
-  <!-- Tabelle -->
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr>
-        <th onclick="renderKunden()" style="cursor:default">Name / Firma</th>
-        <th class="mob-hide">E-Mail</th>
-        <th class="mob-hide">Telefon</th>
-        <th class="mob-hide">Adresse</th>
-        <th class="mob-hide" style="text-align:right">Umsatz</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="kunden-tbody"></tbody>
-    </table>
-    <div id="kunden-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-users"></i></div><p>Keine Kunden vorhanden</p></div>
-  </div>
+  <!-- Kunden Karten -->
+  <div id="kunden-list" class="kunden-list"></div>
+  <div id="kunden-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-users"></i></div><p>Keine Kunden vorhanden</p></div>
 </div>
 </div>
 
@@ -722,26 +710,25 @@
     </div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="rech-cards"></div>
-  <div class="tbl-wrap">
-    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-      <button class="ftab active" onclick="setRechFilter('alle',this)">Alle</button>
-      <button class="ftab" onclick="setRechFilter('offen',this)"><i class="fas fa-circle" style="color:var(--yellow)"></i> Offen</button>
-      <button class="ftab" onclick="setRechFilter('ueberfaellig',this)"><i class="fas fa-circle" style="color:var(--red)"></i> Überfällig</button>
-      <button class="ftab" onclick="setRechFilter('bezahlt',this)"><i class="fas fa-circle" style="color:var(--green)"></i> Bezahlt</button>
-      <input id="rech-search" type="text" placeholder="Nr. oder Kunde suchen..." oninput="renderRech()" style="margin-left:auto;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 12px;font-size:12px;outline:none;width:200px">
-    </div>
-    <table id="rech-table">
-      <thead><tr>
-        <th onclick="sortRech('nr')" style="cursor:pointer">Nr. ↕</th>
-        <th class="mob-hide" onclick="sortRech('kunde')" style="cursor:pointer">Kunde ↕</th>
-        <th class="mob-hide" onclick="sortRech('datum')" style="cursor:pointer">Datum ↕</th>
-        <th class="mob-hide" onclick="sortRech('faellig')" style="cursor:pointer">Fällig am ↕</th>
-        <th style="text-align:right;cursor:pointer" onclick="sortRech('betrag')">Betrag ↕</th>
-        <th style="text-align:center">Status</th>
-        <th></th>
-      </tr></thead><tbody id="rech-tbody"></tbody></table>
-    <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungen</p></div>
+  <!-- Filter + Suche -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+    <button class="ftab active" onclick="setRechFilter('alle',this)">Alle</button>
+    <button class="ftab" onclick="setRechFilter('offen',this)"><i class="fas fa-clock" style="color:var(--yellow)"></i> Offen</button>
+    <button class="ftab" onclick="setRechFilter('ueberfaellig',this)"><i class="fas fa-exclamation-circle" style="color:var(--red)"></i> Überfällig</button>
+    <button class="ftab" onclick="setRechFilter('bezahlt',this)"><i class="fas fa-check-circle" style="color:var(--green)"></i> Bezahlt</button>
+    <input id="rech-search" type="text" placeholder="Nr. oder Kunde..." oninput="renderRech()" style="margin-left:auto;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;width:200px">
   </div>
+  <!-- Sort bar -->
+  <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('datum')">Datum</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('faellig')">Fällig</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('betrag')">Betrag</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('kunde')">Kunde</button>
+  </div>
+  <!-- Rechnungen Karten -->
+  <div id="rech-list"></div>
+  <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungen</p></div>
 </div>
 </div>
 

@@ -146,12 +146,15 @@ let editKundeId = null;
 function renderKunden(){
   const kunden = data.kunden||[];
   const q = (document.getElementById('kunden-search')||{value:''}).value.toLowerCase();
-  const filtered = q ? kunden.filter(k=>(k.name||'').toLowerCase().includes(q)||(k.email||'').toLowerCase().includes(q)||(k.ort||'').toLowerCase().includes(q)) : kunden;
+  const filtered = q ? kunden.filter(k=>
+    (k.name||'').toLowerCase().includes(q)||
+    (k.email||'').toLowerCase().includes(q)||
+    (k.ort||'').toLowerCase().includes(q)
+  ) : kunden;
 
-  // Считаем статистику
-  const totalUmsatz = kunden.reduce((s,k)=>s+getKundeUmsatz(k.id),0);
-  const mitRechnung = kunden.filter(k=>(data.rechnungen||[]).some(r=>r.kundeId===k.id)).length;
-  const offeneRech  = (data.rechnungen||[]).filter(r=>r.status==='offen'||r.status==='ueberfaellig').length;
+  const totalUmsatz  = kunden.reduce((s,k)=>s+getKundeUmsatz(k.id),0);
+  const mitRechnung  = kunden.filter(k=>(data.rechnungen||[]).some(r=>r.kundeId===k.id)).length;
+  const offeneRech   = (data.rechnungen||[]).filter(r=>r.status==='offen'||r.status==='ueberfaellig').length;
 
   document.getElementById('kunden-cards').innerHTML=`
     <div class="sc b" style="cursor:default"><div class="sc-lbl">Kunden gesamt</div><div class="sc-val">${kunden.length}</div><div class="sc-sub">${mitRechnung} mit Rechnungen</div></div>
@@ -159,33 +162,43 @@ function renderKunden(){
     <div class="sc y" style="cursor:default"><div class="sc-lbl">Offene Rechnungen</div><div class="sc-val">${offeneRech}</div><div class="sc-sub">offen + überfällig</div></div>
   `;
 
-  const tb = document.getElementById('kunden-tbody');
+  const container = document.getElementById('kunden-list');
   const em = document.getElementById('kunden-empty');
-  if(!filtered.length){tb.innerHTML='';em.style.display='block';return;}
+  if(!filtered.length){
+    if(container) container.innerHTML='';
+    em.style.display='block';
+    return;
+  }
   em.style.display='none';
-  const mob = isMob();
-  tb.innerHTML = filtered.map(k=>{
+
+  const cards = filtered.map(k=>{
     const umsatz = getKundeUmsatz(k.id);
     const rechCount = (data.rechnungen||[]).filter(r=>r.kundeId===k.id).length;
-    return `<tr style="cursor:pointer" onclick="showKundeRechnungen('${k.id}')" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
-      <td>
-        <div style="font-weight:600;font-size:13px">${k.name||'—'}</div>
-        ${k.ansprechpartner?`<div style="font-size:11px;color:var(--sub)">${k.ansprechpartner}</div>`:''}
-      </td>
-      <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.email ? `<a href="mailto:${k.email}" onclick="event.stopPropagation()" style="color:var(--blue);text-decoration:none">${k.email}</a>` : '—'}</td>
-      <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.tel || '—'}</td>
-      <td class="mob-hide" style="font-size:12px;color:var(--sub)">${k.plz?k.plz+' ':''} ${k.ort||''}</td>
-      <td class="mob-hide" style="font-family:var(--mono);font-size:12px;font-weight:600;color:${umsatz>0?'var(--green)':'var(--sub)'}">
-        ${umsatz>0?fmt(umsatz):'—'}
-        ${rechCount>0?`<div style="font-size:10px;font-weight:400;color:var(--sub)">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:''}
-      </td>
-      <td style="white-space:nowrap" onclick="event.stopPropagation()">
-        <button class="del-btn edit-btn" style="opacity:1" onclick="editKunde('${k.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-        <button class="del-btn edit-btn" style="opacity:1;color:var(--blue)" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen"><i class="fas fa-file-invoice"></i></button>
-        <button class="del-btn" style="opacity:1" onclick="delKunde('${k.id}')" title="Löschen">✕</button>
-      </td>
-    </tr>`;
+    const initials = (k.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const hasContact = k.email || k.tel;
+    return `<div class="kunde-card" onclick="showKundeRechnungen('${k.id}')">
+      <div class="kunde-card-avatar">${initials}</div>
+      <div class="kunde-card-body">
+        <div class="kunde-card-name">${k.name||'—'}</div>
+        ${k.ansprechpartner?`<div class="kunde-card-role">${k.ansprechpartner}</div>`:''}
+        <div class="kunde-card-meta">
+          ${k.email?`<a href="mailto:${k.email}" onclick="event.stopPropagation()" class="kunde-meta-link"><i class="fas fa-envelope"></i> ${k.email}</a>`:''}
+          ${k.tel?`<span class="kunde-meta-item"><i class="fas fa-phone"></i> ${k.tel}</span>`:''}
+          ${k.ort?`<span class="kunde-meta-item"><i class="fas fa-map-marker-alt"></i> ${k.plz?k.plz+' ':''}${k.ort}</span>`:''}
+        </div>
+      </div>
+      <div class="kunde-card-right">
+        ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div><div class="kunde-rech-cnt">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:'<div class="kunde-rech-cnt" style="color:var(--muted)">Keine Rechnungen</div>'}
+        <div class="kunde-card-actions" onclick="event.stopPropagation()">
+          <button class="rca-btn" onclick="editKunde('${k.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+          <button class="rca-btn" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen"><i class="fas fa-file-invoice"></i></button>
+          <button class="rca-btn rca-red" onclick="delKunde('${k.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    </div>`;
   }).join('');
+
+  if(container) container.innerHTML = cards;
 }
 
 function getKundeUmsatz(id){

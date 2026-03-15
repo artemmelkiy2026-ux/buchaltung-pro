@@ -407,6 +407,91 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
 th[onclick]{user-select:none}
 th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 
+/* ── RECHNUNGEN KARTEN ── */
+#rech-list{ display:flex; flex-direction:column; gap:10px; }
+.rech-card{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  background:var(--s1); border:1px solid var(--border); border-radius:14px;
+  padding:14px 16px; cursor:pointer;
+  transition:border-color .15s, box-shadow .15s, transform .1s;
+}
+.rech-card:hover{ border-color:var(--border2); box-shadow:0 4px 16px rgba(0,0,0,.07); transform:translateY(-1px); }
+.rech-card-left{ display:flex; align-items:center; gap:14px; flex:1; min-width:0; }
+.rech-card-avatar{
+  flex-shrink:0; width:44px; height:44px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.rech-badge-offen    { background:var(--ydim); color:var(--yellow); }
+.rech-badge-ueber    { background:var(--rdim);  color:var(--red); }
+.rech-badge-bezahlt  { background:var(--gdim);  color:var(--green); }
+.rech-card-info{ flex:1; min-width:0; }
+.rech-card-nr{ font-family:var(--mono); font-size:12px; font-weight:700; color:var(--sub); margin-bottom:2px; }
+.rech-card-kunde{ font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rech-card-meta{ display:flex; gap:8px; align-items:center; margin-top:4px; flex-wrap:wrap; }
+.rech-card-meta span{ font-size:11px; color:var(--sub); }
+.rech-overdue{ font-size:11px; font-weight:700; color:var(--red); background:var(--rdim); padding:1px 7px; border-radius:20px; }
+.rech-card-right{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+.rech-card-betrag{ font-family:var(--mono); font-size:16px; font-weight:700; color:var(--text); }
+.rech-badge-offen-pill,.rech-badge-ueber-pill,.rech-badge-bezahlt-pill{
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
+}
+.rech-badge-offen-pill  { background:var(--ydim); color:var(--yellow); }
+.rech-badge-ueber-pill  { background:var(--rdim);  color:var(--red); }
+.rech-badge-bezahlt-pill{ background:var(--gdim);  color:var(--green); }
+.rech-card-actions{ display:flex; gap:4px; }
+.rech-summary{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 16px; background:var(--s2); border-radius:12px;
+  margin-top:6px; font-size:13px; color:var(--sub);
+}
+.rech-summary-total{ font-family:var(--mono); font-weight:700; font-size:15px; color:var(--text); }
+
+/* ── ACTION BUTTONS (общие для карточек) ── */
+.rca-btn{
+  width:30px; height:30px; border-radius:8px; border:1px solid var(--border);
+  background:var(--s2); color:var(--sub); cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; font-size:12px;
+  transition:all .15s;
+}
+.rca-btn:hover{ border-color:var(--border2); color:var(--text); background:var(--s1); }
+.rca-btn.rca-green:hover{ background:var(--gdim); border-color:var(--green); color:var(--green); }
+.rca-btn.rca-red:hover{   background:var(--rdim);  border-color:var(--red);   color:var(--red);   }
+
+/* ── KUNDEN KARTEN ── */
+.kunden-list{ display:flex; flex-direction:column; gap:10px; }
+.kunde-card{
+  display:flex; align-items:center; gap:14px;
+  background:var(--s1); border:1px solid var(--border); border-radius:14px;
+  padding:14px 16px; cursor:pointer;
+  transition:border-color .15s, box-shadow .15s, transform .1s;
+}
+.kunde-card:hover{ border-color:var(--border2); box-shadow:0 4px 16px rgba(0,0,0,.07); transform:translateY(-1px); }
+.kunde-card-avatar{
+  flex-shrink:0; width:44px; height:44px; border-radius:12px;
+  background:var(--bdim); border:1px solid var(--blue);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:700; color:var(--blue); letter-spacing:.05em;
+}
+.kunde-card-body{ flex:1; min-width:0; }
+.kunde-card-name{ font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
+.kunde-card-role{ font-size:11px; color:var(--sub); margin-bottom:4px; }
+.kunde-card-meta{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.kunde-meta-link{ font-size:11px; color:var(--blue); text-decoration:none; display:flex; align-items:center; gap:3px; }
+.kunde-meta-link:hover{ text-decoration:underline; }
+.kunde-meta-item{ font-size:11px; color:var(--sub); display:flex; align-items:center; gap:3px; }
+.kunde-card-right{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; min-width:100px; }
+.kunde-umsatz{ font-family:var(--mono); font-size:15px; font-weight:700; color:var(--green); }
+.kunde-rech-cnt{ font-size:11px; color:var(--sub); }
+.kunde-card-actions{ display:flex; gap:4px; margin-top:2px; }
+
+@media(max-width:768px){
+  .rech-card{ flex-wrap:wrap; }
+  .rech-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:space-between; }
+  .kunde-card{ flex-wrap:wrap; }
+  .kunde-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:space-between; min-width:0; }
+}
+
 /* ── PROGNOSE ── */
 .prog-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .prog-bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
