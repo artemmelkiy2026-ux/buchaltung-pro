@@ -681,7 +681,7 @@
     </div>
   </div>
   <!-- Statistik-Cards -->
-  <div id="kunden-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px"></div>
+  <div id="kunden-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
   <!-- Kunden Karten -->
   <div id="kunden-list" class="kunden-list"></div>
   <div id="kunden-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-users"></i></div><p>Keine Kunden vorhanden</p></div>
@@ -786,41 +786,17 @@
 
   <!-- Квартальная сводка (только Regelbesteuerung) -->
   <div id="ust-quartal-section" style="display:none;margin-bottom:20px">
-    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Quartalsübersicht</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>Quartal</th>
-          <th style="text-align:right">Netto-Ein.</th>
-          <th style="text-align:right">USt Ausgang</th>
-          <th style="text-align:right">Vorsteuer</th>
-          <th style="text-align:right">Zahllast</th>
-        </tr></thead>
-        <tbody id="ust-quartal-tbody"></tbody>
-        <tfoot id="ust-quartal-tfoot"></tfoot>
-      </table>
-    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Quartalsübersicht</div>
+    <div id="ust-quartal-list" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px"></div>
   </div>
 
-  <!-- Таблица операций (только Regelbesteuerung) -->
+  <!-- Операции (только Regelbesteuerung) -->
   <div id="ust-buchungen-section" style="display:none">
-    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Buchungen mit USt / Vorsteuer</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr>
-          <th>Datum</th>
-          <th class="mob-hide" style="text-align:center">Typ</th>
-          <th style="text-align:right">Netto</th>
-          <th style="text-align:right">%</th>
-          <th style="text-align:right"><span class="mob-hide">MwSt / Vorst.</span><span class="mob-show">Mw/Vt</span></th>
-          <th style="text-align:right">Brutto</th>
-          <th class="mob-hide"></th>
-        </tr></thead>
-        <tbody id="ust-detail-tbody"></tbody>
-        <tfoot id="ust-tfoot"></tfoot>
-      </table>
-      <div id="ust-empty" class="empty-state" style="display:none"><div class="ei">%</div><p>Keine USt-Buchungen für dieses Jahr</p></div>
-    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Buchungen mit USt / Vorsteuer</div>
+    <div id="ust-detail-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="ust-empty" class="empty-state" style="display:none"><div class="ei">%</div><p>Keine USt-Buchungen für dieses Jahr</p></div>
+    <div id="ust-detail-pager" style="display:none;margin-top:12px"></div>
+    <div id="ust-detail-summary" class="rech-summary" style="margin-top:8px"></div>
   </div>
 
   <!-- §19 Info-Block -->

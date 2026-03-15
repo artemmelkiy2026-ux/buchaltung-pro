@@ -200,7 +200,6 @@ function renderKat(){
               <div class="kat-bar-track">
                 <div class="kat-bar-fill" style="width:${Math.round(v/sorted[0][1]*100)}%;background:${PIE_COLORS[i%PIE_COLORS.length]}"></div>
               </div>
-              <span class="kat-pct">${Math.round(v/total*100)}%</span>
             </div>
           </div>
           <div class="kat-card-val" style="color:${valColor}">${fmt(v)}</div>

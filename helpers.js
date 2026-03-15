@@ -1145,25 +1145,57 @@ function renderUst(){
       const zl   = r2(ust-vst);
       return {q,ust,vst,netto,zl,any:ust>0||vst>0};
     });
-    qtbody.innerHTML = quarters.map(q=>`
-      <tr style="${!q.any?'opacity:.35':''}">
-        <td><strong>Q${q.q} ${yr}</strong></td>
-        <td style="text-align:right;font-family:var(--mono)">${q.netto>0?fmt(q.netto):'—'}</td>
-        <td style="padding-right:10px;text-align:right;font-family:var(--mono);color:var(--red)">${q.ust>0?'+'+fmt(q.ust):'—'}</td>
-        <td style="padding-right:10px;text-align:right;font-family:var(--mono);color:var(--green)">${q.vst>0?'-'+fmt(q.vst):'—'}</td>
-        <td style="text-align:right;font-family:var(--mono);font-weight:700;color:${q.zl>0?'var(--red)':'var(--green)'}">
-          ${q.any?(q.zl>0?'+':'')+fmt(q.zl):'—'}
-        </td>
-      </tr>`).join('');
-    if(qtfoot) qtfoot.innerHTML = `<tr style="background:var(--s2);font-weight:700">
-      <td style="padding:8px 20px">Gesamt ${yr}</td>
-      <td style="text-align:right;font-family:var(--mono)">${fmt(totNetto)}</td>
-      <td style="padding-right:10px;text-align:right;font-family:var(--mono);color:var(--red)">${totUst>0?'+'+fmt(totUst):'—'}</td>
-      <td style="padding-right:10px;text-align:right;font-family:var(--mono);color:var(--green)">${totVorst>0?'-'+fmt(totVorst):'—'}</td>
-      <td style="text-align:right;font-family:var(--mono);font-weight:800;color:${totZahl>0?'var(--red)':'var(--green)'}">
-        ${totZahl>0?'+':''}${fmt(totZahl)}
-      </td>
-    </tr>`;
+    // Quartal als Karten
+    const qtContainer = document.getElementById('ust-quartal-list');
+    if(qtContainer){
+      qtContainer.innerHTML = quarters.map(q=>`
+        <div class="ust-q-card${!q.any?' ust-q-empty':''}">
+          <div class="ust-q-label">Q${q.q} ${yr}</div>
+          <div class="ust-q-row">
+            <span class="ust-q-key">Netto-Ein.</span>
+            <span class="ust-q-val">${q.netto>0?fmt(q.netto):'—'}</span>
+          </div>
+          <div class="ust-q-row">
+            <span class="ust-q-key">USt Ausgang</span>
+            <span class="ust-q-val" style="color:var(--red)">${q.ust>0?'+'+fmt(q.ust):'—'}</span>
+          </div>
+          <div class="ust-q-row">
+            <span class="ust-q-key">Vorsteuer</span>
+            <span class="ust-q-val" style="color:var(--green)">${q.vst>0?'−'+fmt(q.vst):'—'}</span>
+          </div>
+          <div class="ust-q-divider"></div>
+          <div class="ust-q-row ust-q-total">
+            <span class="ust-q-key">Zahllast</span>
+            <span class="ust-q-val" style="color:${q.zl>0?'var(--red)':'var(--green)'}">
+              ${q.any?(q.zl>0?'+':'')+fmt(q.zl):'—'}
+            </span>
+          </div>
+        </div>`).join('');
+      // Итоговая карточка
+      qtContainer.innerHTML += `
+        <div class="ust-q-card ust-q-gesamt">
+          <div class="ust-q-label">Gesamt ${yr}</div>
+          <div class="ust-q-row">
+            <span class="ust-q-key">Netto-Ein.</span>
+            <span class="ust-q-val">${fmt(totNetto)}</span>
+          </div>
+          <div class="ust-q-row">
+            <span class="ust-q-key">USt Ausgang</span>
+            <span class="ust-q-val" style="color:var(--red)">${totUst>0?'+'+fmt(totUst):'—'}</span>
+          </div>
+          <div class="ust-q-row">
+            <span class="ust-q-key">Vorsteuer</span>
+            <span class="ust-q-val" style="color:var(--green)">${totVorst>0?'−'+fmt(totVorst):'—'}</span>
+          </div>
+          <div class="ust-q-divider"></div>
+          <div class="ust-q-row ust-q-total">
+            <span class="ust-q-key">Zahllast</span>
+            <span class="ust-q-val" style="font-size:15px;color:${totZahl>0?'var(--red)':'var(--green)'}">
+              ${totZahl>0?'+':''}${fmt(totZahl)}
+            </span>
+          </div>
+        </div>`;
+    }
   }
 
   // ── Таблица операций с пагинацией (20 строк) ─────────────────────────────
@@ -1210,24 +1242,25 @@ function renderUst(){
         </tr>`;
       }).join('');
     }
-    if(tfoot){
+    // Pagination + summary
+    const detPager = document.getElementById('ust-detail-pager');
+    const detSummary = document.getElementById('ust-detail-summary');
+    if(detPager && totalPages>1){
       const from=(ustPage-1)*PER_PAGE+1, to=Math.min(ustPage*PER_PAGE,allMwst.length);
-      const pager = totalPages>1 ? `<tr><td colspan="7" style="padding:8px 12px">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=1;renderUst()" ${ustPage===1?'disabled':''}>«</button>
-          <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage--;renderUst()" ${ustPage===1?'disabled':''}>‹</button>
-          <span style="font-size:12px;color:var(--sub)">Seite ${ustPage} / ${totalPages} &nbsp;(${from}–${to} von ${allMwst.length})</span>
-          <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage++;renderUst()" ${ustPage===totalPages?'disabled':''}>›</button>
-          <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=${totalPages};renderUst()" ${ustPage===totalPages?'disabled':''}>»</button>
-        </div>
-      </td></tr>` : '';
-      tfoot.innerHTML=`<tr style="background:var(--s2);font-weight:700">
-        <td colspan="4" style="padding:8px 20px">Gesamt ${yr}</td>
-        <td style="padding-right:10px;text-align:right;font-family:var(--mono);color:${totZahl>0?'var(--red)':'var(--green)'}">
-          ${totZahl>0?'+':''}${fmt(totZahl)}
-        </td>
-        <td colspan="2"></td>
-      </tr>${pager}`;
+      detPager.innerHTML=`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=1;renderUst()" ${ustPage===1?'disabled':''}>«</button>
+        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage--;renderUst()" ${ustPage===1?'disabled':''}>‹</button>
+        <span style="font-size:12px;color:var(--sub)">${from}–${to} von ${allMwst.length}</span>
+        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage++;renderUst()" ${ustPage===totalPages?'disabled':''}>›</button>
+        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=${totalPages};renderUst()" ${ustPage===totalPages?'disabled':''}>»</button>
+      </div>`;
+      detPager.style.display='';
+    } else if(detPager){ detPager.style.display='none'; }
+    if(detSummary){
+      detSummary.innerHTML=`<span>${allMwst.length} Buchungen</span>
+        <span class="ust-summary-zahl" style="color:${totZahl>0?'var(--red)':'var(--green)'}">
+          Zahllast: ${totZahl>0?'+':''}${fmt(totZahl)}
+        </span>`;
     }
   }
 }
