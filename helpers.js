@@ -308,44 +308,81 @@ function showKundeRechnungen(id) {
   const k = (data.kunden||[]).find(x=>x.id===id);
   if (!k) return;
 
-  // Заголовок
   document.getElementById('kunde-rech-name').textContent = k.name + (k.email ? ' · ' + k.email : '');
 
-  // Фильтруем счета по kundeId ИЛИ по имени клиента (для старых данных)
   const rechs = (data.rechnungen||[]).filter(r =>
     r.kundeId === id || r.kunde === k.name
   ).sort((a,b) => b.datum.localeCompare(a.datum));
 
-  const tbody = document.getElementById('kunde-rech-tbody');
+  const list  = document.getElementById('kunde-rech-list');
   const empty = document.getElementById('kunde-rech-empty');
-  const wrap  = document.getElementById('kunde-rech-wrap');
+  const stats = document.getElementById('kunde-rech-stats');
   const total = document.getElementById('kunde-rech-total');
 
   if (!rechs.length) {
     empty.style.display = 'block';
-    wrap.style.display  = 'none';
-    total.textContent   = '';
-  } else {
-    empty.style.display = 'none';
-    wrap.style.display  = '';
-    const smap = {
-      offen:        '<span class="rech-status rs-offen"><i class="fas fa-circle" style="color:var(--yellow)"></i> Offen</span>',
-      ueberfaellig: '<span class="rech-status rs-ueberfaellig"><i class="fas fa-circle" style="color:var(--red)"></i> Überfällig</span>',
-      bezahlt:      '<span class="rech-status rs-bezahlt"><i class="fas fa-circle" style="color:var(--green)"></i> Bezahlt</span>',
-    };
-    tbody.innerHTML = rechs.map(r => `
-      <tr style="cursor:pointer" onclick="openRechFromKunde('${r.id}')">
-        <td style="font-family:var(--mono);font-size:11px;font-weight:600">${r.nr}</td>
-        <td style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.beschreibung||'—'}</td>
-        <td style="font-family:var(--mono);font-size:11px;color:var(--sub)">${fd(r.datum)}</td>
-        <td style="text-align:right;font-family:var(--mono);font-weight:600;font-size:12px">${fmt(r.betrag)}</td>
-        <td style="text-align:center">${smap[r.status]||r.status}</td>
-      </tr>`).join('');
-    const gesamt = rechs.reduce((s,r)=>s+r.betrag,0);
-    const bezahlt = rechs.filter(r=>r.status==='bezahlt').reduce((s,r)=>s+r.betrag,0);
-    total.innerHTML = `${rechs.length} Rechnung${rechs.length!==1?'en':''} · Gesamt: <strong>${fmt(gesamt)}</strong> · Bezahlt: <strong style="color:var(--green)">${fmt(bezahlt)}</strong>`;
+    list.innerHTML = '';
+    stats.innerHTML = '';
+    total.textContent = '';
+    openModal('kunde-rech-modal');
+    return;
   }
 
+  empty.style.display = 'none';
+
+  // Мини-статистика
+  const gesamt   = rechs.reduce((s,r)=>s+r.betrag,0);
+  const bezahlt  = rechs.filter(r=>r.status==='bezahlt').reduce((s,r)=>s+r.betrag,0);
+  const offen    = rechs.filter(r=>r.status==='offen'||r.status==='ueberfaellig').reduce((s,r)=>s+r.betrag,0);
+  stats.innerHTML = `
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center">
+      <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Gesamt</div>
+      <div style="font-family:var(--mono);font-size:15px;font-weight:700">${fmt(gesamt)}</div>
+      <div style="font-size:10px;color:var(--sub);margin-top:2px">${rechs.length} Rechnung${rechs.length!==1?'en':''}</div>
+    </div>
+    <div style="background:var(--gdim);border:1px solid rgba(93,157,105,.25);border-radius:10px;padding:10px 12px;text-align:center">
+      <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Bezahlt</div>
+      <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--green)">${fmt(bezahlt)}</div>
+    </div>
+    <div style="background:var(--ydim);border:1px solid rgba(224,140,26,.25);border-radius:10px;padding:10px 12px;text-align:center">
+      <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Offen</div>
+      <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--yellow)">${fmt(offen)}</div>
+    </div>`;
+
+  const statusCfg = {
+    offen:       {icon:'fas fa-clock',              label:'Offen',      avatarCls:'rech-badge-offen',   pillCls:'rech-badge-offen-pill'},
+    ueberfaellig:{icon:'fas fa-exclamation-circle', label:'Überfällig', avatarCls:'rech-badge-ueber',   pillCls:'rech-badge-ueber-pill'},
+    bezahlt:     {icon:'fas fa-check-circle',       label:'Bezahlt',    avatarCls:'rech-badge-bezahlt', pillCls:'rech-badge-bezahlt-pill'}
+  };
+
+  const today = new Date().toISOString().split('T')[0];
+
+  list.innerHTML = rechs.map(r => {
+    const st = statusCfg[r.status] || statusCfg.offen;
+    let overdueTxt = '';
+    if(r.status==='ueberfaellig'&&r.faellig){
+      const diff = Math.floor((new Date(today)-new Date(r.faellig))/(1000*86400));
+      if(diff>0) overdueTxt = `<span class="rech-overdue">+${diff}T</span>`;
+    }
+    return `<div class="krech-card" onclick="openRechFromKunde('${r.id}')">
+      <div class="krech-avatar ${st.avatarCls}"><i class="${st.icon}"></i></div>
+      <div class="krech-info">
+        <div class="krech-nr">${r.nr}</div>
+        <div class="krech-desc">${r.beschreibung||'—'}</div>
+        <div class="krech-meta">
+          <span>${fd(r.datum)}</span>
+          ${r.faellig?`<span>·</span><span style="color:${r.status==='ueberfaellig'?'var(--red)':'var(--sub)'}">Fällig ${fd(r.faellig)}</span>`:''}
+          ${overdueTxt}
+        </div>
+      </div>
+      <div class="krech-right">
+        <div class="krech-betrag">${fmt(r.betrag)}</div>
+        <div class="${st.pillCls}"><i class="${st.icon}" style="font-size:9px"></i> ${st.label}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  total.innerHTML = `${rechs.length} Rechnung${rechs.length!==1?'en':''} · Gesamt: <strong>${fmt(gesamt)}</strong> · Bezahlt: <strong style="color:var(--green)">${fmt(bezahlt)}</strong>`;
   openModal('kunde-rech-modal');
 }
 

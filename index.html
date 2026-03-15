@@ -1267,7 +1267,7 @@
 
 <!-- ── KUNDE RECHNUNGEN MODAL ── -->
 <div class="modal-bg" id="kunde-rech-modal">
-  <div class="modal" style="max-width:680px;width:100%">
+  <div class="modal" style="max-width:580px;width:100%">
     <div class="modal-hdr">
       <div>
         <h2><i class="fas fa-file-invoice"></i> Rechnungen</h2>
@@ -1278,31 +1278,16 @@
         <button class="modal-close" onclick="closeModal('kunde-rech-modal')">✕</button>
       </div>
     </div>
+    <!-- Статистика -->
+    <div id="kunde-rech-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px"></div>
+    <!-- Карточки счетов -->
     <div id="kunde-rech-empty" style="display:none;text-align:center;padding:40px;color:var(--sub)">
       <div style="font-size:32px;margin-bottom:8px"><i class="fas fa-file-alt"></i></div>
       <div>Noch keine Rechnungen für diesen Kunden</div>
     </div>
-    <div class="tbl-wrap" id="kunde-rech-wrap" style="margin-top:0">
-      <table style="table-layout:fixed;width:100%">
-        <colgroup>
-          <col style="width:110px">
-          <col>
-          <col style="width:80px">
-          <col style="width:90px">
-          <col style="width:90px">
-        </colgroup>
-        <thead><tr>
-          <th>Nr.</th>
-          <th>Beschreibung</th>
-          <th>Datum</th>
-          <th style="text-align:right">Betrag</th>
-          <th style="text-align:center">Status</th>
-        </tr></thead>
-        <tbody id="kunde-rech-tbody"></tbody>
-      </table>
-    </div>
+    <div id="kunde-rech-list" style="display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
-      <div id="kunde-rech-total" style="font-size:13px;color:var(--sub)"></div>
+      <div id="kunde-rech-total" style="font-size:12px;color:var(--sub)"></div>
       <button class="btn" style="padding:10px 18px" onclick="closeModal('kunde-rech-modal')">Schließen</button>
     </div>
   </div>

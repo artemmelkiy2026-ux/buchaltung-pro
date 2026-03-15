@@ -458,7 +458,25 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 .rca-btn.rca-green:hover{ background:var(--gdim); border-color:var(--green); color:var(--green); }
 .rca-btn.rca-red:hover{   background:var(--rdim);  border-color:var(--red);   color:var(--red);   }
 
-/* ── KUNDEN KARTEN ── */
+/* ── KUNDEN-RECHNUNGEN MODAL KARTEN ── */
+.krech-card{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; border-radius:12px;
+  border:1px solid var(--border); background:var(--s1);
+  cursor:pointer; transition:border-color .15s, background .15s;
+}
+.krech-card:hover{ border-color:var(--border2); background:var(--s2); }
+.krech-avatar{
+  flex-shrink:0; width:38px; height:38px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; font-size:15px;
+}
+.krech-info{ flex:1; min-width:0; }
+.krech-nr{ font-family:var(--mono); font-size:11px; font-weight:700; color:var(--sub); }
+.krech-desc{ font-size:13px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:2px 0; }
+.krech-meta{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.krech-meta span{ font-size:11px; color:var(--sub); }
+.krech-right{ display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
+.krech-betrag{ font-family:var(--mono); font-size:14px; font-weight:700; color:var(--text); }
 .kunden-list{ display:flex; flex-direction:column; gap:10px; }
 .kunde-card{
   display:flex; align-items:center; gap:14px;
