@@ -193,19 +193,19 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .sidebar{
   width:220px;background:var(--s1);border-right:1px solid var(--border);
   display:flex;flex-direction:column;flex-shrink:0;
-  position:sticky;top:0;
+  position:fixed;top:54px;left:0;
   height:calc(100vh - 54px);
   overflow-y:auto;
+  z-index:200;
 }
+/* Компенсируем ширину фиксированного сайдбара */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;margin-left:220px;}
 .sidebar-section{padding:16px 12px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--sub)}
 .nav-item{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r);margin:1px 8px;cursor:pointer;color:#304a66;font-size:15px;font-weight:500;transition:all .15s;border:1px solid transparent}
 .nav-item:hover{background:var(--s2);color:var(--text)}
 .nav-item.active{background:#002a5be3;color:#ffffff}
 .nav-item .ic{width:16px;text-align:center;font-size:14px}
 .nav-divider{height:1px;background:var(--border);margin:8px 14px}
-
-/* ── MAIN ── */
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
 .page{display:none;flex:1;flex-direction:column}
 .page.active{display:flex}
 .page-inner{padding:20px;flex:1}
@@ -628,6 +628,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   /* ── Скрыть desktop sidebar и topbar ── */
   .sidebar { display: none !important; }
+  .main { margin-left: 0 !important; }
   #beta-topbar { display: none; }
   .mob-menu-btn { display: none !important; }
 
