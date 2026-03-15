@@ -1881,11 +1881,11 @@ input, select, textarea {
 @media(max-width:600px){.vjm-grid{grid-template-columns:repeat(2,1fr)}}
 
 /* ── KATEGORIEN SVG Donut ── */
-.kat-svg{ display:block;overflow:visible }
+.kat-svg{ display:block }
 .kat-donut-wrap{ display:flex;align-items:center;justify-content:center;padding:8px }
 
 .kat-seg{
   cursor:pointer;
-  transition: opacity .2s ease, stroke-width .15s ease;
+  transition: opacity .15s ease;
+  will-change: opacity;
 }
-.kat-seg:hover{ stroke-width: 40px !important; filter: brightness(1.1); }

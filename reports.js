@@ -237,7 +237,7 @@ function renderKat(){
         class="kat-seg" data-idx="${s.i}"
         data-name="${s.k.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}"
         data-val="${fmt(s.val)}" data-pct="${s.pct}%"
-        style="opacity:0;cursor:pointer"
+        style="opacity:1;cursor:pointer"
       />`).join('');
 
       donutWrap.innerHTML=`<svg width="${SZ}" height="${SZ}" viewBox="0 0 ${SZ} ${SZ}" class="kat-svg">
@@ -255,17 +255,30 @@ function renderKat(){
           style="pointer-events:none">${sorted.length} Kategorien</text>
       </svg>`;
 
-      // ── Анимация появления — opacity 0→1 + плавный dashoffset ────────────
+      // ── Анимация: плавный dashoffset от 0 к финальному значению ───────────
       requestAnimationFrame(()=>requestAnimationFrame(()=>{
         const circles=[...donutWrap.querySelectorAll('.kat-seg')];
-        const DUR=600, T0=performance.now();
+        // Сохраняем финальные значения и ставим начальное = скрыто
+        const finals=circles.map(c=>{
+          const segIdx=parseInt(c.dataset.idx);
+          const s=segs[segIdx];
+          const finalOffset=-s.offset;
+          // Начинаем с полностью "намотанного" — сегмент не виден
+          c.style.strokeDashoffset=2*Math.PI*90;
+          return finalOffset;
+        });
+        const DUR=700, T0=performance.now();
         const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
         (function tick(now){
           const t=ease(Math.min((now-T0)/DUR,1));
-          circles.forEach(c=>{ c.style.opacity=t; });
-          if(t<1) requestAnimationFrame(tick);
-          else {
-            // После анимации — вешаем события
+          circles.forEach((c,ci)=>{
+            const start=2*Math.PI*90;
+            c.style.strokeDashoffset=start+(finals[ci]-start)*t;
+          });
+          if(t<1){
+            requestAnimationFrame(tick);
+          } else {
+            // Анимация завершена — вешаем события
             circles.forEach(c=>{
               c.onmouseenter=()=>_katHL(parseInt(c.dataset.idx),c.dataset.name,c.dataset.val,c.dataset.pct,segs,total,sorted.length);
               c.onmouseleave=()=>_katReset(segs,total,sorted.length);
@@ -347,7 +360,6 @@ function _katHL(idx, name, val, pct, segs, total, count){
   _katSetCenter(val, name+' · '+pct);
   document.querySelectorAll('.kat-seg').forEach((c,i)=>{
     c.style.opacity= i===idx ? '1' : '0.2';
-    c.style.transform= i===idx ? 'scale(1.03)' : '';
   });
   document.querySelectorAll('.kat-tile').forEach((t,i)=>{
     t.style.opacity= i===idx ? '1' : '0.4';
@@ -359,7 +371,6 @@ function _katReset(segs, total, count){
   _katSetCenter(sel?'':fmt(total), sel?sel.size+' ausgewählt':count+' Kategorien');
   document.querySelectorAll('.kat-seg').forEach((c,i)=>{
     c.style.opacity= (!sel||sel.has(i)) ? '1' : '0.2';
-    c.style.transform='';
   });
   document.querySelectorAll('.kat-tile').forEach((t,i)=>{
     t.classList.toggle('kat-tile-active', !!sel&&sel.has(i));
@@ -378,3 +389,5 @@ function _katClick(idx, segs, total, count){
   }
   _katReset(segs, total, count);
 }
+
+
