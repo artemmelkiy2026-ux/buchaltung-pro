@@ -1771,7 +1771,7 @@ input, select, textarea {
 }
 .drc{
 
-  
+  border-radius:12px;
   padding:10px 12px;cursor:pointer;
   transition:box-shadow .15s,border-color .15s;
   position:relative;overflow:hidden;
