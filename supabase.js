@@ -171,6 +171,8 @@ async function sbStornoEintrag(id) {
     notiz: 'Storno von Eintrag ' + id,
     mwstRate: orig.mwstRate || 0,
     mwstBetrag: orig.mwstBetrag || 0,
+    vorsteuerRate: orig.vorsteuerRate || 0,
+    vorsteuerBet: orig.vorsteuerBet || 0,
     nettoBetrag: orig.nettoBetrag || orig.betrag,
     mwstMode: orig.mwstMode || '§19',
     storno_of: id,
