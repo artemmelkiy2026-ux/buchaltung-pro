@@ -151,7 +151,7 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .as-txt{font-size:10px;font-family:var(--mono);color:var(--sub);min-width:88px}
 
 .hr{display:flex;align-items:center;gap:6px}
-.btn{padding:5px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn{height:40px;padding:5px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn:hover{border-color:var(--blue);color:var(--text)}
 .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
 .btn.primary:hover{opacity:.88}
