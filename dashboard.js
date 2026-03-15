@@ -629,22 +629,25 @@ function renderDash(){
     const barW=Math.round(e.betrag/maxBet*100);
     const click=mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:`editE(event,'${e.id}')`;
     const color=isEin?'var(--green)':'var(--red)';
-    const bgDim=isEin?'rgba(93,157,105,.07)':'rgba(220,53,69,.07)';
-    const borderCol=isEin?'rgba(93,157,105,.2)':'rgba(220,53,69,.2)';
+    const bgDim=isEin?'rgba(93,157,105,.06)':'rgba(220,53,69,.06)';
+    const borderCol=isEin?'rgba(93,157,105,.18)':'rgba(220,53,69,.18)';
     return `<div class="drc${st?' drc-storno':''}" onclick="${click}" style="border-color:${borderCol};background:${bgDim}">
-      <div class="drc-head">
-        <div class="drc-icon" style="background:${isEin?'rgba(93,157,105,.15)':'rgba(220,53,69,.15)'};color:${color}">
-          <i class="fas fa-arrow-${isEin?'up':'down'}"></i>
+      <div class="drc-icon" style="background:${isEin?'rgba(93,157,105,.14)':'rgba(220,53,69,.14)'};color:${color}">
+        <i class="fas fa-arrow-${isEin?'up':'down'}"></i>
+      </div>
+      <div class="drc-body">
+        <div class="drc-name">${e.beschreibung||e.kategorie}</div>
+        <div class="drc-meta">
+          <span>${mob?fdm(e.datum):fd(e.datum)}</span>
+          <span>·</span>
+          <span class="drc-kat">${e.kategorie}</span>
         </div>
+      </div>
+      <div class="drc-right">
         <div class="drc-amt" style="color:${color}">${isEin?'+':'−'}${fmt(e.betrag)}</div>
-      </div>
-      <div class="drc-name">${e.beschreibung||e.kategorie}</div>
-      <div class="drc-meta">
-        <span>${mob?fdm(e.datum):fd(e.datum)}</span>
-        <span class="drc-kat">${e.kategorie}</span>
-      </div>
-      <div class="drc-bar-track">
-        <div class="drc-bar-fill" style="width:${barW}%;background:${color}"></div>
+        <div class="drc-bar-track">
+          <div class="drc-bar-fill" style="width:${barW}%;background:${color}"></div>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -652,24 +655,22 @@ function renderDash(){
   const summary=`<div class="drc-summary">
     <div class="drc-sum-item">
       <div class="drc-sum-dot" style="background:var(--green)"></div>
-      <div>
-        <div class="drc-sum-lbl">${cntEin} Einnahmen</div>
-        <div class="drc-sum-val" style="color:var(--green)">+${fmt(sumEin)}</div>
-      </div>
+      <span class="drc-sum-lbl">${cntEin} Einnahmen</span>
+      <span class="drc-sum-val" style="color:var(--green)">+${fmt(sumEin)}</span>
     </div>
+    <div class="drc-sum-sep"></div>
     <div class="drc-sum-item">
       <div class="drc-sum-dot" style="background:var(--red)"></div>
-      <div>
-        <div class="drc-sum-lbl">${cntAus} Ausgaben</div>
-        <div class="drc-sum-val" style="color:var(--red)">−${fmt(sumAus)}</div>
-      </div>
+      <span class="drc-sum-lbl">${cntAus} Ausgaben</span>
+      <span class="drc-sum-val" style="color:var(--red)">−${fmt(sumAus)}</span>
     </div>
     <div class="drc-sum-saldo">
-      <div class="drc-sum-lbl">Saldo</div>
-      <div class="drc-sum-val" style="color:${saldo>=0?'var(--green)':'var(--red)'};font-size:16px">${saldo>=0?'+':''}${fmt(saldo)}</div>
+      <span class="drc-sum-lbl">Saldo</span>
+      <span class="drc-sum-val" style="color:${saldo>=0?'var(--green)':'var(--red)'}">
+        ${saldo>=0?'+':''}${fmt(saldo)}
+      </span>
     </div>
   </div>`;
-
   document.getElementById('d-recent').innerHTML=`<div class="drc-grid">${cards}</div>${summary}`;
 }
 
