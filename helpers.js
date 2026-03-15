@@ -1309,16 +1309,21 @@ function renderUst(){
       detPager.innerHTML=`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
         <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=1;renderUst()" ${ustPage===1?'disabled':''}>«</button>
         <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage--;renderUst()" ${ustPage===1?'disabled':''}>‹</button>
-        <span style="font-size:12px;color:var(--sub)">${from}–${to} von ${allMwst.length}</span>
+        <span style="font-size:12px;color:var(--sub)">${from}–${to} von ${filteredMwst.length}</span>
         <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage++;renderUst()" ${ustPage===totalPages?'disabled':''}>›</button>
         <button class="btn" style="padding:4px 10px;font-size:11px" onclick="ustPage=${totalPages};renderUst()" ${ustPage===totalPages?'disabled':''}>»</button>
       </div>`;
       detPager.style.display='';
     } else if(detPager){ detPager.style.display='none'; }
     if(detSummary){
-      detSummary.innerHTML=`<span>${filteredMwst.length} Buchungen${ustQuartalFilter>0?' (Q'+ustQuartalFilter+')':''}</span>
-        <span class="ust-summary-zahl" style="color:${totZahl>0?'var(--red)':'var(--green)'}">
-          Zahllast: ${totZahl>0?'+':''}${fmt(totZahl)}
+      // Считаем итоги только по отфильтрованным записям
+      const filtUst  = r2(filteredMwst.filter(e=>e.typ==='ust').reduce((s,e)=>s+e.mwstBetrag,0));
+      const filtVorst= r2(filteredMwst.filter(e=>e.typ==='vorsteuer').reduce((s,e)=>s+e.mwstBetrag,0));
+      const filtZahl = r2(filtUst-filtVorst);
+      const label = ustQuartalFilter>0 ? `Q${ustQuartalFilter} — ${filteredMwst.length} Buchungen` : `${filteredMwst.length} Buchungen`;
+      detSummary.innerHTML=`<span>${label}</span>
+        <span class="ust-summary-zahl" style="color:${filtZahl>0?'var(--red)':'var(--green)'}">
+          Zahllast: ${filtZahl>0?'+':''}${fmt(filtZahl)}
         </span>`;
     }
   }
