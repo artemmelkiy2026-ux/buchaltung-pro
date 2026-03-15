@@ -212,7 +212,7 @@ async function rechBezahlt(id){
     const _rNetto = r.positionen&&r.positionen.length ? r2(r.positionen.reduce((s,p)=>s+(p.menge||1)*p.netto,0)) : (r.netto||r.betrag);
     const _rMwst  = r.positionen&&r.positionen.length ? r2(r.positionen.reduce((s,p)=>s+(p.menge||1)*(p.brutto-p.netto),0)) : (r.mwstBetrag||0);
     const _rRate  = r.positionen&&r.positionen.length ? (r.positionen.find(p=>p.rate>0)?.rate||0) : (r.mwstRate||0);
-    const newE={id:Date.now()+'',datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:r.kategorie||'Dienstleistung',zahlungsart:r.zahlungsart||'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag,nettoBetrag:_rNetto,mwstBetrag:_rMwst,mwstRate:_rRate};
+    const newE={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum:new Date().toISOString().split('T')[0],typ:'Einnahme',kategorie:r.kategorie||'Dienstleistung',zahlungsart:r.zahlungsart||'Überweisung',beschreibung:`Rechnung ${r.nr}: ${r.beschreibung}`,notiz:'',betrag:r.betrag,nettoBetrag:_rNetto,mwstBetrag:_rMwst,mwstRate:_rRate};
     data.eintraege.unshift(newE);
     sbSaveRechnung(r); sbSaveEintrag(newE);
     renderAll();toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt + Einnahme gebucht`,'ok');
