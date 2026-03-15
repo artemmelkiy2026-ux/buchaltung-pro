@@ -1395,5 +1395,6 @@ function ustSetYear(yr){
   const sel = document.getElementById('ust-yr');
   if(sel){ sel.value = yr; }
   ustPage = 1;
+  ustQuartalFilter = 0; // сбрасываем фильтр квартала при смене года
   renderUst();
 }

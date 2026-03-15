@@ -132,10 +132,18 @@ function wBuchenCore(id){
   };
   data.eintraege.unshift(newE);
   sbSaveEintrag(newE);
+  // Вычисляем следующую дату без переполнения месяца (31 янв → 28 фев, не 3 мар)
   const d=new Date(w.naechste);
-  if(w.intervall==='monatlich') d.setMonth(d.getMonth()+1);
-  else if(w.intervall==='quartalsweise') d.setMonth(d.getMonth()+3);
-  else d.setFullYear(d.getFullYear()+1);
+  const day=d.getDate();
+  if(w.intervall==='monatlich'){
+    d.setDate(1); d.setMonth(d.getMonth()+1);
+    d.setDate(Math.min(day, new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));
+  } else if(w.intervall==='quartalsweise'){
+    d.setDate(1); d.setMonth(d.getMonth()+3);
+    d.setDate(Math.min(day, new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));
+  } else {
+    d.setFullYear(d.getFullYear()+1);
+  }
   w.naechste=d.toISOString().split('T')[0];
   sbSaveWied(w);
   return newE;

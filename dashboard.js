@@ -356,8 +356,7 @@ function addEintrag(){
   }
   data.eintraege.unshift(entry);
   sbSaveEintrag(entry);
-  renderAll();
-  renderDash();
+  renderAll(); // включает renderDash внутри
   updateNeuToolbar(true);
   const fj=document.getElementById('f-jahr');
   if(fj){

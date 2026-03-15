@@ -188,7 +188,7 @@ function saveRechnung(){
     notiz:document.getElementById('rn-notiz').value.trim(),
     kundeId:document.getElementById('rn-nr').dataset.kundeId||'',
     positionen,
-    netto, mwstBetrag:mwst, mwstRate:0, mwstMode:isKleinunternehmer(datum?datum.substring(0,4):new Date().getFullYear()+'')?'§19':'regel'
+    netto, mwstBetrag:mwst, mwstRate:positionen.length>0?(positionen.find(p=>p.rate>0)?.rate||0):0, mwstMode:isKleinunternehmer(datum?datum.substring(0,4):new Date().getFullYear()+'')?'§19':'regel'
   };
   if(editRechId){
     const r=data.rechnungen.find(x=>x.id===editRechId);
