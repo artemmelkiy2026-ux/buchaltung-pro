@@ -103,7 +103,7 @@ let fileHandle=null, asOn=false, asTimer=null, curPage='dashboard';
 // <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для сортировки Dashboard "Letzte 10"
 let dashSortCol='datum', dashSortAsc=false;
 // <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для пагинации Einträge
-let einPage=1, einPerPage=50;
+let einPage=1, einPerPage=10;
 let zPage=1, zPerPage=50;  // Пагинация для Zahlungsarten
 let zSortCol='datum', zSortAsc=false;  // Сортировка Zahlungsarten
 let ustPage=1;              // Пагинация для USt-Buchungen
