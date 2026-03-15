@@ -1007,7 +1007,7 @@ function renderUst(){
 
   if(kleinInfo) kleinInfo.style.display = isRegel ? 'none' : '';
   if(regelCards) regelCards.style.display = isRegel ? 'grid' : 'none';
-  if(quartalSec) quartalSec.style.display = isRegel ? (isMob()?'none':'') : 'none';
+  if(quartalSec) quartalSec.style.display = isRegel ? '' : 'none';
   if(buchSec)    buchSec.style.display    = isRegel ? '' : 'none';
   const addSec = document.getElementById('ust-add-section');
   if(addSec) addSec.style.display = isRegel ? '' : 'none';
