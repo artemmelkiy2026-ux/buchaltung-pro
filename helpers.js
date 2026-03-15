@@ -1218,49 +1218,56 @@ function renderUst(){
   }
 
   // ── Таблица операций с пагинацией (20 строк) ─────────────────────────────
-  const dtbody = document.getElementById('ust-detail-tbody');
-  const tfoot  = document.getElementById('ust-tfoot');
-  const empty  = document.getElementById('ust-empty');
+  const empty2  = document.getElementById('ust-empty');
   const PER_PAGE = 20;
   const totalPages = Math.max(1, Math.ceil(allMwst.length / PER_PAGE));
   if(ustPage > totalPages) ustPage = totalPages;
   if(ustPage < 1) ustPage = 1;
 
   if(!allMwst.length){
-    if(dtbody) dtbody.innerHTML='';
-    if(tfoot)  tfoot.innerHTML='';
-    if(empty)  empty.style.display='';
+    if(empty2) empty2.style.display='';
   } else {
-    if(empty) empty.style.display='none';
+    if(empty2) empty2.style.display='none';
     const pageItems = allMwst.slice((ustPage-1)*PER_PAGE, ustPage*PER_PAGE);
-    if(dtbody){
+
+    // Блочный рендер строк
+    const detContainer = document.getElementById('ust-detail-list');
+    if(detContainer){
       let lastQ=0;
-      dtbody.innerHTML = pageItems.map(e=>{
+      let html='';
+      pageItems.forEach(e=>{
         const m=parseInt(e.datum.substring(5,7));
         const q=Math.ceil(m/3);
-        let sep='';
         if(q!==lastQ){
           lastQ=q;
-          sep=`<tr style="background:var(--s2)">
-            <td colspan="7" style="font-size:11px;font-weight:700;color:var(--sub);padding:5px 20px;text-transform:uppercase;letter-spacing:.5px">Q${q} ${yr}</td>
-          </tr>`;
+          html+=`<div class="ust-q-sep">Q${q} ${yr}</div>`;
         }
         const isUst=e.typ==='ust', canDel=e.quelle==='Manual';
-        // Дата: 26.03.26 вместо 26.03.2026
-        const shortDat = e.datum.substring(8,10)+'.'+e.datum.substring(5,7)+'.'+e.datum.substring(2,4);
-        return sep+`<tr>
-          <td style="font-size:12px;color:var(--sub);font-family:var(--mono);white-space:nowrap">${shortDat}</td>
-          <td class="mob-hide" style="text-align:center">
-            <span class="badge ${isUst?'b-aus':'b-ein'}" style="font-size:10px">${isUst?'● USt':'● Vorst.'}</span>
-          </td>
-          <td style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--sub)">${e.netto>0?fmt(e.netto):'—'}</td>
-          <td style="text-align:right;font-size:11px;color:var(--sub)">${e.rate}%</td>
-          <td style="text-align:right;font-family:var(--mono);font-size:12px;font-weight:600;color:${isUst?'var(--red)':'var(--green)'}">${isUst?'+':'-'}${fmt(e.mwstBetrag)}</td>
-          <td style="text-align:right;font-family:var(--mono);font-size:12px">${e.brutto>0?fmt(e.brutto):'—'}</td>
-          <td class="mob-hide">${canDel?`<button class="del-btn" onclick="delUstEintrag('${e.id}')">✕</button>`:''}</td>
-        </tr>`;
-      }).join('');
+        const shortDat=e.datum.substring(8,10)+'.'+e.datum.substring(5,7)+'.'+e.datum.substring(2,4);
+        html+=`<div class="ust-row">
+          <div class="ust-row-left">
+            <div class="ust-row-badge ${isUst?'ust-badge-ust':'ust-badge-vst'}">${isUst?'USt':'Vorst.'}</div>
+            <div class="ust-row-info">
+              <div class="ust-row-desc">${e.beschreibung||'—'}</div>
+              <div class="ust-row-meta">
+                <span>${shortDat}</span>
+                <span>${e.rate}%</span>
+                ${e.netto>0?`<span>Netto: ${fmt(e.netto)}</span>`:''}
+              </div>
+            </div>
+          </div>
+          <div class="ust-row-right">
+            <div class="ust-row-mwst" style="color:${isUst?'var(--red)':'var(--green)'}">
+              ${isUst?'+':'−'}${fmt(e.mwstBetrag)}
+            </div>
+            <div class="ust-row-brutto">${e.brutto>0?fmt(e.brutto):'—'}</div>
+            ${canDel?`<button class="rca-btn rca-red" onclick="delUstEintrag('${e.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`:''}
+          </div>
+        </div>`;
+      });
+      detContainer.innerHTML = html;
     }
+
     // Pagination + summary
     const detPager = document.getElementById('ust-detail-pager');
     const detSummary = document.getElementById('ust-detail-summary');
