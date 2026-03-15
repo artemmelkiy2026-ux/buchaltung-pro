@@ -18,15 +18,18 @@ function dl(csv,name){const b=new Blob([csv],{type:'text/csv;charset=utf-8'});co
 function toast(msg,type='ok'){
   const t=document.getElementById('toast');
   if(!t) return;
-  // сбрасываем предыдущий таймер
   if(t._toastTimer) clearTimeout(t._toastTimer);
   if(t._toastFadeTimer) clearTimeout(t._toastFadeTimer);
-  t.innerHTML=msg;
+  // Убираем HTML-теги (<i class="fas...">, <span> и т.д.)
+  let clean = msg.replace(/<[^>]*>/g, '');
+  // Убираем иконки-символы в начале строки: ✓ ✗ ↩️ ⚡ и пробелы после них
+  clean = clean.replace(/^[\u2713\u2717\u21A9\u26A1\uFE0F\s✓✗↩️⚡]+\s*/u, '');
+  // Убираем лишние пробелы
+  clean = clean.trim();
+  t.textContent = clean;
   t.className=`toast ${type}`;
-  // принудительный reflow для перезапуска анимации
   void t.offsetWidth;
   t.classList.add('show');
-  // через 2 сек начинаем плавное исчезновение
   t._toastTimer=setTimeout(()=>{
     t.classList.remove('show');
     t._toastFadeTimer=setTimeout(()=>{ t.className='toast'; },300);
