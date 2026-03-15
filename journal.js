@@ -127,7 +127,7 @@ function renderJournal() {
         rowBg = 'background:rgba(148,163,184,.03);';
         opacity = '0.6';
       } else if (e.korrektur_von) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(93,157,105,.12);color:var(--green);border:1px solid rgba(93,157,105,.3)">✎ Korrektur</span>`;
+        badge = `<span class="badge-korrektur">✎ Korrektur</span>`;
         rowBg = 'background:rgba(93,157,105,.03);';
       }
 
@@ -141,7 +141,7 @@ function renderJournal() {
       } else if (involved.has(e.id)) {
         const stornoRec = data.eintraege.find(x => x.storno_of === e.id);
         const korr = data.eintraege.find(x => x.korrektur_von === e.id);
-        if (stornoRec) link = `<span style="font-size:10px;color:var(--sub)">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
+        if (stornoRec) link = `<span class="badge-storno">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
       }
 
       const sep = idx > 0 ? `<div style="height:1px;background:var(--border);margin:0 14px"></div>` : '';
@@ -213,7 +213,7 @@ function renderJournal() {
         badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
         rowBg = 'background:rgba(148,163,184,.03);'; opacity = '0.6';
       } else if (e.korrektur_von) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(93,157,105,.12);color:var(--green);border:1px solid rgba(93,157,105,.3)">✎ Korrektur</span>`;
+        badge = `<span class="badge-korrektur">✎ Korrektur</span>`;
         rowBg = 'background:rgba(93,157,105,.03);';
       }
       let link = '';
@@ -226,7 +226,7 @@ function renderJournal() {
       } else if (involved.has(e.id)) {
         const stornoRec = data.eintraege.find(x => x.storno_of === e.id);
         const korr = data.eintraege.find(x => x.korrektur_von === e.id);
-        if (stornoRec) link = `<span style="font-size:10px;color:var(--sub)">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
+        if (stornoRec) link = `<span class="badge-storno">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
       }
       const sep = idx > 0 ? `<div style="height:1px;background:var(--border);margin:0 14px"></div>` : '';
       const isEin = e.typ === 'Einnahme';
