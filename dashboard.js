@@ -612,68 +612,65 @@ function renderDash(){
   const mob=isMob();
 
   if(!recent.length){
-    document.getElementById('d-recent').innerHTML='<div style="text-align:center;padding:30px;color:var(--sub)">Keine Einträge</div>';
+    document.getElementById('d-recent').innerHTML='<div style="text-align:center;padding:40px;color:var(--sub);font-size:13px">Keine Einträge</div>';
     return;
   }
 
-  // Мини-статистика по последним 10
   const sumEin=recent.filter(e=>e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
   const sumAus=recent.filter(e=>e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
   const cntEin=recent.filter(e=>e.typ==='Einnahme').length;
   const cntAus=recent.filter(e=>e.typ==='Ausgabe').length;
+  const saldo=sumEin-sumAus;
   const maxBet=Math.max(...recent.map(e=>e.betrag),1);
 
-  const rows=recent.map((e,idx)=>{
+  const cards=recent.map((e,idx)=>{
     const isEin=e.typ==='Einnahme';
     const st=e.is_storno||e._storniert;
     const barW=Math.round(e.betrag/maxBet*100);
     const click=mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:`editE(event,'${e.id}')`;
-    const notiz=e.notiz?`<span title="${e.notiz}" style="color:var(--muted);font-size:11px;cursor:help">✎</span>`:'';
-    const mwst=isEin&&e.mwstBetrag>0?`<span style="font-size:10px;color:var(--sub);font-family:var(--mono)">MwSt ${fmt(e.mwstBetrag)}</span>`:'';
-    return `<div class="dr-row${st?' dr-row-storno':''}" onclick="${click}">
-      <div class="dr-idx">${idx+1}</div>
-      <div class="dr-icon ${isEin?'dr-icon-ein':'dr-icon-aus'}">
-        <i class="fas fa-arrow-${isEin?'up':'down'}"></i>
-      </div>
-      <div class="dr-body">
-        <div class="dr-name">${e.beschreibung||e.kategorie} ${notiz}</div>
-        <div class="dr-meta">
-          <span class="dr-date">${mob?fdm(e.datum):fd(e.datum)}</span>
-          <span class="dr-dot">·</span>
-          <span class="dr-kat">${e.kategorie}</span>
-          <span class="dr-dot">·</span>
-          <span class="badge ${ZBADGE[e.zahlungsart]||''}" style="font-size:10px">${e.zahlungsart||'—'}</span>
-          ${mwst?`<span class="dr-dot">·</span>${mwst}`:''}
+    const color=isEin?'var(--green)':'var(--red)';
+    const bgDim=isEin?'rgba(93,157,105,.07)':'rgba(220,53,69,.07)';
+    const borderCol=isEin?'rgba(93,157,105,.2)':'rgba(220,53,69,.2)';
+    return `<div class="drc${st?' drc-storno':''}" onclick="${click}" style="border-color:${borderCol};background:${bgDim}">
+      <div class="drc-head">
+        <div class="drc-icon" style="background:${isEin?'rgba(93,157,105,.15)':'rgba(220,53,69,.15)'};color:${color}">
+          <i class="fas fa-arrow-${isEin?'up':'down'}"></i>
         </div>
-        <div class="dr-bar-track">
-          <div class="dr-bar-fill" style="width:${barW}%;background:${isEin?'var(--green)':'var(--red)'}"></div>
-        </div>
+        <div class="drc-amt" style="color:${color}">${isEin?'+':'−'}${fmt(e.betrag)}</div>
       </div>
-      <div class="dr-amt ${isEin?'dr-amt-ein':'dr-amt-aus'}">${isEin?'+':'−'}${fmt(e.betrag)}</div>
+      <div class="drc-name">${e.beschreibung||e.kategorie}</div>
+      <div class="drc-meta">
+        <span>${mob?fdm(e.datum):fd(e.datum)}</span>
+        <span class="drc-kat">${e.kategorie}</span>
+      </div>
+      <div class="drc-bar-track">
+        <div class="drc-bar-fill" style="width:${barW}%;background:${color}"></div>
+      </div>
     </div>`;
   }).join('');
 
-  const saldo=sumEin-sumAus;
-  const summary=`<div class="dr-summary">
-    <div class="dr-summary-item">
-      <span class="dr-summary-dot" style="background:var(--green)"></span>
-      <span>${cntEin} Einnahmen</span>
-      <strong style="color:var(--green);font-family:var(--mono)">+${fmt(sumEin)}</strong>
+  const summary=`<div class="drc-summary">
+    <div class="drc-sum-item">
+      <div class="drc-sum-dot" style="background:var(--green)"></div>
+      <div>
+        <div class="drc-sum-lbl">${cntEin} Einnahmen</div>
+        <div class="drc-sum-val" style="color:var(--green)">+${fmt(sumEin)}</div>
+      </div>
     </div>
-    <div class="dr-summary-sep"></div>
-    <div class="dr-summary-item">
-      <span class="dr-summary-dot" style="background:var(--red)"></span>
-      <span>${cntAus} Ausgaben</span>
-      <strong style="color:var(--red);font-family:var(--mono)">−${fmt(sumAus)}</strong>
+    <div class="drc-sum-item">
+      <div class="drc-sum-dot" style="background:var(--red)"></div>
+      <div>
+        <div class="drc-sum-lbl">${cntAus} Ausgaben</div>
+        <div class="drc-sum-val" style="color:var(--red)">−${fmt(sumAus)}</div>
+      </div>
     </div>
-    <div class="dr-summary-sep"></div>
-    <div class="dr-summary-item">
-      <span style="color:var(--sub);font-size:12px;font-weight:600">Saldo</span>
-      <strong style="font-family:var(--mono);font-size:14px;color:${saldo>=0?'var(--green)':'var(--red)'}">${saldo>=0?'+':''}${fmt(saldo)}</strong>
+    <div class="drc-sum-saldo">
+      <div class="drc-sum-lbl">Saldo</div>
+      <div class="drc-sum-val" style="color:${saldo>=0?'var(--green)':'var(--red)'};font-size:16px">${saldo>=0?'+':''}${fmt(saldo)}</div>
     </div>
   </div>`;
 
-  document.getElementById('d-recent').innerHTML = `<div class="dr-list">${rows}</div>${summary}`;
+  document.getElementById('d-recent').innerHTML=`<div class="drc-grid">${cards}</div>${summary}`;
 }
 
 // ── EINTRÄGE ──────────────────────────────────────────────────────────────

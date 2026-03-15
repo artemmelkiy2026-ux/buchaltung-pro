@@ -1723,105 +1723,83 @@ input, select, textarea {
   .vj-mc-bar-row{grid-template-columns:28px 1fr 60px}
 }
 
-/* ── DASHBOARD — Letzte 10 Einträge ── */
-.dr-list{
-  border:1px solid var(--border);border-radius:14px;overflow:hidden;
-  background:var(--s1);
-}
-.dr-row{
+/* ── DASHBOARD — Letzte 10 Einträge (card grid) ── */
+.drc-grid{
   display:grid;
-  grid-template-columns:28px 36px 1fr auto;
-  align-items:center;gap:12px;
-  padding:11px 16px;
-  border-bottom:1px solid var(--border);
-  cursor:pointer;transition:background .12s;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-bottom:12px;
 }
-.dr-row:last-child{border-bottom:none}
-.dr-row:hover{background:var(--s2)}
-.dr-row-storno{opacity:.4}
-.dr-idx{
-  font-size:11px;font-weight:700;color:var(--border2);
-  font-family:var(--mono);text-align:right;
+.drc{
+  border:1px solid var(--border);border-radius:14px;
+  padding:14px;cursor:pointer;
+  transition:box-shadow .15s,transform .1s;
+  position:relative;overflow:hidden;
 }
-.dr-icon{
-  width:32px;height:32px;border-radius:50%;
+.drc:hover{box-shadow:0 4px 18px rgba(0,0,0,.1);transform:translateY(-1px)}
+.drc-storno{opacity:.4}
+.drc-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.drc-icon{
+  width:30px;height:30px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
-  font-size:11px;flex-shrink:0;
+  font-size:12px;flex-shrink:0;
 }
-.dr-icon-ein{background:rgba(93,157,105,.12);color:var(--green)}
-.dr-icon-aus{background:rgba(220,53,69,.12);color:var(--red)}
-.dr-body{flex:1;min-width:0}
-.dr-name{
+.drc-amt{
+  font-family:var(--mono);font-size:16px;font-weight:800;
+  line-height:1;
+}
+.drc-name{
   font-size:13px;font-weight:600;color:var(--text);
+  margin-bottom:4px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  margin-bottom:3px;
 }
-.dr-meta{
-  display:flex;align-items:center;gap:5px;flex-wrap:wrap;
-  font-size:11px;color:var(--sub);margin-bottom:5px;
+.drc-meta{
+  display:flex;gap:6px;align-items:center;
+  font-size:11px;color:var(--sub);margin-bottom:8px;
+  flex-wrap:wrap;
 }
-.dr-date{font-family:var(--mono)}
-.dr-dot{color:var(--border2)}
-.dr-kat{color:var(--sub)}
-.dr-bar-track{
-  height:3px;background:var(--border);border-radius:2px;overflow:hidden;
+.drc-kat{
+  background:var(--s3);border-radius:4px;
+  padding:1px 6px;font-size:10px;font-weight:600;color:var(--sub);
 }
-.dr-bar-fill{
-  height:100%;border-radius:2px;transition:width .4s ease;opacity:.7;
+.drc-bar-track{
+  height:3px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden;
 }
-.dr-amt{
-  font-family:var(--mono);font-size:14px;font-weight:700;
-  white-space:nowrap;flex-shrink:0;
-}
-.dr-amt-ein{color:var(--green)}
-.dr-amt-aus{color:var(--red)}
-
-/* Summary bar */
-.dr-summary{
-  display:flex;align-items:center;gap:0;
-  border-top:2px solid var(--border);
-  background:var(--s2);border-radius:0 0 14px 14px;
-  padding:10px 16px;flex-wrap:wrap;gap:8px;
-}
-.dr-summary-item{
-  display:flex;align-items:center;gap:8px;
-  font-size:12px;color:var(--sub);
-}
-.dr-summary-dot{
-  width:8px;height:8px;border-radius:50%;flex-shrink:0;
-}
-.dr-summary-sep{
-  width:1px;height:16px;background:var(--border);flex-shrink:0;
+.drc-bar-fill{
+  height:100%;border-radius:2px;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+  opacity:.6;
 }
 
-@media(max-width:768px){
-  .dr-list{ border-radius:12px; }
-  .dr-row{
-    grid-template-columns:36px 1fr auto;
-    gap:10px;padding:12px 14px;
-    align-items:flex-start;
-  }
-  .dr-idx{ display:none }
-  .dr-bar-track{ display:none }
-  .dr-meta{ gap:4px;margin-bottom:0 }
-  .dr-dot{ display:none }
-  /* Метаданные в одну строку: дата · категория */
-  .dr-kat::before{ content:'· ';color:var(--border2) }
-  .dr-name{ font-size:13px;margin-bottom:2px }
-  .dr-amt{ font-size:13px;padding-top:2px }
-  .dr-summary{ padding:10px 14px;gap:6px }
-  .dr-summary-sep{ display:none }
-  .dr-summary-item{ font-size:11px }
-  /* Скрываем способ оплаты и MwSt на мобиле */
-  .dr-meta .badge{ display:none }
+/* Summary */
+.drc-summary{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:14px;padding:14px 16px;
+}
+.drc-sum-item{display:flex;align-items:center;gap:10px}
+.drc-sum-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.drc-sum-lbl{font-size:11px;color:var(--sub);margin-bottom:2px}
+.drc-sum-val{font-family:var(--mono);font-size:14px;font-weight:700}
+.drc-sum-saldo{
+  display:flex;flex-direction:column;align-items:flex-end;
+  justify-content:center;
+  border-left:1px solid var(--border);padding-left:12px;
+}
+
+@media(max-width:900px){
+  .drc-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:480px){
-  .dr-row{ padding:10px 12px;gap:8px }
-  .dr-icon{ width:28px;height:28px;font-size:10px }
-  .dr-name{ font-size:12px }
-  .dr-amt{ font-size:12px }
-  .dr-meta{ font-size:10px }
+  .drc-grid{grid-template-columns:1fr}
+  .drc-summary{grid-template-columns:1fr 1fr;gap:8px}
+  .drc-sum-saldo{border-left:none;padding-left:0;align-items:flex-start;grid-column:1/-1;border-top:1px solid var(--border);padding-top:8px}
 }
+
 
 /* ── Vorjahresvergleich — новые блочные карточки ── */
 .vjm-legend{
