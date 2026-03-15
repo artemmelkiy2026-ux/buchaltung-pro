@@ -695,9 +695,10 @@ function getFiltered(){
       const q=document.getElementById('f-q').value.toLowerCase();
       if(j!=='Alle'&&!e.datum.startsWith(j))return false;
       if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;
-      if(q&&!e.beschreibung.toLowerCase().includes(q)
+      if(q&&!(e.beschreibung||'').toLowerCase().includes(q)
          &&!(e.kategorie||'').toLowerCase().includes(q)
-         &&!e.datum.includes(q))return false;
+         &&!e.datum.includes(q)
+         &&!(e.belegnr||'').includes(q))return false;
       return true;
     });
   }
@@ -711,7 +712,8 @@ function getFiltered(){
     // Поиск по описанию, категории И ДАТЕ
     if(q&&!(e.beschreibung||'').toLowerCase().includes(q)
        &&!(e.kategorie||'').toLowerCase().includes(q)
-       &&!e.datum.includes(q))return false;
+       &&!e.datum.includes(q)
+       &&!(e.belegnr||'').includes(q))return false;
     return true;
   });
 }
@@ -1170,6 +1172,10 @@ async function scanBeleg(base64, mediaType) {
       document.getElementById('nf-bet').value = parseFloat(result.betrag).toFixed(2);
       calcNfVorsteuer(); calcNfMwst();
     }
+    if (result.belegnr) {
+      const _bnEl = document.getElementById('nf-belegnr');
+      if(_bnEl) _bnEl.value = result.belegnr;
+    }
     if (result.beschreibung) {
       document.getElementById('nf-dsc').value = result.beschreibung;
     }
@@ -1363,7 +1369,8 @@ function parseBelegText(text) {
     const [y,mo,d] = result.datum.split('-');
     parts.push(`${d}.${mo}.${y}`);
   }
-  if (belegNr) parts.push(`Nr. ${belegNr}`);
+  // belegNr → отдельное поле, не в описание
+  result.belegnr = belegNr || '';
   result.beschreibung = parts.join(' · ');
 
   // ── 7. ARTIKELLISTE → Notiz ─────────────────────────────────────────────

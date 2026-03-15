@@ -21,6 +21,7 @@ function editE(e,id){
   document.getElementById('edit-bet').value=en.betrag;
   document.getElementById('edit-dsc').value=en.beschreibung;
   document.getElementById('edit-note').value=en.notiz||'';
+  const _editBnEl=document.getElementById('edit-belegnr'); if(_editBnEl) _editBnEl.value=en.belegnr||'';
   document.getElementById('edit-zahl').value=en.zahlungsart||'Überweisung';
   setEditTyp(en.typ, true);
   document.getElementById('edit-kat').value=en.kategorie;
@@ -78,6 +79,7 @@ async function saveEdit(){
     zahlungsart: normZahl(document.getElementById('edit-zahl').value),
     beschreibung: document.getElementById('edit-dsc').value.trim()||normKat(document.getElementById('edit-kat').value),
     notiz: document.getElementById('edit-note').value.trim(),
+    belegnr: document.getElementById('edit-belegnr')?.value.trim()||'',
     mwstBetrag: newMwstBetrag,
     vorsteuerBet: newVorsteuerBet,
     nettoBetrag: newNettoBetrag,

@@ -163,6 +163,7 @@ function renderJournal() {
                 <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${fd(e.datum)}</span>
               </div>
               <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3${link?';margin-bottom:4px':''}">
+                ${e.belegnr?`<span style="font-size:10px;font-weight:700;font-family:var(--mono);background:var(--blue);color:#fff;padding:1px 5px;border-radius:4px;margin-right:5px">Nr.${e.belegnr}</span>`:''}
                 ${e.beschreibung||e.kategorie||'—'}
               </div>
               ${link ? `<div>${link}</div>` : ''}

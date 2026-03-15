@@ -247,7 +247,7 @@ function exportCSVFormat(fmt) {
 
   entries.forEach(e => {
     rows.push([
-      fmtDate(e.datum), qv(e.typ), qv(e.kategorie), qv(e.beschreibung||''),
+      qv(e.belegnr||''), fmtDate(e.datum), qv(e.typ), qv(e.kategorie), qv(e.beschreibung||''),
       qv(e.zahlungsart||''), qv(e.notiz||''),
       fmtNum(e.typ==='Einnahme' ? e.betrag : -e.betrag),
       fmtNum(e.mwstBetrag||0)
@@ -370,7 +370,7 @@ async function exportPDF() {
     doc.setDrawColor(200,210,220); doc.line(pad,y,W-pad,y); y += 2;
 
     // Заголовок таблицы
-    const cols = ['Datum','Typ','Kategorie','Beschreibung','Zahlungsart','MwSt','Brutto'];
+    const cols = ['Beleg-Nr.','Datum','Typ','Kategorie','Beschreibung','Zahlungsart','MwSt','Brutto'];
     const cw   = [22,     20,   38,          80,            28,           22,    28];
     doc.setFillColor(241,245,249);
     doc.rect(pad,y,W-pad*2,6,'F');
