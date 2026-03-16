@@ -244,9 +244,6 @@ function _angAddPos(p={}) {
   list.appendChild(row);
   recalcAngSumme();
 }
-  list.appendChild(row);
-  recalcAngSumme();
-}
 
 function _angToggleRabatt(btn, typ) {
   const toggle = btn.closest('.ang-rabatt-toggle');
