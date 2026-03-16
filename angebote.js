@@ -3,7 +3,18 @@
 
 let editAngId = null;
 let angPage = 1;
+let angTabFilter = 'alle'; // текущая вкладка
 const ANG_PER_PAGE = 10;
+
+function setAngTab(tab) {
+  angTabFilter = tab;
+  angPage = 1;
+  // Обновляем активную вкладку
+  document.querySelectorAll('.ang-tab').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('ang-tab-' + tab);
+  if (btn) btn.classList.add('active');
+  renderAngebote();
+}
 
 const ANG_STATUS = {
   offen:      { label:'Offen',       icon:'fas fa-clock',        color:'var(--yellow)', bg:'rgba(251,191,36,.12)',  border:'rgba(251,191,36,.3)'  },
@@ -311,47 +322,47 @@ async function angZuRechnung(id) {
 function renderAngebote() {
   const em  = document.getElementById('ang-empty');
   const lst = document.getElementById('ang-list');
-  const cards = document.getElementById('ang-cards');
   if (!lst) return;
 
   const today = new Date().toISOString().split('T')[0];
   const angs  = data.angebote || [];
 
-  // Обновляем статус abgelaufen автоматически
+  // Автообновление статуса abgelaufen
   angs.forEach(a => {
     if (a.status === 'offen' && a.gueltig && a.gueltig < today) a.status = 'abgelaufen';
   });
 
-  const q = (document.getElementById('ang-search') || { value: '' }).value.toLowerCase();
-  let filtered = q
-    ? angs.filter(a => (a.nr || '').toLowerCase().includes(q) || (a.kunde || '').toLowerCase().includes(q))
-    : [...angs];
-  filtered.sort((a, b) => (b.datum || '').localeCompare(a.datum || ''));
+  // Фильтр по вкладке
+  const q = (document.getElementById('ang-search') || {value:''}).value.toLowerCase();
+  let filtered = angTabFilter === 'alle' ? [...angs] : angs.filter(a => a.status === angTabFilter);
+  if (q) filtered = filtered.filter(a =>
+    (a.nr||'').toLowerCase().includes(q) ||
+    (a.kunde||'').toLowerCase().includes(q) ||
+    (a.betreff||'').toLowerCase().includes(q)
+  );
+  filtered.sort((a, b) => (b.datum||'').localeCompare(a.datum||''));
 
-  // Statistik-Karten
-  const offen      = angs.filter(a => a.status === 'offen');
-  const angenommen = angs.filter(a => a.status === 'angenommen');
-  const abgelehnt  = angs.filter(a => a.status === 'abgelehnt' || a.status === 'abgelaufen');
-  if (cards) cards.innerHTML = `
-    <div class="sc y" style="cursor:default">
-      <div class="sc-lbl">Offen</div>
-      <div class="sc-val">${fmt(offen.reduce((s,a)=>s+a.betrag,0))}</div>
-      <div class="sc-sub">${offen.length} Angebot${offen.length!==1?'e':''}</div>
-    </div>
-    <div class="sc g" style="cursor:default">
-      <div class="sc-lbl">Angenommen</div>
-      <div class="sc-val">${fmt(angenommen.reduce((s,a)=>s+a.betrag,0))}</div>
-      <div class="sc-sub">${angenommen.length} Angebot${angenommen.length!==1?'e':''}</div>
-    </div>
-    <div class="sc r" style="cursor:default">
-      <div class="sc-lbl">Abgelehnt / Abgelaufen</div>
-      <div class="sc-val">${fmt(abgelehnt.reduce((s,a)=>s+a.betrag,0))}</div>
-      <div class="sc-sub">${abgelehnt.length} Angebot${abgelehnt.length!==1?'e':''}</div>
-    </div>`;
+  // Счётчики на вкладках
+  const counts = { alle: angs.length };
+  ['offen','angenommen','abgelehnt','abgelaufen'].forEach(s => {
+    counts[s] = angs.filter(a => a.status === s).length;
+  });
+  ['alle','offen','angenommen','abgelehnt','abgelaufen'].forEach(s => {
+    const btn = document.getElementById('ang-tab-' + s);
+    if (!btn) return;
+    const cnt = counts[s] || 0;
+    btn.textContent = (s === 'alle' ? 'Alle' :
+      s === 'offen' ? 'Offen' :
+      s === 'angenommen' ? 'Angenommen' :
+      s === 'abgelehnt' ? 'Abgelehnt' : 'Abgelaufen') + (cnt ? ` (${cnt})` : '');
+  });
 
   if (!filtered.length) {
-    lst.innerHTML = '';
-    if (em) em.style.display = 'block';
+    lst.innerHTML = `<div style="padding:40px;text-align:center;color:var(--sub);font-size:13px">
+      <i class="fas fa-file-alt" style="font-size:24px;margin-bottom:10px;display:block;opacity:.4"></i>
+      Keine Angebote vorhanden
+    </div>`;
+    if (em) em.style.display = 'none';
     document.getElementById('ang-pagination').innerHTML = '';
     return;
   }
@@ -359,37 +370,62 @@ function renderAngebote() {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ANG_PER_PAGE));
   if (angPage > totalPages) angPage = totalPages;
-  const items = filtered.slice((angPage - 1) * ANG_PER_PAGE, angPage * ANG_PER_PAGE);
+  const items = filtered.slice((angPage-1)*ANG_PER_PAGE, angPage*ANG_PER_PAGE);
 
-  // STATUS стили в ANG_STATUS
-
-  lst.innerHTML = items.map(a => {
+  lst.innerHTML = items.map((a, i) => {
     const st = ANG_STATUS[a.status] || ANG_STATUS.offen;
     const isExpiring = a.gueltig && a.gueltig > today && a.status === 'offen' &&
-      (new Date(a.gueltig) - new Date()) < 7 * 24 * 60 * 60 * 1000;
+      (new Date(a.gueltig) - new Date()) < 7*24*60*60*1000;
+    const betreff = a.betreff || a.positionen?.map(p=>p.bez).join(', ') || '—';
+    const bg = i % 2 === 0 ? '' : 'background:var(--s2)';
 
-    return `<div class="rech-card" onclick="editAng('${a.id}')">
-      <div class="rech-card-left">
-        <div class="rech-card-avatar" style="background:${st.bg};color:${st.color}">
-          <i class="${st.icon}"></i>
-        </div>
-        <div class="rech-card-info">
-          <div class="rech-card-nr">A-Nr. ${a.nr}</div>
-          <div class="rech-card-kunde">${a.kunde || '—'}</div>
-          <div class="rech-card-meta">
-            <span>${fd(a.datum)}</span>
-            ${a.gueltig ? `<span style="color:var(--sub)">·</span><span style="${isExpiring?'color:var(--yellow)':''}">Gültig bis ${fd(a.gueltig)}</span>` : ''}
-          </div>
-        </div>
-      </div>
-      <div class="rech-card-right">
-        <div class="rech-card-betrag">${fmt(a.betrag)}</div>
-        <div style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border}">
+    return `<div style="display:grid;grid-template-columns:140px 100px 1fr 120px 130px 40px;gap:0;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;${bg}"
+      onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='${i%2===0?'':'var(--s2)'}'"
+      onclick="editAng('${a.id}')">
+
+      <!-- Status пилюля -->
+      <div style="display:flex;align-items:center">
+        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border}">
           <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
-        </div>
-        <div class="rech-card-actions" onclick="event.stopPropagation()">
-          ${a.status==='offen'||a.status==='abgelaufen' ? `<button class="rca-btn rca-green" onclick="angZuRechnung('${a.id}')" title="In Rechnung umwandeln"><i class="fas fa-file-invoice"></i></button>` : ''}
-          <button class="rca-btn" onclick="delAngebot('${a.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+        </span>
+      </div>
+
+      <!-- Nr -->
+      <div style="display:flex;align-items:center;font-size:13px;font-weight:600;font-family:var(--mono);color:var(--blue)">
+        ${a.nr || '—'}
+      </div>
+
+      <!-- Kunde / Betreff -->
+      <div style="display:flex;flex-direction:column;justify-content:center;min-width:0">
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.kunde || '—'}</div>
+        <div style="font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${betreff}</div>
+      </div>
+
+      <!-- Datum -->
+      <div style="display:flex;align-items:center;font-size:13px;color:var(--sub)">
+        ${isExpiring ? `<span style="color:var(--yellow);font-size:11px;margin-right:4px" title="Läuft bald ab"><i class="fas fa-exclamation-triangle"></i></span>` : ''}
+        ${fd(a.datum)}
+      </div>
+
+      <!-- Betrag -->
+      <div style="display:flex;align-items:center;justify-content:flex-end;font-size:13px;font-weight:700;font-family:var(--mono)">
+        ${fmt(a.betrag)}
+      </div>
+
+      <!-- Aktionen ⋯ -->
+      <div style="display:flex;align-items:center;justify-content:center" onclick="event.stopPropagation()">
+        <button class="del-btn" style="width:28px;height:28px;border-radius:6px;font-size:14px;position:relative"
+          onclick="toggleAngMenu('${a.id}',this)">⋯</button>
+        <div id="ang-menu-${a.id}" style="display:none;position:absolute;right:40px;background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:500;min-width:200px;padding:4px">
+          <div class="ang-menu-item" onclick="editAng('${a.id}')"><i class="fas fa-edit"></i> Dokument bearbeiten</div>
+          <div class="ang-menu-item" onclick="printAngebot('${a.id}')"><i class="fas fa-eye"></i> Vorschau / Drucken</div>
+          <div style="height:1px;background:var(--border);margin:4px 0"></div>
+          <div class="ang-menu-item" onclick="angSetStatus('${a.id}','angenommen')"><i class="fas fa-check-circle" style="color:var(--green)"></i> Auftrag erhalten</div>
+          <div class="ang-menu-item" onclick="angSetStatus('${a.id}','abgelehnt')"><i class="fas fa-times-circle" style="color:var(--red)"></i> Auftrag abgelehnt</div>
+          <div style="height:1px;background:var(--border);margin:4px 0"></div>
+          <div class="ang-menu-item" onclick="angZuRechnung('${a.id}')"><i class="fas fa-file-invoice" style="color:var(--blue)"></i> Rechnung erzeugen</div>
+          <div style="height:1px;background:var(--border);margin:4px 0"></div>
+          <div class="ang-menu-item" style="color:var(--red)" onclick="delAngebot('${a.id}')"><i class="fas fa-trash"></i> Löschen</div>
         </div>
       </div>
     </div>`;
@@ -397,6 +433,35 @@ function renderAngebote() {
 
   window._angPagerCb = function(p) { angPage = p; renderAngebote(); };
   renderPager('ang-pagination', angPage, totalPages, filtered.length, '_angPagerCb');
+}
+
+// Переключение статуса из меню
+function angSetStatus(id, status) {
+  const a = (data.angebote||[]).find(x=>x.id===id);
+  if(!a) return;
+  a.status = status;
+  sbSaveAngebot(a);
+  closeAllAngMenus();
+  renderAngebote();
+  const st = ANG_STATUS[status]||ANG_STATUS.offen;
+  toast(`Angebot ${a.nr}: ${st.label}`, 'ok');
+}
+
+// Открываем/закрываем контекстное меню
+function toggleAngMenu(id, btn) {
+  closeAllAngMenus();
+  const menu = document.getElementById('ang-menu-' + id);
+  if (!menu) return;
+  menu.style.display = 'block';
+  // Позиционируем
+  const rect = btn.getBoundingClientRect();
+  menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+  menu.style.right = (window.innerWidth - rect.right) + 'px';
+  menu.style.position = 'fixed';
+  setTimeout(() => document.addEventListener('click', closeAllAngMenus, {once:true}), 10);
+}
+function closeAllAngMenus() {
+  document.querySelectorAll('[id^="ang-menu-"]').forEach(m => m.style.display = 'none');
 }
 
 function angZuRechnungFromModal() {
@@ -408,7 +473,19 @@ function angZuRechnungFromModal() {
 }
 
 // ── VORSCHAU / DRUCK ──────────────────────────────────────────
-function printAngebot() {
+function printAngebot(id) {
+  // Если вызван из списка по id — открываем форму и печатаем
+  if (id) {
+    const a = (data.angebote||[]).find(x=>x.id===id);
+    if (!a) return;
+    // Печатаем напрямую из объекта
+    _printAngebotFromData(a);
+    return;
+  }
+  // Иначе читаем из открытой формы
+  _printAngebotFromForm();
+}
+function _printAngebotFromForm() {
   const nr      = document.getElementById('ang-nr')?.value || '—';
   const datum   = document.getElementById('ang-dat')?.value || '';
   const gueltig = document.getElementById('ang-gueltig')?.value || '';
@@ -508,6 +585,51 @@ function printAngebot() {
     <tr class="total-row"><td>Gesamt</td><td style="text-align:right;color:#1a4578">${brutto}</td></tr>
   </table>
   ${fuss ? `<div class="fuss">${fuss}</div>` : ''}
+  </body></html>`;
+
+  const w = window.open('','_blank','width=860,height=700');
+  if(w){ w.document.write(html); w.document.close(); w.focus(); setTimeout(()=>w.print(),400); }
+}
+
+function _printAngebotFromData(a) {
+  let firma = {};
+  try { firma = JSON.parse(localStorage.getItem('bp_firma')||'{}'); } catch(e){}
+  const firmaName = firma.name || 'Mein Unternehmen';
+  const firmaAdr  = [firma.strasse, firma.plz&&firma.ort?firma.plz+' '+firma.ort:''].filter(Boolean).join(', ');
+
+  const rows = (a.positionen||[]).map(p => `<tr>
+    <td style="padding:8px 10px">${p.bez||''}</td>
+    <td style="padding:8px 10px;text-align:center">${p.menge||1}</td>
+    <td style="padding:8px 10px;text-align:center">${p.einheit||'Stk.'}</td>
+    <td style="padding:8px 10px;text-align:right">${fmt(p.netto)} €</td>
+    <td style="padding:8px 10px;text-align:center">${p.rate||0}%</td>
+    <td style="padding:8px 10px;text-align:right;font-weight:600">${fmt(p.brutto * (p.menge||1))}</td>
+  </tr>`).join('');
+
+  const netto  = r2((a.positionen||[]).reduce((s,p)=>s+(p.menge||1)*p.netto,0));
+  const brutto = a.betrag;
+  const mwst   = r2(brutto - netto);
+
+  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
+  <title>Angebot ${a.nr}</title>
+  <style>body{font-family:Arial,sans-serif;font-size:13px;color:#222;padding:32px;max-width:800px;margin:0 auto}
+  h1{font-size:22px;font-weight:700;margin:0 0 4px}table{width:100%;border-collapse:collapse;margin:16px 0}
+  thead tr{background:#f5f7fa}th{padding:8px 10px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;color:#555;border-bottom:2px solid #e5e7eb}
+  td{border-bottom:1px solid #f0f0f0}.totals{margin-left:auto;width:260px}.totals td{padding:5px 10px;border:none}
+  .total-row{font-size:15px;font-weight:800;border-top:2px solid #222}</style></head><body>
+  <div style="display:flex;justify-content:space-between;margin-bottom:24px">
+    <div><div style="font-size:20px;font-weight:800;color:#1a4578">${firmaName}</div><div style="color:#666;font-size:12px">${firmaAdr}</div></div>
+    <div style="text-align:right"><h1>Angebot</h1><div style="color:#666;font-size:12px">Nr. <strong>${a.nr||'—'}</strong> · ${fd(a.datum)}</div></div>
+  </div>
+  <div style="margin-bottom:20px"><div style="font-weight:600">${a.kunde||'—'}</div><div style="color:#555;white-space:pre-line">${a.adresse||''}</div></div>
+  ${a.betreff ? `<div style="margin-bottom:16px"><strong>Betreff:</strong> ${a.betreff}</div>` : ''}
+  ${a.kopftext ? `<div style="margin-bottom:20px;line-height:1.6">${(a.kopftext||'').replace(/\n/g,'<br>')}</div>` : ''}
+  <table><thead><tr><th>Leistung</th><th style="text-align:center">Menge</th><th style="text-align:center">Einh.</th><th style="text-align:right">Preis</th><th style="text-align:center">USt.</th><th style="text-align:right">Betrag</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <table class="totals"><tr><td style="color:#666">Netto</td><td style="text-align:right">${fmt(netto)}</td></tr>
+  <tr><td style="color:#666">MwSt.</td><td style="text-align:right">${fmt(mwst)}</td></tr>
+  <tr class="total-row"><td>Gesamt</td><td style="text-align:right;color:#1a4578">${fmt(brutto)}</td></tr></table>
+  ${a.fusstext ? `<div style="margin-top:24px;color:#555;line-height:1.6;border-top:1px solid #e5e7eb;padding-top:16px">${(a.fusstext||'').replace(/\n/g,'<br>')}</div>` : ''}
   </body></html>`;
 
   const w = window.open('','_blank','width=860,height=700');

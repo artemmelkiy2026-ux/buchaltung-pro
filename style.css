@@ -2378,3 +2378,40 @@ input, select, textarea {
   font-weight: 600;
   padding-right: 4px;
 }
+
+/* ── ANGEBOTE TABS (SevDesk style) ─────────────────────────── */
+.ang-tab {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sub);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.ang-tab:hover { color: var(--text); }
+.ang-tab.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  font-weight: 600;
+}
+
+/* Пункты контекстного меню */
+.ang-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 7px;
+  transition: background .12s;
+  color: var(--text);
+}
+.ang-menu-item:hover { background: var(--s2); }
+.ang-menu-item i { width: 16px; text-align: center; font-size: 13px; }

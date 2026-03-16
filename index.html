@@ -2253,28 +2253,47 @@
 <!-- ── ANGEBOTE ── -->
 <div class="page" id="p-angebote">
 <div class="page-inner">
+  <!-- Шапка -->
   <div class="ph">
     <div class="ph-left">
       <div class="ph-title">Angebote</div>
-      <div class="ph-sub">Angebote erstellen und verwalten</div>
     </div>
     <div class="ph-right">
-      <button class="btn primary" onclick="openAngebotModal()"><i class="fas fa-plus"></i> Neues Angebot</button>
+      <button class="btn primary" onclick="openAngebotModal()" style="padding:9px 18px;font-size:13px;font-weight:600">
+        <i class="fas fa-plus"></i> Angebot erstellen
+      </button>
     </div>
   </div>
 
-  <!-- Suchleiste -->
-  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
-    <input type="text" id="ang-search" placeholder="Suche nach Nr., Kunde..." oninput="renderAngebote()"
-      style="flex:1;min-width:180px;padding:8px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:13px">
+  <!-- Вкладки фильтры как SevDesk -->
+  <div style="display:flex;align-items:center;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px">
+    <button class="ang-tab active" id="ang-tab-alle"      onclick="setAngTab('alle')"      >Alle</button>
+    <button class="ang-tab"        id="ang-tab-offen"     onclick="setAngTab('offen')"     >Offen</button>
+    <button class="ang-tab"        id="ang-tab-angenommen" onclick="setAngTab('angenommen')">Angenommen</button>
+    <button class="ang-tab"        id="ang-tab-abgelehnt" onclick="setAngTab('abgelehnt')" >Abgelehnt</button>
+    <button class="ang-tab"        id="ang-tab-abgelaufen" onclick="setAngTab('abgelaufen')">Abgelaufen</button>
+    <div style="margin-left:auto;padding-bottom:2px">
+      <input type="text" id="ang-search" placeholder="Suchen..." oninput="renderAngebote()"
+        style="padding:6px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:13px;width:200px">
+    </div>
   </div>
 
-  <!-- Statistik-Karten -->
-  <div id="ang-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"></div>
+  <!-- Таблица как SevDesk -->
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+    <!-- Заголовок таблицы -->
+    <div style="display:grid;grid-template-columns:140px 100px 1fr 120px 130px 40px;gap:0;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--s2)">
+      <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Status</div>
+      <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Nr.</div>
+      <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Kunde / Betreff</div>
+      <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Datum</div>
+      <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;text-align:right">Betrag (Brutto)</div>
+      <div></div>
+    </div>
+    <!-- Строки -->
+    <div id="ang-list"></div>
+  </div>
 
-  <!-- Liste -->
-  <div id="ang-list"></div>
-  <div id="ang-pagination"></div>
+  <div id="ang-pagination" style="margin-top:12px"></div>
   <div id="ang-empty" class="empty-state" style="display:none">
     <div class="ei"><i class="fas fa-file-alt"></i></div>
     <p>Keine Angebote vorhanden</p>
