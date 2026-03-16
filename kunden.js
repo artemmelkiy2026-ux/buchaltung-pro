@@ -69,6 +69,7 @@ function renderWied(){
         </div>
         <div class="wied-card-actions">
           <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
+          <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
           <button class="rca-btn" onclick="delWied('${w.id}')" title="Vorlage löschen"><i class="fas fa-trash"></i></button>
         </div>
       </div>
@@ -96,12 +97,46 @@ function setWiedTyp(t){
   document.getElementById('wied-btn-a').className='tt'+(t==='Ausgabe'?' aa':'');
   document.getElementById('wied-kat').innerHTML=(t==='Einnahme'?KE:KA).map(k=>`<option value="${k}">${k}</option>`).join('');
 }
+let editWiedId = null;
+
 function openWiedModal(){
+  editWiedId = null;
   wiedTyp='Ausgabe';
   setWiedTyp('Ausgabe');
   document.getElementById('wied-dsc').value='';
   document.getElementById('wied-bet').value='';
   document.getElementById('wied-ab').value=new Date().toISOString().split('T')[0];
+  document.getElementById('wied-kat').value='';
+  document.getElementById('wied-int').value='monatlich';
+  document.getElementById('wied-zahl').value='Überweisung';
+  const hdr = document.getElementById('wied-modal-title');
+  if(hdr) hdr.textContent = 'Wiederkehrende Zahlung';
+  openModal('wied-modal');
+}
+
+function editWied(id){
+  const w = (data.wiederkehrend||[]).find(x=>x.id===id);
+  if(!w) return;
+  editWiedId = id;
+  // Тип
+  wiedTyp = w.typ||'Ausgabe';
+  setWiedTyp(wiedTyp);
+  // Поля
+  document.getElementById('wied-dsc').value = w.bezeichnung||w.beschreibung||'';
+  document.getElementById('wied-bet').value = w.betrag||'';
+  document.getElementById('wied-ab').value  = w.naechste||'';
+  // Категория
+  const katSel = document.getElementById('wied-kat');
+  if(katSel){ [...katSel.options].forEach(o=>{ if(o.value===w.kategorie) o.selected=true; }); }
+  // Интервал
+  const intSel = document.getElementById('wied-int');
+  if(intSel) intSel.value = w.intervall||'monatlich';
+  // Zahlungsart
+  const zahlSel = document.getElementById('wied-zahl');
+  if(zahlSel) zahlSel.value = w.zahlungsart||'Überweisung';
+  // Заголовок
+  const hdr = document.getElementById('wied-modal-title');
+  if(hdr) hdr.textContent = 'Vorlage bearbeiten';
   openModal('wied-modal');
 }
 function saveWied(){
@@ -110,16 +145,27 @@ function saveWied(){
   const ab=document.getElementById('wied-ab').value;
   if(!bez||!betrag||!ab)return toast('Alle Felder ausfüllen!','err');
   if(!data.wiederkehrend)data.wiederkehrend=[];
-  const newW={
-    id:Date.now()+'_'+Math.random().toString(36).slice(2,6),bezeichnung:bez,typ:wiedTyp,betrag,
+  const obj={
+    bezeichnung:bez, typ:wiedTyp, betrag,
     kategorie:normKat(document.getElementById('wied-kat').value),
     zahlungsart:normZahl(document.getElementById('wied-zahl').value),
     intervall:document.getElementById('wied-int').value,
     naechste:ab
   };
-  data.wiederkehrend.push(newW);
-  sbSaveWied(newW);
-  renderWied();closeModal('wied-modal');toast('✓ Vorlage gespeichert!','ok');
+  if(editWiedId){
+    // Редактирование
+    const w=data.wiederkehrend.find(x=>x.id===editWiedId);
+    if(w){ Object.assign(w, obj); sbSaveWied(w); }
+    editWiedId=null;
+    toast('✓ Vorlage aktualisiert!','ok');
+  } else {
+    // Новая запись
+    const newW={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj};
+    data.wiederkehrend.push(newW);
+    sbSaveWied(newW);
+    toast('✓ Vorlage gespeichert!','ok');
+  }
+  renderWied(); closeModal('wied-modal');
 }
 function wBuchenCore(id){
   // Только данные — без renderAll/renderWied
