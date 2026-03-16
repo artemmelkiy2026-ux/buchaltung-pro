@@ -2428,3 +2428,74 @@ input, select, textarea {
   width: 100%;
   flex: 1;
 }
+
+/* ── ANGEBOTE ────────────────────────────────────────────── */
+.ang-badge-offen     { background:var(--ydim); color:var(--yellow); }
+.ang-badge-angenommen{ background:var(--gdim); color:var(--green);  }
+.ang-badge-abgelehnt { background:var(--rdim); color:var(--red);    }
+.ang-badge-abgelaufen{ background:rgba(148,163,184,.12); color:var(--sub); }
+
+.ang-badge-offen-pill,.ang-badge-angenommen-pill,.ang-badge-abgelehnt-pill,.ang-badge-abgelaufen-pill {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
+}
+.ang-badge-offen-pill     { background:var(--ydim); color:var(--yellow); }
+.ang-badge-angenommen-pill{ background:var(--gdim); color:var(--green);  }
+.ang-badge-abgelehnt-pill { background:var(--rdim); color:var(--red);    }
+.ang-badge-abgelaufen-pill{ background:rgba(148,163,184,.12); color:var(--sub); }
+
+/* Строка позиции */
+.ang-pos-row {
+  display: grid;
+  grid-template-columns: 3fr 70px 70px 100px 80px 60px 80px 28px;
+  gap: 6px;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.ang-pos-row input, .ang-pos-row select {
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--s2);
+  color: var(--text);
+  width: 100%;
+  box-sizing: border-box;
+}
+.ang-pos-betrag {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding-right: 4px;
+}
+
+/* Секция-заголовок */
+.ang-section-label {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--sub);
+  margin: 0 0 8px 0;
+}
+.ang-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin-left: 10px;
+}
+
+/* Мобильный — позиции в одну колонку */
+@media (max-width: 768px) {
+  .ang-pos-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 10px 0;
+  }
+  .ang-pos-row input:first-child { grid-column: 1 / -1; }
+}

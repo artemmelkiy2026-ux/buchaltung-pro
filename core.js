@@ -82,6 +82,7 @@ window.addEventListener('supabase-ready', () => {
   }
   // Инициализация
   if (!data.eintraege)    data.eintraege = [];
+  if (!data.angebote)     data.angebote = [];
   if (!data.rechnungen)   data.rechnungen = [];
   if (!data.kunden)       data.kunden = [];
   if (!data.ustEintraege) data.ustEintraege = [];
@@ -132,7 +133,7 @@ function toggleNavGroup(groupId, headerId) {
 
 // Открываем группу Aufträge при переходе в Angebote / Rechnungen / Wiederkehrend
 function openNavGroupIfNeeded(id) {
-  if (['rechnungen'].includes(id)) {
+  if (['angebote','angebote-form','rechnungen'].includes(id)) {
     const group  = document.getElementById('auftraege-group');
     const header = document.getElementById('auftraege-header');
     if (group && !group.classList.contains('open')) {
@@ -233,6 +234,8 @@ function nav(id, el){
   if(id==='journal') renderJournal();
   if(id==='prognose') renderProg();
   if(id==='kategorien') renderKat();
+  if(id==='angebote') renderAngebote();
+  if(id==='angebote-form') { updateAngBanner(); recalcAngSumme(); }
   if(id==='rechnungen') renderRech();
   if(id==='kunden') renderKunden();
   if(id==='ust') renderUst();
