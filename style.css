@@ -2025,16 +2025,18 @@ input, select, textarea {
   .rech-card-actions { flex-wrap: wrap; gap: 4px; }
 }
 
-/* Sticky шапка */
+/* Шапка форм — единый стиль как .ph */
 .ang-sticky-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  background: var(--bg);
+  gap: 16px;
+  padding: 20px 20px 14px;
   border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
   flex-shrink: 0;
-  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -2049,20 +2051,19 @@ input, select, textarea {
   font-size: 22px;
   font-weight: 700;
   color: var(--text);
+  line-height: 1.2;
   letter-spacing: -.3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .ang-sticky-right {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 .ang-back-btn { padding: 7px 12px; }
 
-/* Прокручиваемое тело */
+/* Прокручиваемое тело — убираем margin-top так как шапка уже даёт margin-bottom */
 .ang-form-body {
   flex: 1;
   overflow-y: auto;
