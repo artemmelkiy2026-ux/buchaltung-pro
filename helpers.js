@@ -1474,3 +1474,19 @@ function setUstRate(id, rate, callbackName) {
 }
 
 // posRateChanged для rechnungen — читает hidden input вместо select
+
+// ── USt Flag Dropdown (общая для позиций Angebot и Rechnung) ─────────────
+function toggleAngUstDropdown(btn) {
+  const panel = btn.closest('.ust-flag-wrap').querySelector('.ust-flag-panel');
+  const isOpen = panel.style.display !== 'none';
+  document.querySelectorAll('.ust-flag-panel').forEach(p => p.style.display = 'none');
+  if (!isOpen) {
+    panel.style.display = 'block';
+    setTimeout(() => document.addEventListener('click', function h(e) {
+      if (!btn.closest('.ust-flag-wrap').contains(e.target)) {
+        panel.style.display = 'none';
+        document.removeEventListener('click', h);
+      }
+    }), 0);
+  }
+}

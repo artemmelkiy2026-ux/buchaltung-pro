@@ -637,21 +637,6 @@ function openAngProduktModal() {
 }
 
 // ── USt Flag Dropdown (Angebot positions) ─────────────────────────────────
-function toggleAngUstDropdown(btn) {
-  const panel = btn.closest('.ust-flag-wrap').querySelector('.ust-flag-panel');
-  const isOpen = panel.style.display !== 'none';
-  // close all open panels first
-  document.querySelectorAll('.ust-flag-panel').forEach(p => p.style.display = 'none');
-  if (!isOpen) {
-    panel.style.display = 'block';
-    setTimeout(() => document.addEventListener('click', function h(e) {
-      if (!panel.contains(e.target) && e.target !== btn) {
-        panel.style.display = 'none';
-        document.removeEventListener('click', h);
-      }
-    }), 0);
-  }
-}
 
 function setAngUstRate(el, rate) {
   const wrap = el.closest('.ust-flag-wrap');

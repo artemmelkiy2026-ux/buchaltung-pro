@@ -86,7 +86,10 @@ function openProduktModal(id) {
   document.getElementById('ap-einheit').value     = p?.einheit || 'Stk';
   document.getElementById('ap-artnr').value       = p?.artnr || '';
   document.getElementById('ap-kategorie').value   = p?.kategorie || 'Artikel';
-  document.getElementById('ap-ust').value         = p?.ust ?? 19;
+  const apUstVal = p?.ust ?? 19;
+  document.getElementById('ap-ust').value         = apUstVal;
+  const apUstLbl = document.getElementById('ap-ust-label');
+  if (apUstLbl) apUstLbl.textContent = apUstVal + '%';
   document.getElementById('ap-ek-netto').value    = p?.ekNetto || '';
   document.getElementById('ap-vk-netto').value    = p?.vkNetto || '';
   document.getElementById('ap-ek-brutto').value   = p?.ekBrutto || '';
