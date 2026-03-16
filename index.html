@@ -150,6 +150,7 @@
   <!-- Kontakte -->
   <div class="sidebar-section">Kontakte</div>
   <div class="nav-item" onclick="nav('kunden',this)"><span class="ic"><i class="fas fa-address-book"></i></span> Kunden (CRM)</div>
+  <div class="nav-item" onclick="nav('produkte',this)"><span class="ic"><i class="fas fa-box"></i></span> Produkte &amp; Leistungen</div>
   <div class="nav-divider"></div>
 
   <!-- Auswertung -->
@@ -911,6 +912,42 @@
     </div>
 
   </div>
+</div>
+
+<!-- ── PRODUKTE & LEISTUNGEN ── -->
+<div class="page" id="p-produkte">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Produkte &amp; Leistungen</div>
+      <div class="ph-sub">Artikel, Dienstleistungen und Preise</div>
+    </div>
+    <div class="ph-right">
+      <input type="text" id="produkte-search" placeholder="Suchen..." oninput="renderProdukte()"
+        style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:13px;outline:none;width:200px">
+      <button class="btn primary" onclick="openProduktModal()"><i class="fas fa-plus"></i> Neues Produkt</button>
+    </div>
+  </div>
+
+  <!-- Статы -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="produkte-stats"></div>
+
+  <!-- Фильтр -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+    <button class="ftab active" onclick="setProdFilter('alle',this)">Alle</button>
+    <button class="ftab" onclick="setProdFilter('Artikel',this)"><i class="fas fa-box"></i> Artikel</button>
+    <button class="ftab" onclick="setProdFilter('Dienstleistung',this)"><i class="fas fa-tools"></i> Dienstleistung</button>
+    <button class="ftab" onclick="setProdFilter('Sonstiges',this)"><i class="fas fa-ellipsis-h"></i> Sonstiges</button>
+  </div>
+
+  <!-- Список -->
+  <div id="produkte-list"></div>
+  <div id="produkte-empty" class="empty-state" style="display:none">
+    <div class="ei"><i class="fas fa-box-open"></i></div>
+    <p>Noch keine Produkte oder Leistungen</p>
+    <button class="btn primary" onclick="openProduktModal()"><i class="fas fa-plus"></i> Erstes Produkt anlegen</button>
+  </div>
+</div>
 </div>
 
 <!-- ── RECHNUNGEN ── -->
@@ -1783,6 +1820,7 @@
 <script src="reports.js"></script>
 <script src="rechnungen.js"></script>
 <script src="angebote.js"></script>
+<script src="produkte.js"></script>
 <script src="kunden.js"></script>
 <script src="journal.js"></script>
 <script src="umsatzsteuer.js"></script>

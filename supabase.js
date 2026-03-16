@@ -64,7 +64,7 @@ async function sbLoadAll() {
   if (!currentUser) return null;
   const uid = currentUser.id;
   try {
-  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang] = await Promise.all([
+  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang, prod] = await Promise.all([
     sb.from('eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('kunden').select('*').eq('user_id', uid).order('name'),
     sb.from('rechnungen').select('*').eq('user_id', uid).order('datum', { ascending: false }),
@@ -73,6 +73,7 @@ async function sbLoadAll() {
     sb.from('ust_mode').select('*').eq('user_id', uid),
     sb.from('ust_eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('angebote').select('*').eq('user_id', uid).order('datum', { ascending: false }),
+    sb.from('produkte').select('*').eq('user_id', uid).order('name'),
   ]);
   const eintraege     = (ein.data  || []).map(dbToEintrag);
   // GoBD: восстанавливаем _storniert для оригиналов после перезагрузки
@@ -88,11 +89,12 @@ async function sbLoadAll() {
   const rechLog = await sb.from('rechnungen_log').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(500);
   const rechnungenLog = (rechLog.data || []);  // error игнорируем — таблица может не существовать
   const angebote = (ang && !ang.error && ang.data) ? ang.data.map(dbToAngebot) : [];
-  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog };
+  const produkte = (prod && !prod.error && prod.data) ? prod.data.map(dbToProdukt) : [];
+  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog, produkte };
   } catch(err) {
     console.error('[sbLoadAll error]', err);
     // Возвращаем пустые данные — не теряем приложение
-    return { eintraege:[], kunden:[], rechnungen:[], angebote:[], wiederkehrend:[], ustModeByYear:{}, ustEintraege:[], rechnungenLog:[] };
+    return { eintraege:[], kunden:[], rechnungen:[], angebote:[], wiederkehrend:[], ustModeByYear:{}, ustEintraege:[], rechnungenLog:[], produkte:[] };
   }
 }
 
@@ -265,6 +267,57 @@ async function sbSaveKunde(k) {
 async function sbDeleteKunde(id) {
   if (!currentUser) return;
   await sb.from('kunden').delete().eq('id',id).eq('user_id',currentUser.id);
+}
+
+// ── PRODUKTE ──────────────────────────────────────────────────────────────
+function produktToDb(p) {
+  return {
+    id:           p.id,
+    user_id:      currentUser.id,
+    name:         p.name || '',
+    artnr:        p.artnr || '',
+    einheit:      p.einheit || 'Stk',
+    kategorie:    p.kategorie || 'Artikel',
+    ust:          p.ust ?? 19,
+    ek_netto:     p.ekNetto || 0,
+    vk_netto:     p.vkNetto || 0,
+    ek_brutto:    p.ekBrutto || 0,
+    vk_brutto:    p.vkBrutto || 0,
+    beschreibung: p.beschreibung || '',
+    bemerkung:    p.bemerkung || '',
+    updated_at:   new Date().toISOString(),
+  };
+}
+function dbToProdukt(r) {
+  return {
+    id:          r.id,
+    name:        r.name || '',
+    artnr:       r.artnr || '',
+    einheit:     r.einheit || 'Stk',
+    kategorie:   r.kategorie || 'Artikel',
+    ust:         parseFloat(r.ust) || 0,
+    ekNetto:     parseFloat(r.ek_netto) || 0,
+    vkNetto:     parseFloat(r.vk_netto) || 0,
+    ekBrutto:    parseFloat(r.ek_brutto) || 0,
+    vkBrutto:    parseFloat(r.vk_brutto) || 0,
+    beschreibung:r.beschreibung || '',
+    bemerkung:   r.bemerkung || '',
+  };
+}
+async function sbLoadProdukte() {
+  if (!currentUser) return [];
+  const { data, error } = await sb.from('produkte').select('*').eq('user_id', currentUser.id).order('name');
+  if (error) { console.error('Load produkte:', error); return []; }
+  return (data || []).map(dbToProdukt);
+}
+async function sbSaveProdukt(p) {
+  if (!currentUser) return;
+  const { error } = await sb.from('produkte').upsert(produktToDb(p), { onConflict: 'id' });
+  if (error) console.error('Save produkt:', error);
+}
+async function sbDeleteProdukt(id) {
+  if (!currentUser) return;
+  await sb.from('produkte').delete().eq('id', id).eq('user_id', currentUser.id);
 }
 // ── RECHNUNGEN-LOG (GoBD Variant B) ──────────────────────────────────────
 // Записывает каждое изменение рекоманды в отдельную таблицу rechnungen_log
