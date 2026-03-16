@@ -225,7 +225,7 @@ function _angAddPos(p={}) {
   const row = document.createElement('div');
   row.className = 'ang-pos-row';
   row.innerHTML = `
-    <input type="text" class="ang-f-bez" placeholder="Beschreibung" value="${p.bez||''}" oninput="recalcAngSumme()">
+    <input type="text" class="ang-f-bez" placeholder="Beschreibung" value="${p.bez||''}" oninput="recalcAngSumme();angBezSearch(this)" onfocus="angBezSearch(this)">
     <input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="recalcAngSumme()">
     <input type="text" placeholder="Stk." value="${p.einheit||'Stk.'}">
     <input type="number" placeholder="0,00" value="${preis}" min="0" step="0.01" oninput="recalcAngSumme()">
@@ -516,4 +516,121 @@ function angDruck(id) {
   ${a.fusstext?`<div style="margin-top:24px;color:#555;line-height:1.6;border-top:1px solid #e5e7eb;padding-top:16px">${(a.fusstext).replace(/\n/g,'<br>')}</div>`:''}
   </body></html>`);
   w.document.close(); w.focus(); setTimeout(()=>w.print(),400);
+}
+
+// ── PRODUKT AUTOCOMPLETE в строке позиции ────────────────────────────────────
+let _angCurBezInput = null;
+
+function angBezSearch(input) {
+  _angCurBezInput = input;
+  const q = input.value.trim().toLowerCase();
+  let sug = input._sug;
+  if (!sug) {
+    sug = document.createElement('div');
+    sug.className = 'ang-bez-suggest';
+    input.parentElement.style.position = 'relative';
+    input.parentElement.appendChild(sug);
+    input._sug = sug;
+    document.addEventListener('click', e => {
+      if (!sug.contains(e.target) && e.target !== input) sug.style.display = 'none';
+    }, { once: false });
+  }
+  const produkte = data.produkte || [];
+  const matches = q.length < 1 ? produkte.slice(0,8)
+    : produkte.filter(p => (p.name||'').toLowerCase().includes(q)).slice(0,8);
+
+  sug.innerHTML = matches.map(p => `
+    <div class="ang-bez-suggest-item" onclick="angBezSelect(this.closest('.ang-pos-row'),${JSON.stringify(p)})">
+      <div style="font-weight:600">${p.name}</div>
+      ${p.artnr ? `<div style="font-size:11px;color:var(--sub)">Art.-Nr. ${p.artnr}</div>` : ''}
+    </div>`).join('') +
+    `<div class="ang-bez-suggest-new" onclick="openAngProduktModal('${input.closest('.ang-pos-row')?.dataset.id||''}')">
+      <i class="fas fa-plus-circle"></i> Neues Produkt erstellen
+    </div>`;
+  sug.style.display = 'block';
+}
+
+function angBezSelect(row, p) {
+  if (!row) return;
+  const inputs = row.querySelectorAll('input');
+  // bez
+  inputs[0].value = p.name || '';
+  // menge stays
+  // einheit
+  const einInput = row.querySelectorAll('input[type=text]')[1];
+  if (einInput) einInput.value = p.einheit || 'Stk.';
+  // preis
+  const numInputs = row.querySelectorAll('input[type=number]');
+  if (numInputs[1]) numInputs[1].value = p.vkNetto || p.vkBrutto || '';
+  // ust
+  const sel = row.querySelector('select');
+  if (sel && p.ust != null) sel.value = p.ust;
+  // hide suggest
+  if (inputs[0]._sug) inputs[0]._sug.style.display = 'none';
+  recalcAngSumme();
+}
+
+// ── MODAL: NEUES PRODUKT ─────────────────────────────────────────────────────
+let _angProduktTargetRow = null;
+
+function openAngProduktModal(rowId) {
+  _angProduktTargetRow = rowId;
+  const nameVal = _angCurBezInput?.value || '';
+  document.getElementById('ap-name').value = nameVal;
+  document.getElementById('ap-artnr').value = '';
+  document.getElementById('ap-bestand').value = '0';
+  document.getElementById('ap-vk-netto').value = '';
+  document.getElementById('ap-vk-brutto').value = '';
+  document.getElementById('ap-ek-netto').value = '';
+  document.getElementById('ap-ek-brutto').value = '';
+  document.getElementById('ap-beschreibung').value = '';
+  document.getElementById('ap-einheit').value = 'Stk';
+  document.getElementById('ap-ust').value = '19';
+  document.getElementById('ang-produkt-modal').classList.add('open');
+}
+
+function apCalcBrutto() {
+  const netto = parseFloat(document.getElementById('ap-vk-netto').value) || 0;
+  const ust   = parseFloat(document.getElementById('ap-ust').value) || 0;
+  const brutto = r2(netto * (1 + ust/100));
+  document.getElementById('ap-vk-brutto').value = brutto || '';
+}
+
+function saveAngProdukt(andNew) {
+  const name = document.getElementById('ap-name').value.trim();
+  if (!name) return toast('Produktname ist Pflichtfeld!', 'err');
+  if (!data.produkte) data.produkte = [];
+  const prod = {
+    id: 'p-' + Date.now(),
+    name,
+    artnr:    document.getElementById('ap-artnr').value.trim(),
+    einheit:  document.getElementById('ap-einheit').value,
+    bestand:  parseFloat(document.getElementById('ap-bestand').value)||0,
+    kategorie:document.getElementById('ap-kategorie').value,
+    ust:      parseFloat(document.getElementById('ap-ust').value)||0,
+    ekNetto:  parseFloat(document.getElementById('ap-ek-netto').value)||0,
+    vkNetto:  parseFloat(document.getElementById('ap-vk-netto').value)||0,
+    ekBrutto: parseFloat(document.getElementById('ap-ek-brutto').value)||0,
+    vkBrutto: parseFloat(document.getElementById('ap-vk-brutto').value)||0,
+    beschreibung: document.getElementById('ap-beschreibung').value.trim(),
+  };
+  data.produkte.push(prod);
+  saveData();
+  toast(`Produkt „${name}" erstellt`, 'ok');
+
+  // Вставить в текущую строку если была открыта из неё
+  if (_angCurBezInput) {
+    const row = _angCurBezInput.closest('.ang-pos-row');
+    if (row) angBezSelect(row, prod);
+  }
+
+  if (andNew) {
+    document.getElementById('ap-name').value = '';
+    document.getElementById('ap-artnr').value = '';
+    document.getElementById('ap-vk-netto').value = '';
+    document.getElementById('ap-vk-brutto').value = '';
+    document.getElementById('ap-name').focus();
+  } else {
+    closeModal('ang-produkt-modal');
+  }
 }

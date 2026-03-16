@@ -2667,8 +2667,8 @@ input, select, textarea {
   border-bottom: 1px solid var(--border);
 }
 .ang-pos-row input, .ang-pos-row select {
-  padding: 6px 8px;
-  font-size: 12px;
+  padding: 7px 8px;
+  font-size: 14px;
   border-radius: 6px;
   border: 1px solid var(--border);
   background: var(--s2);
@@ -2679,7 +2679,7 @@ input, select, textarea {
 .ang-pos-betrag {
   text-align: right;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   padding-right: 4px;
 }
@@ -2739,7 +2739,47 @@ input, select, textarea {
   margin-left: 10px;
 }
 
-/* Лейбл-обёртка поля — не используется */
+/* ── Neues Produkt Modal ── */
+.ang-prod-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+@media(max-width:480px){ .ang-prod-grid { grid-template-columns: 1fr; } }
+
+/* Автокомплит продуктов в строке позиции */
+.ang-bez-suggest {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(100% + 2px);
+  z-index: 400;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  max-height: 220px;
+  overflow-y: auto;
+}
+.ang-bez-suggest-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background .1s;
+}
+.ang-bez-suggest-item:hover { background: var(--s2); }
+.ang-bez-suggest-new {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--blue);
+  font-weight: 600;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ang-bez-suggest-new:hover { background: var(--bdim); }
 .ang-f-wrap { display: contents; }
 .ang-f-lbl  { display: none; }
 

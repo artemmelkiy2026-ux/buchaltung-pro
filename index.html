@@ -1644,6 +1644,76 @@
   </div>
 </div>
 
+<!-- ── NEUES PRODUKT MODAL ── -->
+<div class="modal-bg" id="ang-produkt-modal">
+  <div class="modal" style="max-width:640px;width:95%">
+    <div class="modal-hdr">
+      <h2><i class="fas fa-box"></i> Neues Produkt</h2>
+      <button class="modal-close" onclick="closeModal('ang-produkt-modal')">✕</button>
+    </div>
+    <div class="ang-prod-grid">
+      <div class="fg" style="margin:0">
+        <label>Produktname <span style="color:var(--red)">*</span></label>
+        <input type="text" id="ap-name" placeholder="Produktname">
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Standardeinheit</label>
+        <select id="ap-einheit">
+          <option>Stk</option><option>h</option><option>kg</option>
+          <option>m</option><option>m²</option><option>l</option><option>Pauschal</option>
+        </select>
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Art.-Nr.</label>
+        <input type="text" id="ap-artnr" placeholder="1000">
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Bestand (Stk)</label>
+        <input type="number" id="ap-bestand" placeholder="0,00" value="0" min="0" step="0.01">
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Kategorie</label>
+        <select id="ap-kategorie">
+          <option>Artikel</option><option>Dienstleistung</option><option>Sonstiges</option>
+        </select>
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Umsatzsteuer in %</label>
+        <select id="ap-ust">
+          <option value="19">19%</option>
+          <option value="7">7%</option>
+          <option value="0">0%</option>
+        </select>
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Einkaufspreis (Netto)</label>
+        <input type="number" id="ap-ek-netto" placeholder="0 EUR" min="0" step="0.01">
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Verkaufspreis (Netto)</label>
+        <input type="number" id="ap-vk-netto" placeholder="0 EUR" min="0" step="0.01" oninput="apCalcBrutto()">
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Einkaufspreis (Brutto)</label>
+        <input type="number" id="ap-ek-brutto" placeholder="0 EUR" min="0" step="0.01">
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Verkaufspreis (Brutto)</label>
+        <input type="number" id="ap-vk-brutto" placeholder="0 EUR" min="0" step="0.01">
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:16px -24px 16px;padding:0 24px;padding-top:16px">
+      <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);display:block;margin-bottom:6px">Produktbeschreibung</label>
+      <textarea id="ap-beschreibung" style="width:100%;min-height:60px;resize:vertical;box-sizing:border-box;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 10px;outline:none"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('ang-produkt-modal')">Abbrechen</button>
+      <button class="btn primary" onclick="saveAngProdukt(true)"><i class="fas fa-plus"></i> Erstellen und neu</button>
+      <button class="btn primary" onclick="saveAngProdukt(false)"><i class="fas fa-check"></i> Erstellen</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <script src="helpers.js"></script>
