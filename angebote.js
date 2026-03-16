@@ -221,6 +221,7 @@ function _angAddPos(p={}) {
   const isKlein = isKleinunternehmer(yr);
   const rate = p.rate ?? (isKlein ? 0 : 19);
   const preis = p.brutto ?? p.netto ?? '';
+  const rabattTyp = p.rabattTyp || '%';
   const row = document.createElement('div');
   row.className = 'ang-pos-row';
   row.innerHTML = `
@@ -228,15 +229,26 @@ function _angAddPos(p={}) {
     <input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="recalcAngSumme()">
     <input type="text"   placeholder="Stk." value="${p.einheit||'Stk.'}">
     <input type="number" placeholder="0,00" value="${preis}" min="0" step="0.01" oninput="recalcAngSumme()">
-    ${isKlein ? '' : `<select onchange="recalcAngSumme()">
+    ${isKlein ? '<div></div>' : `<select onchange="recalcAngSumme()">
       <option value="19" ${rate==19?'selected':''}>19%</option>
       <option value="7"  ${rate==7?'selected':''}>7%</option>
       <option value="0"  ${rate==0?'selected':''}>0%</option>
     </select>`}
-    <input type="number" placeholder="0" value="${p.rabatt||0}" min="0" max="100" step="0.1" oninput="recalcAngSumme()" style="width:60px">
+    <input type="number" placeholder="0" value="${p.rabatt||0}" min="0" step="0.01" oninput="recalcAngSumme()" class="ang-rabatt-val">
+    <div class="ang-rabatt-toggle">
+      <button type="button" class="${rabattTyp==='%'?'active':''}" onclick="_angToggleRabatt(this,'%')">%</button>
+      <button type="button" class="${rabattTyp==='€'?'active':''}" onclick="_angToggleRabatt(this,'€')">€</button>
+    </div>
     <div class="ang-pos-betrag">0,00 €</div>
     <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px">✕</button>`;
   list.appendChild(row);
+  recalcAngSumme();
+}
+
+function _angToggleRabatt(btn, typ) {
+  const toggle = btn.closest('.ang-rabatt-toggle');
+  toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   recalcAngSumme();
 }
 
@@ -257,13 +269,20 @@ function setAngPreisMode(mode) {
 function recalcAngSumme() {
   let netto = 0, mwst = 0;
   document.querySelectorAll('#ang-pos-list .ang-pos-row').forEach(row => {
-    const inputs = row.querySelectorAll('input[type=number]');
-    const menge  = parseFloat(inputs[0]?.value)||1;
-    const preis  = parseFloat(inputs[1]?.value)||0;
-    const rabatt = parseFloat(inputs[2]?.value)||0;
-    const sel    = row.querySelector('select');
-    const rate   = sel ? parseFloat(sel.value) : 0;
-    const factor = 1 - rabatt/100;
+    const inputs   = row.querySelectorAll('input[type=number]');
+    const menge    = parseFloat(inputs[0]?.value)||1;
+    const preis    = parseFloat(inputs[1]?.value)||0;
+    const rabatt   = parseFloat(inputs[2]?.value)||0;
+    const sel      = row.querySelector('select');
+    const rate     = sel ? parseFloat(sel.value) : 0;
+    const rabattTyp = row.querySelector('.ang-rabatt-toggle .active')?.textContent?.trim() || '%';
+    let factor;
+    if (rabattTyp === '%') {
+      factor = 1 - rabatt / 100;
+    } else {
+      // € — вычитаем фиксированную сумму из общей стоимости
+      factor = preis > 0 ? Math.max(0, (menge * preis - rabatt)) / (menge * preis) : 1;
+    }
     let n, b;
     if (angPreisMode === 'brutto') {
       b = r2(menge * preis * factor);
@@ -286,14 +305,20 @@ function recalcAngSumme() {
 
 function _angGetPos() {
   return [...document.querySelectorAll('#ang-pos-list .ang-pos-row')].map(row => {
-    const inputs  = row.querySelectorAll('input[type=number]');
-    const textIns = row.querySelectorAll('input[type=text]');
-    const sel     = row.querySelector('select');
-    const menge   = parseFloat(inputs[0]?.value)||1;
-    const preis   = parseFloat(inputs[1]?.value)||0;
-    const rabatt  = parseFloat(inputs[2]?.value)||0;
-    const rate    = sel ? parseFloat(sel.value) : 0;
-    const factor  = 1 - rabatt/100;
+    const inputs   = row.querySelectorAll('input[type=number]');
+    const textIns  = row.querySelectorAll('input[type=text]');
+    const sel      = row.querySelector('select');
+    const menge    = parseFloat(inputs[0]?.value)||1;
+    const preis    = parseFloat(inputs[1]?.value)||0;
+    const rabatt   = parseFloat(inputs[2]?.value)||0;
+    const rate     = sel ? parseFloat(sel.value) : 0;
+    const rabattTyp = row.querySelector('.ang-rabatt-toggle .active')?.textContent?.trim() || '%';
+    let factor;
+    if (rabattTyp === '%') {
+      factor = 1 - rabatt / 100;
+    } else {
+      factor = preis > 0 ? Math.max(0, (menge * preis - rabatt)) / (menge * preis) : 1;
+    }
     let netto, brutto;
     if (angPreisMode === 'brutto') {
       brutto = r2(menge * preis * factor);
@@ -305,7 +330,7 @@ function _angGetPos() {
     return {
       bez: textIns[0]?.value?.trim()||'',
       menge, einheit: textIns[1]?.value?.trim()||'Stk.',
-      netto: r2(netto/menge), brutto: r2(brutto/menge), rate, rabatt
+      netto: r2(netto/menge), brutto: r2(brutto/menge), rate, rabatt, rabattTyp
     };
   }).filter(p => p.bez || p.netto);
 }

@@ -2046,16 +2046,16 @@ input, select, textarea {
   gap: 0;
 }
 
-/* Секция-блок */
+/* Секция-блок — чистый стиль как sevdesk */
 .ang-block {
-  background: var(--s1);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--r2);
-  padding: 20px;
-  margin-bottom: 16px;
+  padding: 20px 24px;
+  margin-bottom: 12px;
 }
 
-/* Лейбл секции — как тег */
+/* Лейбл секции — тег как у sevdesk */
 .ang-block-label {
   display: inline-block;
   font-size: 10px;
@@ -2101,7 +2101,7 @@ input, select, textarea {
 /* Шапка таблицы продуктов */
 .ang-pos-header {
   display: grid;
-  grid-template-columns: 3fr 70px 70px 110px 80px 70px 90px 28px;
+  grid-template-columns: 3fr 70px 70px 110px 80px 55px 42px 90px 28px;
   gap: 6px;
   padding: 6px 8px;
   font-size: 11px;
@@ -2660,10 +2660,10 @@ input, select, textarea {
 /* Строка позиции */
 .ang-pos-row {
   display: grid;
-  grid-template-columns: 3fr 70px 70px 100px 80px 60px 80px 28px;
+  grid-template-columns: 3fr 70px 70px 110px 80px 55px 42px 90px 28px;
   gap: 6px;
   align-items: center;
-  padding: 5px 0;
+  padding: 6px 0;
   border-bottom: 1px solid var(--border);
 }
 .ang-pos-row input, .ang-pos-row select {
@@ -2682,6 +2682,36 @@ input, select, textarea {
   font-size: 12px;
   font-weight: 600;
   padding-right: 4px;
+}
+
+/* Переключатель % / € в строке позиции */
+.ang-rabatt-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--s2);
+  height: 30px;
+}
+.ang-rabatt-toggle button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--sub);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: all .12s;
+  font-family: var(--sans);
+}
+.ang-rabatt-toggle button.active {
+  background: var(--blue);
+  color: #fff;
+}
+.ang-rabatt-toggle button:not(.active):hover {
+  background: var(--border);
+  color: var(--text);
 }
 
 /* Секция-заголовок */
