@@ -226,29 +226,26 @@ function _angAddPos(p={}) {
   row.className = 'ang-pos-row';
   row.innerHTML = `
     <input type="text" class="ang-f-bez" placeholder="Beschreibung" value="${p.bez||''}" oninput="recalcAngSumme()">
-    <div class="ang-f-wrap"><span class="ang-f-lbl">Menge</span><input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="recalcAngSumme()"></div>
-    <div class="ang-f-wrap"><span class="ang-f-lbl">Einheit</span><input type="text" placeholder="Stk." value="${p.einheit||'Stk.'}"></div>
-    <div class="ang-f-wrap"><span class="ang-f-lbl">Preis</span><input type="number" placeholder="0,00" value="${preis}" min="0" step="0.01" oninput="recalcAngSumme()"></div>
-    ${isKlein ? '<div></div>' : `<div class="ang-f-wrap"><span class="ang-f-lbl">USt.</span><select onchange="recalcAngSumme()">
+    <input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="recalcAngSumme()">
+    <input type="text" placeholder="Stk." value="${p.einheit||'Stk.'}">
+    <input type="number" placeholder="0,00" value="${preis}" min="0" step="0.01" oninput="recalcAngSumme()">
+    ${isKlein ? '<div></div>' : `<select onchange="recalcAngSumme()">
       <option value="19" ${rate==19?'selected':''}>19%</option>
       <option value="7"  ${rate==7?'selected':''}>7%</option>
       <option value="0"  ${rate==0?'selected':''}>0%</option>
-    </select></div>`}
-    <div class="ang-f-wrap"><span class="ang-f-lbl">Rabatt</span><input type="number" placeholder="0" value="${p.rabatt||0}" min="0" step="0.01" oninput="recalcAngSumme()" class="ang-rabatt-val"></div>
-    <div class="ang-f-wrap ang-f-wrap-toggle"><span class="ang-f-lbl">Typ</span><div class="ang-rabatt-toggle">
-      <button type="button" class="${rabattTyp==='%'?'active':''}" onclick="_angToggleRabatt(this,'%')">%</button>
-      <button type="button" class="${rabattTyp==='€'?'active':''}" onclick="_angToggleRabatt(this,'€')">€</button>
-    </div></div>
+    </select>`}
+    <div class="ang-rabatt-group">
+      <input type="number" placeholder="0" value="${p.rabatt||0}" min="0" step="0.01" oninput="recalcAngSumme()" class="ang-rabatt-val">
+      <button type="button" class="ang-rabatt-suffix" onclick="_angToggleRabatt(this)">${rabattTyp}</button>
+    </div>
     <div class="ang-pos-betrag">0,00 €</div>
     <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px">✕</button>`;
   list.appendChild(row);
   recalcAngSumme();
 }
 
-function _angToggleRabatt(btn, typ) {
-  const toggle = btn.closest('.ang-rabatt-toggle');
-  toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+function _angToggleRabatt(btn) {
+  btn.textContent = btn.textContent.trim() === '%' ? '€' : '%';
   recalcAngSumme();
 }
 
@@ -275,7 +272,7 @@ function recalcAngSumme() {
     const rabatt   = parseFloat(inputs[2]?.value)||0;
     const sel      = row.querySelector('select');
     const rate     = sel ? parseFloat(sel.value) : 0;
-    const rabattTyp = row.querySelector('.ang-rabatt-toggle .active')?.textContent?.trim() || '%';
+    const rabattTyp = row.querySelector('.ang-rabatt-suffix')?.textContent?.trim() || '%';
     let factor;
     if (rabattTyp === '%') {
       factor = 1 - rabatt / 100;
@@ -311,7 +308,7 @@ function _angGetPos() {
     const preis     = parseFloat(numInputs[1]?.value)||0;
     const rabatt    = parseFloat(numInputs[2]?.value)||0;
     const rate      = sel ? parseFloat(sel.value) : 0;
-    const rabattTyp = row.querySelector('.ang-rabatt-toggle .active')?.textContent?.trim() || '%';
+    const rabattTyp = row.querySelector('.ang-rabatt-suffix')?.textContent?.trim() || '%';
     const bez       = row.querySelector('.ang-f-bez')?.value?.trim() || '';
     const einheit   = row.querySelectorAll('input[type=text]')[1]?.value?.trim() || 'Stk.';
     let factor;
