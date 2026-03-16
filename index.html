@@ -765,15 +765,13 @@
 
 <!-- ── ANGEBOTE ── -->
 <div class="page" id="p-angebote">
-  <div class="ang-sticky-header">
-    <div class="ang-sticky-left">
-      <div class="ang-sticky-title">Angebote</div>
-    </div>
-    <div class="ang-sticky-right">
-      <button class="btn primary" onclick="openAngForm(null)"><i class="fas fa-plus"></i><span class="ang-btn-txt"> Angebot erstellen</span></button>
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Angebote</div></div>
+    <div class="ph-right">
+      <button class="btn primary" onclick="openAngForm(null)"><i class="fas fa-plus"></i> Angebot erstellen</button>
     </div>
   </div>
-  <div class="ang-form-body">
   <div id="ang-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
     <button class="ftab active" onclick="setAngFilter('alle',this)">Alle</button>
@@ -793,7 +791,7 @@
   <div id="ang-list"></div>
   <div id="ang-pagination"></div>
   <div id="ang-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-alt"></i></div><p>Keine Angebote</p></div>
-  </div>
+</div>
 </div>
 
 <!-- ── ANGEBOTE FORM ── -->
@@ -966,16 +964,14 @@
 
 <!-- ── RECHNUNGEN ── -->
 <div class="page" id="p-rechnungen">
-  <div class="ang-sticky-header">
-    <div class="ang-sticky-left">
-      <div class="ang-sticky-title">Rechnungen</div>
-    </div>
-    <div class="ang-sticky-right">
-      <button class="btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i><span class="ang-btn-txt"> Firmenprofil</span></button>
-      <button class="btn primary" onclick="openRechModal()"><i class="fas fa-plus"></i><span class="ang-btn-txt"> Rechnung erstellen</span></button>
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Rechnungen</div></div>
+    <div class="ph-right">
+      <button class="btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i> Firmenprofil</button>
+      <button class="btn primary" onclick="openRechModal()"><i class="fas fa-plus"></i> Rechnung erstellen</button>
     </div>
   </div>
-  <div class="ang-form-body">
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="rech-cards"></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
     <button class="ftab active" onclick="setRechFilter('alle',this)">Alle</button>
@@ -994,7 +990,7 @@
   <div id="rech-list"></div>
   <div id="rech-pagination"></div>
   <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungen</p></div>
-  </div>
+</div>
 </div>
 
 <!-- ── WIEDERKEHREND ── -->

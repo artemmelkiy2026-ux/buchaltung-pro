@@ -1991,8 +1991,6 @@ input, select, textarea {
    ════════════════════════════════════════════════════════ */
 
 /* Страница-контейнер: flex-колонка, высота = экрану */
-#p-angebote,
-#p-rechnungen,
 #p-angebote-form,
 #p-rechnungen-form {
   display: none;
@@ -2000,10 +1998,32 @@ input, select, textarea {
   height: calc(100vh - 54px);
   overflow: hidden;
 }
-#p-angebote.active,
-#p-rechnungen.active,
 #p-angebote-form.active,
 #p-rechnungen-form.active { display: flex; }
+
+/* Иконки статусов в карточках — 18px */
+.rech-card-avatar i,
+.rech-card-status i { font-size: 18px !important; }
+
+/* Адаптивные карточки статистики */
+#ang-cards,
+#rech-cards {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media(max-width: 768px) {
+  #ang-cards,
+  #rech-cards { grid-template-columns: 1fr; }
+  #ang-search,
+  #rech-search { width: 100% !important; margin-left: 0 !important; }
+  .rech-card { flex-wrap: wrap; }
+  .rech-card-right { width: 100%; justify-content: space-between; margin-top: 8px; }
+}
+@media(max-width: 480px) {
+  .rech-card-actions { flex-wrap: wrap; gap: 4px; }
+}
 
 /* Sticky шапка */
 .ang-sticky-header {
@@ -2172,8 +2192,6 @@ input, select, textarea {
 
 /* ── МОБИЛЕ ≤ 768px ── */
 @media(max-width: 768px) {
-  #p-angebote,
-  #p-rechnungen,
   #p-angebote-form,
   #p-rechnungen-form { height: auto; overflow: visible; }
   .ang-form-body { padding: 12px; }
