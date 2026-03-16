@@ -26,19 +26,12 @@ const ANG_STATUS = {
 
 // ── INLINE FORM (вместо модального окна) ────────────────────
 function openAngForm(id) {
-  const listView = document.getElementById('ang-view-list');
-  const formView = document.getElementById('ang-view-form');
-  const title    = document.getElementById('ang-form-title');
-  if (!formView) { openAngebotModal(); return; } // fallback
-
+  const title = document.getElementById('ang-form-title');
   if (id) {
-    // Редактирование существующего
     editAngFill(id);
     if (title) title.textContent = 'Angebot bearbeiten';
   } else {
-    // Новое
     editAngId = null;
-    wiedTyp = 'Ausgabe';
     document.getElementById('ang-nr').value = autoAngNr();
     document.getElementById('ang-dat').value = new Date().toISOString().split('T')[0];
     document.getElementById('ang-gueltig').value = '';
@@ -54,21 +47,16 @@ function openAngForm(id) {
     initAngPositionen();
     if (title) title.textContent = 'Neues Angebot';
   }
-  updateAngBanner();
-  if (listView) listView.style.display = 'none';
-  if (formView) formView.style.display = 'flex';
-  // Скролл наверх
-  const pi = document.querySelector('#p-angebote .page-inner');
-  if (pi) pi.scrollTop = 0;
+  // Переключаем страницу через nav() — как в Rechnungen
+  const navEl = document.querySelector('.nav-item[onclick*="angebote-form"]') ||
+                document.querySelector('.nav-item.active');
+  nav('angebote-form', navEl || document.querySelector('.nav-item'));
 }
 
 function closeAngForm() {
-  const listView = document.getElementById('ang-view-list');
-  const formView = document.getElementById('ang-view-form');
-  if (listView) listView.style.display = 'block';
-  if (formView) formView.style.display = 'none';
   editAngId = null;
-  renderAngebote();
+  const navEl = document.querySelector('.nav-item[onclick*="angebote"]');
+  nav('angebote', navEl || document.querySelector('.nav-item'));
 }
 
 // Заполняем форму данными существующего Angebot

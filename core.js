@@ -239,6 +239,7 @@ function nav(id, el){
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
   if(id==='angebote') renderAngebote();
+  if(id==='angebote-form') { updateAngBanner(); recalcAngSumme(); }
   if(id==='neu') updateNeuToolbar(false);
 }
 
