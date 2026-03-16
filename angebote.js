@@ -10,7 +10,7 @@ function setAngTab(tab) {
   angTabFilter = tab;
   angPage = 1;
   // Обновляем активную вкладку
-  document.querySelectorAll('.ang-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('ang-tab-' + tab);
   if (btn) btn.classList.add('active');
   renderAngebote();
@@ -56,7 +56,7 @@ function openAngForm(id) {
   }
   updateAngBanner();
   if (listView) listView.style.display = 'none';
-  if (formView) formView.style.display = 'block';
+  if (formView) formView.style.display = 'flex';
   // Скролл наверх
   const pi = document.querySelector('#p-angebote .page-inner');
   if (pi) pi.scrollTop = 0;
@@ -401,42 +401,38 @@ function renderAngebote() {
   const today = new Date().toISOString().split('T')[0];
   const angs  = data.angebote || [];
 
-  // Автообновление статуса abgelaufen
+  // Автообновление статуса
   angs.forEach(a => {
     if (a.status === 'offen' && a.gueltig && a.gueltig < today) a.status = 'abgelaufen';
   });
 
-  // Фильтр по вкладке
-  const q = (document.getElementById('ang-search') || {value:''}).value.toLowerCase();
+  // Фильтр по вкладке + поиск
+  const q = (document.getElementById('ang-search')||{value:''}).value.toLowerCase();
   let filtered = angTabFilter === 'alle' ? [...angs] : angs.filter(a => a.status === angTabFilter);
   if (q) filtered = filtered.filter(a =>
     (a.nr||'').toLowerCase().includes(q) ||
     (a.kunde||'').toLowerCase().includes(q) ||
     (a.betreff||'').toLowerCase().includes(q)
   );
-  filtered.sort((a, b) => (b.datum||'').localeCompare(a.datum||''));
+  filtered.sort((a,b) => (b.datum||'').localeCompare(a.datum||''));
 
   // Счётчики на вкладках
   const counts = { alle: angs.length };
   ['offen','angenommen','abgelehnt','abgelaufen'].forEach(s => {
     counts[s] = angs.filter(a => a.status === s).length;
   });
-  ['alle','offen','angenommen','abgelehnt','abgelaufen'].forEach(s => {
-    const btn = document.getElementById('ang-tab-' + s);
+  [{id:'alle',lbl:'Alle'},{id:'offen',lbl:'Offen'},{id:'angenommen',lbl:'Angenommen'},
+   {id:'abgelehnt',lbl:'Abgelehnt'},{id:'abgelaufen',lbl:'Abgelaufen'}].forEach(({id,lbl}) => {
+    const btn = document.getElementById('ang-tab-' + id);
     if (!btn) return;
-    const cnt = counts[s] || 0;
-    btn.textContent = (s === 'alle' ? 'Alle' :
-      s === 'offen' ? 'Offen' :
-      s === 'angenommen' ? 'Angenommen' :
-      s === 'abgelehnt' ? 'Abgelehnt' : 'Abgelaufen') + (cnt ? ` (${cnt})` : '');
+    const icon = btn.querySelector('i');
+    const iconHtml = icon ? icon.outerHTML + ' ' : '';
+    btn.innerHTML = iconHtml + lbl + (counts[id] ? ` (${counts[id]})` : '');
   });
 
   if (!filtered.length) {
-    lst.innerHTML = `<div style="padding:40px;text-align:center;color:var(--sub);font-size:13px">
-      <i class="fas fa-file-alt" style="font-size:24px;margin-bottom:10px;display:block;opacity:.4"></i>
-      Keine Angebote vorhanden
-    </div>`;
-    if (em) em.style.display = 'none';
+    lst.innerHTML = '';
+    if (em) em.style.display = 'block';
     document.getElementById('ang-pagination').innerHTML = '';
     return;
   }
@@ -446,60 +442,47 @@ function renderAngebote() {
   if (angPage > totalPages) angPage = totalPages;
   const items = filtered.slice((angPage-1)*ANG_PER_PAGE, angPage*ANG_PER_PAGE);
 
-  lst.innerHTML = items.map((a, i) => {
+  // Рендерим как rech-card карточки
+  lst.innerHTML = items.map(a => {
     const st = ANG_STATUS[a.status] || ANG_STATUS.offen;
     const isExpiring = a.gueltig && a.gueltig > today && a.status === 'offen' &&
       (new Date(a.gueltig) - new Date()) < 7*24*60*60*1000;
-    const betreff = a.betreff || a.positionen?.map(p=>p.bez).join(', ') || '—';
-    const bg = i % 2 === 0 ? '' : 'background:var(--s2)';
 
-    return `<div style="display:grid;grid-template-columns:140px 100px 1fr 120px 130px 40px;gap:0;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;${bg}"
-      onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='${i%2===0?'':'var(--s2)'}'"
-      onclick="openAngForm('${a.id}')">
-
-      <!-- Status пилюля -->
-      <div style="display:flex;align-items:center">
-        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border}">
-          <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
-        </span>
+    return `<div class="rech-card" onclick="openAngForm('${a.id}')">
+      <div class="rech-card-left">
+        <div class="rech-card-avatar" style="background:${st.bg};color:${st.color}">
+          <i class="${st.icon}"></i>
+        </div>
+        <div class="rech-card-info">
+          <div class="rech-card-nr" style="display:flex;align-items:center;gap:8px">
+            <span>${a.nr || '—'}</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border}">
+              <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
+            </span>
+          </div>
+          <div class="rech-card-kunde">${a.kunde || '—'}</div>
+          <div class="rech-card-meta">
+            <span>${fd(a.datum)}</span>
+            ${a.gueltig ? `<span>·</span><span style="${isExpiring?'color:var(--yellow)':''}">Gültig bis ${fd(a.gueltig)}</span>` : ''}
+            ${a.betreff ? `<span>·</span><span style="color:var(--sub)">${a.betreff}</span>` : ''}
+          </div>
+        </div>
       </div>
-
-      <!-- Nr -->
-      <div style="display:flex;align-items:center;font-size:13px;font-weight:600;font-family:var(--mono);color:var(--blue)">
-        ${a.nr || '—'}
-      </div>
-
-      <!-- Kunde / Betreff -->
-      <div style="display:flex;flex-direction:column;justify-content:center;min-width:0">
-        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.kunde || '—'}</div>
-        <div style="font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${betreff}</div>
-      </div>
-
-      <!-- Datum -->
-      <div style="display:flex;align-items:center;font-size:13px;color:var(--sub)">
-        ${isExpiring ? `<span style="color:var(--yellow);font-size:11px;margin-right:4px" title="Läuft bald ab"><i class="fas fa-exclamation-triangle"></i></span>` : ''}
-        ${fd(a.datum)}
-      </div>
-
-      <!-- Betrag -->
-      <div style="display:flex;align-items:center;justify-content:flex-end;font-size:13px;font-weight:700;font-family:var(--mono)">
-        ${fmt(a.betrag)}
-      </div>
-
-      <!-- Aktionen ⋯ -->
-      <div style="display:flex;align-items:center;justify-content:center" onclick="event.stopPropagation()">
-        <button class="del-btn" style="width:28px;height:28px;border-radius:6px;font-size:14px;position:relative"
-          onclick="toggleAngMenu('${a.id}',this)">⋯</button>
-        <div id="ang-menu-${a.id}" style="display:none;position:absolute;right:40px;background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:500;min-width:200px;padding:4px">
-          <div class="ang-menu-item" onclick="openAngForm('${a.id}')"><i class="fas fa-edit"></i> Dokument bearbeiten</div>
-          <div class="ang-menu-item" onclick="printAngebot('${a.id}')"><i class="fas fa-eye"></i> Vorschau / Drucken</div>
-          <div style="height:1px;background:var(--border);margin:4px 0"></div>
-          <div class="ang-menu-item" onclick="angSetStatus('${a.id}','angenommen')"><i class="fas fa-check-circle" style="color:var(--green)"></i> Auftrag erhalten</div>
-          <div class="ang-menu-item" onclick="angSetStatus('${a.id}','abgelehnt')"><i class="fas fa-times-circle" style="color:var(--red)"></i> Auftrag abgelehnt</div>
-          <div style="height:1px;background:var(--border);margin:4px 0"></div>
-          <div class="ang-menu-item" onclick="angZuRechnung('${a.id}')"><i class="fas fa-file-invoice" style="color:var(--blue)"></i> Rechnung erzeugen</div>
-          <div style="height:1px;background:var(--border);margin:4px 0"></div>
-          <div class="ang-menu-item" style="color:var(--red)" onclick="delAngebot('${a.id}')"><i class="fas fa-trash"></i> Löschen</div>
+      <div class="rech-card-right">
+        <div class="rech-card-betrag">${fmt(a.betrag)}</div>
+        <div class="rech-card-actions" onclick="event.stopPropagation()">
+          <button class="rca-btn" onclick="toggleAngMenu('${a.id}',this)" title="Aktionen">⋯</button>
+          <div id="ang-menu-${a.id}" style="display:none;position:fixed;background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:500;min-width:200px;padding:4px">
+            <div class="ang-menu-item" onclick="openAngForm('${a.id}')"><i class="fas fa-edit"></i> Bearbeiten</div>
+            <div class="ang-menu-item" onclick="printAngebot('${a.id}')"><i class="fas fa-eye"></i> Vorschau</div>
+            <div style="height:1px;background:var(--border);margin:4px 0"></div>
+            <div class="ang-menu-item" onclick="angSetStatus('${a.id}','angenommen')"><i class="fas fa-check-circle" style="color:var(--green)"></i> Auftrag erhalten</div>
+            <div class="ang-menu-item" onclick="angSetStatus('${a.id}','abgelehnt')"><i class="fas fa-times-circle" style="color:var(--red)"></i> Auftrag abgelehnt</div>
+            <div style="height:1px;background:var(--border);margin:4px 0"></div>
+            <div class="ang-menu-item" onclick="angZuRechnung('${a.id}')"><i class="fas fa-file-invoice" style="color:var(--blue)"></i> Rechnung erzeugen</div>
+            <div style="height:1px;background:var(--border);margin:4px 0"></div>
+            <div class="ang-menu-item" style="color:var(--red)" onclick="delAngebot('${a.id}')"><i class="fas fa-trash"></i> Löschen</div>
+          </div>
         </div>
       </div>
     </div>`;
@@ -509,7 +492,7 @@ function renderAngebote() {
   renderPager('ang-pagination', angPage, totalPages, filtered.length, '_angPagerCb');
 }
 
-// Переключение статуса из меню
+
 function angSetStatus(id, status) {
   const a = (data.angebote||[]).find(x=>x.id===id);
   if(!a) return;
