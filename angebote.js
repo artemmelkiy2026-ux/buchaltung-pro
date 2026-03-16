@@ -626,7 +626,6 @@ function angBezSelect(row, p) {
 // openProduktModal, saveAngProdukt, apCalcBrutto, apCalcEkBrutto,
 // apAddEinheit, apSetTab, delProdukt — все в produkte.js
 
-// Открыть модал из строки позиции (передаёт контекст)
 function openAngProduktModal() {
   if (typeof openProduktModal === 'function') openProduktModal();
 }

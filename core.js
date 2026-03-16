@@ -281,6 +281,8 @@ function nav(id, el){
   if(id==='rechnungen-form') { updateRechBanner(); calcRechTotal(); }
   if(id==='kunden') renderKunden();
   if(id==='produkte') renderProdukte();
+  if(id==='kunden-form') { /* форма готова */ }
+  if(id==='produkte-form') { /* форма готова */ }
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
   if(id==='eintraege') renderEin();

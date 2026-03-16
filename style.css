@@ -2048,14 +2048,18 @@ input, select, textarea {
 
 /* Страница-контейнер: flex-колонка, высота = экрану */
 #p-angebote-form,
-#p-rechnungen-form {
+#p-rechnungen-form,
+#p-kunden-form,
+#p-produkte-form {
   display: none;
   flex-direction: column;
   height: calc(100vh - 54px);
   overflow: hidden;
 }
 #p-angebote-form.active,
-#p-rechnungen-form.active { display: flex; }
+#p-rechnungen-form.active,
+#p-kunden-form.active,
+#p-produkte-form.active { display: flex; }
 
 /* Иконки статусов в карточках — 18px */
 .rech-card-avatar i,
@@ -2250,7 +2254,9 @@ input, select, textarea {
 /* ── МОБИЛЕ ≤ 768px ── */
 @media(max-width: 768px) {
   #p-angebote-form,
-  #p-rechnungen-form { height: auto; overflow: visible; }
+  #p-rechnungen-form,
+  #p-kunden-form,
+  #p-produkte-form { height: auto; overflow: visible; }
   .ang-form-body { padding: 12px; }
   .ang-block { padding: 14px; }
   .ang-sticky-header { padding: 10px 12px; }

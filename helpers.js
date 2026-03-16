@@ -270,7 +270,13 @@ function openKundeModal(){
   ['km-name','km-ansprechpartner','km-email','km-tel','km-strasse','km-plz','km-ort','km-iban','km-ustid','km-notiz'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
-  openModal('kunde-modal');
+  const t=document.getElementById('km-form-title'); if(t) t.textContent='Neuer Kunde';
+  nav('kunden-form', null);
+}
+
+function closeKundeForm(){
+  editKundeId=null;
+  nav('kunden', document.querySelector('.nav-item[onclick*="kunden"]:not([onclick*="form"])') || null);
 }
 
 function editKunde(id){
@@ -287,7 +293,8 @@ function editKunde(id){
   document.getElementById('km-iban').value=k.iban||'';
   document.getElementById('km-ustid').value=k.ustid||'';
   document.getElementById('km-notiz').value=k.notiz||'';
-  openModal('kunde-modal');
+  const t=document.getElementById('km-form-title'); if(t) t.textContent='Kunde bearbeiten';
+  nav('kunden-form', null);
 }
 
 function saveKunde(){
@@ -315,7 +322,7 @@ function saveKunde(){
     data.kunden.push(newK);
     sbSaveKunde(newK);
   }
-  renderKunden(); closeModal('kunde-modal');
+  renderKunden(); closeKundeForm();
   toast('✓ Kunde gespeichert!','ok');
 }
 

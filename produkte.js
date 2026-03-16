@@ -77,7 +77,7 @@ function renderProdukte() {
     </div>`).join('');
 }
 
-// ── MODAL öffnen/schließen ────────────────────────────────────────────────────
+// ── FORM öffnen/schließen ────────────────────────────────────────────────────
 function openProduktModal(id) {
   editProduktId = id || null;
   const p = id ? (data.produkte||[]).find(x => x.id === id) : null;
@@ -85,7 +85,6 @@ function openProduktModal(id) {
   document.getElementById('ap-name').value        = p?.name || '';
   document.getElementById('ap-einheit').value     = p?.einheit || 'Stk';
   document.getElementById('ap-artnr').value       = p?.artnr || '';
-  document.getElementById('ap-bestand').value     = '0';
   document.getElementById('ap-kategorie').value   = p?.kategorie || 'Artikel';
   document.getElementById('ap-ust').value         = p?.ust ?? 19;
   document.getElementById('ap-ek-netto').value    = p?.ekNetto || '';
@@ -97,17 +96,21 @@ function openProduktModal(id) {
   document.getElementById('ap-einheiten-list').innerHTML = '';
   apAddEinheit();
 
-  // Заголовок модала
-  const title = document.querySelector('#ang-produkt-modal .modal-hdr h2');
+  const title = document.getElementById('ap-form-title');
   if (title) title.textContent = p ? 'Produkt bearbeiten' : 'Neues Produkt';
 
   // Первый таб
   document.querySelectorAll('.ap-tab').forEach(b => b.classList.remove('ap-tab-active'));
-  document.querySelectorAll('.ap-tab-pane').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.ap-tab-pane').forEach(pane => pane.style.display = 'none');
   document.querySelector('.ap-tab').classList.add('ap-tab-active');
   document.getElementById('ap-pane-beschreibung').style.display = 'block';
 
-  document.getElementById('ang-produkt-modal').classList.add('open');
+  nav('produkte-form', null);
+}
+
+function closeProduktForm() {
+  editProduktId = null;
+  nav('produkte', document.querySelector('.nav-item[onclick*="produkte"]') || null);
 }
 
 // ── СОХРАНЕНИЕ ────────────────────────────────────────────────────────────────
@@ -153,11 +156,11 @@ function saveAngProdukt(andNew) {
     editProduktId = null;
     ['ap-name','ap-artnr','ap-vk-netto','ap-vk-brutto','ap-ek-netto','ap-ek-brutto','ap-beschreibung','ap-bemerkung']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const t = document.getElementById('ap-form-title');
+    if (t) t.textContent = 'Neues Produkt';
     document.getElementById('ap-name').focus();
-    document.querySelector('#ang-produkt-modal .modal-hdr h2').textContent = 'Neues Produkt';
   } else {
-    closeModal('ang-produkt-modal');
-    editProduktId = null;
+    closeProduktForm();
   }
 }
 
