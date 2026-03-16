@@ -427,7 +427,7 @@ th[onclick]{user-select:none}
 th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 
 /* ── RECHNUNGEN KARTEN ── */
-#rech-list{ display:flex; flex-direction:column; gap:10px; }
+#rech-list, #ang-list{ display:flex; flex-direction:column; gap:10px; }
 .rech-card{
   display:flex; align-items:center; justify-content:space-between; gap:14px;
   background:var(--s1); border:1px solid var(--border); border-radius:14px;
