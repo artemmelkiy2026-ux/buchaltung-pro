@@ -2239,52 +2239,64 @@ input, select, textarea {
 .nav-group-header {
   display: flex;
   align-items: center;
-  padding: 8px 12px 8px 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  cursor: pointer;
+  padding: 8px 14px;
+  margin: 1px 8px;
   border-radius: var(--r);
+  font-size: 15px;
+  font-weight: 500;
+  color: #304a66;
+  cursor: pointer;
   transition: background .15s;
   user-select: none;
+  border: 1px solid transparent;
 }
 .nav-group-header:hover { background: var(--s2); }
 .nav-group-icon {
-  width: 28px;
+  width: 16px;
   text-align: center;
-  font-size: 13px;
-  color: var(--sub);
+  font-size: 14px;
   flex-shrink: 0;
 }
 .nav-group-label {
   flex: 1;
-  margin-left: 6px;
+  margin-left: 8px;
 }
 .nav-group-arrow {
   font-size: 10px;
   color: var(--sub);
   transition: transform .22s ease;
   flex-shrink: 0;
-  margin-left: 4px;
 }
 .nav-group-header.open .nav-group-arrow {
   transform: rotate(90deg);
 }
+
+/* Раскрывающийся список — плавная анимация */
 .nav-group-children {
   overflow: hidden;
   max-height: 0;
-  transition: max-height .28s cubic-bezier(0.4,0,0.2,1);
-  margin-left: 18px;
-  padding-left: 10px;
+  transition: max-height .28s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 14px;
+  padding-left: 12px;
   border-left: 2px solid var(--border);
 }
-.nav-group-children.open { max-height: 200px; }
-.nav-item.nav-child {
-  font-size: 12.5px;
-  font-weight: 500;
-  padding: 7px 10px;
+.nav-group-children.open {
+  max-height: 300px;
 }
-.nav-item.nav-child .ic { font-size: 12px; width: 22px; }
+
+/* Дочерние пункты — ТОТЖЕ размер как обычные nav-item */
+.nav-item.nav-child {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 14px;
+  margin: 1px 0;
+}
+.nav-item.nav-child .ic {
+  font-size: 14px;
+  width: 16px;
+}
+/* Убираем точку ::before — не нужна */
+.nav-item.nav-child::before { display: none; }
 
 /* ── BEZAHLT BUTTON ──────────────────────────────────────── */
 .btn-bezahlt {
