@@ -207,7 +207,7 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .nav-item.active{background:#002a5be3;color:#ffffff}
 .nav-item .ic{width:16px;text-align:center;font-size:14px}
 .nav-divider{height:1px;background:var(--border);margin:8px 14px}
-.page{display:none;flex:1;flex-direction:column;width:100%}
+.page{display:none;flex-direction:column;width:100%}
 .page.active{display:flex}
 .page-inner{padding:20px;flex:1;width:100%;box-sizing:border-box}
 
