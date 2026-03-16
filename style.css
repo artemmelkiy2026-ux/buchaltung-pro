@@ -3028,12 +3028,14 @@ input, select, textarea {
 .ust-drop {
   position: relative;
   width: 100%;
+  min-width: 90px;
 }
 .ust-drop-btn {
   display: flex;
   align-items: center;
   gap: 5px;
   width: 100%;
+  min-width: 90px;
   padding: 6px 8px;
   border: 1px solid var(--border);
   border-radius: var(--r);
