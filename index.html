@@ -797,16 +797,14 @@
 <div class="page" id="p-angebote-form">
 <div class="page-inner">
   <div class="ph ang-form-ph">
-    <div id="ang-form-title" class="ph-title ang-form-title-top">Angebot bearbeiten</div>
-    <div class="ang-form-ph-row">
-      <div class="ph-left">
-        <div id="ang-form-title-inline" class="ph-title ang-form-title-inline">Angebot bearbeiten</div>
-      </div>
-      <div class="ph-right" style="display:flex;gap:8px">
-        <button class="btn" onclick="angDruck(null)"><i class="fas fa-print"></i> Drucken</button>
-        <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i> Speichern</button>
-        <button class="btn ang-back-btn" onclick="closeAngForm()" style="padding:7px 12px" title="Zurück"><i class="fas fa-arrow-left"></i></button>
-      </div>
+    <div class="ph-left">
+      <button class="btn ang-back-btn-left" onclick="closeAngForm()" style="margin-right:10px;padding:7px 12px"><i class="fas fa-arrow-left"></i></button>
+      <div id="ang-form-title" class="ph-title">Angebot bearbeiten</div>
+    </div>
+    <div class="ph-right" style="display:flex;gap:8px">
+      <button class="btn" onclick="angDruck(null)"><i class="fas fa-print"></i> Drucken</button>
+      <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn ang-back-btn-right" onclick="closeAngForm()" style="padding:7px 12px;display:none"><i class="fas fa-arrow-left"></i></button>
     </div>
   </div>
 

@@ -153,15 +153,13 @@ function openAngForm(id) {
     if (!a) return;
     editAngId = id;
     _angFillForm(a);
-    ['ang-form-title','ang-form-title-inline'].forEach(tid => {
-      const t = document.getElementById(tid); if (t) t.textContent = 'Angebot bearbeiten';
-    });
+    const t = document.getElementById('ang-form-title');
+    if (t) t.textContent = 'Angebot bearbeiten';
   } else {
     editAngId = null;
     _angClearForm();
-    ['ang-form-title','ang-form-title-inline'].forEach(tid => {
-      const t = document.getElementById(tid); if (t) t.textContent = 'Neues Angebot';
-    });
+    const t = document.getElementById('ang-form-title');
+    if (t) t.textContent = 'Neues Angebot';
   }
   updateAngBanner();
 }
