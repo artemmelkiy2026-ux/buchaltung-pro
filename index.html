@@ -839,13 +839,25 @@
           </div>
           <div class="ang-fields-2col">
             <div class="fg" style="margin:0"><label>Gültig bis</label><input type="date" id="ang-gueltig"></div>
-            <div class="fg" style="margin:0"><label>Status</label>
-              <select id="ang-status">
-                <option value="offen">Offen</option>
-                <option value="angenommen">Angenommen</option>
-                <option value="abgelehnt">Abgelehnt</option>
-                <option value="abgelaufen">Abgelaufen</option>
-              </select>
+            <div class="fg" style="margin:0">
+              <label>Status</label>
+              <input type="hidden" id="ang-status" value="offen">
+              <div style="position:relative">
+                <button type="button" id="ang-status-btn" onclick="toggleAngStatusDropdown()"
+                  style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 12px;border-radius:var(--r);margin-top:4px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
+                  <span id="ang-status-label" style="display:flex;align-items:center;gap:7px">
+                    <i class="fas fa-clock" id="ang-status-icon" style="color:var(--yellow);font-size:11px"></i>
+                    <span id="ang-status-text">Offen</span>
+                  </span>
+                  <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
+                </button>
+                <div id="ang-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
+                  <div onclick="setAngStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:12px;width:14px"></i> Offen</div>
+                  <div onclick="setAngStatus('angenommen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:12px;width:14px"></i> Angenommen</div>
+                  <div onclick="setAngStatus('abgelehnt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-times-circle" style="color:var(--red);font-size:12px;width:14px"></i> Abgelehnt</div>
+                  <div onclick="setAngStatus('abgelaufen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-hourglass-end" style="color:var(--sub);font-size:12px;width:14px"></i> Abgelaufen</div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="fg" style="margin:0">

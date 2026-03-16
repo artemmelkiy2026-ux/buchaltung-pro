@@ -9,11 +9,41 @@ let angPreisMode = 'brutto';
 const ANG_PER = 10;
 
 const ANG_ST = {
-  offen:      { label:'Offen',      icon:'fas fa-clock',         cls:'ang-badge-offen',      pill:'ang-badge-offen-pill'      },
-  angenommen: { label:'Angenommen', icon:'fas fa-check-circle',  cls:'ang-badge-angenommen', pill:'ang-badge-angenommen-pill' },
-  abgelehnt:  { label:'Abgelehnt',  icon:'fas fa-times-circle',  cls:'ang-badge-abgelehnt',  pill:'ang-badge-abgelehnt-pill'  },
-  abgelaufen: { label:'Abgelaufen', icon:'fas fa-hourglass-end', cls:'ang-badge-abgelaufen', pill:'ang-badge-abgelaufen-pill' },
+  offen:      { label:'Offen',      icon:'fas fa-clock',         color:'var(--yellow)', cls:'ang-badge-offen',      pill:'ang-badge-offen-pill'      },
+  angenommen: { label:'Angenommen', icon:'fas fa-check-circle',  color:'var(--green)',  cls:'ang-badge-angenommen', pill:'ang-badge-angenommen-pill' },
+  abgelehnt:  { label:'Abgelehnt',  icon:'fas fa-times-circle',  color:'var(--red)',    cls:'ang-badge-abgelehnt',  pill:'ang-badge-abgelehnt-pill'  },
+  abgelaufen: { label:'Abgelaufen', icon:'fas fa-hourglass-end', color:'var(--sub)',    cls:'ang-badge-abgelaufen', pill:'ang-badge-abgelaufen-pill' },
 };
+
+// ── STATUS DROPDOWN ──────────────────────────────────────────────────────────
+function setAngStatus(val) {
+  const cfg  = ANG_ST[val] || ANG_ST.offen;
+  const inp  = document.getElementById('ang-status');
+  const icon = document.getElementById('ang-status-icon');
+  const txt  = document.getElementById('ang-status-text');
+  if (inp)  inp.value = val;
+  if (icon) { icon.className = cfg.icon; icon.style.color = cfg.color; }
+  if (txt)  txt.textContent = cfg.label;
+  const panel = document.getElementById('ang-status-panel');
+  if (panel) panel.style.display = 'none';
+}
+
+function toggleAngStatusDropdown() {
+  const panel = document.getElementById('ang-status-panel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  document.querySelectorAll('[id$="-panel"]').forEach(p => { if (p !== panel) p.style.display = 'none'; });
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    const close = (e) => {
+      if (!panel.contains(e.target) && e.target.id !== 'ang-status-btn') {
+        panel.style.display = 'none';
+        document.removeEventListener('click', close);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', close), 0);
+  }
+}
 
 // ── AUTOMATISCHE NR ──────────────────────────────────────────────────────────
 function autoAngNr() {
@@ -176,6 +206,7 @@ function _angClearForm() {
   document.getElementById('ang-dat').value     = new Date().toISOString().split('T')[0];
   document.getElementById('ang-gueltig').value = '';
   document.getElementById('ang-status').value  = 'offen';
+  setAngStatus('offen');
   document.getElementById('ang-kunde').value   = '';
   document.getElementById('ang-adresse').value = '';
   document.getElementById('ang-betreff').value = 'Angebot ' + nr;
@@ -193,6 +224,7 @@ function _angFillForm(a) {
   document.getElementById('ang-dat').value     = a.datum||'';
   document.getElementById('ang-gueltig').value = a.gueltig||'';
   document.getElementById('ang-status').value  = a.status||'offen';
+  setAngStatus(a.status||'offen');
   document.getElementById('ang-kunde').value   = a.kunde||'';
   document.getElementById('ang-adresse').value = a.adresse||'';
   document.getElementById('ang-betreff').value = a.betreff||'';
