@@ -183,13 +183,11 @@ function openRechModal(){
   setRechPositionen([{bez:'',menge:1,netto:'',rate:19,brutto:''}]);
   const t = document.getElementById('rn-form-title');
   if (t) t.textContent = 'Rechnung erstellen';
-  const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
-  nav('rechnungen-form', navEl || document.querySelector('.nav-item'));
+  nav('rechnungen-form', null);
 }
 function closeRechForm(){
   editRechId=null;
-  const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
-  nav('rechnungen', navEl || document.querySelector('.nav-item'));
+  nav('rechnungen', document.querySelector('.nav-item[onclick*="rechnungen"]:not([onclick*="form"])') || null);
 }
 function editRech(id){
   const r=data.rechnungen.find(x=>x.id===id);
@@ -212,8 +210,7 @@ function editRech(id){
   setRechPositionen(posData);
   const t = document.getElementById('rn-form-title');
   if (t) t.textContent = 'Rechnung bearbeiten';
-  const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
-  nav('rechnungen-form', navEl || document.querySelector('.nav-item'));
+  nav('rechnungen-form', null);
 }
 
 // Создаёт Einnahme из Rechnung и сохраняет в БД

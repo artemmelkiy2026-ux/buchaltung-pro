@@ -225,9 +225,10 @@ function activeEintraegeMitRech(yr) {
 function nav(id, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   openNavGroupIfNeeded(id);
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('p-'+id).classList.add('active');
+  const page = document.getElementById('p-'+id);
+  if(page) page.classList.add('active');
   curPage=id;
   if(id==='bericht') renderRep();
   if(id==='zahlungen') renderZ();
