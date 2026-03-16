@@ -63,7 +63,7 @@ async function pinToHash(pin) {
 async function sbLoadAll() {
   if (!currentUser) return null;
   const uid = currentUser.id;
-  const [ein, kun, rech, rechPos, wied, ustM, ustE] = await Promise.all([
+  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang] = await Promise.all([
     sb.from('eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('kunden').select('*').eq('user_id', uid).order('name'),
     sb.from('rechnungen').select('*').eq('user_id', uid).order('datum', { ascending: false }),
@@ -71,6 +71,7 @@ async function sbLoadAll() {
     sb.from('wiederkehrend').select('*').eq('user_id', uid),
     sb.from('ust_mode').select('*').eq('user_id', uid),
     sb.from('ust_eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
+    sb.from('angebote').select('*').eq('user_id', uid).order('datum', { ascending: false }).catch(()=>({data:[]})),
   ]);
   const eintraege     = (ein.data  || []).map(dbToEintrag);
   // GoBD: восстанавливаем _storniert для оригиналов после перезагрузки
@@ -85,7 +86,8 @@ async function sbLoadAll() {
   // Загружаем журнал изменений рекоманд
   const rechLog = await sb.from('rechnungen_log').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(500);
   const rechnungenLog = (rechLog.data || []);
-  return { eintraege, kunden, rechnungen, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog };
+  const angebote = ((ang && ang.data) || []).map(dbToAngebot);
+  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog };
 }
 
 // ФИХ: один запрос вместо двух (sbLoadPin + отдельный user_data)
@@ -165,6 +167,50 @@ function ustEintragToDb(e) {
 }
 
 // ── SAVE / DELETE ──────────────────────────────────────────────────────────
+
+// ── ANGEBOTE ──────────────────────────────────────────────────
+function angebotToDb(a) {
+  return {
+    id: a.id,
+    user_id: currentUser.id,
+    nr: a.nr || null,
+    datum: a.datum || null,
+    gueltig: a.gueltig || null,
+    status: a.status || 'offen',
+    kunde: a.kunde || null,
+    adresse: a.adresse || null,
+    betrag: a.betrag || 0,
+    notiz: a.notiz || null,
+    betreff: a.betreff || null,
+    referenz: a.referenz || null,
+    kopftext: a.kopftext || null,
+    fusstext: a.fusstext || null,
+    preis_mode: a.preisMode || 'brutto',
+    positionen: a.positionen ? JSON.stringify(a.positionen) : null,
+  };
+}
+function dbToAngebot(r) {
+  let pos = [];
+  try { if (r.positionen) pos = typeof r.positionen === 'string' ? JSON.parse(r.positionen) : r.positionen; } catch(e){}
+  return {
+    id: r.id, nr: r.nr||'', datum: r.datum||'', gueltig: r.gueltig||'',
+    status: r.status||'offen', kunde: r.kunde||'', adresse: r.adresse||'',
+    betrag: parseFloat(r.betrag)||0, notiz: r.notiz||'',
+    betreff: r.betreff||'', referenz: r.referenz||'',
+    kopftext: r.kopftext||'', fusstext: r.fusstext||'',
+    preisMode: r.preis_mode||'brutto', positionen: pos
+  };
+}
+async function sbSaveAngebot(a) {
+  if (!currentUser) return;
+  const { error } = await sb.from('angebote').upsert(angebotToDb(a), { onConflict:'id' });
+  if (error) console.error('Save angebot:', error);
+}
+async function sbDeleteAngebot(id) {
+  if (!currentUser) return;
+  await sb.from('angebote').delete().eq('id', id).eq('user_id', currentUser.id);
+}
+
 async function sbSaveEintrag(e) {
   if (!currentUser) { console.warn('sbSaveEintrag: no user'); return; }
   const {error} = await sb.from('eintraege').upsert(eintragToDb(e), {onConflict:'id'});

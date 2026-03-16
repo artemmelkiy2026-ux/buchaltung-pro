@@ -404,3 +404,110 @@ function angZuRechnungFromModal() {
   closeModal('ang-modal');
   if(a) angZuRechnung(a.id);
 }
+
+// ── VORSCHAU / DRUCK ──────────────────────────────────────────
+function printAngebot() {
+  const nr      = document.getElementById('ang-nr')?.value || '—';
+  const datum   = document.getElementById('ang-dat')?.value || '';
+  const gueltig = document.getElementById('ang-gueltig')?.value || '';
+  const kunde   = document.getElementById('ang-kunde')?.value || '';
+  const adresse = (document.getElementById('ang-adresse')?.value || '').replace(/\n/g,'<br>');
+  const betreff = document.getElementById('ang-betreff')?.value || '';
+  const referenz= document.getElementById('ang-referenz')?.value || '';
+  const kopf    = (document.getElementById('ang-kopftext')?.value || '').replace(/\n/g,'<br>');
+  const fuss    = (document.getElementById('ang-fusstext')?.value || '').replace(/\n/g,'<br>');
+  const nettoEl = document.getElementById('ang-sum-netto')?.textContent || '0,00 €';
+  const mwstEl  = document.getElementById('ang-sum-mwst')?.textContent  || '0,00 €';
+  const brutto  = document.getElementById('ang-sum-brutto')?.textContent|| '0,00 €';
+
+  // Firma aus localStorage
+  let firma = {};
+  try { firma = JSON.parse(localStorage.getItem('bp_firma')||'{}'); } catch(e){}
+  const firmaName = firma.name || 'Mein Unternehmen';
+  const firmaAdr  = [firma.strasse, firma.plz&&firma.ort?firma.plz+' '+firma.ort:''].filter(Boolean).join(', ');
+
+  // Positionen
+  const rows = [...document.querySelectorAll('#ang-pos-list .ang-pos-row')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    const sel    = row.querySelector('select');
+    const bez    = inputs[0]?.value || '';
+    const menge  = inputs[1]?.value || '1';
+    const einh   = inputs[2]?.value || 'Stk.';
+    const preis  = inputs[3]?.value || '0';
+    const ust    = sel?.value || '0';
+    const betrag = row.querySelector('.ang-betrag')?.textContent || '0,00 €';
+    return `<tr>
+      <td style="padding:8px 10px">${bez}</td>
+      <td style="padding:8px 10px;text-align:center">${menge}</td>
+      <td style="padding:8px 10px;text-align:center">${einh}</td>
+      <td style="padding:8px 10px;text-align:right">${preis} €</td>
+      <td style="padding:8px 10px;text-align:center">${ust}%</td>
+      <td style="padding:8px 10px;text-align:right;font-weight:600">${betrag}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
+  <title>Angebot ${nr}</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:13px;color:#222;margin:0;padding:32px;max-width:800px;margin:0 auto}
+    h1{font-size:22px;font-weight:700;margin:0 0 4px}
+    .meta{color:#666;font-size:12px;margin-bottom:24px}
+    .two-col{display:flex;gap:40px;margin-bottom:24px}
+    .two-col>div{flex:1}
+    .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:4px}
+    table{width:100%;border-collapse:collapse;margin:16px 0}
+    thead tr{background:#f5f7fa}
+    th{padding:8px 10px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#555;border-bottom:2px solid #e5e7eb}
+    td{border-bottom:1px solid #f0f0f0}
+    .totals{margin-left:auto;width:260px;margin-top:8px}
+    .totals tr td{padding:5px 10px;border:none}
+    .totals .total-row{font-size:15px;font-weight:800;border-top:2px solid #222}
+    .kopf{margin-bottom:20px;line-height:1.6}
+    .fuss{margin-top:24px;color:#555;line-height:1.6;border-top:1px solid #e5e7eb;padding-top:16px}
+    @media print{body{padding:16px}}
+  </style></head><body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px">
+    <div>
+      <div style="font-size:20px;font-weight:800;color:#1a4578">${firmaName}</div>
+      <div style="color:#666;font-size:12px">${firmaAdr}</div>
+    </div>
+    <div style="text-align:right">
+      <h1>Angebot</h1>
+      <div class="meta">
+        Nr. <strong>${nr}</strong> · ${fd(datum)}
+        ${gueltig ? ' · Gültig bis '+fd(gueltig) : ''}
+        ${referenz ? '<br>Ref: '+referenz : ''}
+      </div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="label">An</div>
+      <div style="font-weight:600">${kunde}</div>
+      <div style="color:#555">${adresse}</div>
+    </div>
+    ${betreff ? `<div><div class="label">Betreff</div><div style="font-weight:600">${betreff}</div></div>` : ''}
+  </div>
+  ${kopf ? `<div class="kopf">${kopf}</div>` : ''}
+  <table>
+    <thead><tr>
+      <th>Produkt / Leistung</th>
+      <th style="text-align:center">Menge</th>
+      <th style="text-align:center">Einh.</th>
+      <th style="text-align:right">Preis</th>
+      <th style="text-align:center">USt.</th>
+      <th style="text-align:right">Betrag</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <table class="totals">
+    <tr><td style="color:#666">Gesamtsumme Netto</td><td style="text-align:right">${nettoEl}</td></tr>
+    <tr><td style="color:#666">Umsatzsteuer</td><td style="text-align:right">${mwstEl}</td></tr>
+    <tr class="total-row"><td>Gesamt</td><td style="text-align:right;color:#1a4578">${brutto}</td></tr>
+  </table>
+  ${fuss ? `<div class="fuss">${fuss}</div>` : ''}
+  </body></html>`;
+
+  const w = window.open('','_blank','width=860,height=700');
+  if(w){ w.document.write(html); w.document.close(); w.focus(); setTimeout(()=>w.print(),400); }
+}
