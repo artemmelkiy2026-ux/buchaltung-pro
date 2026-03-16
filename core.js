@@ -132,17 +132,8 @@ function toggleNavGroup(groupId, headerId) {
   if (header) header.classList.toggle('open', !isOpen);
 }
 
-// Открываем группу Aufträge при переходе в Angebote / Rechnungen / Wiederkehrend
-function openNavGroupIfNeeded(id) {
-  if (['angebote','angebote-form','rechnungen'].includes(id)) {
-    const group  = document.getElementById('auftraege-group');
-    const header = document.getElementById('auftraege-header');
-    if (group && !group.classList.contains('open')) {
-      group.classList.add('open');
-      if (header) header.classList.add('open');
-    }
-  }
-}
+// openNavGroupIfNeeded — удалено (группа Aufträge теперь развёрнутая секция)
+function openNavGroupIfNeeded(id) { /* no-op */ }
 
 function appInit(){
   document.getElementById('nf-dat').value=new Date().toISOString().split('T')[0];

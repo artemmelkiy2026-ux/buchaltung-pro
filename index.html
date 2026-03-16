@@ -104,17 +104,28 @@
 <div id="mob-drawer">
   <div class="mob-drawer-handle"></div>
 
-  <div class="mob-drawer-title">Analyse</div>
+  <div class="mob-drawer-title">Buchen</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('wiederkehrend')"><span class="ic"><i class="fas fa-sync-alt"></i></span> Wiederkehrend</div>
+
+  <div class="mob-drawer-sep"></div>
+  <div class="mob-drawer-title">Aufträge</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('angebote')"><span class="ic"><i class="fas fa-file-alt"></i></span> Angebote</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('rechnungen')"><span class="ic"><i class="fas fa-file-invoice"></i></span> Rechnungen</div>
+
+  <div class="mob-drawer-sep"></div>
+  <div class="mob-drawer-title">Kontakte</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('kunden')"><span class="ic"><i class="fas fa-address-book"></i></span> Kunden (CRM)</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('produkte')"><span class="ic"><i class="fas fa-box"></i></span> Produkte &amp; Leistungen</div>
+
+  <div class="mob-drawer-sep"></div>
+  <div class="mob-drawer-title">Auswertung</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('prognose')"><span class="ic"><i class="fas fa-chart-line"></i></span> Prognose</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('kategorien')"><span class="ic"><i class="fas fa-chart-bar"></i></span> Kategorien</div>
-  <div class="mob-drawer-item" onclick="mobNavDrawer('kunden')"><span class="ic"><i class="fas fa-address-book"></i></span> Kunden (CRM)</div>
-  <div class="mob-drawer-item" onclick="mobNavDrawer('rechnungen')"><span class="ic"><i class="fas fa-receipt"></i></span> Rechnungen</div>
-  <div class="mob-drawer-item" onclick="mobNavDrawer('journal')"><span class="ic"><i class="fas fa-book"></i></span> Journal (GoBD)</div>
-  <div class="mob-drawer-item" onclick="mobNavDrawer('wiederkehrend')"><span class="ic"><i class="fas fa-sync-alt"></i></span> Wiederkehrend</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('zahlungen')"><span class="ic"><i class="fas fa-credit-card"></i></span> Zahlungsarten</div>
 
   <div class="mob-drawer-sep"></div>
-  <div class="mob-drawer-title">Finanzamt</div>
+  <div class="mob-drawer-title">GoBD &amp; Finanzamt</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('journal')"><span class="ic"><i class="fas fa-book"></i></span> Journal (GoBD)</div>
   <div class="mob-drawer-item" onclick="mobNavDrawer('ust')"><span class="ic"><i class="fas fa-percentage"></i></span> Umsatzsteuer</div>
   <div class="mob-drawer-sep"></div>
 </div>
@@ -135,16 +146,10 @@
   <div class="nav-item" onclick="nav('wiederkehrend',this)"><span class="ic"><i class="fas fa-sync-alt"></i></span> Wiederkehrend</div>
   <div class="nav-divider"></div>
 
-  <!-- Aufträge — раскрывающаяся группа (закрыта по умолчанию) -->
-  <div class="nav-group-header" id="auftraege-header" onclick="toggleNavGroup('auftraege-group','auftraege-header')">
-    <span class="nav-group-icon"><i class="fas fa-envelope-open-text"></i></span>
-    <span class="nav-group-label">Aufträge</span>
-    <i class="fas fa-chevron-right nav-group-arrow" id="auftraege-arrow"></i>
-  </div>
-  <div class="nav-group-children" id="auftraege-group">
-    <div class="nav-item nav-child" onclick="nav('angebote',this)"><span class="ic"><i class="fas fa-file-alt"></i></span> Angebote</div>
-    <div class="nav-item nav-child" onclick="nav('rechnungen',this)"><span class="ic"><i class="fas fa-file-invoice"></i></span> Rechnungen</div>
-  </div>
+  <!-- Aufträge -->
+  <div class="sidebar-section">Aufträge</div>
+  <div class="nav-item" onclick="nav('angebote',this)"><span class="ic"><i class="fas fa-file-alt"></i></span> Angebote</div>
+  <div class="nav-item" onclick="nav('rechnungen',this)"><span class="ic"><i class="fas fa-file-invoice"></i></span> Rechnungen</div>
   <div class="nav-divider"></div>
 
   <!-- Kontakte -->
