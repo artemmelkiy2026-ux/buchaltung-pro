@@ -564,67 +564,105 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   display: none;
 }
 
-
-/* Кнопка «Ещё» — "More" drawer trigger */
 .mob-more-btn { display: none; }
 .mob-show { display: none; }
 
-/* Drawer — полный список разделов */
+/* ── Drawer — боковое меню слева ── */
 #mob-drawer {
   display: none;
   position: fixed;
-  bottom: 0; left: 0; right: 0;
+  top: 0; left: 0; bottom: 0;
+  width: 280px;
   background: var(--s1);
-  border-top: 1px solid var(--border2);
-  border-radius: 20px 20px 0 0;
-  z-index: 300;
-  padding: 12px 0 env(safe-area-inset-bottom, 0);
-  transform: translateY(100%);
-  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  border-right: 1px solid var(--border);
+  z-index: 400;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
-#mob-drawer.open { transform: translateY(0); }
+#mob-drawer.open { transform: translateX(0); }
+
 #mob-drawer-overlay {
   display: none;
   position: fixed; inset: 0;
   background: #00000055;
-  z-index: 150;
-  backdrop-filter: blur(3px);
+  z-index: 350;
+  backdrop-filter: blur(2px);
 }
 #mob-drawer-overlay.open { display: block; }
-.mob-drawer-handle {
-  width: 36px; height: 4px;
-  background: var(--border2);
-  border-radius: 2px;
-  margin: 0 auto 14px;
+
+/* Шапка drawer */
+.mob-drawer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
 }
-.mob-drawer-title {
-  font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .12em;
+
+/* Группа в drawer */
+.mob-drawer-group { margin: 2px 8px; }
+.mob-drawer-group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: background .15s;
+  user-select: none;
+}
+.mob-drawer-group-header:hover { background: var(--s2); }
+.mob-drawer-group-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 14px;
   color: var(--sub);
-  padding: 0 16px 6px;
+  flex-shrink: 0;
 }
-.mob-drawer-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 20px;
-  color: var(--muted); font-size: 14px; font-weight: 500;
+.mob-drawer-arrow {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--sub);
+  transition: transform .2s;
+}
+.mob-drawer-group.open .mob-drawer-arrow { transform: rotate(90deg); }
+.mob-drawer-group.open .mob-drawer-group-header { color: var(--blue); }
+.mob-drawer-group.open .mob-drawer-group-icon { color: var(--blue); }
+
+/* Дочерние пункты */
+.mob-drawer-group-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .25s cubic-bezier(.4,0,.2,1);
+  margin-left: 16px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+}
+.mob-drawer-group.open .mob-drawer-group-body { max-height: 300px; }
+.mob-drawer-child {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #4a6080;
   cursor: pointer;
+  border-radius: var(--r);
+  margin: 1px 4px;
   transition: background .12s, color .12s;
-  border-radius: 0;
 }
-.mob-drawer-item:hover,
-.mob-drawer-item:active { background: var(--s2); color: var(--text); }
-.mob-drawer-item.active { color: var(--blue); }
-.mob-drawer-item .ic { font-size: 20px; width: 24px; text-align: center; }
-.mob-drawer-sep { height: 1px; background: var(--border); margin: 6px 16px; }
-.mob-drawer-action {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 20px;
-  color: var(--muted); font-size: 13px;
-  cursor: pointer;
-  transition: background .12s;
-}
-.mob-drawer-action:hover { background: var(--s2); color: var(--text); }
-.mob-drawer-action .ic { font-size: 16px; width: 24px; text-align: center; }
+.mob-drawer-child:hover { background: var(--s2); color: var(--text); }
+.mob-drawer-child.active { color: var(--blue); font-weight: 600; }
+
+/* Старые стили (оставляем для совместимости) */
+.mob-drawer-handle { display: none; }
+.mob-drawer-title { display: none; }
+.mob-drawer-item { display: none; }
+.mob-drawer-sep { display: none; }
 
 /* ═══════════════════════════════════════════════════════════════
    МОБИЛЬНЫЙ BREAKPOINT 768px
@@ -740,14 +778,28 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     background: var(--blue);
     border-radius: 0 0 2px 2px;
   }
-  .mob-tab .tab-ic { font-size: 25px; line-height: 1; }
+  .mob-tab .tab-ic { font-size: 22px; line-height: 1; }
   .mob-tab .tab-lbl { font-size: 9px; }
+
+  /* Кнопка «Neu» — выделенная */
+  .mob-plus-ic {
+    font-size: 22px !important;
+    color: #fff !important;
+    background: var(--blue);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+    box-shadow: 0 3px 10px rgba(26,69,120,.4);
+  }
 
   /* Кнопка «Ещё» как отдельный таб */
   .mob-tab.more-tab { color: var(--sub); }
 
   /* ── Drawer виден ── */
-   #mob-drawer { display: block; background:#fff; }
+  #mob-drawer { display: block; background: var(--s1); }
 
   /* ── Контентные зоны ── */
   .page-inner { padding: 12px 12px 16px; }

@@ -100,10 +100,10 @@ document.addEventListener('click',function(e){
 // ── MOBILE BOTTOM NAV ─────────────────────────────────────────
 // Таббары которые соответствуют разделам
 const MOB_TAB_MAP = {
-  dashboard: 'mobt-dashboard',
-  eintraege: 'mobt-eintraege',
-  neu:       'mobt-neu',
-  bericht:   'mobt-bericht',
+  dashboard:  'mobt-dashboard',
+  eintraege:  'mobt-eintraege',
+  neu:        'mobt-neu',
+  rechnungen: 'mobt-rechnungen',
 };
 
 function mobNav(page, tabEl) {
@@ -135,6 +135,27 @@ function openMobDrawer() {
 function closeMobDrawer() {
   document.getElementById('mob-drawer').classList.remove('open');
   document.getElementById('mob-drawer-overlay').classList.remove('open');
+}
+
+function toggleMobGroup(headerEl) {
+  const group = headerEl.closest('.mob-drawer-group');
+  if (!group) return;
+  group.classList.toggle('open');
+}
+
+function mobNavDrawer(page) {
+  closeMobDrawer();
+  // Подсвечиваем активный child
+  document.querySelectorAll('.mob-drawer-child').forEach(el => el.classList.remove('active'));
+  const sidebarEl = document.querySelector('.nav-item[onclick*="' + page + '"]');
+  if (sidebarEl) nav(page, sidebarEl);
+  else {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const pg = document.getElementById('p-' + page);
+    if (pg) pg.classList.add('active');
+  }
+  // Снимаем активность с табов
+  document.querySelectorAll('.mob-tab').forEach(t => t.classList.remove('active'));
 }
 
 // Синхронизируем мобильные табы с desktop nav()
