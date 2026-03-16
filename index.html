@@ -1126,6 +1126,1126 @@
       <button class="btn" style="padding:10px 18px" onclick="closeModal('edit-modal')">Abbrechen</button>
     </div>
   </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+/* Scan layout: desktop 2col, mobile 1col */
+@media (max-width: 900px) {
+  #neu-layout {
+    grid-template-columns: 1fr !important;
+  }
+  #scan-beleg-box {
+    position: static !important;
+    order: -1;
+  }
+}
+/* Scan progress animation */
+@keyframes scan-progress-slide {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(150%); }
+  100% { transform: translateX(400%); }
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOADING SCREEN ────────────────────────────────────────────────────── -->
+<div id="loading-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background: #ffffff;">
+  <div style="text-align:center">
+    <div style="font-size:48px;margin-bottom:16px"><img src="mini-logo.svg" width="80px" height="auto" alt="mini logo MelaLogic">
+<p style="font-size:13px;color:var(--sub)">Laden...</p></div>
+    
+    
+  </div>
+</div>
+
+<!-- ── AUTH SCREEN moved to login.html ──>
+<div id="auth-screen" style="display:none"></div>
+
+
+
+<!-- ── APP WRAPPER ─────────────────────────────────────────────────────── -->
+<div id="app-wrapper" style="display:none">
+
+<!-- ══════════════════════════════════════════════════════════ -->
+
+
+
+<!-- HEADER -->
+<header>
+  <div class="logo" onclick="lockApp()" style="cursor:pointer"><img src="MelaLogic-logo.svg" width="140px" height="auto" alt="mini logo MelaLogic">  </div>
+  
+
+  <div class="hd">
+
+  </div>
+
+  <div class="hr">
+    <!-- Индикатор сохранения в облако -->
+    <span id="save-indicator" style="font-size:11px;color:var(--sub);opacity:0;transition:opacity .4s;margin-right:8px"></span>
+    <!-- Пользователь -->
+    <div style="display:flex;align-items:center;gap:8px">
+      <button onclick="location.href='profile.html'" class="btn" title="Profil" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-user" style="font-size:1.3rem"></i></button>
+
+      <button id="signout-btn" class="btn" title="Abmelden" onclick="sbSignOut()" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-right-from-bracket" style="font-size:1.3rem"></i></button>
+    </div>
+  </div>
+  <input type="file" id="fi" accept=".json" style="display:none" onchange="onLoad(event)">
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     MOBILE BOTTOM NAVIGATION (только мобильный)
+     ══════════════════════════════════════════════════════════ -->
+<nav id="mob-bottom-nav">
+  <button class="mob-tab active" id="mobt-dashboard" onclick="mobNav('dashboard',this)">
+    <span class="tab-ic"><i class="fas fa-home"></i></span><span class="tab-lbl">Dashboard</span>
+  </button>
+  <button class="mob-tab" id="mobt-eintraege" onclick="mobNav('eintraege',this)">
+    <span class="tab-ic"><i class="fas fa-list"></i></span><span class="tab-lbl">Einträge</span>
+  </button>
+  <button class="mob-tab" id="mobt-neu" onclick="mobNav('neu',this)">
+    <span class="tab-ic" style="font-size:25px;color:var(--blue)"><i class="fa-solid fa-plus"></i></span><span class="tab-lbl">Eintrag</span>
+  </button>
+  <button class="mob-tab" id="mobt-bericht" onclick="mobNav('bericht',this)">
+    <span class="tab-ic"><i class="fas fa-calendar-alt"></i></span><span class="tab-lbl">Bericht</span>
+  </button>
+  <button class="mob-tab more-tab" onclick="openMobDrawer()">
+    <span class="tab-ic"><i class="fas fa-bars"></i></span><span class="tab-lbl">Mehr</span>
+  </button>
+</nav>
+
+<!-- MOBILE DRAWER (все остальные разделы) -->
+<div id="mob-drawer-overlay" onclick="closeMobDrawer()"></div>
+<div id="mob-drawer">
+  <div class="mob-drawer-handle"></div>
+
+  <div class="mob-drawer-title">Analyse</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('prognose')"><span class="ic"><i class="fas fa-chart-line"></i></span> Prognose</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('kategorien')"><span class="ic"><i class="fas fa-chart-bar"></i></span> Kategorien</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('kunden')"><span class="ic"><i class="fas fa-address-book"></i></span> Kunden (CRM)</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('rechnungen')"><span class="ic"><i class="fas fa-receipt"></i></span> Rechnungen</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('journal')"><span class="ic"><i class="fas fa-book"></i></span> Journal (GoBD)</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('wiederkehrend')"><span class="ic"><i class="fas fa-sync-alt"></i></span> Wiederkehrend</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('zahlungen')"><span class="ic"><i class="fas fa-credit-card"></i></span> Zahlungsarten</div>
+
+  <div class="mob-drawer-sep"></div>
+  <div class="mob-drawer-title">Finanzamt</div>
+  <div class="mob-drawer-item" onclick="mobNavDrawer('ust')"><span class="ic"><i class="fas fa-percentage"></i></span> Umsatzsteuer</div>
+  <div class="mob-drawer-sep"></div>
+</div>
+</div>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+
+  <!-- Dashboard -->
+  <div class="nav-item active" onclick="nav('dashboard',this)"><span class="ic"><i class="fas fa-home"></i></span> Dashboard</div>
+  <div class="nav-divider"></div>
+
+  <!-- Buchen -->
+  <div class="sidebar-section">Buchen</div>
+  <div class="nav-item" onclick="nav('neu',this)"><span class="ic"><i class="fa-solid fa-plus"></i></span> Neuer Eintrag</div>
+  <div class="nav-item" onclick="nav('eintraege',this)"><span class="ic"><i class="fas fa-list"></i></span> Einträge</div>
+  <div class="nav-item" onclick="nav('wiederkehrend',this)"><span class="ic"><i class="fas fa-sync-alt"></i></span> Wiederkehrend</div>
+  <div class="nav-divider"></div>
+
+  <!-- Aufträge — раскрывающаяся группа (закрыта по умолчанию) -->
+  <div class="nav-group-header" id="auftraege-header" onclick="toggleNavGroup('auftraege-group','auftraege-header')">
+    <span class="nav-group-icon"><i class="fas fa-envelope-open-text"></i></span>
+    <span class="nav-group-label">Aufträge</span>
+    <i class="fas fa-chevron-right nav-group-arrow" id="auftraege-arrow"></i>
+  </div>
+  <div class="nav-group-children" id="auftraege-group">
+    <div class="nav-item nav-child" onclick="nav('angebote',this)"><span class="ic"><i class="fas fa-file-alt"></i></span> Angebote</div>
+    <div class="nav-item nav-child" onclick="nav('rechnungen',this)"><span class="ic"><i class="fas fa-file-invoice"></i></span> Rechnungen</div>
+  </div>
+  <div class="nav-divider"></div>
+
+  <!-- Kontakte -->
+  <div class="sidebar-section">Kontakte</div>
+  <div class="nav-item" onclick="nav('kunden',this)"><span class="ic"><i class="fas fa-address-book"></i></span> Kunden (CRM)</div>
+  <div class="nav-divider"></div>
+
+  <!-- Auswertung -->
+  <div class="sidebar-section">Auswertung</div>
+  <div class="nav-item" onclick="nav('bericht',this)"><span class="ic"><i class="fas fa-calendar-alt"></i></span> Monatsbericht</div>
+  <div class="nav-item" onclick="nav('prognose',this)"><span class="ic"><i class="fas fa-chart-line"></i></span> Prognose</div>
+  <div class="nav-item" onclick="nav('kategorien',this)"><span class="ic"><i class="fas fa-chart-bar"></i></span> Kategorien</div>
+  <div class="nav-item" onclick="nav('zahlungen',this)"><span class="ic"><i class="fas fa-credit-card"></i></span> Zahlungsarten</div>
+  <div class="nav-divider"></div>
+
+  <!-- GoBD & Finanzamt -->
+  <div class="sidebar-section">GoBD &amp; Finanzamt</div>
+  <div class="nav-item" onclick="nav('journal',this)"><span class="ic"><i class="fas fa-book"></i></span> Journal</div>
+  <div class="nav-item" onclick="nav('ust',this)"><span class="ic"><i class="fas fa-percentage"></i></span> Umsatzsteuer</div>
+
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ── DASHBOARD ── -->
+<div class="page active" id="p-dashboard">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Dashboard</div>
+      <div class="ph-sub">Übersicht — <span id="dash-yr-lbl"></span></div>
+    </div>
+    <div class="ph-right">
+      <select id="dash-yr" onchange="renderDash()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--sans)">
+        <option>Alle</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="stats" id="dash-stats">
+    <div class="sc g"><div class="sc-lbl">Einnahmen</div><div class="sc-val" id="d-ein">—</div><div class="sc-sub" id="d-ein-c">—</div><div class="sc-bar"><div class="sc-bar-fill" id="d-ein-bar" style="background:var(--green);width:0"></div></div></div>
+    <div class="sc r"><div class="sc-lbl">Ausgaben</div><div class="sc-val" id="d-aus">—</div><div class="sc-sub" id="d-aus-c">—</div><div class="sc-bar"><div class="sc-bar-fill" id="d-aus-bar" style="background:var(--red);width:0"></div></div></div>
+    <div class="sc b"><div class="sc-lbl">Gewinn (EÜR)</div><div class="sc-val" id="d-gew">—</div><div class="sc-sub" id="d-gew-s">Einnahmen − Ausgaben</div></div>
+    <div class="sc y"><div class="sc-lbl">Limit KU (25k)</div><div class="sc-val" id="d-lim">0%</div><div class="sc-sub" id="d-lim-s">0 € von 25.000 €</div><div class="sc-bar"><div class="sc-bar-fill" id="d-lim-bar" style="background:var(--yellow);width:0"></div></div></div>
+    <div class="sc p"><div class="sc-lbl">Einträge gesamt</div><div class="sc-val" id="d-cnt">—</div><div class="sc-sub" id="d-cnt-s">—</div></div>
+    <div class="sc r" id="d-mwst-card" style="display:none"><div class="sc-lbl">MwSt-Zahllast</div><div class="sc-val" style="color:var(--red)">—</div><div class="sc-sub">USt − Vorsteuer</div></div>
+  </div>
+
+  <!-- Chart -->
+  <div style="background:var(--s1);border-radius:var(--r2);padding:5px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub)"><i class="fas fa-chart-line"></i> Monatsverlauf</span>
+  
+    </div>
+    <div id="d-chart-container" style="position:relative;height:300px;margin-top:12px;margin-bottom:20px">
+      <canvas id="d-chart"></canvas>
+    </div>
+    <div id="d-cxl" style="display:flex;gap:4px;padding-top:5px"></div>
+  </div>
+
+  <!-- Recent -->
+  <div id="d-recent-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">Letzte 10 Einträge</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+        <button class="btn" id="dsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortDash('datum')">Datum</button>
+        <button class="btn" id="dsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortDash('betrag')">Betrag</button>
+        <button class="btn" id="dsort-typ"    style="padding:4px 10px;font-size:11px" onclick="sortDash('typ')">Typ</button>
+      </div>
+    </div>
+    <div id="d-recent"></div>
+  </div>
+</div>
+</div>
+
+<!-- ── EINTRÄGE ── -->
+<div class="page" id="p-eintraege">
+<div class="page-inner">
+
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Einträge</div></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="filter-tabs">
+      <button class="ftab active" onclick="setFTyp('Alle',this)">Alle</button>
+      <button class="ftab" onclick="setFTyp('Einnahme',this)">▲ Einnahmen</button>
+      <button class="ftab" onclick="setFTyp('Ausgabe',this)">▼ Ausgaben</button>
+    </div>
+    <div class="toolbar-group">
+      <label>Jahr</label>
+      <select id="f-jahr" onchange="renderEin()"><option value="Alle">Alle</option></select>
+    </div>
+    <div class="toolbar-group">
+      <label>Monat</label>
+      <select id="f-mon" onchange="renderEin()">
+        <option value="Alle">Alle</option>
+        <option value="01">Januar</option><option value="02">Februar</option><option value="03">März</option>
+        <option value="04">April</option><option value="05">Mai</option><option value="06">Juni</option>
+        <option value="07">Juli</option><option value="08">August</option><option value="09">September</option>
+        <option value="10">Oktober</option><option value="11">November</option><option value="12">Dezember</option>
+      </select>
+    </div>
+    <div class="toolbar-group">
+      <label>Kategorie</label>
+      <select id="f-kat" onchange="renderEin()"><option value="Alle">Alle</option></select>
+    </div>
+    <div class="toolbar-group">
+      <label><span class="mob-hide">Zahlung</span><span class="mob-show">Zahl</span></label>
+      <select id="f-zahl" onchange="renderEin()">
+        <option value="Alle">Alle</option>
+        <option>Überweisung</option><option>Barzahlung</option><option>PayPal</option>
+        <option>EC-Karte</option><option>Lastschrift</option><option>Sonstiges</option>
+      </select>
+    </div>
+    <div class="toolbar-group">
+      <label><i class="fas fa-search"></i></label>
+      <input type="text" id="f-q" placeholder="Suche..." oninput="renderEin()" style="width:140px">
+    </div>
+    <button class="csv" onclick="exportCSV()"><i class="fa-solid fa-download"></i> CSV</button>
+    <button class="csv" onclick="exportPDF()" style="background:var(--blue);color:#fff"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+  </div>
+
+  <!-- Sort bar -->
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" id="esort-datum"       style="padding:4px 10px;font-size:11px" onclick="sortE('datum')">Datum</button>
+    <button class="btn" id="esort-betrag"      style="padding:4px 10px;font-size:11px" onclick="sortE('betrag')">Betrag</button>
+    <button class="btn" id="esort-kategorie"   style="padding:4px 10px;font-size:11px" onclick="sortE('kategorie')">Kategorie</button>
+    <button class="btn" id="esort-zahlungsart" style="padding:4px 10px;font-size:11px" onclick="sortE('zahlungsart')">Zahlung</button>
+    <!-- compat hidden elements for JS refs -->
+    <span id="th-datum" style="display:none"></span>
+    <span id="th-typ" style="display:none"></span>
+    <span id="th-kat" style="display:none"></span>
+    <span id="th-desc" style="display:none"></span>
+    <span id="th-desc-mob" style="display:none"></span>
+    <span id="th-zahl" style="display:none"></span>
+    <span id="th-netto" style="display:none"></span>
+    <span id="th-mwst" style="display:none"></span>
+    <span id="th-bet" style="display:none"></span>
+  </div>
+  <div id="e-tbody"></div>
+  <div id="e-pagination" style="margin-top:8px"></div>
+  <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-inbox"></i></div><p>Keine Einträge gefunden</p></div>
+  <!-- Summary -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;font-family: var(--mono);" id="e-sum">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einträge</div>
+      <div style="font-size:18px;font-weight:700" id="es-cnt">0</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
+      <div style="font-size:18px;font-weight:700;color:var(--green)" id="es-ein">0,00 €</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Ausgaben</div>
+      <div style="font-size:18px;font-weight:700;color:var(--red)" id="es-aus">0,00 €</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Gewinn</div>
+      <div style="font-size:18px;font-weight:700" id="es-gew">0,00 €</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ── JOURNAL (GoBD) ── -->
+<div class="page" id="p-journal">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Buchungsjournal</div>
+      <div class="ph-sub">GoBD §146 · §147 AO — vollständige Änderungshistorie</div>
+    </div>
+    <div class="ph-right">
+      <span id="journal-count" style="font-size:12px;color:var(--sub);font-family:var(--mono)"></span>
+    </div>
+  </div>
+  <!-- Вкладки -->
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <button id="jtab-eintraege" onclick="setJournalTab('eintraege')"
+      style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:var(--blue);color:#fff;transition:all .15s">
+      <i class="fas fa-list"></i> Einträge (GoBD-Storno)
+    </button>
+    <button id="jtab-rechnungen" onclick="setJournalTab('rechnungen')"
+      style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:;color:;transition:all .15s">
+      <i class="fas fa-file-invoice"></i> Rechnungen-Log
+    </button>
+  </div>
+  <div id="journal-eintraege-controls">
+    <div style="background:rgba(26,69,120,.06);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px">
+      <i class="fas fa-info-circle"></i> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+      <button class="btn" id="jsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortJournal('datum')">Datum</button>
+      <button class="btn" id="jsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortJournal('betrag')">Betrag</button>
+    </div>
+  </div>
+  <div id="journal-tbody"></div>
+  <div id="journal-pagination"></div>
+  <div id="journal-empty" class="empty-state" style="display:none">
+    <div class="ei"><i class="fas fa-book"></i></div>
+    <p>Keine Storno-Buchungen vorhanden</p>
+    <p style="font-size:12px;color:var(--sub);margin-top:6px">Alle Einträge sind unverändert</p>
+  </div>
+</div>
+</div>
+
+<!-- ── NEUER EINTRAG ── -->
+<div class="page" id="p-neu">
+<div class="page-inner">
+
+
+  <!-- ── TOOLBAR ── -->
+  <div id="neu-toolbar" style="
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;
+    margin-bottom:20px;border-radius:16px;overflow:hidden">
+
+    <!-- Einnahmen -->
+    <div style="
+      background:linear-gradient(135deg,#3d8b4e 0%,#5d9d69 100%);
+      border-radius:14px;padding:16px 20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;
+        border-radius:50%;background:rgba(255,255,255,.08)"></div>
+      <div style="position:absolute;bottom:-24px;left:-10px;width:100px;height:100px;
+        border-radius:50%;background:rgba(255,255,255,.05)"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);
+          display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-arrow-up" style="color:#fff;font-size:12px"></i>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);
+          text-transform:uppercase;letter-spacing:.08em">Einnahmen</span>
+      </div>
+      <div id="toolbar-ein-val" style="
+        font-size:22px;font-weight:800;color:#fff;font-family:var(--mono);
+        letter-spacing:-.5px;position:relative;line-height:1.1">0,00 €</div>
+      <div id="toolbar-ein-cnt" style="font-size:11px;color:rgba(255,255,255,.7);
+        margin-top:4px;position:relative">0 Einträge</div>
+    </div>
+
+    <!-- Ausgaben -->
+    <div style="
+      background:linear-gradient(135deg,#b02a37 0%,#dc3545 100%);
+      border-radius:14px;padding:16px 20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;
+        border-radius:50%;background:rgba(255,255,255,.08)"></div>
+      <div style="position:absolute;bottom:-24px;left:-10px;width:100px;height:100px;
+        border-radius:50%;background:rgba(255,255,255,.05)"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);
+          display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-arrow-down" style="color:#fff;font-size:12px"></i>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);
+          text-transform:uppercase;letter-spacing:.08em">Ausgaben</span>
+      </div>
+      <div id="toolbar-aus-val" style="
+        font-size:22px;font-weight:800;color:#fff;font-family:var(--mono);
+        letter-spacing:-.5px;position:relative;line-height:1.1">0,00 €</div>
+      <div id="toolbar-aus-cnt" style="font-size:11px;color:rgba(255,255,255,.7);
+        margin-top:4px;position:relative">0 Einträge</div>
+    </div>
+
+  </div>
+
+
+
+  <!-- Desktop: 2 Spalten. Mobil: 1 Spalte -->
+  <div id="neu-layout" style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start">
+
+  <!-- LINKE SPALTE: Formular -->
+  <div>
+
+  <!-- USt-Mode Banner in Neuer Eintrag -->
+  <div class="form-panel">
+
+    <div class="typ-toggle">
+      <button class="tt ae" id="btn-e" onclick="setTyp('Einnahme')">▲ Einnahme</button>
+      <button class="tt" id="btn-a" onclick="setTyp('Ausgabe')">▼ Ausgabe</button>
+    </div>
+
+    <!-- Beleg scannen (nur bei Ausgabe, direkt unter Umschalter) -->
+    <div id="scan-beleg-box" style="display:none;margin-top:12px;margin-bottom:4px">
+      <input type="file" id="scan-file-input" accept="image/*" capture="environment" style="display:none" onchange="scanBelegPreview(this)">
+
+      <!-- Scan-Button -->
+      <div id="scan-btn-area">
+        <button onclick="document.getElementById('scan-file-input').click()"
+          style="width:100%;padding:12px 16px;background:rgba(59,130,246,.06);border:2px dashed rgba(59,130,246,.35);color:var(--text);font-size:13px;font-weight:600;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .2s,background .2s;box-sizing:border-box;justify-content: center;"
+          onmouseover="this.style.borderColor='var(--blue)';this.style.background='rgba(59,130,246,.1)'"
+          onmouseout="this.style.borderColor='rgba(59,130,246,.35)';this.style.background='rgba(59,130,246,.06)'">
+          <i class="fas fa-camera" style="font-size:20px;color:var(--blue);flex:0 0 auto"></i>
+          <span style="display:flex;flex-direction:column;align-items:flex-start;gap:1px">
+            <span>Beleg / Rechnung scannen</span>
+            <span style="font-size:11px;font-weight:400;color:var(--sub)">Foto hochladen oder Kamera öffnen</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Vorschau -->
+      <div id="scan-preview-box" style="display:none;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--s2);margin-top:10px">
+        <div style="position:relative">
+          <img id="scan-preview-img" style="width:100%;max-height:300px;object-fit:contain;display:block;transition:transform .15s ease;cursor:crosshair" onmousemove="if(window.innerWidth>900){const r=this.getBoundingClientRect();const x=((event.clientX-r.left)/r.width*100).toFixed(1);const y=((event.clientY-r.top)/r.height*100).toFixed(1);this.style.transformOrigin=x+'% '+y+'%';this.style.transform='scale(2)'}" onmouseleave="this.style.transform='';this.style.transformOrigin=''">
+          <button onclick="scanBelegCancel()"
+            style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div style="padding:8px 12px 12px;display:flex;gap:8px">
+          <button class="btn primary" onclick="scanBelegStart()" style="flex:1;padding:10px;font-size:14px;z-index:1">
+            KI-Analyse starten
+          </button>
+        </div>
+      </div>
+
+      <!-- Status / Animation -->
+      <div id="scan-status" style="display:none;margin-top:10px">
+        <div id="scan-status-inner" style="padding:14px;border-radius:var(--r);background:var(--s2);border:1px solid var(--border);text-align:center">
+        </div>
+      </div>
+
+      <!-- Hinweis-Box -->
+      <div id="scan-hinweis" style="margin-top:8px;padding:8px 12px;border-radius:var(--r);background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);font-size:11px;color:var(--sub);line-height:1.5">
+        <span style="font-weight:600;color:var(--blue)"> KI-Belegerfassung — </span>
+        Datum, Betrag, MwSt und Zahlungsart werden automatisch erkannt.
+      </div>
+    </div>
+    <div class="fgrow c2">
+      <div class="fg"><label>Datum</label><input type="date" id="nf-dat" max="2099-12-31" min="2000-01-01" onchange="updateMwstFormVisibility()"></div>
+      <div class="fg"><label>Betrag (€) <span id="nf-betrag-info" style="font-size:10px;color:#f97316;font-weight:700"></span></label><input type="number" id="nf-bet" placeholder="0,00" step="0.01" min="0.01" oninput="calcNfVorsteuer();calcNfMwst()"></div>
+    </div>
+    <div class="fgrow c2">
+      <div class="fg"><label>Kategorie</label><select id="nf-kat"></select></div>
+      <div class="fg"><label>Zahlungsart</label>
+        <select id="nf-zahl">
+          <option value="Überweisung">Überweisung</option><option value="Barzahlung">Barzahlung</option><option value="PayPal">PayPal</option>
+          <option value="EC-Karte">EC-Karte</option><option value="Lastschrift">Lastschrift</option><option value="Sonstiges">Sonstiges</option>
+        </select>
+      </div>
+    </div>
+    <div class="fgrow c2" id="nf-belegnr-row">
+      <div class="fg" style="flex:0 0 140px"><label>Beleg-Nr. <span style="font-size:10px;color:var(--sub);font-weight:400">(optional)</span></label><input type="text" id="nf-belegnr" placeholder="z.B. 12" style="font-weight:700;font-family:var(--mono)"></div>
+      <div class="fg"><label>Beschreibung</label><input type="text" id="nf-dsc" placeholder="z.B. Handwerkerleistung, Miete März..."></div>
+    </div>
+    <div class="fg"><label>Notiz (optional)</label><textarea id="nf-note" placeholder="Zusätzliche Informationen..."></textarea></div>
+    <!-- MwSt-Block — Regelbesteuerung (erscheint für Einnahme + Ausgabe) -->
+    <div id="nf-mwst-row" style="display:none;border-radius:var(--r);padding:14px 16px;margin-top:8px">
+      <div id="nf-mwst-title" style="font-size:11px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="fg" style="margin:0">
+          <label id="nf-mwst-rate-lbl">MwSt-Satz</label>
+          <!-- Скрытый input хранит значение -->
+          <input type="hidden" id="nf-mwst-rate" value="19">
+          <!-- Кастомный компактный dropdown -->
+          <div id="nf-mwst-rate-wrap" style="position:relative;margin-top:4px">
+            <button type="button" id="nf-mwst-rate-trigger" onclick="toggleMwstDropdown()"
+              style="display:flex;align-items:center;justify-content:space-between;gap:8px;
+                     width:100%;padding:8px 12px;border-radius:var(--r);
+                     border:1px solid var(--border);background:var(--s2);
+                     color:var(--text);font-size:13px;font-weight:600;cursor:pointer;
+                     font-family:inherit;transition:border-color .15s">
+              <span style="display:flex;align-items:center;gap:7px">
+                <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                <span id="nf-mwst-rate-label">19%</span>
+              </span>
+              <i class="fas fa-chevron-down" id="nf-mwst-arrow" style="font-size:10px;color:var(--sub);transition:transform .2s"></i>
+            </button>
+            <div id="nf-mwst-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);
+              background:var(--s1);border:1px solid var(--border);border-radius:10px;
+              box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:200;padding:4px;min-width:160px">
+              <div onclick="setMwstRate(19)" style="display:flex;align-items:center;gap:8px;
+                padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+                id="mwst-opt-19"
+                onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+                <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                19%
+              </div>
+              <div onclick="setMwstRate(7)" style="display:flex;align-items:center;gap:8px;
+                padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+                id="mwst-opt-7"
+                onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+                <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                7%
+              </div>
+               <div onclick="setMwstRate(0)" style="display:flex;align-items:center;gap:8px;
+                padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
+                id="mwst-opt-0"
+                onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+                <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+               0%
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fg" style="margin:0">
+          <label>Netto (€)</label>
+          <input type="number" id="nf-netto-bet" placeholder="0.00" step="0.01"
+            style="font-weight:700;font-family:var(--mono);color:var(--green);background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.3)" readonly>
+        </div>
+        <div class="fg" style="margin:0">
+          <label id="nf-mwst-bet-lbl">MwSt (€)</label>
+          <input type="number" id="nf-mwst-bet" placeholder="0.00" step="0.01"
+            style="font-weight:700;font-family:var(--mono)" readonly>
+        </div>
+      </div>
+      <div id="nf-mwst-summary" style="margin-top:10px;padding:8px 12px;border-radius:6px;font-size:12px;font-family:var(--mono)"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn primary" style="flex:1;min-width:140px;padding:11px" onclick="addEintrag(false)">
+        <i class="fas fa-save"></i> Speichern
+      </button>
+      <button class="btn btn-bezahlt" id="btn-add-bezahlt" style="flex:1;min-width:140px;padding:11px;background:var(--green);color:#fff;border-color:var(--green)" onclick="addEintrag(true)">
+        <i class="fas fa-check-circle"></i> Speichern &amp; Bezahlt
+      </button>
+      <button class="btn" style="padding:11px 16px" onclick="clearForm()">✕</button>
+    </div>
+  </div>
+
+  </div><!-- /linke Spalte -->
+
+  <!-- Rechte Spalte Einnahme: Letzte Einnahmen (nur Desktop) -->
+  <div id="letzte-einnahmen-box" style="display:none;position:sticky;top:20px">
+    <div>
+      <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:#dbe4ec75;border-radius:12px;margin-bottom:10px;">
+        <span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">
+          <i class="fas fa-arrow-up" style="#fff;font-size:12px"></i>
+          Letzte Einnahmen
+        </span>
+        <span id="letzte-ein-summe" style="font-size:14px;font-weight: 600;"></span>
+      </div>
+      <div id="letzte-ein-list">
+        <!-- gefüllt durch renderLetzteEinnahmen() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Rechte Spalte Ausgabe: Letzte Ausgaben (nur Desktop) -->
+  <div id="letzte-ausgaben-box" style="display:none;position:sticky;top:20px">
+    <div>
+      <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(239,68,68,.07);border-radius:12px;margin-bottom:10px;">
+        <span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">
+          <i class="fas fa-arrow-down" style="color:var(--red);font-size:12px"></i>
+          Letzte Ausgaben
+        </span>
+        <span id="letzte-aus-summe" style="font-size:14px;font-weight:600;color:var(--red)"></span>
+      </div>
+      <div id="letzte-aus-list">
+        <!-- gefüllt durch renderLetzteAusgaben() -->
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /neu-layout -->
+
+  <!-- Hinweis Rechnungen -->
+  <div style="margin-top:20px;padding:12px 16px;background:var(--bdim);border-radius:var(--r);border:1px solid rgba(30,80,150,.12);font-size:13px;color:var(--sub);line-height:1.6">
+    <i class="fas fa-info-circle" style="color:var(--blue);margin-right:6px"></i>
+    Wenn Sie eine Rechnung ausstellen möchten, nutzen Sie dafür den Bereich
+    <a href="#" onclick="event.preventDefault();nav('rechnungen',document.querySelector('.nav-item[onclick*=rechnungen]'))" style="color:var(--blue);font-weight:600;text-decoration:none;border-bottom:1px solid var(--blue)">Rechnungen</a>.
+  </div>
+
+</div>
+</div>
+
+<!-- ── MONATSBERICHT ── -->
+<div class="page" id="p-bericht">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title">Monatsbericht</div></div>
+    <div class="ph-right">
+      <select id="rep-yr" onchange="renderRep()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--mono)"></select>
+      <button class="csv" onclick="exportRepCSV()"><span class="mob-hide">Jahresbericht </span>CSV <i class="fa-solid fa-download"></i></button>
+    </div>
+  </div>
+
+  <!-- Jahres-Stats -->
+  <div class="stats rep-stats-grid" style="margin-bottom:20px" id="rep-stats">
+    <div class="sc g"><div class="sc-lbl">Einnahmen gesamt</div><div class="sc-val" id="rs-ein">—</div></div>
+    <div class="sc r"><div class="sc-lbl">Ausgaben gesamt</div><div class="sc-val" id="rs-aus">—</div></div>
+    <div class="sc b"><div class="sc-lbl">Jahresgewinn</div><div class="sc-val" id="rs-gew">—</div></div>
+    <div class="sc y"><div class="sc-lbl">Bester Monat</div><div class="sc-val" id="rs-best">—</div><div class="sc-sub" id="rs-best-s"></div></div>
+    <div class="sc r" id="rs-mwst-card" style="display:none"><div class="sc-lbl">MwSt-Zahllast</div><div class="sc-val">—</div><div class="sc-sub">USt − Vorsteuer</div></div>
+  </div>
+
+  <div class="month-cards rep-month-grid" id="month-cards"></div>
+
+  <!-- hidden compat elements for JS -->
+  <div style="display:none" id="rep-th-netto"></div>
+  <div style="display:none" id="rep-th-mwst"></div>
+  <div style="display:none" id="rep-th-zl"></div>
+  <div style="display:none"><table><tbody id="rep-tbody"></tbody><tfoot id="rep-tfoot"></tfoot></table></div>
+
+  <!-- Итоговый блок -->
+  <div id="rep-total-block" style="margin-top:16px;background:var(--s1);border-radius:14px"></div>
+</div>
+</div>
+
+<!-- ── ZAHLUNGSARTEN ── -->
+<div class="page" id="p-zahlungen">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Zahlungsarten</div>
+      <div class="ph-sub">Analyse nach Zahlungsart</div>
+    </div>
+    <div class="ph-right">
+      <select id="z-yr" onchange="renderZ()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--sans)">
+        <option>Alle</option>
+      </select>
+    </div>
+  </div>
+  <div class="zk-grid" id="zk-grid"></div>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" id="zsort-datum"       style="padding:4px 10px;font-size:11px" onclick="sortZ('datum')">Datum</button>
+    <button class="btn" id="zsort-zahlungsart" style="padding:4px 10px;font-size:11px" onclick="sortZ('zahlungsart')">Zahlungsart</button>
+    <button class="btn" id="zsort-typ"         style="padding:4px 10px;font-size:11px" onclick="sortZ('typ')">Ein / Aus</button>
+  </div>
+  <div id="z-tbody"></div>
+  <div id="z-pagination" style="margin-top:8px"></div>
+  <div id="z-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-credit-card"></i></div><p>Keine Einträge</p></div>
+</div>
+</div>
+
+<!-- ── PROGNOSE ── -->
+<div class="page" id="p-prognose">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Prognose & Vorjahresvergleich</div>
+      <div class="ph-sub">Hochrechnung auf Basis der laufenden Monate</div>
+    </div>
+    <div class="ph-right">
+      <select id="prog-yr" onchange="renderProg()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--sans)"></select>
+    </div>
+  </div>
+
+  <!-- Hero-карточки прогноза -->
+  <div id="prog-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px"></div>
+
+  <!-- Vorjahresvergleich — на всю ширину -->
+  <div style="background:var(--s1);border-radius:var(--r2);margin-bottom:20px">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><i class="fas fa-calendar-alt"></i> Vorjahresvergleich</div>
+    <div id="prog-vergleich"></div>
+  </div>
+
+  <!-- Hochrechnung KU-Limiten -->
+  <div style="background:var(--s1);border-radius:var(--r2)">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><i class="fas fa-tachometer-alt"></i> Kleinunternehmer-Grenzen (§19 UStG)</div>
+    <div id="prog-hochrechnung"></div>
+  </div>
+</div>
+</div>
+
+<!-- ── KATEGORIEN ── -->
+<div class="page" id="p-kategorien">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Kategorienanalyse</div>
+      <div class="ph-sub">Ausgaben & Einnahmen nach Kategorien</div>
+    </div>
+    <div class="ph-right">
+      <select id="kat-yr" onchange="renderKat()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--sans)"></select>
+      <button class="ftab active" id="kat-tab-aus" onclick="setKatTab('Ausgabe',this)">▼ Ausgaben</button>
+      <button class="ftab" id="kat-tab-ein" onclick="setKatTab('Einnahme',this)">▲ Einnahmen</button>
+    </div>
+  </div>
+
+  <!-- Stat-карточки -->
+  <div id="kat-stats" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px"></div>
+
+  <!-- Donut + Плитки -->
+  <div class="kat-layout">
+    <!-- Левая колонка — Donut -->
+    <div class="kat-donut-col">
+      <div class="kat-donut-wrap" id="kat-donut-wrap"></div>
+    </div>
+    <!-- Правая колонка — Плитки Канва -->
+    <div id="kat-grid" class="kat-grid"></div>
+  </div>
+</div>
+</div>
+
+
+<!-- ── KUNDEN (CRM) ── -->
+<div class="page" id="p-kunden">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Kunden (CRM)</div>
+      <div class="ph-sub">Kundenverwaltung · Umsatz · Rechnungen</div>
+    </div>
+    <div class="ph-right">
+      <button class="btn primary" onclick="openKundeModal()"><i class="fas fa-plus"></i> Neuer Kunde</button>
+    </div>
+  </div>
+  <!-- Statistik-Cards -->
+  <div id="kunden-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px"></div>
+  <!-- Sort bar -->
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('name')">Name</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('ort')">Ort</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('umsatz')">Umsatz</button>
+  </div>
+  <!-- Kunden Karten -->
+  <div id="kunden-list" class="kunden-list"></div>
+  <div id="kunden-pagination"></div>
+  <div id="kunden-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-users"></i></div><p>Keine Kunden vorhanden</p></div>
+</div>
+</div>
+
+<!-- ── RECHNUNGEN ── -->
+<div class="page" id="p-rechnungen">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Offene Rechnungen</div>
+    </div>
+    <div class="ph-right">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i> Firmenprofil</button>
+      <button class="btn primary" onclick="openRechModal()">＋ Rechnung erstellen</button>
+    </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="rech-cards"></div>
+  <!-- Filter + Suche -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+    <button class="ftab active" onclick="setRechFilter('alle',this)">Alle</button>
+    <button class="ftab" onclick="setRechFilter('offen',this)"><i class="fas fa-clock" style="color:var(--yellow)"></i> Offen</button>
+    <button class="ftab" onclick="setRechFilter('ueberfaellig',this)"><i class="fas fa-exclamation-circle" style="color:var(--red)"></i> Überfällig</button>
+    <button class="ftab" onclick="setRechFilter('bezahlt',this)"><i class="fas fa-check-circle" style="color:var(--green)"></i> Bezahlt</button>
+    <input id="rech-search" type="text" placeholder="Nr. oder Kunde..." oninput="renderRech()" style="margin-left:auto;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;width:200px">
+  </div>
+  <!-- Sort bar -->
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('datum')">Datum</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('faellig')">Fällig</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('betrag')">Betrag</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('kunde')">Kunde</button>
+  </div>
+  <!-- Rechnungen Karten -->
+  <div id="rech-list"></div>
+  <div id="rech-pagination"></div>
+  <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungen</p></div>
+</div>
+</div>
+
+<!-- ── WIEDERKEHREND ── -->
+<div class="page" id="p-wiederkehrend">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Wiederkehrende Zahlungen</div>
+      <div class="ph-sub">Automatisch je Monat / Quartal / Jahr</div>
+    </div>
+    <div class="ph-right">
+      <button class="btn success" onclick="wBuchenAlle()"><i class="fas fa-bolt"></i> Alle fälligen buchen</button>
+      <button class="btn primary" onclick="openWiedModal()"><i class="fas fa-plus"></i> Neue Vorlage</button>
+    </div>
+  </div>
+  <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px" id="wied-hint" style="display:none">
+    <i class="fas fa-lightbulb"></i> Beim Programmstart werden fällige Zahlungen automatisch erkannt und können mit einem Klick gebucht werden.
+  </div>
+  <!-- Sort bar -->
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('naechste')">Nächste</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('bezeichnung')">Bezeichnung</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('betrag')">Betrag</button>
+    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('intervall')">Intervall</button>
+  </div>
+  <div id="wied-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div id="wied-pagination"></div>
+  <div id="wied-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-sync-alt"></i></div><p>Keine Vorlagen — erstelle wiederkehrende Zahlungen</p></div>
+</div>
+</div>
+
+<!-- ── UMSATZSTEUER ── -->
+<div class="page" id="p-ust">
+<div class="page-inner">
+
+  <!-- Заголовок -->
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Umsatzsteuer</div>
+      <div class="ph-sub">USt-Modus je Jahr · Zahllast · Voranmeldung</div>
+    </div>
+    <div class="ph-right">
+      <select id="ust-yr" onchange="ustPage=1;ustQuartalFilter=0;renderUst()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;font-weight:600;outline:none;cursor:pointer"></select>
+    </div>
+  </div>
+
+  <!-- Два столбца -->
+  <div class="ust-two-col">
+
+    <!-- ── ЛЕВЫЙ столбец: обзор, режим, карточки, кварталы ── -->
+    <div class="ust-col-left">
+
+      <!-- Обзор лет -->
+      <div id="ust-years-overview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+
+      <!-- Режим года -->
+      <div id="ust-mode-card" style="background:var(--s2);border-radius:var(--r2);padding:18px 20px;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
+          Besteuerungsform — <span id="ust-mode-yr-label" style="color:var(--text)"></span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <label id="ust-lbl-klein" class="ust-mode-lbl" onclick="document.getElementById('ust-mode-klein').checked=true;saveUstMode()">
+            <input type="radio" name="ust-mode" value="§19" id="ust-mode-klein" style="accent-color:var(--green)" onclick="saveUstMode()">
+            <div class="ust-mode-icon" style="background:var(--gdim);color:var(--green)"><i class="fas fa-store"></i></div>
+            <div>
+              <div style="font-weight:700;font-size:13px">§19 UStG</div>
+              <div style="font-size:11px;color:var(--sub);margin-top:2px">Kleinunternehmer</div>
+            </div>
+          </label>
+          <label id="ust-lbl-regel" class="ust-mode-lbl" onclick="document.getElementById('ust-mode-regel').checked=true;saveUstMode()">
+            <input type="radio" name="ust-mode" value="regel" id="ust-mode-regel" style="accent-color:var(--blue)" onclick="saveUstMode()">
+            <div class="ust-mode-icon" style="background:var(--bdim);color:var(--blue)"><i class="fas fa-receipt"></i></div>
+            <div>
+              <div style="font-weight:700;font-size:13px">MwSt-Regelbesteuerung</div>
+              <div style="font-size:11px;color:var(--sub);margin-top:2px">USt 19% / 7%</div>
+            </div>
+          </label>
+        </div>
+        <div id="ust-mode-hint" style="margin-top:10px;font-size:12px"></div>
+      </div>
+
+      <!-- Stat-карточки -->
+      <div id="ust-cards" style="display:none;gap:12px;margin-bottom:20px"></div>
+
+      <!-- Квартальная сводка -->
+      <div id="ust-quartal-section" style="display:none;margin-bottom:20px">
+        <div id="ust-quartal-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div>
+      </div>
+
+      <!-- §19 Info -->
+      <div id="ust-klein-info" style="display:none">
+        <div class="ust-klein-banner">
+          <div class="ust-klein-banner-icon"><i class="fas fa-check-circle"></i></div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px">§19 UStG — kein USt-Ausweis nötig</div>
+            <div style="font-size:13px;color:var(--text);line-height:1.6">
+              Rechnungen <strong>ohne Umsatzsteuer</strong> · Keine Voranmeldung erforderlich
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:16px 18px;background:var(--s2);border-radius:var(--r2)">
+          <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">Einnahmen dieses Jahres</div>
+          <div id="ust-klein-stats" style="display:flex;gap:20px;flex-wrap:wrap"></div>
+        </div>
+      </div>
+
+    </div><!-- /ust-col-left -->
+
+    <!-- ── ПРАВЫЙ столбец: операции + добавление ── -->
+    <div class="ust-col-right">
+
+      <!-- Операции (Regelbesteuerung) -->
+      <div id="ust-buchungen-section" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Buchungen mit USt / Vorsteuer</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Quartal:</span>
+            <button id="ust-q-filter-0" class="btn" style="padding:4px 10px;font-size:11px;background:var(--blue);border-color:var(--blue);color:#fff" onclick="ustQuartalFilter=0;ustPage=1;renderUst()">Alle</button>
+            <button id="ust-q-filter-1" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=1;ustPage=1;renderUst()">Q1</button>
+            <button id="ust-q-filter-2" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=2;ustPage=1;renderUst()">Q2</button>
+            <button id="ust-q-filter-3" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=3;ustPage=1;renderUst()">Q3</button>
+            <button id="ust-q-filter-4" class="btn" style="padding:4px 10px;font-size:11px" onclick="ustQuartalFilter=4;ustPage=1;renderUst()">Q4</button>
+          </div>
+        </div>
+        <div id="ust-detail-list" style="display:flex;flex-direction:column;gap:8px"></div>
+        <div id="ust-empty" class="empty-state" style="display:none"><div class="ei">%</div><p>Keine USt-Buchungen für dieses Jahr</p></div>
+        <div id="ust-detail-pager" style="margin-top:12px"></div>
+        <div id="ust-detail-summary" class="rech-summary" style="margin-top:8px"></div>
+      </div>
+
+      <!-- Schnellrechner (§19 Kleinunternehmer) -->
+      <div id="ust-rechner" style="display:none">
+
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">Schnellrechner §19</div>
+
+        <!-- Ввод -->
+        <div class="ku-card" style="margin-bottom:12px">
+          <div class="ku-card-lbl">Betrag eingeben</div>
+          <input id="ku-input" type="number" placeholder="0,00" step="0.01" min="0"
+            inputmode="decimal" oninput="kuCalc()" class="ku-input">
+          <div class="ku-row-btns" style="margin-top:12px">
+            <span class="ku-card-lbl" style="margin:0;align-self:center">MwSt-Satz</span>
+            <div style="display:flex;gap:4px">
+              <button class="ku-rb active" id="ku-btn-19" onclick="kuSetRate(19)">19 %</button>
+              <button class="ku-rb" id="ku-btn-7"  onclick="kuSetRate(7)">7 %</button>
+            </div>
+          </div>
+          <div class="ku-row-btns" style="margin-top:8px">
+            <span class="ku-card-lbl" style="margin:0;align-self:center">Eingegebener Betrag</span>
+            <div style="display:flex;gap:4px">
+              <button class="ku-rb active" id="ku-m-brutto" onclick="kuSetMode('brutto')" title="Brutto = Betrag inkl. MwSt">Ist Brutto</button>
+              <button class="ku-rb" id="ku-m-netto"  onclick="kuSetMode('netto')"  title="Netto = Betrag ohne MwSt">Ist Netto</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Результаты — блоки -->
+        <div class="ku-blocks" id="ku-results">
+          <div class="ku-block ku-block-main">
+            <div class="ku-block-lbl">Rechnungsbetrag §19</div>
+            <div class="ku-block-val" id="ku-r-ku">—</div>
+            <div class="ku-block-sub">Ohne Umsatzsteuer ausgestellt</div>
+          </div>
+          <div class="ku-block-row">
+            <div class="ku-block ku-block-sm">
+              <div class="ku-block-lbl">Netto</div>
+              <div class="ku-block-val ku-val-sm" id="ku-r-netto">—</div>
+            </div>
+            <div class="ku-block ku-block-sm">
+              <div class="ku-block-lbl">Brutto</div>
+              <div class="ku-block-val ku-val-sm" id="ku-r-brutto">—</div>
+            </div>
+          </div>
+          <div class="ku-block-row">
+            <div class="ku-block ku-block-sm">
+              <div class="ku-block-lbl">MwSt-Betrag</div>
+              <div class="ku-block-val ku-val-sm" id="ku-r-mwst" style="color:var(--red)">—</div>
+              <div class="ku-block-sub">Bei Regelbesteuerung</div>
+            </div>
+            <div class="ku-block ku-block-sm" style="background:var(--gdim);border-color:rgba(78,144,96,.2)">
+              <div class="ku-block-lbl" style="color:var(--green)">Du sparst</div>
+              <div class="ku-block-val ku-val-sm" id="ku-r-diff" style="color:var(--green)">—</div>
+              <div class="ku-block-sub">Als §19 KU</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KU Grenzen -->
+        <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px">Kleinunternehmer-Grenzen</div>
+        <div class="ku-limits-grid">
+          <div class="ku-limit-block">
+            <div class="ku-limit-top">
+              <span class="ku-limit-title">Vorjahresumsatz</span>
+              <span class="ku-limit-badge">2025</span>
+            </div>
+            <div class="ku-limit-num">25.000 €</div>
+            <div class="ku-limit-desc">Netto-Grenze — Überschreitung = kein §19 im Folgejahr</div>
+          </div>
+          <div class="ku-limit-block">
+            <div class="ku-limit-top">
+              <span class="ku-limit-title">Laufendes Jahr</span>
+              <span class="ku-limit-badge ku-limit-badge-red">Fallbeil!</span>
+            </div>
+            <div class="ku-limit-num">100.000 €</div>
+            <div class="ku-limit-desc">Sofort wirksam — §19 endet beim Überschreiten</div>
+          </div>
+        </div>
+
+        <!-- Pflichthinweis -->
+        <div class="ku-hinweis">
+          <div class="ku-hinweis-title"><i class="fas fa-info-circle"></i> Pflichthinweis auf Rechnung</div>
+          <div class="ku-hinweis-text">„Gemäß §19 UStG wird keine Umsatzsteuer berechnet."</div>
+        </div>
+
+      </div>
+    </div><!-- /ust-col-right -->
+
+  </div><!-- /ust-two-col -->
+
+  <!-- Manueller Eintrag hinzufügen — под двумя колонками -->
+  <div id="ust-add-section" style="display:none;margin-top:20px">
+    <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Manuellen Eintrag hinzufügen</div>
+    <div class="form-panel">
+      <div class="fgrow c2" style="margin-bottom:10px">
+        <div class="fg" style="margin:0">
+          <label>Datum</label>
+          <input type="date" id="ust-new-dat" max="2099-12-31" min="2000-01-01">
+        </div>
+        <div class="fg" style="margin:0">
+          <label>Betrag (€)</label>
+          <input type="number" id="ust-new-bet" placeholder="0,00" step="0.01" min="0.01" inputmode="decimal" style="width:100%">
+        </div>
+      </div>
+      <div class="fgrow c2" style="margin-bottom:10px">
+        <div class="fg" style="margin:0"><label>Typ</label>
+          <select id="ust-new-typ" style="width:100%">
+            <option value="ust">Ausgangs-USt (Einnahme)</option>
+            <option value="vorsteuer">Vorsteuer (Ausgabe)</option>
+          </select>
+        </div>
+        <div class="fg" style="margin:0"><label>USt-Satz (%)</label>
+          <select id="ust-new-rate" style="width:100%">
+            <option value="19">19%</option>
+            <option value="7">7%</option>
+            <option value="0">0%</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:12px"><label>Beschreibung (optional)</label>
+        <input type="text" id="ust-new-dsc" placeholder="z.B. Rechnung Nr. 2025-001...">
+      </div>
+      <button class="btn primary" style="width:100%;padding:11px;font-size:14px" onclick="addUstEintrag()">＋ Eintrag hinzufügen</button>
+    </div>
+  </div>
+
+</div>
+</div>
+</div><!-- /main -->
+<!-- ── MONATSDETAIL MODAL ── -->
+<div class="modal-bg" id="mon-modal">
+  <div class="modal" style="max-width:780px;width:95%">
+    <div class="modal-hdr">
+      <h2 id="mon-modal-title"><i class="fa-solid fa-calendar"></i> Monatsdetails</h2>
+      <button class="modal-close" onclick="closeModal('mon-modal')">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px" id="mon-modal-stats"></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:12px;color:var(--sub)" id="mon-modal-count"></span>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn success" onclick="exportMonatXLS()"><i class="fa-solid fa-chart-bar"></i> Excel (.xlsx)</button>
+        <button class="csv" onclick="exportMonatCSV()"><i class="fa-solid fa-download"></i> CSV</button>
+      </div>
+    </div>
+    <div class="modal-inner-tbl" style="max-height:420px;overflow-y:auto;border-radius:var(--r);border:1px solid var(--border)">
+      <table style="width:100%;border-collapse:collapse">
+        <thead style="position:sticky;top:0;background:var(--s2);z-index:1">
+          <tr>
+            <th style="padding:9px 12px;text-align:left;font-size:11px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--border)">Datum</th>
+            <th style="padding:9px 12px;text-align:left;font-size:11px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--border)">Typ</th>
+            <th class="mob-hide" style="padding:9px 12px;text-align:left;font-size:11px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--border)">Kategorie</th>
+            <th class="mob-hide" style="padding:9px 12px;text-align:left;font-size:11px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--border)">Beschreibung</th>
+            <th class="mob-hide" style="padding:9px 12px;text-align:left;font-size:11px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--border)">Zahlungsart</th>
+            <th style="padding:9px 12px;text-align:right;font-size:11px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--border)">Betrag</th>
+          </tr>
+        </thead>
+        <tbody id="mon-modal-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── EDIT MODAL ── -->
+<div class="modal-bg" id="edit-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2><i class="fas fa-pen"></i>️ Eintrag bearbeiten</h2>
+      <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <div class="typ-toggle" style="margin-bottom:16px">
+      <button class="tt" id="edit-btn-e" onclick="setEditTyp('Einnahme')">▲ Einnahme</button>
+      <button class="tt" id="edit-btn-a" onclick="setEditTyp('Ausgabe')">▼ Ausgabe</button>
+    </div>
+    <div class="fgrow c2">
+      <div class="fg"><label>Datum</label><input type="date" id="edit-dat"></div>
+      <div class="fg"><label>Betrag (€)</label><input type="number" id="edit-bet" step="0.01" min="0.01"></div>
+    </div>
+    <div class="fgrow c2">
+      <div class="fg"><label>Kategorie</label><select id="edit-kat"></select></div>
+      <div class="fg"><label>Zahlungsart</label>
+        <select id="edit-zahl">
+          <option value="Überweisung">Überweisung</option><option value="Barzahlung">Barzahlung</option><option value="PayPal">PayPal</option>
+          <option value="EC-Karte">EC-Karte</option><option value="Lastschrift">Lastschrift</option><option value="Sonstiges">Sonstiges</option>
+        </select>
+      </div>
+    </div>
+    <div class="fgrow c2">
+      <div class="fg" style="flex:0 0 140px"><label>Beleg-Nr. <span style="font-size:10px;color:var(--sub);font-weight:400">(optional)</span></label><input type="text" id="edit-belegnr" style="font-weight:700;font-family:var(--mono)"></div>
+      <div class="fg"><label>Beschreibung</label><input type="text" id="edit-dsc"></div>
+    </div>
+    <div class="fg"><label>Notiz</label><textarea id="edit-note" style="min-height:50px"></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn primary" style="flex:1;padding:10px" onclick="saveEdit()"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn" style="padding:10px 18px" onclick="closeModal('edit-modal')">Abbrechen</button>
+    </div>
+  </div>
 </div>
 
 
@@ -1255,12 +2375,13 @@
       </div>
 
       <!-- Заголовок таблицы позиций -->
-      <div style="display:grid;grid-template-columns:3fr 80px 80px 110px 90px 80px 24px;gap:6px;padding:6px 8px;font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);margin-bottom:4px">
+      <div style="display:grid;grid-template-columns:3fr 80px 80px 110px 90px 70px 80px 24px;gap:6px;padding:6px 8px;font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);margin-bottom:4px">
         <div>Produkt oder Service</div>
         <div>Menge</div>
         <div>Einh.</div>
         <div id="ang-preis-lbl">Preis (brutto)</div>
         <div>USt.</div>
+        <div>Rabatt</div>
         <div style="text-align:right">Betrag</div>
         <div></div>
       </div>

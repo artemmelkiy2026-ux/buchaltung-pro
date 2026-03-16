@@ -2355,7 +2355,7 @@ input, select, textarea {
 /* Строка позиции в Angebot */
 .ang-pos-row {
   display: grid;
-  grid-template-columns: 3fr 80px 80px 110px 90px 80px 24px;
+  grid-template-columns: 3fr 80px 80px 110px 90px 70px 80px 24px;
   gap: 6px;
   align-items: center;
   padding: 5px 0;

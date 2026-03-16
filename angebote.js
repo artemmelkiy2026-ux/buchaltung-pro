@@ -6,10 +6,10 @@ let angPage = 1;
 const ANG_PER_PAGE = 10;
 
 const ANG_STATUS = {
-  offen:      { label:'Offen',       cls:'ang-offen',      icon:'fas fa-clock' },
-  angenommen: { label:'Angenommen',  cls:'ang-angenommen', icon:'fas fa-check-circle' },
-  abgelehnt:  { label:'Abgelehnt',   cls:'ang-abgelehnt',  icon:'fas fa-times-circle' },
-  abgelaufen: { label:'Abgelaufen',  cls:'ang-abgelaufen', icon:'fas fa-hourglass-end' },
+  offen:      { label:'Offen',       icon:'fas fa-clock',        color:'var(--yellow)', bg:'rgba(251,191,36,.12)',  border:'rgba(251,191,36,.3)'  },
+  angenommen: { label:'Angenommen',  icon:'fas fa-check-circle', color:'var(--green)',  bg:'rgba(34,197,94,.12)',   border:'rgba(34,197,94,.3)'   },
+  abgelehnt:  { label:'Abgelehnt',   icon:'fas fa-times-circle', color:'var(--red)',    bg:'rgba(239,68,68,.12)',   border:'rgba(239,68,68,.3)'   },
+  abgelaufen: { label:'Abgelaufen',  icon:'fas fa-hourglass-end',color:'var(--sub)',    bg:'rgba(148,163,184,.12)', border:'rgba(148,163,184,.3)' },
 };
 
 function autoAngNr() {
@@ -115,6 +115,7 @@ function addAngPosition(p = {}) {
   const preis = p.brutto ?? p.netto ?? '';
   const div = document.createElement('div');
   div.className = 'ang-pos-row';
+  const rabatt = p.rabatt||0;
   div.innerHTML = `
     <input type="text"   placeholder="Produkt oder Service" value="${p.bez||p.beschreibung||''}" oninput="recalcAngSumme()">
     <input type="number" placeholder="1,00" value="${p.menge||1}"    min="0.01" step="0.01"  oninput="recalcAngSumme()">
@@ -125,6 +126,10 @@ function addAngPosition(p = {}) {
       <option value="7"  ${rate==7?'selected':''}>7%</option>
       <option value="0"  ${rate==0?'selected':''}>0%</option>
     </select>
+    <div style="display:flex;align-items:center;gap:2px">
+      <input type="number" placeholder="0" value="${rabatt}" min="0" max="100" step="0.1" oninput="recalcAngSumme()" style="width:45px;padding:6px 4px;text-align:center">
+      <span style="font-size:11px;color:var(--sub)">%</span>
+    </div>
     <div class="ang-betrag">0,00 €</div>
     <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" title="Entfernen" style="font-size:13px;width:22px;height:22px;padding:0;border-radius:4px">✕</button>
   `;
@@ -136,17 +141,19 @@ function recalcAngSumme() {
   const rows = document.querySelectorAll('#ang-pos-list .ang-pos-row');
   let totalNetto = 0, totalMwst = 0;
   rows.forEach(row => {
-    const inputs = row.querySelectorAll('input[type=number]');
-    const menge  = parseFloat(inputs[0]?.value) || 1;
-    const preis  = parseFloat(inputs[1]?.value) || 0;
-    const sel    = row.querySelector('select');
-    const rate   = sel ? parseFloat(sel.value) : 0;
+    const inputs  = row.querySelectorAll('input[type=number]');
+    const menge   = parseFloat(inputs[0]?.value) || 1;
+    const preis   = parseFloat(inputs[1]?.value) || 0;
+    const rabatt  = parseFloat(inputs[2]?.value) || 0;
+    const sel     = row.querySelector('select');
+    const rate    = sel ? parseFloat(sel.value) : 0;
+    const factor  = 1 - rabatt/100;
     let netto, brutto;
     if (angPreisMode === 'brutto') {
-      brutto = r2(menge * preis);
+      brutto = r2(menge * preis * factor);
       netto  = rate > 0 ? r2(brutto / (1 + rate/100)) : brutto;
     } else {
-      netto  = r2(menge * preis);
+      netto  = r2(menge * preis * factor);
       brutto = r2(netto * (1 + rate/100));
     }
     const mwst = r2(brutto - netto);
@@ -172,6 +179,7 @@ function getAngPositionen() {
     const menge   = parseFloat(inputs[1]?.value) || 1;
     const einheit = inputs[2]?.value?.trim() || 'Stk.';
     const preis   = parseFloat(inputs[3]?.value) || 0;
+    const rabatt  = parseFloat(inputs[4]?.value) || 0;
     const rate    = sel ? parseFloat(sel.value) : 0;
     let netto, brutto;
     if (angPreisMode === 'brutto') {
@@ -181,7 +189,7 @@ function getAngPositionen() {
       netto  = r2(menge * preis);
       brutto = r2(netto * (1 + rate/100));
     }
-    return { bez, menge, einheit, netto: r2(netto/menge), brutto: r2(brutto/menge), rate };
+    return { bez, menge, einheit, netto: r2(netto/menge), brutto: r2(brutto/menge), rate, rabatt };
   }).filter(p => p.bez || p.netto);
 }
 
@@ -353,22 +361,16 @@ function renderAngebote() {
   if (angPage > totalPages) angPage = totalPages;
   const items = filtered.slice((angPage - 1) * ANG_PER_PAGE, angPage * ANG_PER_PAGE);
 
-  const STATUS_COLORS = {
-    offen:      { bg:'rgba(251,191,36,.12)',  c:'var(--yellow)', border:'rgba(251,191,36,.3)'  },
-    angenommen: { bg:'rgba(34,197,94,.12)',   c:'var(--green)',  border:'rgba(34,197,94,.3)'   },
-    abgelehnt:  { bg:'rgba(239,68,68,.12)',   c:'var(--red)',    border:'rgba(239,68,68,.3)'   },
-    abgelaufen: { bg:'rgba(148,163,184,.12)', c:'var(--sub)',    border:'rgba(148,163,184,.3)' },
-  };
+  // STATUS стили в ANG_STATUS
 
   lst.innerHTML = items.map(a => {
     const st = ANG_STATUS[a.status] || ANG_STATUS.offen;
-    const sc = STATUS_COLORS[a.status] || STATUS_COLORS.offen;
     const isExpiring = a.gueltig && a.gueltig > today && a.status === 'offen' &&
       (new Date(a.gueltig) - new Date()) < 7 * 24 * 60 * 60 * 1000;
 
     return `<div class="rech-card" onclick="editAng('${a.id}')">
       <div class="rech-card-left">
-        <div class="rech-card-avatar" style="background:${sc.bg};color:${sc.c}">
+        <div class="rech-card-avatar" style="background:${st.bg};color:${st.color}">
           <i class="${st.icon}"></i>
         </div>
         <div class="rech-card-info">
@@ -382,7 +384,7 @@ function renderAngebote() {
       </div>
       <div class="rech-card-right">
         <div class="rech-card-betrag">${fmt(a.betrag)}</div>
-        <div style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:${sc.bg};color:${sc.c};border:1px solid ${sc.border}">
+        <div style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border}">
           <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
         </div>
         <div class="rech-card-actions" onclick="event.stopPropagation()">
