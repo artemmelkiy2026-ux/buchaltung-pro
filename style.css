@@ -1970,9 +1970,20 @@ input, select, textarea {
 }
 
 @media(max-width:600px){
-  .ph{ gap:10px; flex-wrap:nowrap; align-items:center }
+  .ph{
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .ph-left{
+    width: 100%;
+    min-width: 0;
+  }
   .ph-title{ font-size:17px }
-  .ph-right{ flex-shrink:0 }
+  .ph-right{
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
 }
 
 /* ════════════════════════════════════════════════════════
