@@ -2495,7 +2495,8 @@ input, select, textarea {
   border-left: 2px solid var(--border);
 }
 .nav-group-children.open {
-  max-height: 300px;
+  max-height: 600px;
+  overflow: visible;
 }
 
 /* Дочерние пункты — ТОТЖЕ размер как обычные nav-item */
