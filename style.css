@@ -1991,6 +1991,8 @@ input, select, textarea {
    ════════════════════════════════════════════════════════ */
 
 /* Страница-контейнер: flex-колонка, высота = экрану */
+#p-angebote,
+#p-rechnungen,
 #p-angebote-form,
 #p-rechnungen-form {
   display: none;
@@ -1998,6 +2000,8 @@ input, select, textarea {
   height: calc(100vh - 54px);
   overflow: hidden;
 }
+#p-angebote.active,
+#p-rechnungen.active,
 #p-angebote-form.active,
 #p-rechnungen-form.active { display: flex; }
 
@@ -2168,6 +2172,8 @@ input, select, textarea {
 
 /* ── МОБИЛЕ ≤ 768px ── */
 @media(max-width: 768px) {
+  #p-angebote,
+  #p-rechnungen,
   #p-angebote-form,
   #p-rechnungen-form { height: auto; overflow: visible; }
   .ang-form-body { padding: 12px; }
