@@ -467,94 +467,48 @@ function addRechPosRow(i,p){
       <input type="text"   placeholder="Bezeichnung" value="${p.bez||''}" oninput="calcRechTotal()" style="${INP};font-size:13px">
       <input type="number" placeholder="Menge" value="${p.menge||1}" min="0.01" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:center">
       <input type="number" placeholder="Netto" value="${nettoVal}" min="0" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:right">
-      <div class="ust-drop" data-rate="${rateVal}" style="${klein?'opacity:.4;pointer-events:none':''}">
-        <button type="button" class="ust-drop-btn" onclick="_ustToggleRn(this)">
-          <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
-          <span class="ust-drop-lbl">${rateVal}%</span>
-          <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub);margin-left:2px"></i>
-        </button>
-        <div class="ust-drop-panel" style="display:none">
-          ${[0,7,19].map(v=>`<div class="ust-drop-opt${v==rateVal?' ust-drop-opt-active':''}" onclick="_ustSelectRn(this,${v})" data-val="${v}">
-            <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>${v}%
-          </div>`).join('')}
-        </div>
-      </div>
+      <select onchange="posRateChanged(this)" style="${INP};padding:7px 4px;${klein?'opacity:.4;pointer-events:none':''}">
+        <option value="0"  ${rateVal==0 ?'selected':''}>§19 / 0%</option>
+        <option value="7"  ${rateVal==7 ?'selected':''}>7%</option>
+        <option value="19" ${rateVal==19?'selected':''}>19%</option>
+      </select>
       <input type="number" placeholder="Brutto" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue)">
       <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0"><i class="fas fa-trash"></i></button>`;
   }
   document.getElementById('rn-positionen').appendChild(div);
 }
 
-// Читаем ставку USt из строки позиции (ust-drop или select)
-function _getRnRate(row) {
-  const drop = row.querySelector('.ust-drop');
-  if (drop) return parseFloat(drop.dataset.rate) || 0;
-  const inputs = row.querySelectorAll('input,select');
-  return parseFloat(inputs[3]?.value) || 0;
-}
-
 // Вводим Netto → пересчитываем Brutto
 function posNettoChanged(input){
   const row=input.closest('.rn-pos-row');
-  const inputs=row.querySelectorAll('input[type=number]');
-  const menge =parseFloat(inputs[0]?.value)||1;
-  const netto =parseFloat(inputs[1]?.value)||0;
-  const rate  =_getRnRate(row);
+  const inputs=row.querySelectorAll('input,select');
+  const menge =parseFloat(inputs[1].value)||1;
+  const netto =parseFloat(inputs[2].value)||0;
+  const rate  =parseFloat(inputs[3].value)||0;
   const rnYr1=document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
   const brutto=calcBrutto(netto,isKleinunternehmer(rnYr1)?0:rate);
-  inputs[2].value=brutto.toFixed(2);
+  inputs[4].value=brutto.toFixed(2);
+  calcRechTotal();
+}
+// Меняем ставку → пересчитываем Brutto из Netto
+function posRateChanged(sel){
+  const row=sel.closest('.rn-pos-row');
+  const inputs=row.querySelectorAll('input,select');
+  const netto=parseFloat(inputs[2].value)||0;
+  const rate =parseFloat(sel.value)||0;
+  const rnYr2=document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
+  inputs[4].value=calcBrutto(netto,isKleinunternehmer(rnYr2)?0:rate).toFixed(2);
   calcRechTotal();
 }
 // Вводим Brutto → пересчитываем Netto
 function posBruttoChanged(input){
   const row=input.closest('.rn-pos-row');
-  const inputs=row.querySelectorAll('input[type=number]');
-  const brutto=parseFloat(inputs[2]?.value)||0;
-  const rate  =_getRnRate(row);
+  const inputs=row.querySelectorAll('input,select');
+  const brutto=parseFloat(inputs[4].value)||0;
+  const rate  =parseFloat(inputs[3].value)||0;
   const rnYr3=document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
-  const netto=calcNetto(brutto, isKleinunternehmer(rnYr3)?0:rate);
-  inputs[1].value=netto.toFixed(2);
-  calcRechTotal();
-}
-// Меняем ставку (старый select — оставляем для совместимости)
-function posRateChanged(sel){
-  const row=sel.closest('.rn-pos-row');
-  const inputs=row.querySelectorAll('input[type=number]');
-  const netto=parseFloat(inputs[1]?.value)||0;
-  const rate =parseFloat(sel.value)||0;
-  const rnYr2=document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
-  inputs[2].value=calcBrutto(netto,isKleinunternehmer(rnYr2)?0:rate).toFixed(2);
-  calcRechTotal();
-}
-
-// USt dropdown для Rechnungen
-function _ustToggleRn(btn) {
-  const panel = btn.nextElementSibling;
-  const isOpen = panel.style.display !== 'none';
-  document.querySelectorAll('.ust-drop-panel').forEach(p => p.style.display = 'none');
-  if (!isOpen) {
-    panel.style.display = 'block';
-    const close = e => {
-      if (!btn.closest('.ust-drop').contains(e.target)) {
-        panel.style.display = 'none';
-        document.removeEventListener('click', close);
-      }
-    };
-    setTimeout(() => document.addEventListener('click', close), 0);
-  }
-}
-function _ustSelectRn(optEl, val) {
-  const drop = optEl.closest('.ust-drop');
-  drop.dataset.rate = val;
-  drop.querySelector('.ust-drop-lbl').textContent = val + '%';
-  drop.querySelectorAll('.ust-drop-opt').forEach(o => o.classList.toggle('ust-drop-opt-active', parseInt(o.dataset.val) === val));
-  drop.querySelector('.ust-drop-panel').style.display = 'none';
-  // Пересчитываем brutto из netto
-  const row = drop.closest('.rn-pos-row');
-  const inputs = row.querySelectorAll('input[type=number]');
-  const netto = parseFloat(inputs[1]?.value)||0;
-  const rnYr = document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
-  inputs[2].value = calcBrutto(netto, isKleinunternehmer(rnYr)?0:val).toFixed(2);
+  const netto =calcNetto(brutto, isKleinunternehmer(rnYr3)?0:rate);
+  inputs[2].value=netto.toFixed(2);
   calcRechTotal();
 }
 
@@ -568,10 +522,10 @@ function calcRechTotal(){
   let totalMwst=0;
 
   document.querySelectorAll('.rn-pos-row').forEach(row=>{
-    const inputs=row.querySelectorAll('input[type=number]');
-    const menge =parseFloat(inputs[0]?.value)||0;
-    const netto =parseFloat(inputs[1]?.value)||0;
-    const rate  =klein?0:_getRnRate(row);
+    const inputs=row.querySelectorAll('input,select');
+    const menge =parseFloat(inputs[1].value)||0;
+    const netto =parseFloat(inputs[2].value)||0;
+    const rate  =klein?0:parseFloat(inputs[3].value)||0;
     const lineNetto = r2(menge*netto);
     const lineMwst  = r2(lineNetto*rate/100);
     totalNetto+=lineNetto;
