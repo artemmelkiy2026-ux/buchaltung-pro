@@ -685,10 +685,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   /* ── App: убираем фиксированную высоту, добавляем паддинг снизу под таббар ── */
   .app {
     height: auto;
+    margin-top: 52px;
     min-height: calc(100vh - 52px);
     flex-direction: column;
     padding-bottom: 64px; /* место под bottom nav */
-
   }
 
   /* ── Main занимает всю ширину ── */
