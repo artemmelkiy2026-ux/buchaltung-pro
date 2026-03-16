@@ -661,12 +661,13 @@ function saveAngProdukt(andNew) {
     erinnere:      document.getElementById('ap-erinnere').value,
   };
   data.produkte.push(prod);
-  // Сохраняем продукты в user_data как JSON
   if (typeof sb !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
-    sb.from('user_data').upsert(
-      { user_id: currentUser.id, produkte_json: JSON.stringify(data.produkte) },
-      { onConflict: 'user_id' }
-    ).catch(() => {});
+    (async () => { try {
+      await sb.from('user_data').upsert(
+        { user_id: currentUser.id, produkte_json: JSON.stringify(data.produkte) },
+        { onConflict: 'user_id' }
+      );
+    } catch(e) {} })();
   }
   toast(`Produkt „${name}" erstellt`, 'ok');
 
