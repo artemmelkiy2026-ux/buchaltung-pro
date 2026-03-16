@@ -32,6 +32,11 @@ function openAngebotModal() {
   document.getElementById('ang-kunde').value = '';
   document.getElementById('ang-adresse').value = '';
   document.getElementById('ang-notiz').value = '';
+  const bEl = document.getElementById('ang-betreff'); if(bEl) bEl.value = 'Angebot ' + autoAngNr();
+  const rEl = document.getElementById('ang-referenz'); if(rEl) rEl.value = '';
+  const kEl = document.getElementById('ang-kopftext'); if(kEl) kEl.value = 'Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen das gewünschte freibleibende Angebot:';
+  const fEl = document.getElementById('ang-fusstext'); if(fEl) fEl.value = 'Für Rückfragen stehen wir Ihnen jederzeit gerne zur Verfügung.\nMit freundlichen Grüßen';
+  angPreisMode = 'brutto'; setAngPreisMode('brutto');
   initAngPositionen();
   updateAngBanner();
   openModal('ang-modal');
@@ -48,6 +53,11 @@ function editAng(id) {
   document.getElementById('ang-kunde').value = a.kunde || '';
   document.getElementById('ang-adresse').value = a.adresse || '';
   document.getElementById('ang-notiz').value = a.notiz || '';
+  const bEl2 = document.getElementById('ang-betreff');  if(bEl2) bEl2.value = a.betreff||'';
+  const rEl2 = document.getElementById('ang-referenz'); if(rEl2) rEl2.value = a.referenz||'';
+  const kEl2 = document.getElementById('ang-kopftext'); if(kEl2) kEl2.value = a.kopftext||'';
+  const fEl2 = document.getElementById('ang-fusstext'); if(fEl2) fEl2.value = a.fusstext||'';
+  angPreisMode = a.preisMode||'brutto'; setAngPreisMode(angPreisMode);
   loadAngPositionen(a.positionen || []);
   updateAngBanner();
   openModal('ang-modal');
@@ -80,66 +90,98 @@ function loadAngPositionen(positionen) {
   list.innerHTML = '';
   if (!positionen.length) { addAngPosition(); return; }
   positionen.forEach(p => addAngPosition(p));
+  recalcAngSumme();
+}
+
+let angPreisMode = 'brutto'; // 'brutto' | 'netto'
+
+function setAngPreisMode(mode) {
+  angPreisMode = mode;
+  const lbl = document.getElementById('ang-preis-lbl');
+  if(lbl) lbl.textContent = mode === 'brutto' ? 'Preis (brutto)' : 'Preis (netto)';
+  const btnB = document.getElementById('ang-brutto-btn');
+  const btnN = document.getElementById('ang-netto-btn');
+  if(btnB){ btnB.style.background = mode==='brutto'?'var(--blue)':''; btnB.style.color = mode==='brutto'?'#fff':''; btnB.style.borderColor = mode==='brutto'?'var(--blue)':''; }
+  if(btnN){ btnN.style.background = mode==='netto'?'var(--blue)':'';  btnN.style.color = mode==='netto'?'#fff':'';  btnN.style.borderColor = mode==='netto'?'var(--blue)':'';  }
+  recalcAngSumme();
 }
 
 function addAngPosition(p = {}) {
   const list = document.getElementById('ang-pos-list');
   if (!list) return;
-  const idx = list.children.length;
   const yr = document.getElementById('ang-dat')?.value?.substring(0, 4) || new Date().getFullYear() + '';
   const isKlein = isKleinunternehmer(yr);
+  const rate = p.rate ?? p.mwstRate ?? (isKlein ? 0 : 19);
+  const preis = p.brutto ?? p.netto ?? '';
   const div = document.createElement('div');
-  div.className = 'rech-pos-row';
+  div.className = 'ang-pos-row';
   div.innerHTML = `
-    <input type="text" placeholder="Beschreibung" value="${p.bez||p.beschreibung||''}"
-      style="flex:2;min-width:120px" oninput="recalcAngSumme()">
-    <input type="number" placeholder="Menge" value="${p.menge||1}" min="0.01" step="0.01"
-      style="width:70px" oninput="recalcAngSumme()">
-    <input type="number" placeholder="Netto €" value="${p.netto||p.einzelpreis||''}" min="0" step="0.01"
-      style="width:100px" oninput="recalcAngSumme()">
-    ${isKlein ? '' : `<select style="width:70px" onchange="recalcAngSumme()">
-      <option value="19" ${(p.rate||p.mwstRate||19)==19?'selected':''}>19%</option>
-      <option value="7"  ${(p.rate||p.mwstRate||0)==7?'selected':''}>7%</option>
-      <option value="0"  ${(p.rate||p.mwstRate||0)==0?'selected':''}>0%</option>
-    </select>`}
-    <button class="del-btn" onclick="this.parentElement.remove();recalcAngSumme()" title="Entfernen">✕</button>
+    <input type="text"   placeholder="Produkt oder Service" value="${p.bez||p.beschreibung||''}" oninput="recalcAngSumme()">
+    <input type="number" placeholder="1,00" value="${p.menge||1}"    min="0.01" step="0.01"  oninput="recalcAngSumme()">
+    <input type="text"   placeholder="Stk." value="${p.einheit||'Stk.'}"                                               >
+    <input type="number" placeholder="0,00" value="${preis}"         min="0"    step="0.01"  oninput="recalcAngSumme()">
+    <select onchange="recalcAngSumme()">
+      <option value="19" ${rate==19?'selected':''}>19%</option>
+      <option value="7"  ${rate==7?'selected':''}>7%</option>
+      <option value="0"  ${rate==0?'selected':''}>0%</option>
+    </select>
+    <div class="ang-betrag">0,00 €</div>
+    <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" title="Entfernen" style="font-size:13px;width:22px;height:22px;padding:0;border-radius:4px">✕</button>
   `;
   list.appendChild(div);
   recalcAngSumme();
 }
 
 function recalcAngSumme() {
-  const rows = document.querySelectorAll('#ang-pos-list .rech-pos-row');
-  let netto = 0, mwst = 0;
+  const rows = document.querySelectorAll('#ang-pos-list .ang-pos-row');
+  let totalNetto = 0, totalMwst = 0;
   rows.forEach(row => {
     const inputs = row.querySelectorAll('input[type=number]');
-    const menge = parseFloat(inputs[0]?.value) || 1;
-    const price = parseFloat(inputs[1]?.value) || 0;
-    const sel = row.querySelector('select');
-    const rate = sel ? parseFloat(sel.value) : 0;
-    const n = r2(menge * price);
-    netto += n;
-    mwst  += r2(n * rate / 100);
+    const menge  = parseFloat(inputs[0]?.value) || 1;
+    const preis  = parseFloat(inputs[1]?.value) || 0;
+    const sel    = row.querySelector('select');
+    const rate   = sel ? parseFloat(sel.value) : 0;
+    let netto, brutto;
+    if (angPreisMode === 'brutto') {
+      brutto = r2(menge * preis);
+      netto  = rate > 0 ? r2(brutto / (1 + rate/100)) : brutto;
+    } else {
+      netto  = r2(menge * preis);
+      brutto = r2(netto * (1 + rate/100));
+    }
+    const mwst = r2(brutto - netto);
+    totalNetto += netto;
+    totalMwst  += mwst;
+    // Обновляем Betrag в строке
+    const betragEl = row.querySelector('.ang-betrag');
+    if(betragEl) betragEl.textContent = brutto.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
   });
-  const brutto = r2(netto + mwst);
-  const f = v => v.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
-  document.getElementById('ang-sum-netto').textContent  = f(netto);
-  document.getElementById('ang-sum-mwst').textContent   = f(mwst);
-  document.getElementById('ang-sum-brutto').textContent = f(brutto);
+  const totalBrutto = r2(totalNetto + totalMwst);
+  const f = v => v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  const ne = document.getElementById('ang-sum-netto');    if(ne) ne.textContent = f(totalNetto);
+  const mw = document.getElementById('ang-sum-mwst');     if(mw) mw.textContent = f(totalMwst);
+  const br = document.getElementById('ang-sum-brutto');   if(br) br.textContent = f(totalBrutto);
 }
 
 function getAngPositionen() {
-  const rows = document.querySelectorAll('#ang-pos-list .rech-pos-row');
-  const yr = document.getElementById('ang-dat')?.value?.substring(0, 4) || new Date().getFullYear() + '';
-  const isKlein = isKleinunternehmer(yr);
+  const rows = document.querySelectorAll('#ang-pos-list .ang-pos-row');
   return [...rows].map(row => {
-    const inputs = row.querySelectorAll('input');
-    const sel = row.querySelector('select');
-    const bez   = inputs[0]?.value?.trim() || '';
-    const menge = parseFloat(inputs[1]?.value) || 1;
-    const netto = parseFloat(inputs[2]?.value) || 0;
-    const rate  = isKlein ? 0 : (sel ? parseFloat(sel.value) : 0);
-    return { bez, menge, netto, rate, brutto: r2(netto * (1 + rate / 100)) };
+    const inputs  = row.querySelectorAll('input');
+    const sel     = row.querySelector('select');
+    const bez     = inputs[0]?.value?.trim() || '';
+    const menge   = parseFloat(inputs[1]?.value) || 1;
+    const einheit = inputs[2]?.value?.trim() || 'Stk.';
+    const preis   = parseFloat(inputs[3]?.value) || 0;
+    const rate    = sel ? parseFloat(sel.value) : 0;
+    let netto, brutto;
+    if (angPreisMode === 'brutto') {
+      brutto = r2(menge * preis);
+      netto  = rate > 0 ? r2(brutto / (1 + rate/100)) : brutto;
+    } else {
+      netto  = r2(menge * preis);
+      brutto = r2(netto * (1 + rate/100));
+    }
+    return { bez, menge, einheit, netto: r2(netto/menge), brutto: r2(brutto/menge), rate };
   }).filter(p => p.bez || p.netto);
 }
 
@@ -187,6 +229,11 @@ function saveAngebot() {
     kunde:      document.getElementById('ang-kunde').value.trim(),
     adresse:    document.getElementById('ang-adresse').value.trim(),
     notiz:      document.getElementById('ang-notiz').value.trim(),
+    betreff:    document.getElementById('ang-betreff')?.value.trim()||'',
+    referenz:   document.getElementById('ang-referenz')?.value.trim()||'',
+    kopftext:   document.getElementById('ang-kopftext')?.value.trim()||'',
+    fusstext:   document.getElementById('ang-fusstext')?.value.trim()||'',
+    preisMode:  angPreisMode,
     betrag:     brutto,
     positionen,
   };
@@ -348,4 +395,12 @@ function renderAngebote() {
 
   window._angPagerCb = function(p) { angPage = p; renderAngebote(); };
   renderPager('ang-pagination', angPage, totalPages, filtered.length, '_angPagerCb');
+}
+
+function angZuRechnungFromModal() {
+  // Сначала сохраняем текущее состояние, потом конвертируем
+  const nr = document.getElementById('ang-nr')?.value.trim();
+  const a = (data.angebote||[]).find(x=>x.nr===nr);
+  closeModal('ang-modal');
+  if(a) angZuRechnung(a.id);
 }
