@@ -161,6 +161,28 @@ function openNavGroupIfNeeded(id) {
     if (header) header.classList.add('open');
   }
 }
+
+// Открыть форму нового/редактирования записи
+function openNeuEintrag(editId) {
+  if (editId) {
+    // Редактирование — заголовок меняется
+    const t = document.getElementById('neu-form-title');
+    if (t) t.textContent = 'Eintrag bearbeiten';
+  } else {
+    const t = document.getElementById('neu-form-title');
+    if (t) t.textContent = 'Neuer Eintrag';
+    if (typeof clearForm === 'function') clearForm();
+  }
+  // Запоминаем откуда пришли
+  window._neuPrevPage = curPage || 'eintraege';
+  nav('neu', document.querySelector('.nav-item[onclick*="eintraege"]') || document.querySelector('.nav-item'));
+}
+
+function closeNeuEintrag() {
+  const prev = window._neuPrevPage || 'eintraege';
+  const navEl = document.querySelector('.nav-item[onclick*="eintraege"]');
+  nav(prev, navEl || document.querySelector('.nav-item'));
+}
 function appInit(){
   document.getElementById('nf-dat').value=new Date().toISOString().split('T')[0];
   updateKatSel(); buildYearFilters(); renderAll();
@@ -261,6 +283,7 @@ function nav(id, el){
   if(id==='produkte') renderProdukte();
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
+  if(id==='eintraege') renderEin();
   if(id==='neu') updateNeuToolbar(false);
 }
 

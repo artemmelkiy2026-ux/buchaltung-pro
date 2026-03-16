@@ -88,7 +88,7 @@
   <button class="mob-tab" id="mobt-eintraege" onclick="mobNav('eintraege',this)">
     <span class="tab-ic"><i class="fas fa-list"></i></span><span class="tab-lbl">Einträge</span>
   </button>
-  <button class="mob-tab" id="mobt-neu" onclick="mobNav('neu',this)">
+  <button class="mob-tab" id="mobt-neu" onclick="openNeuEintrag()">
     <span class="tab-ic mob-plus-ic"><i class="fa-solid fa-plus"></i></span><span class="tab-lbl">Neu</span>
   </button>
   <button class="mob-tab" id="mobt-rechnungen" onclick="mobNav('rechnungen',this)">
@@ -108,15 +108,14 @@
     <button onclick="closeMobDrawer()" style="margin-left:auto;background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer;padding:4px"><i class="fas fa-times"></i></button>
   </div>
 
-  <!-- Buchen -->
+  <!-- Buchhaltung -->
   <div class="mob-drawer-group">
     <div class="mob-drawer-group-header" onclick="toggleMobGroup(this)">
       <span class="mob-drawer-group-icon"><i class="fas fa-pen"></i></span>
-      <span>Buchen</span>
+      <span>Buchhaltung</span>
       <i class="fas fa-chevron-right mob-drawer-arrow"></i>
     </div>
     <div class="mob-drawer-group-body">
-      <div class="mob-drawer-child" onclick="mobNavDrawer('neu')">Neuer Eintrag</div>
       <div class="mob-drawer-child" onclick="mobNavDrawer('eintraege')">Einträge</div>
       <div class="mob-drawer-child" onclick="mobNavDrawer('wiederkehrend')">Wiederkehrend</div>
     </div>
@@ -187,14 +186,13 @@
   <div class="nav-item active" onclick="nav('dashboard',this)"><span class="ic"><i class="fas fa-home"></i></span> Dashboard</div>
   <div class="nav-divider"></div>
 
-  <!-- Buchen — раскрывающаяся группа -->
+  <!-- Buchhaltung — раскрывающаяся группа -->
   <div class="nav-group-header" id="buchen-header" onclick="toggleNavGroup('buchen-group','buchen-header')">
     <span class="nav-group-icon"><i class="fas fa-pen"></i></span>
-    <span class="nav-group-label">Buchen</span>
+    <span class="nav-group-label">Buchhaltung</span>
     <i class="fas fa-chevron-right nav-group-arrow"></i>
   </div>
   <div class="nav-group-children" id="buchen-group">
-    <div class="nav-item nav-child" onclick="nav('neu',this)">Neuer Eintrag</div>
     <div class="nav-item nav-child" onclick="nav('eintraege',this)">Einträge</div>
     <div class="nav-item nav-child" onclick="nav('wiederkehrend',this)">Wiederkehrend</div>
   </div>
@@ -308,6 +306,9 @@
 
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Einträge</div></div>
+    <div class="ph-right">
+      <button class="btn primary" onclick="openNeuEintrag()"><i class="fas fa-plus"></i> Neuer Eintrag</button>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -440,7 +441,13 @@
 <div class="page" id="p-neu">
 <div class="page-inner">
 
-
+  <!-- Шапка как у Rechnungen -->
+  <div class="ph">
+    <div class="ph-left"><div class="ph-title" id="neu-form-title">Neuer Eintrag</div></div>
+    <div class="ph-right">
+      <button class="btn" onclick="closeNeuEintrag()"><i class="fas fa-arrow-left"></i></button>
+    </div>
+  </div>
   <!-- ── TOOLBAR ── -->
   <div id="neu-toolbar" style="
     display:grid;grid-template-columns:1fr 1fr;gap:12px;
@@ -637,9 +644,6 @@
       <div id="nf-mwst-summary" style="margin-top:10px;padding:8px 12px;border-radius:6px;font-size:12px;font-family:var(--mono)"></div>
     </div>
     <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-      <button class="btn primary" style="flex:1;min-width:140px;padding:11px" onclick="addEintrag(false)">
-        <i class="fas fa-save"></i> Speichern
-      </button>
       <button class="btn btn-bezahlt" id="btn-add-bezahlt" style="flex:1;min-width:140px;padding:11px;background:var(--green);color:#fff;border-color:var(--green)" onclick="addEintrag(true)">
         <i class="fas fa-check-circle"></i> Speichern &amp; Bezahlt
       </button>

@@ -382,6 +382,8 @@ function addEintrag(){
   calcNfMwst(); // reset summary
   const mwLabel = !isKleinunternehmer(datum.substring(0,4))&&mwBet>0 ? ` (Netto: ${netBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €, MwSt: ${mwBet.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})} €)` : '';
   toast(`${curTyp} gespeichert: ${fmt(betrag)}${mwLabel}`, 'ok');
+  // Переходим обратно на Einträge
+  if (typeof closeNeuEintrag === 'function') closeNeuEintrag();
   // Мигание новой строки в боковой колонке
   if(curTyp==='Einnahme') {
     renderLetzteEinnahmen(entry.id);
