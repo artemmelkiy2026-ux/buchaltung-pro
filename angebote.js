@@ -533,21 +533,32 @@ function angBezSearch(input) {
     input._sug = sug;
     document.addEventListener('click', e => {
       if (!sug.contains(e.target) && e.target !== input) sug.style.display = 'none';
-    }, { once: false });
+    });
   }
   const produkte = data.produkte || [];
   const matches = q.length < 1 ? produkte.slice(0,8)
     : produkte.filter(p => (p.name||'').toLowerCase().includes(q)).slice(0,8);
 
-  sug.innerHTML = matches.map(p => `
-    <div class="ang-bez-suggest-item" onclick="angBezSelect(this.closest('.ang-pos-row'),${JSON.stringify(p)})">
+  sug.innerHTML = matches.map((p, i) => `
+    <div class="ang-bez-suggest-item" data-idx="${i}">
       <div style="font-weight:600">${p.name}</div>
       ${p.artnr ? `<div style="font-size:11px;color:var(--sub)">Art.-Nr. ${p.artnr}</div>` : ''}
     </div>`).join('') +
-    `<div class="ang-bez-suggest-new" onclick="openAngProduktModal('${input.closest('.ang-pos-row')?.dataset.id||''}')">
+    `<div class="ang-bez-suggest-new" id="ang-bez-new-btn">
       <i class="fas fa-plus-circle"></i> Neues Produkt erstellen
     </div>`;
-  sug.style.display = 'block';
+
+  // Вешаем клики через JS — без проблем с кавычками
+  sug.querySelectorAll('.ang-bez-suggest-item').forEach((el, i) => {
+    el.addEventListener('click', () => {
+      const row = input.closest('.ang-pos-row');
+      angBezSelect(row, matches[i]);
+    });
+  });
+  const newBtn = sug.querySelector('#ang-bez-new-btn');
+  if (newBtn) newBtn.addEventListener('click', () => openAngProduktModal());
+
+  sug.style.display = matches.length || true ? 'block' : 'none';
 }
 
 function angBezSelect(row, p) {

@@ -85,6 +85,7 @@ window.addEventListener('supabase-ready', () => {
   if (!data.angebote)     data.angebote = [];
   if (!data.rechnungen)   data.rechnungen = [];
   if (!data.kunden)       data.kunden = [];
+  if (!data.produkte)     data.produkte = [];
   if (!data.ustEintraege) data.ustEintraege = [];
   if (!data.ustModeByYear) data.ustModeByYear = {};
   if (!data.wiederkehrend) data.wiederkehrend = [];
@@ -238,6 +239,7 @@ function nav(id, el){
   if(id==='angebote-form') { updateAngBanner(); recalcAngSumme(); }
   if(id==='rechnungen') renderRech();
   if(id==='kunden') renderKunden();
+  if(id==='produkte') renderProdukte();
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
   if(id==='neu') updateNeuToolbar(false);
