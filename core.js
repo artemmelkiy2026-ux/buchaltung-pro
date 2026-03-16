@@ -83,7 +83,6 @@ window.addEventListener('supabase-ready', () => {
   // Инициализация
   if (!data.eintraege)    data.eintraege = [];
   if (!data.rechnungen)   data.rechnungen = [];
-  if (!data.angebote)     data.angebote = [];
   if (!data.kunden)       data.kunden = [];
   if (!data.ustEintraege) data.ustEintraege = [];
   if (!data.ustModeByYear) data.ustModeByYear = {};
@@ -133,7 +132,7 @@ function toggleNavGroup(groupId, headerId) {
 
 // Открываем группу Aufträge при переходе в Angebote / Rechnungen / Wiederkehrend
 function openNavGroupIfNeeded(id) {
-  if (['angebote','rechnungen'].includes(id)) {
+  if (['rechnungen'].includes(id)) {
     const group  = document.getElementById('auftraege-group');
     const header = document.getElementById('auftraege-header');
     if (group && !group.classList.contains('open')) {
@@ -238,8 +237,6 @@ function nav(id, el){
   if(id==='kunden') renderKunden();
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
-  if(id==='angebote') renderAngebote();
-  if(id==='angebote-form') { updateAngBanner(); recalcAngSumme(); }
   if(id==='neu') updateNeuToolbar(false);
 }
 
