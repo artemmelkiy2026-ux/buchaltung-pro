@@ -239,7 +239,7 @@ function _angAddPos(p={}) {
       <button type="button" class="ang-rabatt-suffix" onclick="_angToggleRabatt(this)">${rabattTyp}</button>
     </div>
     <div class="ang-pos-betrag">0,00 €</div>
-    <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px">✕</button>`;
+    <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px"><i class="fas fa-trash"></i></button>`;
   list.appendChild(row);
   recalcAngSumme();
 }
