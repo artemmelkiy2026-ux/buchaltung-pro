@@ -1328,6 +1328,137 @@
 
 </div>
 </div>
+
+
+<div class="page" id="p-kunden-form">
+  <div class="ang-sticky-header">
+    <div class="ang-sticky-left">
+      <div id="km-form-title" class="ang-sticky-title">Neuer Kunde</div>
+    </div>
+    <div class="ang-sticky-right">
+      <button class="btn primary" onclick="saveKunde()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
+      <button class="btn ang-back-btn" onclick="closeKundeForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
+    </div>
+  </div>
+  <div class="ang-form-body">
+    <div class="ang-block">
+      <div class="ang-block-label">Kontaktdaten</div>
+      <div class="ang-info-grid">
+        <div class="ang-col-left">
+          <div class="fg" style="margin:0"><label>Name / Firma <span style="color:var(--red)">*</span></label><input type="text" id="km-name" placeholder="Max Mustermann GmbH"></div>
+          <div class="fg" style="margin:0"><label>Ansprechpartner</label><input type="text" id="km-ansprechpartner" placeholder="Herr / Frau ..."></div>
+          <div class="fg" style="margin:0"><label>E-Mail</label><input type="email" id="km-email" placeholder="kunde@email.de"></div>
+          <div class="fg" style="margin:0"><label>Telefon / WhatsApp</label><input type="tel" id="km-tel" placeholder="+49 1234 567890"></div>
+        </div>
+        <div class="ang-col-right">
+          <div class="fg" style="margin:0"><label>Straße und Hausnummer</label><input type="text" id="km-strasse" placeholder="Musterstraße 1"></div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>PLZ</label><input type="text" id="km-plz" placeholder="67547" maxlength="5" oninput="validatePLZ(this)"></div>
+            <div class="fg" style="margin:0"><label>Ort</label><input type="text" id="km-ort" placeholder="Worms"></div>
+          </div>
+          <div class="fg" style="margin:0"><label>IBAN</label><input type="text" id="km-iban" placeholder="DE12 3456 7890 ..." oninput="validateIBAN(this)" style="font-family:var(--mono)"></div>
+          <div class="fg" style="margin:0"><label>USt-ID (optional)</label><input type="text" id="km-ustid" placeholder="DE123456789"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ang-block">
+      <div class="ang-block-label">Notiz</div>
+      <div class="fg" style="margin:0"><textarea id="km-notiz" rows="3" placeholder="Interne Notiz..." style="min-height:80px;resize:vertical"></textarea></div>
+    </div>
+    <div class="ang-bottom-actions">
+      <button class="btn primary" onclick="saveKunde()"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn" onclick="closeKundeForm()"><i class="fas fa-times"></i> Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="p-produkte-form">
+  <div class="ang-sticky-header">
+    <div class="ang-sticky-left">
+      <div id="ap-form-title" class="ang-sticky-title">Neues Produkt</div>
+    </div>
+    <div class="ang-sticky-right">
+      <button class="btn" onclick="saveAngProdukt(true)"><span class="ang-btn-txt">Erstellen und neu</span><span class="ang-btn-txt-short" style="display:none">+ Neu</span></button>
+      <button class="btn primary" onclick="saveAngProdukt(false)"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
+      <button class="btn ang-back-btn" onclick="closeProduktForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
+    </div>
+  </div>
+  <div class="ang-form-body">
+    <div class="ang-block">
+      <div class="ang-block-label">Produktinformationen</div>
+      <div class="ang-info-grid">
+        <div class="ang-col-left">
+          <div class="fg" style="margin:0"><label>Produktname <span style="color:var(--red)">*</span></label><input type="text" id="ap-name" placeholder="Produktname"></div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Art.-Nr.</label><input type="text" id="ap-artnr" placeholder="1000"></div>
+            <div class="fg" style="margin:0"><label>Kategorie</label>
+              <select id="ap-kategorie"><option>Artikel</option><option>Dienstleistung</option><option>Sonstiges</option></select>
+            </div>
+          </div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Standardeinheit</label>
+              <select id="ap-einheit"><option>Stk</option><option>h</option><option>kg</option><option>m</option><option>m²</option><option>l</option><option>Pauschal</option></select>
+            </div>
+            <div class="fg" style="margin:0"><label>Umsatzsteuer in %</label>
+              <select id="ap-ust" onchange="apCalcBrutto()"><option value="19">19%</option><option value="7">7%</option><option value="0">0%</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="ang-col-right">
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Einkaufspreis (Netto)</label><input type="number" id="ap-ek-netto" placeholder="0,00 EUR" min="0" step="0.01" oninput="apCalcEkBrutto()"></div>
+            <div class="fg" style="margin:0"><label>Einkaufspreis (Brutto)</label><input type="number" id="ap-ek-brutto" placeholder="0,00 EUR" min="0" step="0.01"></div>
+          </div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Verkaufspreis (Netto)</label><input type="number" id="ap-vk-netto" placeholder="0,00 EUR" min="0" step="0.01" oninput="apCalcBrutto()"></div>
+            <div class="fg" style="margin:0"><label>Verkaufspreis (Brutto)</label><input type="number" id="ap-vk-brutto" placeholder="0,00 EUR" min="0" step="0.01"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Табы -->
+    <div class="ap-tabs">
+      <button class="ap-tab ap-tab-active" onclick="apSetTab('beschreibung',this)">Beschreibung</button>
+      <button class="ap-tab" onclick="apSetTab('einheiten',this)">Weitere Einheiten</button>
+      <button class="ap-tab" onclick="apSetTab('einstellungen',this)">Weitere Einstellungen</button>
+    </div>
+
+    <div class="ang-block" style="border-top:none;border-radius:0 0 var(--r2) var(--r2)">
+      <div class="ap-tab-pane" id="ap-pane-beschreibung">
+        <div class="fg" style="margin:0"><label>Produktbeschreibung</label><textarea id="ap-beschreibung" style="min-height:80px;resize:vertical"></textarea></div>
+        <div class="fg" style="margin-top:12px;margin-bottom:0"><label>Interne Bemerkung</label><textarea id="ap-bemerkung" style="min-height:60px;resize:vertical"></textarea></div>
+      </div>
+      <div class="ap-tab-pane" id="ap-pane-einheiten" style="display:none">
+        <div id="ap-einheiten-list"></div>
+        <button class="btn" style="color:var(--blue);border-color:var(--blue);margin-top:8px" onclick="apAddEinheit()"><i class="fas fa-plus"></i> Einheit hinzufügen</button>
+      </div>
+      <div class="ap-tab-pane" id="ap-pane-einstellungen" style="display:none">
+        <div class="ap-toggle-row">
+          <label class="ap-toggle-switch"><input type="checkbox" id="ap-bestand-aktiv" checked><span class="ap-toggle-slider"></span></label>
+          <span>Bestand aktiviert</span>
+        </div>
+        <div class="ap-toggle-row" style="margin-top:12px">
+          <label class="ap-toggle-switch"><input type="checkbox" id="ap-meldebestand-aktiv" checked><span class="ap-toggle-slider"></span></label>
+          <span>Meldebestand</span>
+        </div>
+        <div class="ang-prod-grid" style="margin-top:16px">
+          <div class="fg" style="margin:0"><label>Schwellenwert für Benachrichtigung</label><input type="number" id="ap-schwellenwert" placeholder="0,00" value="0" min="0" step="0.01"></div>
+          <div class="fg" style="margin:0"><label>Erinnere mich</label>
+            <select id="ap-erinnere"><option>Täglich</option><option>2 Tage</option><option>3 Tage</option><option>4 Tage</option><option>5 Tage</option><option>6 Tage</option><option>7 Tage</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ang-bottom-actions">
+      <button class="btn primary" onclick="saveAngProdukt(false)"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn" onclick="saveAngProdukt(true)">+ Erstellen und neu</button>
+      <button class="btn" onclick="closeProduktForm()"><i class="fas fa-times"></i> Abbrechen</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /main -->
 <!-- ── MONATSDETAIL MODAL ── -->
 <div class="modal-bg" id="mon-modal">
@@ -1598,47 +1729,7 @@
 
 <!-- ── KUNDE MODAL ── -->
 <!-- ── KUNDE FORM ── -->
-<div class="page" id="p-kunden-form">
-  <div class="ang-sticky-header">
-    <div class="ang-sticky-left">
-      <div id="km-form-title" class="ang-sticky-title">Neuer Kunde</div>
-    </div>
-    <div class="ang-sticky-right">
-      <button class="btn primary" onclick="saveKunde()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
-      <button class="btn ang-back-btn" onclick="closeKundeForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
-    </div>
-  </div>
-  <div class="ang-form-body">
-    <div class="ang-block">
-      <div class="ang-block-label">Kontaktdaten</div>
-      <div class="ang-info-grid">
-        <div class="ang-col-left">
-          <div class="fg" style="margin:0"><label>Name / Firma <span style="color:var(--red)">*</span></label><input type="text" id="km-name" placeholder="Max Mustermann GmbH"></div>
-          <div class="fg" style="margin:0"><label>Ansprechpartner</label><input type="text" id="km-ansprechpartner" placeholder="Herr / Frau ..."></div>
-          <div class="fg" style="margin:0"><label>E-Mail</label><input type="email" id="km-email" placeholder="kunde@email.de"></div>
-          <div class="fg" style="margin:0"><label>Telefon / WhatsApp</label><input type="tel" id="km-tel" placeholder="+49 1234 567890"></div>
-        </div>
-        <div class="ang-col-right">
-          <div class="fg" style="margin:0"><label>Straße und Hausnummer</label><input type="text" id="km-strasse" placeholder="Musterstraße 1"></div>
-          <div class="ang-fields-2col">
-            <div class="fg" style="margin:0"><label>PLZ</label><input type="text" id="km-plz" placeholder="67547" maxlength="5" oninput="validatePLZ(this)"></div>
-            <div class="fg" style="margin:0"><label>Ort</label><input type="text" id="km-ort" placeholder="Worms"></div>
-          </div>
-          <div class="fg" style="margin:0"><label>IBAN</label><input type="text" id="km-iban" placeholder="DE12 3456 7890 ..." oninput="validateIBAN(this)" style="font-family:var(--mono)"></div>
-          <div class="fg" style="margin:0"><label>USt-ID (optional)</label><input type="text" id="km-ustid" placeholder="DE123456789"></div>
-        </div>
-      </div>
-    </div>
-    <div class="ang-block">
-      <div class="ang-block-label">Notiz</div>
-      <div class="fg" style="margin:0"><textarea id="km-notiz" rows="3" placeholder="Interne Notiz..." style="min-height:80px;resize:vertical"></textarea></div>
-    </div>
-    <div class="ang-bottom-actions">
-      <button class="btn primary" onclick="saveKunde()"><i class="fas fa-save"></i> Speichern</button>
-      <button class="btn" onclick="closeKundeForm()"><i class="fas fa-times"></i> Abbrechen</button>
-    </div>
-  </div>
-</div>
+
 
 
 
@@ -1786,92 +1877,7 @@
 
 <!-- ── NEUES PRODUKT MODAL ── -->
 <!-- ── PRODUKTE FORM ── -->
-<div class="page" id="p-produkte-form">
-  <div class="ang-sticky-header">
-    <div class="ang-sticky-left">
-      <div id="ap-form-title" class="ang-sticky-title">Neues Produkt</div>
-    </div>
-    <div class="ang-sticky-right">
-      <button class="btn" onclick="saveAngProdukt(true)"><span class="ang-btn-txt">Erstellen und neu</span><span class="ang-btn-txt-short" style="display:none">+ Neu</span></button>
-      <button class="btn primary" onclick="saveAngProdukt(false)"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
-      <button class="btn ang-back-btn" onclick="closeProduktForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
-    </div>
-  </div>
-  <div class="ang-form-body">
-    <div class="ang-block">
-      <div class="ang-block-label">Produktinformationen</div>
-      <div class="ang-info-grid">
-        <div class="ang-col-left">
-          <div class="fg" style="margin:0"><label>Produktname <span style="color:var(--red)">*</span></label><input type="text" id="ap-name" placeholder="Produktname"></div>
-          <div class="ang-fields-2col">
-            <div class="fg" style="margin:0"><label>Art.-Nr.</label><input type="text" id="ap-artnr" placeholder="1000"></div>
-            <div class="fg" style="margin:0"><label>Kategorie</label>
-              <select id="ap-kategorie"><option>Artikel</option><option>Dienstleistung</option><option>Sonstiges</option></select>
-            </div>
-          </div>
-          <div class="ang-fields-2col">
-            <div class="fg" style="margin:0"><label>Standardeinheit</label>
-              <select id="ap-einheit"><option>Stk</option><option>h</option><option>kg</option><option>m</option><option>m²</option><option>l</option><option>Pauschal</option></select>
-            </div>
-            <div class="fg" style="margin:0"><label>Umsatzsteuer in %</label>
-              <select id="ap-ust" onchange="apCalcBrutto()"><option value="19">19%</option><option value="7">7%</option><option value="0">0%</option></select>
-            </div>
-          </div>
-        </div>
-        <div class="ang-col-right">
-          <div class="ang-fields-2col">
-            <div class="fg" style="margin:0"><label>Einkaufspreis (Netto)</label><input type="number" id="ap-ek-netto" placeholder="0,00 EUR" min="0" step="0.01" oninput="apCalcEkBrutto()"></div>
-            <div class="fg" style="margin:0"><label>Einkaufspreis (Brutto)</label><input type="number" id="ap-ek-brutto" placeholder="0,00 EUR" min="0" step="0.01"></div>
-          </div>
-          <div class="ang-fields-2col">
-            <div class="fg" style="margin:0"><label>Verkaufspreis (Netto)</label><input type="number" id="ap-vk-netto" placeholder="0,00 EUR" min="0" step="0.01" oninput="apCalcBrutto()"></div>
-            <div class="fg" style="margin:0"><label>Verkaufspreis (Brutto)</label><input type="number" id="ap-vk-brutto" placeholder="0,00 EUR" min="0" step="0.01"></div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Табы -->
-    <div class="ap-tabs">
-      <button class="ap-tab ap-tab-active" onclick="apSetTab('beschreibung',this)">Beschreibung</button>
-      <button class="ap-tab" onclick="apSetTab('einheiten',this)">Weitere Einheiten</button>
-      <button class="ap-tab" onclick="apSetTab('einstellungen',this)">Weitere Einstellungen</button>
-    </div>
-
-    <div class="ang-block" style="border-top:none;border-radius:0 0 var(--r2) var(--r2)">
-      <div class="ap-tab-pane" id="ap-pane-beschreibung">
-        <div class="fg" style="margin:0"><label>Produktbeschreibung</label><textarea id="ap-beschreibung" style="min-height:80px;resize:vertical"></textarea></div>
-        <div class="fg" style="margin-top:12px;margin-bottom:0"><label>Interne Bemerkung</label><textarea id="ap-bemerkung" style="min-height:60px;resize:vertical"></textarea></div>
-      </div>
-      <div class="ap-tab-pane" id="ap-pane-einheiten" style="display:none">
-        <div id="ap-einheiten-list"></div>
-        <button class="btn" style="color:var(--blue);border-color:var(--blue);margin-top:8px" onclick="apAddEinheit()"><i class="fas fa-plus"></i> Einheit hinzufügen</button>
-      </div>
-      <div class="ap-tab-pane" id="ap-pane-einstellungen" style="display:none">
-        <div class="ap-toggle-row">
-          <label class="ap-toggle-switch"><input type="checkbox" id="ap-bestand-aktiv" checked><span class="ap-toggle-slider"></span></label>
-          <span>Bestand aktiviert</span>
-        </div>
-        <div class="ap-toggle-row" style="margin-top:12px">
-          <label class="ap-toggle-switch"><input type="checkbox" id="ap-meldebestand-aktiv" checked><span class="ap-toggle-slider"></span></label>
-          <span>Meldebestand</span>
-        </div>
-        <div class="ang-prod-grid" style="margin-top:16px">
-          <div class="fg" style="margin:0"><label>Schwellenwert für Benachrichtigung</label><input type="number" id="ap-schwellenwert" placeholder="0,00" value="0" min="0" step="0.01"></div>
-          <div class="fg" style="margin:0"><label>Erinnere mich</label>
-            <select id="ap-erinnere"><option>Täglich</option><option>2 Tage</option><option>3 Tage</option><option>4 Tage</option><option>5 Tage</option><option>6 Tage</option><option>7 Tage</option></select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="ang-bottom-actions">
-      <button class="btn primary" onclick="saveAngProdukt(false)"><i class="fas fa-save"></i> Speichern</button>
-      <button class="btn" onclick="saveAngProdukt(true)">+ Erstellen und neu</button>
-      <button class="btn" onclick="closeProduktForm()"><i class="fas fa-times"></i> Abbrechen</button>
-    </div>
-  </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
