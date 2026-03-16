@@ -238,6 +238,7 @@ function nav(id, el){
   if(id==='angebote') renderAngebote();
   if(id==='angebote-form') { updateAngBanner(); recalcAngSumme(); }
   if(id==='rechnungen') renderRech();
+  if(id==='rechnungen-form') { updateRechBanner(); calcRechTotal(); }
   if(id==='kunden') renderKunden();
   if(id==='produkte') renderProdukte();
   if(id==='ust') renderUst();
