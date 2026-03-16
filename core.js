@@ -83,6 +83,7 @@ window.addEventListener('supabase-ready', () => {
   // Инициализация
   if (!data.eintraege)    data.eintraege = [];
   if (!data.rechnungen)   data.rechnungen = [];
+  if (!data.angebote)     data.angebote = [];
   if (!data.kunden)       data.kunden = [];
   if (!data.ustEintraege) data.ustEintraege = [];
   if (!data.ustModeByYear) data.ustModeByYear = {};
@@ -119,11 +120,36 @@ let zSortCol='datum', zSortAsc=false;  // Сортировка Zahlungsarten
 let ustPage=1;              // Пагинация для USt-Buchungen
 
 // ── INIT — вызывается после загрузки данных из Supabase ──────────────────
+
+// ── NAV GROUP TOGGLE ─────────────────────────────────────────
+function toggleNavGroup(groupId) {
+  const group = document.getElementById(groupId);
+  const header = group?.previousElementSibling;
+  if (!group) return;
+  const isOpen = group.classList.contains('open');
+  group.classList.toggle('open', !isOpen);
+  if (header) header.classList.toggle('open', !isOpen);
+}
+
+// Открываем группу Aufträge при nav на Angebote или Rechnungen
+function openNavGroupIfNeeded(id) {
+  if (['angebote','rechnungen','wiederkehrend'].includes(id)) {
+    const group = document.getElementById('auftraege-group');
+    const header = group?.previousElementSibling;
+    if (group && !group.classList.contains('open')) {
+      group.classList.add('open');
+      if (header) header.classList.add('open');
+    }
+  }
+}
+
 function appInit(){
   document.getElementById('nf-dat').value=new Date().toISOString().split('T')[0];
   updateKatSel(); buildYearFilters(); renderAll();
   updateMwstFormVisibility();
   setTyp(curTyp);
+  // Открываем группу Aufträge по умолчанию при запуске
+  openNavGroupIfNeeded('rechnungen');
   setTimeout(()=>{
     const today=new Date().toISOString().split('T')[0];
     const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
@@ -198,6 +224,7 @@ function activeEintraegeMitRech(yr) {
 // ── NAV ───────────────────────────────────────────────────────────────────
 function nav(id, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  openNavGroupIfNeeded(id);
   el.classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('p-'+id).classList.add('active');
@@ -212,6 +239,7 @@ function nav(id, el){
   if(id==='kunden') renderKunden();
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
+  if(id==='angebote') renderAngebote();
   if(id==='neu') updateNeuToolbar(false);
 }
 
