@@ -261,6 +261,7 @@ function activeEintraegeMitRech(yr) {
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────
+const FORM_PAGES = ['angebote-form','rechnungen-form','kunden-form','produkte-form','neu'];
 function nav(id, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   openNavGroupIfNeeded(id);
@@ -269,6 +270,9 @@ function nav(id, el){
   const page = document.getElementById('p-'+id);
   if(page) page.classList.add('active');
   curPage=id;
+  // Скрываем footer на полноэкранных формах
+  const footer = document.getElementById('legal-footer');
+  if(footer) footer.style.display = FORM_PAGES.includes(id) ? 'none' : '';
   if(id==='bericht') renderRep();
   if(id==='zahlungen') renderZ();
   if(id==='dashboard') renderDash();

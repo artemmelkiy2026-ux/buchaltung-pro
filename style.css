@@ -2055,6 +2055,8 @@ input, select, textarea {
   flex-direction: column;
   height: calc(100vh - 54px);
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 #p-angebote-form.active,
 #p-rechnungen-form.active,
