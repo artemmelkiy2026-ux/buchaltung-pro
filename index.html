@@ -1800,22 +1800,34 @@
   <div class="ang-form-body">
     <div class="ang-block">
       <div class="ang-block-label">Produktinformationen</div>
-      <div class="ang-prod-grid">
-        <div class="fg" style="margin:0"><label>Produktname <span style="color:var(--red)">*</span></label><input type="text" id="ap-name" placeholder="Produktname"></div>
-        <div class="fg" style="margin:0"><label>Standardeinheit</label>
-          <select id="ap-einheit"><option>Stk</option><option>h</option><option>kg</option><option>m</option><option>m²</option><option>l</option><option>Pauschal</option></select>
+      <div class="ang-info-grid">
+        <div class="ang-col-left">
+          <div class="fg" style="margin:0"><label>Produktname <span style="color:var(--red)">*</span></label><input type="text" id="ap-name" placeholder="Produktname"></div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Art.-Nr.</label><input type="text" id="ap-artnr" placeholder="1000"></div>
+            <div class="fg" style="margin:0"><label>Kategorie</label>
+              <select id="ap-kategorie"><option>Artikel</option><option>Dienstleistung</option><option>Sonstiges</option></select>
+            </div>
+          </div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Standardeinheit</label>
+              <select id="ap-einheit"><option>Stk</option><option>h</option><option>kg</option><option>m</option><option>m²</option><option>l</option><option>Pauschal</option></select>
+            </div>
+            <div class="fg" style="margin:0"><label>Umsatzsteuer in %</label>
+              <select id="ap-ust" onchange="apCalcBrutto()"><option value="19">19%</option><option value="7">7%</option><option value="0">0%</option></select>
+            </div>
+          </div>
         </div>
-        <div class="fg" style="margin:0"><label>Art.-Nr.</label><input type="text" id="ap-artnr" placeholder="1000"></div>
-        <div class="fg" style="margin:0"><label>Kategorie</label>
-          <select id="ap-kategorie"><option>Artikel</option><option>Dienstleistung</option><option>Sonstiges</option></select>
+        <div class="ang-col-right">
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Einkaufspreis (Netto)</label><input type="number" id="ap-ek-netto" placeholder="0,00 EUR" min="0" step="0.01" oninput="apCalcEkBrutto()"></div>
+            <div class="fg" style="margin:0"><label>Einkaufspreis (Brutto)</label><input type="number" id="ap-ek-brutto" placeholder="0,00 EUR" min="0" step="0.01"></div>
+          </div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Verkaufspreis (Netto)</label><input type="number" id="ap-vk-netto" placeholder="0,00 EUR" min="0" step="0.01" oninput="apCalcBrutto()"></div>
+            <div class="fg" style="margin:0"><label>Verkaufspreis (Brutto)</label><input type="number" id="ap-vk-brutto" placeholder="0,00 EUR" min="0" step="0.01"></div>
+          </div>
         </div>
-        <div class="fg" style="margin:0"><label>Umsatzsteuer in %</label>
-          <select id="ap-ust" onchange="apCalcBrutto()"><option value="19">19%</option><option value="7">7%</option><option value="0">0%</option></select>
-        </div>
-        <div class="fg" style="margin:0"><label>Einkaufspreis (Netto)</label><input type="number" id="ap-ek-netto" placeholder="0 EUR" min="0" step="0.01" oninput="apCalcEkBrutto()"></div>
-        <div class="fg" style="margin:0"><label>Verkaufspreis (Netto)</label><input type="number" id="ap-vk-netto" placeholder="0 EUR" min="0" step="0.01" oninput="apCalcBrutto()"></div>
-        <div class="fg" style="margin:0"><label>Einkaufspreis (Brutto)</label><input type="number" id="ap-ek-brutto" placeholder="0 EUR" min="0" step="0.01"></div>
-        <div class="fg" style="margin:0"><label>Verkaufspreis (Brutto)</label><input type="number" id="ap-vk-brutto" placeholder="0 EUR" min="0" step="0.01"></div>
       </div>
     </div>
 
