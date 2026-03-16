@@ -2733,24 +2733,67 @@ input, select, textarea {
   margin-left: 10px;
 }
 
-/* Мобильный — позиции в карточки */
+/* Лейбл-обёртка поля в строке позиции */
+.ang-f-wrap {
+  display: contents; /* на десктопе — прозрачная обёртка, дети идут в грид */
+}
+.ang-f-lbl { display: none; } /* скрыт на десктопе */
+
+/* Мобильный — позиции как карточки с подписями полей */
 @media (max-width: 768px) {
   .ang-pos-row {
-    grid-template-columns: 1fr 1fr;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas:
+      "bez  bez  del"
+      "mng  einh preis"
+      "ust  rab  typ"
+      "btg  btg  btg";
     gap: 8px;
-    padding: 10px 0;
+    padding: 14px 0;
+    border-bottom: 2px solid var(--border);
+    align-items: start;
   }
-  .ang-pos-row input:first-child { grid-column: 1 / -1; }
+
+  .ang-f-wrap { display: flex; flex-direction: column; gap: 3px; }
+  .ang-f-lbl {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--sub);
+  }
+  .ang-f-wrap input, .ang-f-wrap select { width: 100%; box-sizing: border-box; }
+  .ang-f-wrap.ang-f-wrap-toggle .ang-rabatt-toggle { height: 34px; }
+
+  /* Размещение по grid-area */
+  .ang-f-bez                                { grid-area: bez; font-size:14px; font-weight:600; }
+  .ang-pos-row .del-btn                     { grid-area: del; justify-self: end; align-self: start; }
+  .ang-pos-row .ang-f-wrap:nth-of-type(1)   { grid-area: mng; }
+  .ang-pos-row .ang-f-wrap:nth-of-type(2)   { grid-area: einh; }
+  .ang-pos-row .ang-f-wrap:nth-of-type(3)   { grid-area: preis; }
+  .ang-pos-row .ang-f-wrap:nth-of-type(4)   { grid-area: ust; }
+  .ang-pos-row .ang-f-wrap:nth-of-type(5)   { grid-area: rab; }
+  .ang-pos-row .ang-f-wrap:nth-of-type(6)   { grid-area: typ; }
+
   .ang-pos-betrag {
-    text-align: left;
-    grid-column: 1 / -1;
-    font-size: 13px;
-    padding: 4px 0 0 0;
+    grid-area: btg;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 700;
+    padding-top: 4px;
   }
-  .ang-pos-row .del-btn { grid-column: 2 / 3; justify-self: end; }
 }
+
 @media (max-width: 480px) {
-  .ang-pos-row { grid-template-columns: 1fr; }
-  .ang-pos-row input:first-child { grid-column: 1; }
-  .ang-pos-row .del-btn { justify-self: start; }
+  .ang-pos-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "bez  del"
+      "mng  einh"
+      "preis ust"
+      "rab  typ"
+      "btg  btg";
+  }
 }

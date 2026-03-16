@@ -225,22 +225,25 @@ function _angAddPos(p={}) {
   const row = document.createElement('div');
   row.className = 'ang-pos-row';
   row.innerHTML = `
-    <input type="text"   placeholder="Beschreibung" value="${p.bez||''}" oninput="recalcAngSumme()">
-    <input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="recalcAngSumme()">
-    <input type="text"   placeholder="Stk." value="${p.einheit||'Stk.'}">
-    <input type="number" placeholder="0,00" value="${preis}" min="0" step="0.01" oninput="recalcAngSumme()">
-    ${isKlein ? '<div></div>' : `<select onchange="recalcAngSumme()">
+    <input type="text" class="ang-f-bez" placeholder="Beschreibung" value="${p.bez||''}" oninput="recalcAngSumme()">
+    <div class="ang-f-wrap"><span class="ang-f-lbl">Menge</span><input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="recalcAngSumme()"></div>
+    <div class="ang-f-wrap"><span class="ang-f-lbl">Einheit</span><input type="text" placeholder="Stk." value="${p.einheit||'Stk.'}"></div>
+    <div class="ang-f-wrap"><span class="ang-f-lbl">Preis</span><input type="number" placeholder="0,00" value="${preis}" min="0" step="0.01" oninput="recalcAngSumme()"></div>
+    ${isKlein ? '<div></div>' : `<div class="ang-f-wrap"><span class="ang-f-lbl">USt.</span><select onchange="recalcAngSumme()">
       <option value="19" ${rate==19?'selected':''}>19%</option>
       <option value="7"  ${rate==7?'selected':''}>7%</option>
       <option value="0"  ${rate==0?'selected':''}>0%</option>
-    </select>`}
-    <input type="number" placeholder="0" value="${p.rabatt||0}" min="0" step="0.01" oninput="recalcAngSumme()" class="ang-rabatt-val">
-    <div class="ang-rabatt-toggle">
+    </select></div>`}
+    <div class="ang-f-wrap"><span class="ang-f-lbl">Rabatt</span><input type="number" placeholder="0" value="${p.rabatt||0}" min="0" step="0.01" oninput="recalcAngSumme()" class="ang-rabatt-val"></div>
+    <div class="ang-f-wrap ang-f-wrap-toggle"><span class="ang-f-lbl">Typ</span><div class="ang-rabatt-toggle">
       <button type="button" class="${rabattTyp==='%'?'active':''}" onclick="_angToggleRabatt(this,'%')">%</button>
       <button type="button" class="${rabattTyp==='€'?'active':''}" onclick="_angToggleRabatt(this,'€')">€</button>
-    </div>
+    </div></div>
     <div class="ang-pos-betrag">0,00 €</div>
     <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px">✕</button>`;
+  list.appendChild(row);
+  recalcAngSumme();
+}
   list.appendChild(row);
   recalcAngSumme();
 }
@@ -305,14 +308,15 @@ function recalcAngSumme() {
 
 function _angGetPos() {
   return [...document.querySelectorAll('#ang-pos-list .ang-pos-row')].map(row => {
-    const inputs   = row.querySelectorAll('input[type=number]');
-    const textIns  = row.querySelectorAll('input[type=text]');
-    const sel      = row.querySelector('select');
-    const menge    = parseFloat(inputs[0]?.value)||1;
-    const preis    = parseFloat(inputs[1]?.value)||0;
-    const rabatt   = parseFloat(inputs[2]?.value)||0;
-    const rate     = sel ? parseFloat(sel.value) : 0;
+    const numInputs = row.querySelectorAll('input[type=number]');
+    const sel       = row.querySelector('select');
+    const menge     = parseFloat(numInputs[0]?.value)||1;
+    const preis     = parseFloat(numInputs[1]?.value)||0;
+    const rabatt    = parseFloat(numInputs[2]?.value)||0;
+    const rate      = sel ? parseFloat(sel.value) : 0;
     const rabattTyp = row.querySelector('.ang-rabatt-toggle .active')?.textContent?.trim() || '%';
+    const bez       = row.querySelector('.ang-f-bez')?.value?.trim() || '';
+    const einheit   = row.querySelectorAll('input[type=text]')[1]?.value?.trim() || 'Stk.';
     let factor;
     if (rabattTyp === '%') {
       factor = 1 - rabatt / 100;
@@ -327,11 +331,7 @@ function _angGetPos() {
       netto  = r2(menge * preis * factor);
       brutto = r2(netto * (1 + rate/100));
     }
-    return {
-      bez: textIns[0]?.value?.trim()||'',
-      menge, einheit: textIns[1]?.value?.trim()||'Stk.',
-      netto: r2(netto/menge), brutto: r2(brutto/menge), rate, rabatt, rabattTyp
-    };
+    return { bez, menge, einheit, netto: r2(netto/menge), brutto: r2(brutto/menge), rate, rabatt, rabattTyp };
   }).filter(p => p.bez || p.netto);
 }
 
