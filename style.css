@@ -2289,7 +2289,7 @@ input, select, textarea {
   font-size: 15px;
   font-weight: 500;
   padding: 8px 14px;
-  margin: 1px 0;
+  margin: 1px 10px;
 }
 .nav-item.nav-child .ic {
   font-size: 14px;
