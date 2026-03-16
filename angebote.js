@@ -261,11 +261,22 @@ function _angAddPos(p={}) {
     <input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="recalcAngSumme()">
     <input type="text" placeholder="Stk." value="${p.einheit||'Stk.'}">
     <input type="number" placeholder="0,00" value="${preis}" min="0" step="0.01" oninput="recalcAngSumme()">
-    ${isKlein ? '<div></div>' : `<select onchange="recalcAngSumme()">
-      <option value="19" ${rate==19?'selected':''}>19%</option>
-      <option value="7"  ${rate==7?'selected':''}>7%</option>
-      <option value="0"  ${rate==0?'selected':''}>0%</option>
-    </select>`}
+    ${isKlein ? '<div></div>' : `<div class="ust-flag-wrap" style="position:relative">
+      <button type="button" class="ust-flag-btn" onclick="toggleAngUstDropdown(this)"
+        style="display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;padding:7px 10px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;height:100%;box-sizing:border-box">
+        <span style="display:flex;align-items:center;gap:5px">
+          <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+          <span class="ust-flag-label">${rate}%</span>
+        </span>
+        <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
+      </button>
+      <input type="hidden" class="ust-flag-val" value="${rate}" onchange="recalcAngSumme()">
+      <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:120px">
+        <div onclick="setAngUstRate(this,19)" style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
+        <div onclick="setAngUstRate(this,7)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
+        <div onclick="setAngUstRate(this,0)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
+      </div>
+    </div>`}
     <div class="ang-rabatt-group">
       <input type="number" placeholder="0" value="${p.rabatt||0}" min="0" step="0.01" oninput="recalcAngSumme()" class="ang-rabatt-val">
       <button type="button" class="ang-rabatt-suffix" onclick="_angToggleRabatt(this)">${rabattTyp}</button>
@@ -302,7 +313,7 @@ function recalcAngSumme() {
     const menge    = parseFloat(inputs[0]?.value)||1;
     const preis    = parseFloat(inputs[1]?.value)||0;
     const rabatt   = parseFloat(inputs[2]?.value)||0;
-    const sel      = row.querySelector('select');
+    const sel      = row.querySelector('select') || row.querySelector('.ust-flag-val');
     const rate     = sel ? parseFloat(sel.value) : 0;
     const rabattTyp = row.querySelector('.ang-rabatt-suffix')?.textContent?.trim() || '%';
     let factor;
@@ -335,7 +346,7 @@ function recalcAngSumme() {
 function _angGetPos() {
   return [...document.querySelectorAll('#ang-pos-list .ang-pos-row')].map(row => {
     const numInputs = row.querySelectorAll('input[type=number]');
-    const sel       = row.querySelector('select');
+    const sel       = row.querySelector('select') || row.querySelector('.ust-flag-val');
     const menge     = parseFloat(numInputs[0]?.value)||1;
     const preis     = parseFloat(numInputs[1]?.value)||0;
     const rabatt    = parseFloat(numInputs[2]?.value)||0;
@@ -606,8 +617,12 @@ function angBezSelect(row, p) {
   const numInputs = row.querySelectorAll('input[type=number]');
   if (numInputs[1]) numInputs[1].value = p.vkNetto || p.vkBrutto || '';
   // ust
-  const sel = row.querySelector('select');
-  if (sel && p.ust != null) sel.value = p.ust;
+  const sel = row.querySelector('.ust-flag-val');
+  if (sel && p.ust != null) {
+    sel.value = p.ust;
+    const btn = row.querySelector('.ust-flag-btn .ust-flag-label');
+    if (btn) btn.textContent = p.ust + '%';
+  }
   // hide suggest
   if (inputs[0]._sug) inputs[0]._sug.style.display = 'none';
   recalcAngSumme();
@@ -619,4 +634,29 @@ function angBezSelect(row, p) {
 
 function openAngProduktModal() {
   if (typeof openProduktModal === 'function') openProduktModal();
+}
+
+// ── USt Flag Dropdown (Angebot positions) ─────────────────────────────────
+function toggleAngUstDropdown(btn) {
+  const panel = btn.closest('.ust-flag-wrap').querySelector('.ust-flag-panel');
+  const isOpen = panel.style.display !== 'none';
+  // close all open panels first
+  document.querySelectorAll('.ust-flag-panel').forEach(p => p.style.display = 'none');
+  if (!isOpen) {
+    panel.style.display = 'block';
+    setTimeout(() => document.addEventListener('click', function h(e) {
+      if (!panel.contains(e.target) && e.target !== btn) {
+        panel.style.display = 'none';
+        document.removeEventListener('click', h);
+      }
+    }), 0);
+  }
+}
+
+function setAngUstRate(el, rate) {
+  const wrap = el.closest('.ust-flag-wrap');
+  wrap.querySelector('.ust-flag-val').value = rate;
+  wrap.querySelector('.ust-flag-label').textContent = rate + '%';
+  wrap.querySelector('.ust-flag-panel').style.display = 'none';
+  recalcAngSumme();
 }

@@ -1312,11 +1312,22 @@
           </select>
         </div>
         <div class="fg" style="margin:0"><label>USt-Satz (%)</label>
-          <select id="ust-new-rate" style="width:100%">
-            <option value="19">19%</option>
-            <option value="7">7%</option>
-            <option value="0">0%</option>
-          </select>
+          <input type="hidden" id="ust-new-rate" value="19">
+          <div style="position:relative;margin-top:4px">
+            <button type="button" onclick="toggleUstDropdown('ust-new-rate')"
+              style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
+              <span style="display:flex;align-items:center;gap:7px">
+                <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                <span id="ust-new-rate-label">19%</span>
+              </span>
+              <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
+            </button>
+            <div id="ust-new-rate-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:140px">
+              <div onclick="setUstRate('ust-new-rate',19,null)" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
+              <div onclick="setUstRate('ust-new-rate',7,null)" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
+              <div onclick="setUstRate('ust-new-rate',0,null)" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="fg" style="margin-bottom:12px"><label>Beschreibung (optional)</label>
@@ -1400,7 +1411,22 @@
               <select id="ap-einheit"><option>Stk</option><option>h</option><option>kg</option><option>m</option><option>m²</option><option>l</option><option>Pauschal</option></select>
             </div>
             <div class="fg" style="margin:0"><label>Umsatzsteuer in %</label>
-              <select id="ap-ust" onchange="apCalcBrutto()"><option value="19">19%</option><option value="7">7%</option><option value="0">0%</option></select>
+              <input type="hidden" id="ap-ust" value="19">
+              <div style="position:relative;margin-top:4px">
+                <button type="button" id="ap-ust-trigger" onclick="toggleUstDropdown('ap-ust')"
+                  style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
+                  <span style="display:flex;align-items:center;gap:7px">
+                    <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                    <span id="ap-ust-label">19%</span>
+                  </span>
+                  <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
+                </button>
+                <div id="ap-ust-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:140px">
+                  <div onclick="setUstRate('ap-ust',19,'apCalcBrutto')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
+                  <div onclick="setUstRate('ap-ust',7,'apCalcBrutto')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
+                  <div onclick="setUstRate('ap-ust',0,'apCalcBrutto')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -1443,3 +1443,34 @@ function ustSetYear(yr){
   ustQuartalFilter = 0; // сбрасываем фильтр квартала при смене года
   renderUst();
 }
+
+// ── Универсальный USt Flag Dropdown (для статических полей в index.html) ─
+function toggleUstDropdown(id) {
+  const panel = document.getElementById(id + '-panel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  document.querySelectorAll('.ust-flag-panel, [id$="-panel"]').forEach(p => {
+    if (p.id && p.id.endsWith('-panel') && p.id !== 'nf-mwst-panel') p.style.display = 'none';
+  });
+  if (!isOpen) {
+    panel.style.display = 'block';
+    setTimeout(() => document.addEventListener('click', function h(e) {
+      if (!panel.contains(e.target) && !e.target.closest('[onclick*="toggleUstDropdown(\'' + id + '\')"]')) {
+        panel.style.display = 'none';
+        document.removeEventListener('click', h);
+      }
+    }), 0);
+  }
+}
+
+function setUstRate(id, rate, callbackName) {
+  const hidden = document.getElementById(id);
+  if (hidden) hidden.value = rate;
+  const label = document.getElementById(id + '-label');
+  if (label) label.textContent = rate + '%';
+  const panel = document.getElementById(id + '-panel');
+  if (panel) panel.style.display = 'none';
+  if (callbackName && typeof window[callbackName] === 'function') window[callbackName]();
+}
+
+// posRateChanged для rechnungen — читает hidden input вместо select

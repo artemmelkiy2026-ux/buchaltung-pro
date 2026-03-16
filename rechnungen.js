@@ -399,7 +399,7 @@ function reRenderRechPos(){
   // Перерисовываем позиции с текущим годом (для правильного klein/regel)
   const rows = Array.from(document.querySelectorAll('.rn-pos-row'));
   const current = rows.map(row => {
-    const inputs = row.querySelectorAll('input,select');
+    const inputs = row.querySelectorAll('input');
     return {
       bez:    inputs[0].value.trim(),
       menge:  parseFloat(inputs[1].value)||1,
@@ -449,11 +449,22 @@ function addRechPosRow(i,p){
         </div>
         <div>
           <div style="font-size:10px;color:var(--sub);margin-bottom:2px">USt %</div>
-          <select onchange="posRateChanged(this)" style="${INP};padding:7px 4px;width:100%;box-sizing:border-box;${klein?'opacity:.4;pointer-events:none':''}">
-            <option value="0"  ${rateVal==0 ?'selected':''}>0%</option>
-            <option value="7"  ${rateVal==7 ?'selected':''}>7%</option>
-            <option value="19" ${rateVal==19?'selected':''}>19%</option>
-          </select>
+          <div class="ust-flag-wrap" style="position:relative;${klein?'opacity:.4;pointer-events:none':''}">
+            <button type="button" class="ust-flag-btn" onclick="toggleAngUstDropdown(this)"
+              style="display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:7px 8px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;box-sizing:border-box">
+              <span style="display:flex;align-items:center;gap:4px">
+                <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+                <span class="ust-flag-label">${rateVal}%</span>
+              </span>
+              <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
+            </button>
+            <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
+            <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:110px">
+              <div onclick="setRechUstRate(this,0)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
+              <div onclick="setRechUstRate(this,7)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
+              <div onclick="setRechUstRate(this,19)" style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
+            </div>
+          </div>
         </div>
         <div>
           <div style="font-size:10px;color:var(--sub);margin-bottom:2px">Brutto/St.</div>
@@ -467,11 +478,22 @@ function addRechPosRow(i,p){
       <input type="text"   placeholder="Bezeichnung" value="${p.bez||''}" oninput="calcRechTotal()" style="${INP};font-size:13px">
       <input type="number" placeholder="Menge" value="${p.menge||1}" min="0.01" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:center">
       <input type="number" placeholder="Netto" value="${nettoVal}" min="0" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:right">
-      <select onchange="posRateChanged(this)" style="${INP};padding:7px 4px;${klein?'opacity:.4;pointer-events:none':''}">
-        <option value="0"  ${rateVal==0 ?'selected':''}>§19 / 0%</option>
-        <option value="7"  ${rateVal==7 ?'selected':''}>7%</option>
-        <option value="19" ${rateVal==19?'selected':''}>19%</option>
-      </select>
+      <div class="ust-flag-wrap" style="position:relative;${klein?'opacity:.4;pointer-events:none':''}">
+        <button type="button" class="ust-flag-btn" onclick="toggleAngUstDropdown(this)"
+          style="display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;padding:7px 8px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;box-sizing:border-box">
+          <span style="display:flex;align-items:center;gap:4px">
+            <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+            <span class="ust-flag-label">${rateVal}%</span>
+          </span>
+          <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
+        </button>
+        <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
+        <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:110px">
+          <div onclick="setRechUstRate(this,0)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
+          <div onclick="setRechUstRate(this,7)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
+          <div onclick="setRechUstRate(this,19)" style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
+        </div>
+      </div>
       <input type="number" placeholder="Brutto" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue)">
       <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0"><i class="fas fa-trash"></i></button>`;
   }
@@ -481,7 +503,7 @@ function addRechPosRow(i,p){
 // Вводим Netto → пересчитываем Brutto
 function posNettoChanged(input){
   const row=input.closest('.rn-pos-row');
-  const inputs=row.querySelectorAll('input,select');
+  const inputs=row.querySelectorAll('input');
   const menge =parseFloat(inputs[1].value)||1;
   const netto =parseFloat(inputs[2].value)||0;
   const rate  =parseFloat(inputs[3].value)||0;
@@ -493,7 +515,7 @@ function posNettoChanged(input){
 // Меняем ставку → пересчитываем Brutto из Netto
 function posRateChanged(sel){
   const row=sel.closest('.rn-pos-row');
-  const inputs=row.querySelectorAll('input,select');
+  const inputs=row.querySelectorAll('input');
   const netto=parseFloat(inputs[2].value)||0;
   const rate =parseFloat(sel.value)||0;
   const rnYr2=document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
@@ -503,7 +525,7 @@ function posRateChanged(sel){
 // Вводим Brutto → пересчитываем Netto
 function posBruttoChanged(input){
   const row=input.closest('.rn-pos-row');
-  const inputs=row.querySelectorAll('input,select');
+  const inputs=row.querySelectorAll('input');
   const brutto=parseFloat(inputs[4].value)||0;
   const rate  =parseFloat(inputs[3].value)||0;
   const rnYr3=document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
@@ -522,7 +544,7 @@ function calcRechTotal(){
   let totalMwst=0;
 
   document.querySelectorAll('.rn-pos-row').forEach(row=>{
-    const inputs=row.querySelectorAll('input,select');
+    const inputs=row.querySelectorAll('input');
     const menge =parseFloat(inputs[1].value)||0;
     const netto =parseFloat(inputs[2].value)||0;
     const rate  =klein?0:parseFloat(inputs[3].value)||0;
@@ -1300,4 +1322,14 @@ function rnSelectKunde(id) {
   if (k.tel)   document.getElementById('rn-tel').value   = k.tel;
   document.getElementById('rn-nr').dataset.kundeId = id;
   document.getElementById('rn-kunde-suggest').style.display = 'none';
+}
+
+// ── USt Flag Dropdown (Rechnung positions) ───────────────────────────────
+function setRechUstRate(el, rate) {
+  const wrap = el.closest('.ust-flag-wrap');
+  const hidden = wrap.querySelector('.ust-flag-val');
+  hidden.value = rate;
+  wrap.querySelector('.ust-flag-label').textContent = rate + '%';
+  wrap.querySelector('.ust-flag-panel').style.display = 'none';
+  posRateChanged(hidden);
 }
