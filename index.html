@@ -139,37 +139,63 @@
   <div class="nav-item active" onclick="nav('dashboard',this)"><span class="ic"><i class="fas fa-home"></i></span> Dashboard</div>
   <div class="nav-divider"></div>
 
-  <!-- Buchen -->
-  <div class="sidebar-section">Buchen</div>
-  <div class="nav-item" onclick="nav('neu',this)"><span class="ic"><i class="fa-solid fa-plus"></i></span> Neuer Eintrag</div>
-  <div class="nav-item" onclick="nav('eintraege',this)"><span class="ic"><i class="fas fa-list"></i></span> Einträge</div>
-  <div class="nav-item" onclick="nav('wiederkehrend',this)"><span class="ic"><i class="fas fa-sync-alt"></i></span> Wiederkehrend</div>
-  <div class="nav-divider"></div>
+  <!-- Buchen — раскрывающаяся группа -->
+  <div class="nav-group-header" id="buchen-header" onclick="toggleNavGroup('buchen-group','buchen-header')">
+    <span class="nav-group-icon"><i class="fas fa-pen"></i></span>
+    <span class="nav-group-label">Buchen</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
+  </div>
+  <div class="nav-group-children" id="buchen-group">
+    <div class="nav-item nav-child" onclick="nav('neu',this)">Neuer Eintrag</div>
+    <div class="nav-item nav-child" onclick="nav('eintraege',this)">Einträge</div>
+    <div class="nav-item nav-child" onclick="nav('wiederkehrend',this)">Wiederkehrend</div>
+  </div>
 
-  <!-- Aufträge -->
-  <div class="sidebar-section">Aufträge</div>
-  <div class="nav-item" onclick="nav('angebote',this)"><span class="ic"><i class="fas fa-file-alt"></i></span> Angebote</div>
-  <div class="nav-item" onclick="nav('rechnungen',this)"><span class="ic"><i class="fas fa-file-invoice"></i></span> Rechnungen</div>
-  <div class="nav-divider"></div>
+  <!-- Aufträge — раскрывающаяся группа -->
+  <div class="nav-group-header" id="auftraege-header" onclick="toggleNavGroup('auftraege-group','auftraege-header')">
+    <span class="nav-group-icon"><i class="fas fa-file-invoice"></i></span>
+    <span class="nav-group-label">Aufträge</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
+  </div>
+  <div class="nav-group-children" id="auftraege-group">
+    <div class="nav-item nav-child" onclick="nav('angebote',this)">Angebote</div>
+    <div class="nav-item nav-child" onclick="nav('rechnungen',this)">Rechnungen</div>
+  </div>
 
-  <!-- Kontakte -->
-  <div class="sidebar-section">Kontakte</div>
-  <div class="nav-item" onclick="nav('kunden',this)"><span class="ic"><i class="fas fa-address-book"></i></span> Kunden (CRM)</div>
-  <div class="nav-item" onclick="nav('produkte',this)"><span class="ic"><i class="fas fa-box"></i></span> Produkte &amp; Leistungen</div>
-  <div class="nav-divider"></div>
+  <!-- Kontakte — раскрывающаяся группа -->
+  <div class="nav-group-header" id="kontakte-header" onclick="toggleNavGroup('kontakte-group','kontakte-header')">
+    <span class="nav-group-icon"><i class="fas fa-address-book"></i></span>
+    <span class="nav-group-label">Kontakte</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
+  </div>
+  <div class="nav-group-children" id="kontakte-group">
+    <div class="nav-item nav-child" onclick="nav('kunden',this)">Kunden (CRM)</div>
+    <div class="nav-item nav-child" onclick="nav('produkte',this)">Produkte &amp; Leistungen</div>
+  </div>
 
-  <!-- Auswertung -->
-  <div class="sidebar-section">Auswertung</div>
-  <div class="nav-item" onclick="nav('bericht',this)"><span class="ic"><i class="fas fa-calendar-alt"></i></span> Monatsbericht</div>
-  <div class="nav-item" onclick="nav('prognose',this)"><span class="ic"><i class="fas fa-chart-line"></i></span> Prognose</div>
-  <div class="nav-item" onclick="nav('kategorien',this)"><span class="ic"><i class="fas fa-chart-bar"></i></span> Kategorien</div>
-  <div class="nav-item" onclick="nav('zahlungen',this)"><span class="ic"><i class="fas fa-credit-card"></i></span> Zahlungsarten</div>
-  <div class="nav-divider"></div>
+  <!-- Auswertung — раскрывающаяся группа -->
+  <div class="nav-group-header" id="auswertung-header" onclick="toggleNavGroup('auswertung-group','auswertung-header')">
+    <span class="nav-group-icon"><i class="fas fa-chart-bar"></i></span>
+    <span class="nav-group-label">Auswertung</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
+  </div>
+  <div class="nav-group-children" id="auswertung-group">
+    <div class="nav-item nav-child" onclick="nav('bericht',this)">Monatsbericht</div>
+    <div class="nav-item nav-child" onclick="nav('prognose',this)">Prognose</div>
+    <div class="nav-item nav-child" onclick="nav('kategorien',this)">Kategorien</div>
+    <div class="nav-item nav-child" onclick="nav('zahlungen',this)">Zahlungsarten</div>
+  </div>
 
-  <!-- GoBD & Finanzamt -->
-  <div class="sidebar-section">GoBD &amp; Finanzamt</div>
-  <div class="nav-item" onclick="nav('journal',this)"><span class="ic"><i class="fas fa-book"></i></span> Journal</div>
-  <div class="nav-item" onclick="nav('ust',this)"><span class="ic"><i class="fas fa-percentage"></i></span> Umsatzsteuer</div>
+  <!-- GoBD & Finanzamt — раскрывающаяся группа -->
+  <div class="nav-group-header" id="gobd-header" onclick="toggleNavGroup('gobd-group','gobd-header')">
+    <span class="nav-group-icon"><i class="fas fa-landmark"></i></span>
+    <span class="nav-group-label">GoBD &amp; Finanzamt</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
+  </div>
+  <div class="nav-group-children" id="gobd-group">
+    <div class="nav-item nav-child" onclick="nav('journal',this)">Journal</div>
+    <div class="nav-item nav-child" onclick="nav('ust',this)">Umsatzsteuer</div>
+  </div>
 
 </nav>
 

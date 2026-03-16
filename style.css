@@ -2527,18 +2527,17 @@ input, select, textarea {
   overflow: visible;
 }
 
-/* Дочерние пункты — ТОТЖЕ размер как обычные nav-item */
+/* Дочерние пункты — без иконок, компактные */
 .nav-item.nav-child {
-  font-size: 15px;
-  font-weight: 500;
-  padding: 8px 14px;
-  margin: 1px 10px;
-}
-.nav-item.nav-child .ic {
   font-size: 14px;
-  width: 16px;
+  font-weight: 400;
+  padding: 7px 10px;
+  margin: 0 4px;
+  color: #4a6080;
 }
-/* Убираем точку ::before — не нужна */
+.nav-item.nav-child:hover { color: var(--text); }
+.nav-item.nav-child.active { font-weight: 600; color: var(--blue); background: var(--bdim); }
+.nav-item.nav-child .ic { display: none; }
 .nav-item.nav-child::before { display: none; }
 
 /* ── BEZAHLT BUTTON ──────────────────────────────────────── */

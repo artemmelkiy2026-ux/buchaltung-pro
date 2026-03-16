@@ -132,9 +132,35 @@ function toggleNavGroup(groupId, headerId) {
   if (header) header.classList.toggle('open', !isOpen);
 }
 
-// openNavGroupIfNeeded — удалено (группа Aufträge теперь развёрнутая секция)
-function openNavGroupIfNeeded(id) { /* no-op */ }
-
+// Открываем нужную группу при переходе
+function openNavGroupIfNeeded(id) {
+  const map = {
+    'neu':           'buchen-group',
+    'eintraege':     'buchen-group',
+    'wiederkehrend': 'buchen-group',
+    'angebote':      'auftraege-group',
+    'angebote-form': 'auftraege-group',
+    'rechnungen':    'auftraege-group',
+    'rechnungen-form':'auftraege-group',
+    'kunden':        'kontakte-group',
+    'produkte':      'kontakte-group',
+    'bericht':       'auswertung-group',
+    'prognose':      'auswertung-group',
+    'kategorien':    'auswertung-group',
+    'zahlungen':     'auswertung-group',
+    'journal':       'gobd-group',
+    'ust':           'gobd-group',
+  };
+  const groupId = map[id];
+  if (!groupId) return;
+  const group = document.getElementById(groupId);
+  const headerId = groupId.replace('-group', '-header');
+  const header = document.getElementById(headerId);
+  if (group && !group.classList.contains('open')) {
+    group.classList.add('open');
+    if (header) header.classList.add('open');
+  }
+}
 function appInit(){
   document.getElementById('nf-dat').value=new Date().toISOString().split('T')[0];
   updateKatSel(); buildYearFilters(); renderAll();
