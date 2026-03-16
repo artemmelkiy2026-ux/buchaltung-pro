@@ -2423,3 +2423,8 @@ input, select, textarea {
   flex-direction: column;
   min-height: 100vh;
 }
+
+#ang-view-list, #ang-view-form {
+  width: 100%;
+  flex: 1;
+}
