@@ -63,6 +63,7 @@ async function pinToHash(pin) {
 async function sbLoadAll() {
   if (!currentUser) return null;
   const uid = currentUser.id;
+  try {
   const [ein, kun, rech, rechPos, wied, ustM, ustE, ang] = await Promise.all([
     sb.from('eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('kunden').select('*').eq('user_id', uid).order('name'),
@@ -84,10 +85,15 @@ async function sbLoadAll() {
   const ustModeByYear = {};
   (ustM.data || []).forEach(r => { ustModeByYear[r.jahr] = r.mode; });
   // Загружаем журнал изменений рекоманд
-  const rechLog = await sb.from('rechnungen_log').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(500);
+  const rechLog = await sb.from('rechnungen_log').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(500).catch(()=>({data:[]}));
   const rechnungenLog = (rechLog.data || []);
   const angebote = ((ang && ang.data) || []).map(dbToAngebot);
   return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog };
+  } catch(err) {
+    console.error('[sbLoadAll error]', err);
+    // Возвращаем пустые данные — не теряем приложение
+    return { eintraege:[], kunden:[], rechnungen:[], angebote:[], wiederkehrend:[], ustModeByYear:{}, ustEintraege:[], rechnungenLog:[] };
+  }
 }
 
 // ФИХ: один запрос вместо двух (sbLoadPin + отдельный user_data)
