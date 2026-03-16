@@ -140,7 +140,11 @@ function closeMobDrawer() {
 function toggleMobGroup(headerEl) {
   const group = headerEl.closest('.mob-drawer-group');
   if (!group) return;
-  group.classList.toggle('open');
+  const isOpen = group.classList.contains('open');
+  // Закрываем все группы
+  document.querySelectorAll('.mob-drawer-group').forEach(g => g.classList.remove('open'));
+  // Открываем кликнутую только если она была закрыта
+  if (!isOpen) group.classList.add('open');
 }
 
 function mobNavDrawer(page) {
