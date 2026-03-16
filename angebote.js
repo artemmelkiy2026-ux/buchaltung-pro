@@ -573,6 +573,13 @@ function angBezSelect(row, p) {
 // ── MODAL: NEUES PRODUKT ─────────────────────────────────────────────────────
 let _angProduktTargetRow = null;
 
+function apSetTab(tab, btn) {
+  document.querySelectorAll('.ap-tab').forEach(b => b.classList.remove('ap-tab-active'));
+  document.querySelectorAll('.ap-tab-pane').forEach(p => p.style.display = 'none');
+  btn.classList.add('ap-tab-active');
+  document.getElementById('ap-pane-' + tab).style.display = 'block';
+}
+
 function openAngProduktModal(rowId) {
   _angProduktTargetRow = rowId;
   const nameVal = _angCurBezInput?.value || '';
@@ -584,16 +591,50 @@ function openAngProduktModal(rowId) {
   document.getElementById('ap-ek-netto').value = '';
   document.getElementById('ap-ek-brutto').value = '';
   document.getElementById('ap-beschreibung').value = '';
+  document.getElementById('ap-bemerkung').value = '';
   document.getElementById('ap-einheit').value = 'Stk';
   document.getElementById('ap-ust').value = '19';
+  document.getElementById('ap-schwellenwert').value = '0';
+  document.getElementById('ap-bestand-aktiv').checked = true;
+  document.getElementById('ap-meldebestand-aktiv').checked = true;
+  document.getElementById('ap-einheiten-list').innerHTML = '';
+  apAddEinheit();
+  // активируем первый таб
+  document.querySelectorAll('.ap-tab').forEach(b => b.classList.remove('ap-tab-active'));
+  document.querySelectorAll('.ap-tab-pane').forEach(p => p.style.display = 'none');
+  document.querySelector('.ap-tab').classList.add('ap-tab-active');
+  document.getElementById('ap-pane-beschreibung').style.display = 'block';
   document.getElementById('ang-produkt-modal').classList.add('open');
 }
 
 function apCalcBrutto() {
-  const netto = parseFloat(document.getElementById('ap-vk-netto').value) || 0;
-  const ust   = parseFloat(document.getElementById('ap-ust').value) || 0;
-  const brutto = r2(netto * (1 + ust/100));
-  document.getElementById('ap-vk-brutto').value = brutto || '';
+  const netto  = parseFloat(document.getElementById('ap-vk-netto').value) || 0;
+  const ust    = parseFloat(document.getElementById('ap-ust').value) || 0;
+  document.getElementById('ap-vk-brutto').value = netto ? r2(netto * (1 + ust/100)) : '';
+}
+function apCalcEkBrutto() {
+  const netto  = parseFloat(document.getElementById('ap-ek-netto').value) || 0;
+  const ust    = parseFloat(document.getElementById('ap-ust').value) || 0;
+  document.getElementById('ap-ek-brutto').value = netto ? r2(netto * (1 + ust/100)) : '';
+}
+
+function apAddEinheit() {
+  const list = document.getElementById('ap-einheiten-list');
+  const row = document.createElement('div');
+  row.className = 'ap-einheit-row';
+  row.innerHTML = `
+    <select>
+      <option>Stk</option><option>h</option><option>kg</option>
+      <option>m</option><option>m²</option><option>l</option><option>Pauschal</option>
+    </select>
+    <span class="ap-op">×</span>
+    <input type="number" placeholder="1" value="1" min="0.001" step="0.001">
+    <span class="ap-op">=</span>
+    <input type="number" placeholder="Preis (Brutto)" min="0" step="0.01">
+    <button class="btn" style="padding:4px 8px;color:var(--blue)" onclick="this.closest('.ap-einheit-row').remove()">
+      <i class="fas fa-trash"></i>
+    </button>`;
+  list.appendChild(row);
 }
 
 function saveAngProdukt(andNew) {
@@ -603,22 +644,26 @@ function saveAngProdukt(andNew) {
   const prod = {
     id: 'p-' + Date.now(),
     name,
-    artnr:    document.getElementById('ap-artnr').value.trim(),
-    einheit:  document.getElementById('ap-einheit').value,
-    bestand:  parseFloat(document.getElementById('ap-bestand').value)||0,
-    kategorie:document.getElementById('ap-kategorie').value,
-    ust:      parseFloat(document.getElementById('ap-ust').value)||0,
-    ekNetto:  parseFloat(document.getElementById('ap-ek-netto').value)||0,
-    vkNetto:  parseFloat(document.getElementById('ap-vk-netto').value)||0,
-    ekBrutto: parseFloat(document.getElementById('ap-ek-brutto').value)||0,
-    vkBrutto: parseFloat(document.getElementById('ap-vk-brutto').value)||0,
-    beschreibung: document.getElementById('ap-beschreibung').value.trim(),
+    artnr:         document.getElementById('ap-artnr').value.trim(),
+    einheit:       document.getElementById('ap-einheit').value,
+    bestand:       parseFloat(document.getElementById('ap-bestand').value)||0,
+    kategorie:     document.getElementById('ap-kategorie').value,
+    ust:           parseFloat(document.getElementById('ap-ust').value)||0,
+    ekNetto:       parseFloat(document.getElementById('ap-ek-netto').value)||0,
+    vkNetto:       parseFloat(document.getElementById('ap-vk-netto').value)||0,
+    ekBrutto:      parseFloat(document.getElementById('ap-ek-brutto').value)||0,
+    vkBrutto:      parseFloat(document.getElementById('ap-vk-brutto').value)||0,
+    beschreibung:  document.getElementById('ap-beschreibung').value.trim(),
+    bemerkung:     document.getElementById('ap-bemerkung').value.trim(),
+    bestandAktiv:  document.getElementById('ap-bestand-aktiv').checked,
+    meldebestand:  document.getElementById('ap-meldebestand-aktiv').checked,
+    schwellenwert: parseFloat(document.getElementById('ap-schwellenwert').value)||0,
+    erinnere:      document.getElementById('ap-erinnere').value,
   };
   data.produkte.push(prod);
   saveData();
   toast(`Produkt „${name}" erstellt`, 'ok');
 
-  // Вставить в текущую строку если была открыта из неё
   if (_angCurBezInput) {
     const row = _angCurBezInput.closest('.ang-pos-row');
     if (row) angBezSelect(row, prod);
@@ -629,6 +674,9 @@ function saveAngProdukt(andNew) {
     document.getElementById('ap-artnr').value = '';
     document.getElementById('ap-vk-netto').value = '';
     document.getElementById('ap-vk-brutto').value = '';
+    document.getElementById('ap-ek-netto').value = '';
+    document.getElementById('ap-ek-brutto').value = '';
+    document.getElementById('ap-beschreibung').value = '';
     document.getElementById('ap-name').focus();
   } else {
     closeModal('ang-produkt-modal');
