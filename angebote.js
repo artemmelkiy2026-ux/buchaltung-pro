@@ -261,11 +261,18 @@ function _angAddPos(p={}) {
     <input type="number" placeholder="1" value="${p.menge||1}" min="0.01" step="0.01" oninput="recalcAngSumme()">
     <input type="text" placeholder="Stk." value="${p.einheit||'Stk.'}">
     <input type="number" placeholder="0,00" value="${preis}" min="0" step="0.01" oninput="recalcAngSumme()">
-    ${isKlein ? '<div></div>' : `<select onchange="recalcAngSumme()">
-      <option value="19" ${rate==19?'selected':''}>19%</option>
-      <option value="7"  ${rate==7?'selected':''}>7%</option>
-      <option value="0"  ${rate==0?'selected':''}>0%</option>
-    </select>`}
+    ${isKlein ? '<div></div>' : `<div class="ust-drop" data-rate="${rate}">
+      <button type="button" class="ust-drop-btn" onclick="_ustToggle(this)">
+        <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
+        <span class="ust-drop-lbl">${rate}%</span>
+        <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub);margin-left:2px"></i>
+      </button>
+      <div class="ust-drop-panel" style="display:none">
+        ${[19,7,0].map(v=>`<div class="ust-drop-opt${v==rate?' ust-drop-opt-active':''}" onclick="_ustSelect(this,${v})" data-val="${v}">
+          <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>${v}%
+        </div>`).join('')}
+      </div>
+    </div>`}
     <div class="ang-rabatt-group">
       <input type="number" placeholder="0" value="${p.rabatt||0}" min="0" step="0.01" oninput="recalcAngSumme()" class="ang-rabatt-val">
       <button type="button" class="ang-rabatt-suffix" onclick="_angToggleRabatt(this)">${rabattTyp}</button>
@@ -303,7 +310,8 @@ function recalcAngSumme() {
     const preis    = parseFloat(inputs[1]?.value)||0;
     const rabatt   = parseFloat(inputs[2]?.value)||0;
     const sel      = row.querySelector('select');
-    const rate     = sel ? parseFloat(sel.value) : 0;
+    const ustDrop  = row.querySelector('.ust-drop');
+    const rate     = ustDrop ? parseFloat(ustDrop.dataset.rate)||0 : (sel ? parseFloat(sel.value) : 0);
     const rabattTyp = row.querySelector('.ang-rabatt-suffix')?.textContent?.trim() || '%';
     let factor;
     if (rabattTyp === '%') {
@@ -336,10 +344,11 @@ function _angGetPos() {
   return [...document.querySelectorAll('#ang-pos-list .ang-pos-row')].map(row => {
     const numInputs = row.querySelectorAll('input[type=number]');
     const sel       = row.querySelector('select');
+    const ustDrop   = row.querySelector('.ust-drop');
     const menge     = parseFloat(numInputs[0]?.value)||1;
     const preis     = parseFloat(numInputs[1]?.value)||0;
     const rabatt    = parseFloat(numInputs[2]?.value)||0;
-    const rate      = sel ? parseFloat(sel.value) : 0;
+    const rate      = ustDrop ? parseFloat(ustDrop.dataset.rate)||0 : (sel ? parseFloat(sel.value) : 0);
     const rabattTyp = row.querySelector('.ang-rabatt-suffix')?.textContent?.trim() || '%';
     const bez       = row.querySelector('.ang-f-bez')?.value?.trim() || '';
     const einheit   = row.querySelectorAll('input[type=text]')[1]?.value?.trim() || 'Stk.';
@@ -620,4 +629,31 @@ function angBezSelect(row, p) {
 // Открыть модал из строки позиции (передаёт контекст)
 function openAngProduktModal() {
   if (typeof openProduktModal === 'function') openProduktModal();
+}
+
+// ── USt DROPDOWN с флагом Германии ──────────────────────────────────────────
+function _ustToggle(btn) {
+  const panel = btn.nextElementSibling;
+  const isOpen = panel.style.display !== 'none';
+  // Закрываем все открытые
+  document.querySelectorAll('.ust-drop-panel').forEach(p => p.style.display = 'none');
+  if (!isOpen) {
+    panel.style.display = 'block';
+    const close = e => {
+      if (!btn.closest('.ust-drop').contains(e.target)) {
+        panel.style.display = 'none';
+        document.removeEventListener('click', close);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', close), 0);
+  }
+}
+
+function _ustSelect(optEl, val) {
+  const drop = optEl.closest('.ust-drop');
+  drop.dataset.rate = val;
+  drop.querySelector('.ust-drop-lbl').textContent = val + '%';
+  drop.querySelectorAll('.ust-drop-opt').forEach(o => o.classList.toggle('ust-drop-opt-active', parseInt(o.dataset.val) === val));
+  drop.querySelector('.ust-drop-panel').style.display = 'none';
+  recalcAngSumme();
 }
