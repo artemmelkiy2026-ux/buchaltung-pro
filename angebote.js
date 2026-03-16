@@ -23,6 +23,74 @@ const ANG_STATUS = {
   abgelaufen: { label:'Abgelaufen',  icon:'fas fa-hourglass-end',color:'var(--sub)',    bg:'rgba(148,163,184,.12)', border:'rgba(148,163,184,.3)' },
 };
 
+
+// ── INLINE FORM (вместо модального окна) ────────────────────
+function openAngForm(id) {
+  const listView = document.getElementById('ang-view-list');
+  const formView = document.getElementById('ang-view-form');
+  const title    = document.getElementById('ang-form-title');
+  if (!formView) { openAngebotModal(); return; } // fallback
+
+  if (id) {
+    // Редактирование существующего
+    editAngFill(id);
+    if (title) title.textContent = 'Angebot bearbeiten';
+  } else {
+    // Новое
+    editAngId = null;
+    wiedTyp = 'Ausgabe';
+    document.getElementById('ang-nr').value = autoAngNr();
+    document.getElementById('ang-dat').value = new Date().toISOString().split('T')[0];
+    document.getElementById('ang-gueltig').value = '';
+    document.getElementById('ang-status').value = 'offen';
+    document.getElementById('ang-kunde').value = '';
+    document.getElementById('ang-adresse').value = '';
+    document.getElementById('ang-notiz').value = '';
+    const bEl = document.getElementById('ang-betreff');  if(bEl) bEl.value = 'Angebot ' + autoAngNr();
+    const rEl = document.getElementById('ang-referenz'); if(rEl) rEl.value = '';
+    const kEl = document.getElementById('ang-kopftext'); if(kEl) kEl.value = 'Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen das gewünschte freibleibende Angebot:';
+    const fEl = document.getElementById('ang-fusstext'); if(fEl) fEl.value = 'Für Rückfragen stehen wir Ihnen jederzeit gerne zur Verfügung.\nMit freundlichen Grüßen';
+    angPreisMode = 'brutto'; setAngPreisMode('brutto');
+    initAngPositionen();
+    if (title) title.textContent = 'Neues Angebot';
+  }
+  updateAngBanner();
+  if (listView) listView.style.display = 'none';
+  if (formView) formView.style.display = 'block';
+  // Скролл наверх
+  const pi = document.querySelector('#p-angebote .page-inner');
+  if (pi) pi.scrollTop = 0;
+}
+
+function closeAngForm() {
+  const listView = document.getElementById('ang-view-list');
+  const formView = document.getElementById('ang-view-form');
+  if (listView) listView.style.display = 'block';
+  if (formView) formView.style.display = 'none';
+  editAngId = null;
+  renderAngebote();
+}
+
+// Заполняем форму данными существующего Angebot
+function editAngFill(id) {
+  const a = (data.angebote||[]).find(x=>x.id===id);
+  if (!a) return;
+  editAngId = id;
+  document.getElementById('ang-nr').value = a.nr || '';
+  document.getElementById('ang-dat').value = a.datum || '';
+  document.getElementById('ang-gueltig').value = a.gueltig || '';
+  document.getElementById('ang-status').value = a.status || 'offen';
+  document.getElementById('ang-kunde').value = a.kunde || '';
+  document.getElementById('ang-adresse').value = a.adresse || '';
+  document.getElementById('ang-notiz').value = a.notiz || '';
+  const bEl = document.getElementById('ang-betreff');  if(bEl) bEl.value = a.betreff||'';
+  const rEl = document.getElementById('ang-referenz'); if(rEl) rEl.value = a.referenz||'';
+  const kEl = document.getElementById('ang-kopftext'); if(kEl) kEl.value = a.kopftext||'';
+  const fEl = document.getElementById('ang-fusstext'); if(fEl) fEl.value = a.fusstext||'';
+  angPreisMode = a.preisMode||'brutto'; setAngPreisMode(angPreisMode);
+  loadAngPositionen(a.positionen||[]);
+}
+
 function autoAngNr() {
   const angs = data.angebote || [];
   let maxN = 0;
@@ -35,6 +103,10 @@ function autoAngNr() {
 }
 
 function openAngebotModal() {
+  openAngForm(null);
+  return;
+}
+function _openAngebotModalOld() {
   editAngId = null;
   document.getElementById('ang-nr').value = autoAngNr();
   document.getElementById('ang-dat').value = new Date().toISOString().split('T')[0];
@@ -54,6 +126,9 @@ function openAngebotModal() {
 }
 
 function editAng(id) {
+  openAngForm(id);
+}
+function editAngOld(id) {
   const a = (data.angebote || []).find(x => x.id === id);
   if (!a) return;
   editAngId = id;
@@ -268,8 +343,7 @@ function saveAngebot() {
     data.angebote.push(newA);
     sbSaveAngebot(newA);
   }
-  closeModal('ang-modal');
-  renderAngebote();
+  closeAngForm();
   toast('✓ Angebot gespeichert!', 'ok');
 }
 
@@ -381,7 +455,7 @@ function renderAngebote() {
 
     return `<div style="display:grid;grid-template-columns:140px 100px 1fr 120px 130px 40px;gap:0;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;${bg}"
       onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='${i%2===0?'':'var(--s2)'}'"
-      onclick="editAng('${a.id}')">
+      onclick="openAngForm('${a.id}')">
 
       <!-- Status пилюля -->
       <div style="display:flex;align-items:center">
@@ -417,7 +491,7 @@ function renderAngebote() {
         <button class="del-btn" style="width:28px;height:28px;border-radius:6px;font-size:14px;position:relative"
           onclick="toggleAngMenu('${a.id}',this)">⋯</button>
         <div id="ang-menu-${a.id}" style="display:none;position:absolute;right:40px;background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:500;min-width:200px;padding:4px">
-          <div class="ang-menu-item" onclick="editAng('${a.id}')"><i class="fas fa-edit"></i> Dokument bearbeiten</div>
+          <div class="ang-menu-item" onclick="openAngForm('${a.id}')"><i class="fas fa-edit"></i> Dokument bearbeiten</div>
           <div class="ang-menu-item" onclick="printAngebot('${a.id}')"><i class="fas fa-eye"></i> Vorschau / Drucken</div>
           <div style="height:1px;background:var(--border);margin:4px 0"></div>
           <div class="ang-menu-item" onclick="angSetStatus('${a.id}','angenommen')"><i class="fas fa-check-circle" style="color:var(--green)"></i> Auftrag erhalten</div>
@@ -468,7 +542,7 @@ function angZuRechnungFromModal() {
   // Сначала сохраняем текущее состояние, потом конвертируем
   const nr = document.getElementById('ang-nr')?.value.trim();
   const a = (data.angebote||[]).find(x=>x.nr===nr);
-  closeModal('ang-modal');
+  closeAngForm();
   if(a) angZuRechnung(a.id);
 }
 
