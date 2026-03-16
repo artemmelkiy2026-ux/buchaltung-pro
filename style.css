@@ -207,9 +207,9 @@ header{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px
 .nav-item.active{background:#002a5be3;color:#ffffff}
 .nav-item .ic{width:16px;text-align:center;font-size:14px}
 .nav-divider{height:1px;background:var(--border);margin:8px 14px}
-.page{display:none;flex:1;flex-direction:column}
+.page{display:none;flex:1;flex-direction:column;width:100%}
 .page.active{display:flex}
-.page-inner{padding:20px;flex:1}
+.page-inner{padding:20px;flex:1;width:100%;box-sizing:border-box}
 
 /* ── STATS ── */
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
@@ -1940,6 +1940,7 @@ input, select, textarea {
   gap:16px;
   padding-bottom:14px;
   border-bottom:1px solid var(--border);
+  width:100%;
   margin-bottom:20px;
   flex-wrap:wrap;
 }
