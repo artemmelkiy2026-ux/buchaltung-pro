@@ -358,7 +358,7 @@ function hideAuthScreen() {
   const ls = document.getElementById('loading-screen');
   const aw = document.getElementById('app-wrapper');
   if (ls) { ls.style.display='none'; ls.style.pointerEvents='none'; ls.style.visibility='hidden'; }
-  if (aw) aw.style.display = 'block';
+  if (aw) aw.style.display = 'flex';
   isAppUnlocked = true;
   startInactivityWatch();
 }

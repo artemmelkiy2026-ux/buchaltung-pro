@@ -2416,3 +2416,10 @@ input, select, textarea {
 }
 .ang-menu-item:hover { background: var(--s2); }
 .ang-menu-item i { width: 16px; text-align: center; font-size: 13px; }
+
+/* app-wrapper должен быть flex-контейнером для корректной работы .app */
+#app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
