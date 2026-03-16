@@ -567,67 +567,66 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .mob-more-btn { display: none; }
 .mob-show { display: none; }
 
-/* ── Drawer — боковое меню слева ── */
+/* ── Drawer — снизу вверх (оригинальный дизайн) ── */
 #mob-drawer {
   display: none;
   position: fixed;
-  top: 0; left: 0; bottom: 0;
-  width: 280px;
+  bottom: 0; left: 0; right: 0;
   background: var(--s1);
-  border-right: 1px solid var(--border);
+  border-top: 1px solid var(--border2);
+  border-radius: 20px 20px 0 0;
   z-index: 400;
+  padding: 0 0 env(safe-area-inset-bottom, 0);
+  transform: translateY(100%);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  max-height: 80vh;
   overflow-y: auto;
-  transform: translateX(-100%);
-  transition: transform .28s cubic-bezier(.4,0,.2,1);
-  padding-bottom: env(safe-area-inset-bottom, 0);
 }
-#mob-drawer.open { transform: translateX(0); }
+#mob-drawer.open { transform: translateY(0); }
 
 #mob-drawer-overlay {
   display: none;
   position: fixed; inset: 0;
   background: #00000055;
   z-index: 350;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
 }
 #mob-drawer-overlay.open { display: block; }
 
-/* Шапка drawer */
-.mob-drawer-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 16px 12px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 8px;
+/* Handle */
+.mob-drawer-handle {
+  display: block;
+  width: 36px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 12px auto 8px;
 }
 
 /* Группа в drawer */
-.mob-drawer-group { margin: 2px 8px; }
+.mob-drawer-group { margin: 0; }
 .mob-drawer-group-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--r);
-  font-size: 14px;
-  font-weight: 600;
+  gap: 12px;
+  padding: 13px 20px;
+  font-size: 15px;
+  font-weight: 500;
   color: var(--text);
   cursor: pointer;
-  transition: background .15s;
+  transition: background .12s;
   user-select: none;
 }
-.mob-drawer-group-header:hover { background: var(--s2); }
+.mob-drawer-group-header:active { background: var(--s2); }
 .mob-drawer-group-icon {
-  width: 20px;
+  width: 22px;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--sub);
   flex-shrink: 0;
 }
 .mob-drawer-arrow {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--sub);
   transition: transform .2s;
 }
@@ -640,26 +639,30 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   overflow: hidden;
   max-height: 0;
   transition: max-height .25s cubic-bezier(.4,0,.2,1);
-  margin-left: 16px;
-  padding-left: 12px;
-  border-left: 2px solid var(--border);
+  background: var(--s2);
 }
-.mob-drawer-group.open .mob-drawer-group-body { max-height: 300px; }
+.mob-drawer-group.open .mob-drawer-group-body { max-height: 400px; }
 .mob-drawer-child {
-  padding: 8px 12px;
+  display: block;
+  padding: 11px 20px 11px 54px;
   font-size: 14px;
   font-weight: 400;
   color: #4a6080;
   cursor: pointer;
-  border-radius: var(--r);
-  margin: 1px 4px;
   transition: background .12s, color .12s;
+  border-bottom: 1px solid var(--border);
 }
-.mob-drawer-child:hover { background: var(--s2); color: var(--text); }
+.mob-drawer-child:last-child { border-bottom: none; }
+.mob-drawer-child:active { background: var(--border); color: var(--text); }
 .mob-drawer-child.active { color: var(--blue); font-weight: 600; }
 
-/* Старые стили (оставляем для совместимости) */
-.mob-drawer-handle { display: none; }
+/* Разделитель между группами */
+.mob-drawer-group + .mob-drawer-group {
+  border-top: 1px solid var(--border);
+}
+
+/* Совместимость со старыми элементами */
+.mob-drawer-logo { display: none; }
 .mob-drawer-title { display: none; }
 .mob-drawer-item { display: none; }
 .mob-drawer-sep { display: none; }
