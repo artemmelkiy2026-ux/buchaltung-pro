@@ -1319,112 +1319,119 @@
 
 
 
-<!-- ── RECHNUNG MODAL ── -->
-<div class="modal-bg" id="rech-modal">
-  <div class="modal" style="max-width:680px;width:100%">
-    <div class="modal-hdr">
-      <h2><i class="fas fa-file-invoice"></i> Rechnung erstellen</h2>
-      <button class="modal-close" onclick="closeModal('rech-modal')">✕</button>
+<!-- ── RECHNUNGEN FORM ── -->
+<div class="page" id="p-rechnungen-form">
+  <!-- Sticky шапка -->
+  <div class="ang-sticky-header">
+    <div class="ang-sticky-left">
+      <div id="rn-form-title" class="ang-sticky-title">Rechnung erstellen</div>
     </div>
-    <!-- Rechnungskopf -->
-    <div class="fgrow c2">
-      <div class="fg"><label>Rechnungs-Nr.</label><input type="text" id="rn-nr" placeholder="2025-001"></div>
-      <div class="fg">
-        <label>Status</label>
-        <input type="hidden" id="rn-status" value="offen">
-        <div style="position:relative">
-          <button type="button" id="rn-status-btn" onclick="toggleRechStatusDropdown()"
-            style="display:flex;align-items:center;justify-content:space-between;gap:8px;
-                   width:100%;padding:8px 12px;border-radius:var(--r);margin-top:4px;
-                   border:1px solid var(--border);background:var(--s2);
-                   color:var(--text);font-size:13px;font-weight:600;cursor:pointer;
-                   font-family:inherit;transition:border-color .15s">
-            <span id="rn-status-label" style="display:flex;align-items:center;gap:7px">
-              <i class="fas fa-clock" id="rn-status-icon" style="color:var(--yellow);font-size:11px"></i>
-              <span id="rn-status-text">Offen</span>
-            </span>
-            <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
-          </button>
-          <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);
-            background:var(--s1);border:1px solid var(--border);border-radius:10px;
-            box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
-            <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;
-              padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
-              onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
-              <i class="fas fa-clock" style="color:var(--yellow);font-size:12px;width:14px"></i> Offen
-            </div>
-            <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;
-              padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
-              onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
-              <i class="fas fa-check-circle" style="color:var(--green);font-size:12px;width:14px"></i> Bezahlt
-            </div>
-            <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;
-              padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
-              onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
-              <i class="fas fa-exclamation-circle" style="color:var(--red);font-size:12px;width:14px"></i> Überfällig
+    <div class="ang-sticky-right">
+      <button class="btn" onclick="druckRechnung()"><i class="fas fa-print"></i><span class="ang-btn-txt"> Drucken</span></button>
+      <button class="btn" onclick="emailRechnung()" title="Per E-Mail senden"><i class="fas fa-envelope"></i><span class="ang-btn-txt"> E-Mail</span></button>
+      <button class="btn primary" onclick="saveRechnung()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
+      <button class="btn ang-back-btn" onclick="closeRechForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
+    </div>
+  </div>
+
+  <div class="ang-form-body">
+
+    <div id="rn-ust-banner" style="display:none;border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:14px"></div>
+
+    <!-- Rechnungsinformationen -->
+    <div class="ang-block">
+      <div class="ang-block-label">Rechnungsinformationen</div>
+      <div class="ang-info-grid">
+        <div class="ang-col-left">
+          <div class="fg" style="position:relative">
+            <label>Kundenname / Firma</label>
+            <input type="text" id="rn-kunde" placeholder="Kontakt suchen..." oninput="rnKundeSearch(this.value)" autocomplete="off">
+            <div id="rn-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
+          </div>
+          <div class="fg" style="margin:0">
+            <label>Adresse</label>
+            <input type="text" id="rn-adresse" placeholder="Musterstraße 1, 67547 Worms">
+          </div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>E-Mail (optional)</label><input type="email" id="rn-email" placeholder="kunde@email.de"></div>
+            <div class="fg" style="margin:0"><label>Telefon (optional)</label><input type="tel" id="rn-tel" placeholder="+49 6241 000000"></div>
+          </div>
+        </div>
+        <div class="ang-col-right">
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Rechnungs-Nr.</label><input type="text" id="rn-nr" placeholder="2025-001" style="font-weight:700;font-family:var(--mono)"></div>
+            <div class="fg" style="margin:0">
+              <label>Status</label>
+              <input type="hidden" id="rn-status" value="offen">
+              <div style="position:relative">
+                <button type="button" id="rn-status-btn" onclick="toggleRechStatusDropdown()"
+                  style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 12px;border-radius:var(--r);margin-top:4px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
+                  <span id="rn-status-label" style="display:flex;align-items:center;gap:7px">
+                    <i class="fas fa-clock" id="rn-status-icon" style="color:var(--yellow);font-size:11px"></i>
+                    <span id="rn-status-text">Offen</span>
+                  </span>
+                  <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
+                </button>
+                <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
+                  <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:12px;width:14px"></i> Offen</div>
+                  <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:12px;width:14px"></i> Bezahlt</div>
+                  <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-exclamation-circle" style="color:var(--red);font-size:12px;width:14px"></i> Überfällig</div>
+                </div>
+              </div>
             </div>
           </div>
+          <div class="ang-fields-2col">
+            <div class="fg" style="margin:0"><label>Rechnungsdatum</label><input type="date" id="rn-dat" oninput="updateRechBanner();reRenderRechPos()"></div>
+            <div class="fg" style="margin:0"><label>Fällig am</label><input type="date" id="rn-faellig"></div>
+          </div>
+          <div class="fg" style="margin:0"><label>Notiz / Zahlungshinweis <span style="font-size:10px;color:var(--sub)">(optional)</span></label><textarea id="rn-notiz" rows="2" placeholder="Bitte überweisen Sie den Betrag innerhalb von 14 Tagen..." style="min-height:60px;resize:vertical"></textarea></div>
         </div>
       </div>
     </div>
-    <div class="fgrow c2">
-      <div class="fg"><label>Rechnungsdatum</label><input type="date" id="rn-dat"></div>
-      <div class="fg"><label>Fällig am</label><input type="date" id="rn-faellig"></div>
-    </div>
-    <!-- Kundendaten -->
-    <div style="border-top:1px solid var(--border);margin:12px 0 10px;padding-top:10px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Kundendaten</span><button class="btn" style="padding:4px 10px;font-size:11px" onclick="openKundePick()"><i class="fas fa-address-book"></i> Aus Kundenliste</button></div>
-    <div class="fgrow c2">
-      <div class="fg"><label>Kundenname / Firma</label><input type="text" id="rn-kunde" placeholder="Max Mustermann GmbH"></div>
-      <div class="fg"><label>E-Mail (optional)</label><input type="email" id="rn-email" placeholder="kunde@email.de"></div>
-      <div class="fg"><label>Telefon (optional)</label><input type="tel" id="rn-tel" placeholder="+49 6241 000000"></div>
-    </div>
-    <div class="fgrow c2">
-      <div class="fg"><label>Adresse</label><input type="text" id="rn-adresse" placeholder="Musterstraße 1, 67547 Worms"></div>
-    </div>
-    <!-- USt-Modus Banner (глобальный) -->
-    <div id="rn-ust-banner" style="display:none;margin-bottom:10px;padding:8px 14px;border-radius:var(--r);font-size:12px"></div>
 
     <!-- Positionen -->
-    <div style="border-top:1px solid var(--border);margin:12px 0 6px;padding-top:10px;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px">Positionen</span>
-      <span style="font-size:10px;color:var(--sub)">Eingabe: Netto oder Brutto möglich</span>
+    <div class="ang-block">
+      <div class="ang-block-label-row">
+        <div class="ang-block-label" style="margin:0">Positionen</div>
+        <span style="font-size:11px;color:var(--sub)">Eingabe: Netto oder Brutto möglich</span>
+      </div>
+      <div id="rn-pos-header" class="mob-hide" style="display:grid;grid-template-columns:1fr 60px 90px 70px 90px 28px;gap:6px;margin-bottom:4px;padding:0 2px">
+        <span style="font-size:10px;color:var(--sub)">Bezeichnung</span>
+        <span style="font-size:10px;color:var(--sub);text-align:center">Menge</span>
+        <span style="font-size:10px;color:var(--sub);text-align:right">Netto/St.</span>
+        <span style="font-size:10px;color:var(--sub);text-align:center">USt %</span>
+        <span style="font-size:10px;color:var(--sub);text-align:right">Brutto/St.</span>
+        <span></span>
+      </div>
+      <div id="rn-positionen"></div>
+      <button class="btn ang-add-pos-btn" onclick="addRechPos()"><i class="fas fa-plus"></i> Position hinzufügen</button>
     </div>
-    <!-- Шапка колонок (nur Desktop) -->
-    <div id="rn-pos-header" class="mob-hide" style="display:grid;grid-template-columns:1fr 60px 90px 70px 90px 28px;gap:6px;margin-bottom:4px;padding:0 2px">
-      <span style="font-size:10px;color:var(--sub)">Bezeichnung</span>
-      <span style="font-size:10px;color:var(--sub);text-align:center">Menge</span>
-      <span style="font-size:10px;color:var(--sub);text-align:right">Netto/St.</span>
-      <span style="font-size:10px;color:var(--sub);text-align:center">USt %</span>
-      <span style="font-size:10px;color:var(--sub);text-align:right">Brutto/St.</span>
-      <span></span>
+
+    <!-- Итог -->
+    <div class="ang-totals-wrap">
+      <div class="ang-totals" id="rn-summary"></div>
     </div>
-    <div id="rn-positionen"></div>
-    <button class="btn" style="width:100%;margin-bottom:10px;padding:7px" onclick="addRechPos()">＋ Position hinzufügen</button>
-    <!-- Итог с группировкой по ставкам -->
-    <div id="rn-summary" style="border-top:1px solid var(--border);padding-top:10px"></div>
     <input type="hidden" id="rn-bet">
-    <!-- Notiz -->
-    <div class="fg" style="margin-top:8px"><label>Notiz / Zahlungshinweis (optional)</label><textarea id="rn-notiz" rows="2" placeholder="Bitte überweisen Sie den Betrag innerhalb von 14 Tagen..."></textarea></div>
-    <!-- Buttons -->
-    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-      <button class="btn primary" style="flex:1;padding:10px;min-width:120px" onclick="saveRechnung()"><i class="fas fa-save"></i> Speichern</button>
-      <button class="btn success" style="padding:10px 14px" onclick="druckRechnung()" title="Drucken / PDF"><i class="fas fa-print"></i> Drucken</button>
-      <button class="btn" style="padding:10px 14px;background:var(--s2)" onclick="emailRechnung()" title="Per E-Mail senden"><i class="fas fa-envelope"></i> E-Mail</button>
-      <button class="btn" style="padding:10px 14px" onclick="closeModal('rech-modal')">Abbrechen</button>
+
+    <!-- E-Rechnung -->
+    <div class="ang-block" style="padding:14px 24px">
+      <div class="ang-block-label" style="margin-bottom:12px">🇩🇪 E-Rechnung (EN 16931)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" style="padding:8px 12px;background:#1e3a5f;color:#fff;font-size:12px" onclick="downloadZUGFeRD(null)"><i class="fas fa-file-pdf"></i> ZUGFeRD</button>
+        <button class="btn" style="padding:8px 12px;background:#0d6b3b;color:#fff;font-size:12px" onclick="downloadXRechnung(null)"><i class="fas fa-file-code"></i> XRechnung</button>
+      </div>
     </div>
-    <!-- E-Rechnung Buttons -->
-    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border)">
-      <span style="font-size:11px;color:var(--sub);align-self:center;white-space:nowrap">🇩🇪 E-Rechnung (EN 16931):</span>
-      <button class="btn" style="padding:8px 12px;background:#1e3a5f;color:#fff;font-size:12px" onclick="downloadZUGFeRD(null)" title="ZUGFeRD: PDF mit eingebettetem XML">
-        <i class="fas fa-file-pdf"></i> ZUGFeRD
-      </button>
-      <button class="btn" style="padding:8px 12px;background:#0d6b3b;color:#fff;font-size:12px" onclick="downloadXRechnung(null)" title="XRechnung: reines XML für Behörden">
-        <i class="fas fa-file-code"></i> XRechnung
-      </button>
+
+    <!-- Кнопки внизу -->
+    <div class="ang-bottom-actions">
+      <button class="btn primary" onclick="saveRechnung()"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn" onclick="druckRechnung()"><i class="fas fa-print"></i> Drucken</button>
+      <button class="btn" onclick="emailRechnung()"><i class="fas fa-envelope"></i> E-Mail</button>
+      <button class="btn" onclick="closeRechForm()"><i class="fas fa-times"></i> Abbrechen</button>
     </div>
+
   </div>
 </div>
-
 
 <!-- ── WIEDERKEHREND MODAL ── -->
 <div class="modal-bg" id="wied-modal">

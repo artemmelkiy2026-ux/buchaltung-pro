@@ -170,17 +170,26 @@ function openRechModal(){
   document.getElementById('rn-nr').value=autoRechNr();
   const _rnDatEl=document.getElementById('rn-dat');
   _rnDatEl.value=new Date().toISOString().split('T')[0];
-  _rnDatEl.oninput=()=>{updateRechBanner();reRenderRechPos();};
   const faellig=new Date();faellig.setDate(faellig.getDate()+14);
   document.getElementById('rn-faellig').value=faellig.toISOString().split('T')[0];
   document.getElementById('rn-bet').value='';
   ['rn-kunde','rn-adresse','rn-email','rn-tel','rn-notiz'].forEach(id=>document.getElementById(id).value='');
+  const sug = document.getElementById('rn-kunde-suggest');
+  if (sug) sug.style.display = 'none';
   setRechStatus('offen');
   editRechId=null;
   document.getElementById('rn-nr').dataset.kundeId='';
   updateRechBanner();
   setRechPositionen([{bez:'',menge:1,netto:'',rate:19,brutto:''}]);
-  openModal('rech-modal');
+  const t = document.getElementById('rn-form-title');
+  if (t) t.textContent = 'Rechnung erstellen';
+  const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
+  nav('rechnungen-form', navEl || document.querySelector('.nav-item'));
+}
+function closeRechForm(){
+  editRechId=null;
+  const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
+  nav('rechnungen', navEl || document.querySelector('.nav-item'));
 }
 function editRech(id){
   const r=data.rechnungen.find(x=>x.id===id);
@@ -189,7 +198,6 @@ function editRech(id){
   document.getElementById('rn-nr').value=r.nr;
   const _rnDatEl2=document.getElementById('rn-dat');
   _rnDatEl2.value=r.datum;
-  _rnDatEl2.oninput=()=>{updateRechBanner();reRenderRechPos();};
   document.getElementById('rn-faellig').value=r.faellig||'';
   document.getElementById('rn-bet').value=r.betrag;
   setRechStatus(r.status||'offen');
@@ -202,7 +210,10 @@ function editRech(id){
   updateRechBanner();
   const posData=r.positionen&&r.positionen.length?r.positionen:[{bez:r.beschreibung||'',menge:1,netto:r.netto||r.betrag||'',rate:r.mwstRate||0,brutto:r.betrag||''}];
   setRechPositionen(posData);
-  openModal('rech-modal');
+  const t = document.getElementById('rn-form-title');
+  if (t) t.textContent = 'Rechnung bearbeiten';
+  const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
+  nav('rechnungen-form', navEl || document.querySelector('.nav-item'));
 }
 
 // Создаёт Einnahme из Rechnung и сохраняет в БД
@@ -301,7 +312,7 @@ function saveRechnung(){
     sbSaveRechnung(newR);
     sbLogRechnung(newR, 'erstellt', null, {nr:newR.nr, betrag:newR.betrag, kunde:newR.kunde, status:newR.status});
   }
-  renderRech();closeModal('rech-modal');toast('✓ Rechnung gespeichert!','ok');
+  renderRech(); closeRechForm(); toast('✓ Rechnung gespeichert!','ok');
 }
 async function rechBezahlt(id){
   const r=data.rechnungen.find(x=>x.id===id);if(!r)return;
@@ -368,7 +379,7 @@ function updateRechBanner(){
     el.style.background='rgba(34,197,94,.08)';
     el.style.border='1px solid var(--green)';
     el.style.color='var(--green)';
-    el.innerHTML='✓ §19 UStG Kleinunternehmer — alle Positionen ohne USt. <a href="#" onclick="nav(\'ust\',null);closeModal(\'rech-modal\')" style="color:var(--green);text-decoration:underline;font-size:11px">Ändern im USt-Bereich</a>';
+    el.innerHTML='✓ §19 UStG Kleinunternehmer — alle Positionen ohne USt. <a href="#" onclick="closeRechForm();nav(\'ust\',document.querySelector(\'.nav-item[onclick*=ust]\'))" style="color:var(--green);text-decoration:underline;font-size:11px">Ändern im USt-Bereich</a>';
   } else {
     el.style.display='';
     el.style.background='rgba(59,130,246,.08)';
@@ -1264,4 +1275,32 @@ async function downloadZUGFeRD(r) {
 function downloadZUGFeRDId(id) {
   const r = data.rechnungen.find(x => x.id === id);
   if (r) downloadZUGFeRD(r);
+}
+
+// ── KUNDE AUTOCOMPLETE für Rechnungen-Form ──────────────────────────────────
+function rnKundeSearch(q) {
+  const sug = document.getElementById('rn-kunde-suggest');
+  if (!sug) return;
+  if (!q || q.length < 1) { sug.style.display='none'; return; }
+  const matches = (data.kunden||[]).filter(k=>(k.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,6);
+  if (!matches.length) { sug.style.display='none'; return; }
+  sug.style.display = 'block';
+  sug.innerHTML = matches.map(k=>`
+    <div onclick="rnSelectKunde('${k.id}')"
+      style="padding:8px 12px;cursor:pointer;font-size:13px"
+      onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
+      <div style="font-weight:600">${k.name}</div>
+      ${k.strasse?`<div style="font-size:11px;color:var(--sub)">${k.strasse}${k.plz?' · '+k.plz:''} ${k.ort||''}</div>`:''}
+    </div>`).join('');
+}
+function rnSelectKunde(id) {
+  const k = (data.kunden||[]).find(x=>x.id===id);
+  if (!k) return;
+  document.getElementById('rn-kunde').value = k.name||'';
+  const parts = [k.strasse, [k.plz, k.ort].filter(Boolean).join(' ')].filter(Boolean);
+  document.getElementById('rn-adresse').value = parts.join(', ');
+  if (k.email) document.getElementById('rn-email').value = k.email;
+  if (k.tel)   document.getElementById('rn-tel').value   = k.tel;
+  document.getElementById('rn-nr').dataset.kundeId = id;
+  document.getElementById('rn-kunde-suggest').style.display = 'none';
 }

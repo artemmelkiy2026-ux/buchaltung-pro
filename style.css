@@ -1991,13 +1991,15 @@ input, select, textarea {
    ════════════════════════════════════════════════════════ */
 
 /* Страница-контейнер: flex-колонка, высота = экрану */
-#p-angebote-form {
+#p-angebote-form,
+#p-rechnungen-form {
   display: none;
   flex-direction: column;
   height: calc(100vh - 54px);
   overflow: hidden;
 }
-#p-angebote-form.active { display: flex; }
+#p-angebote-form.active,
+#p-rechnungen-form.active { display: flex; }
 
 /* Sticky шапка */
 .ang-sticky-header {
@@ -2166,7 +2168,8 @@ input, select, textarea {
 
 /* ── МОБИЛЕ ≤ 768px ── */
 @media(max-width: 768px) {
-  #p-angebote-form { height: auto; overflow: visible; }
+  #p-angebote-form,
+  #p-rechnungen-form { height: auto; overflow: visible; }
   .ang-form-body { padding: 12px; }
   .ang-block { padding: 14px; }
   .ang-sticky-header { padding: 10px 12px; }
