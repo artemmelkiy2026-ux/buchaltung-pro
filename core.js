@@ -122,20 +122,20 @@ let ustPage=1;              // Пагинация для USt-Buchungen
 // ── INIT — вызывается после загрузки данных из Supabase ──────────────────
 
 // ── NAV GROUP TOGGLE ─────────────────────────────────────────
-function toggleNavGroup(groupId) {
-  const group = document.getElementById(groupId);
-  const header = group?.previousElementSibling;
+function toggleNavGroup(groupId, headerId) {
+  const group  = document.getElementById(groupId);
+  const header = headerId ? document.getElementById(headerId) : group?.previousElementSibling;
   if (!group) return;
   const isOpen = group.classList.contains('open');
   group.classList.toggle('open', !isOpen);
   if (header) header.classList.toggle('open', !isOpen);
 }
 
-// Открываем группу Aufträge при nav на Angebote или Rechnungen
+// Открываем группу Aufträge при переходе в Angebote / Rechnungen / Wiederkehrend
 function openNavGroupIfNeeded(id) {
-  if (['angebote','rechnungen','wiederkehrend'].includes(id)) {
-    const group = document.getElementById('auftraege-group');
-    const header = group?.previousElementSibling;
+  if (['angebote','rechnungen'].includes(id)) {
+    const group  = document.getElementById('auftraege-group');
+    const header = document.getElementById('auftraege-header');
     if (group && !group.classList.contains('open')) {
       group.classList.add('open');
       if (header) header.classList.add('open');
@@ -148,8 +148,7 @@ function appInit(){
   updateKatSel(); buildYearFilters(); renderAll();
   updateMwstFormVisibility();
   setTyp(curTyp);
-  // Открываем группу Aufträge по умолчанию при запуске
-  openNavGroupIfNeeded('rechnungen');
+  // Группа Aufträge открывается при переходе в неё
   setTimeout(()=>{
     const today=new Date().toISOString().split('T')[0];
     const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
