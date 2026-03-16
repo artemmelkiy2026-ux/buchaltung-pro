@@ -796,22 +796,21 @@
 <!-- ── ANGEBOTE FORM ── -->
 <div class="page" id="p-angebote-form">
 <div class="page-inner">
-  <div class="ph ang-form-ph">
+  <div class="ph">
     <div class="ph-left">
-      <button class="btn ang-back-btn-left" onclick="closeAngForm()" style="margin-right:10px;padding:7px 12px"><i class="fas fa-arrow-left"></i></button>
+      <button class="btn" onclick="closeAngForm()" style="margin-right:10px;padding:7px 12px;flex-shrink:0"><i class="fas fa-arrow-left"></i></button>
       <div id="ang-form-title" class="ph-title">Angebot bearbeiten</div>
     </div>
-    <div class="ph-right" style="display:flex;gap:8px">
-      <button class="btn" onclick="angDruck(null)"><i class="fas fa-print"></i> Drucken</button>
-      <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i> Speichern</button>
-      <button class="btn ang-back-btn-right" onclick="closeAngForm()" style="padding:7px 12px;display:none"><i class="fas fa-arrow-left"></i></button>
+    <div class="ph-right">
+      <button class="btn" onclick="angDruck(null)"><i class="fas fa-print"></i> <span class="btn-label">Drucken</span></button>
+      <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i> <span class="btn-label">Speichern</span></button>
     </div>
   </div>
 
   <div id="ang-ust-banner" style="display:none;border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:14px"></div>
 
   <div class="ang-section-label">Kontakt- und Angebotsinformationen</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px">
+  <div class="ang-info-grid">
     <div>
       <div class="fg" style="margin-bottom:10px;position:relative">
         <label>Kunde</label>
@@ -824,11 +823,11 @@
       </div>
     </div>
     <div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="ang-fields-2col">
         <div class="fg" style="margin:0"><label>Angebotsnummer</label><input type="text" id="ang-nr" placeholder="A-001" style="font-weight:700;font-family:var(--mono)"></div>
         <div class="fg" style="margin:0"><label>Datum</label><input type="date" id="ang-dat" oninput="updateAngBanner()"></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="ang-fields-2col">
         <div class="fg" style="margin:0"><label>Gültig bis</label><input type="date" id="ang-gueltig"></div>
         <div class="fg" style="margin:0"><label>Status</label>
           <select id="ang-status">
@@ -854,7 +853,7 @@
       <button id="ang-netto-btn"  class="btn" onclick="setAngPreisMode('netto')"  style="padding:4px 10px;font-size:11px">Netto</button>
     </div>
   </div>
-  <div style="display:grid;grid-template-columns:3fr 70px 70px 100px 80px 60px 80px 28px;gap:6px;padding:6px 8px;font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);margin-bottom:4px">
+  <div class="ang-pos-header">
     <div>Produkt</div><div>Menge</div><div>Einh.</div>
     <div id="ang-preis-lbl">Preis</div><div>USt.</div><div>Rabatt</div>
     <div style="text-align:right">Betrag</div><div></div>
@@ -864,11 +863,11 @@
     <i class="fas fa-plus"></i> Position hinzufügen
   </button>
 
-  <div style="display:flex;justify-content:flex-end;margin-top:12px">
-    <div style="min-width:260px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
-      <div style="display:flex;justify-content:space-between;padding:8px 14px;font-size:13px;border-bottom:1px solid var(--border)"><span style="color:var(--sub)">Netto</span><span id="ang-sum-netto" style="font-family:var(--mono);font-weight:600">0,00 €</span></div>
-      <div style="display:flex;justify-content:space-between;padding:8px 14px;font-size:13px;border-bottom:1px solid var(--border)"><span style="color:var(--sub)">MwSt.</span><span id="ang-sum-mwst" style="font-family:var(--mono);font-weight:600">0,00 €</span></div>
-      <div style="display:flex;justify-content:space-between;padding:10px 14px;font-size:15px;font-weight:800;background:var(--s2)"><span>Gesamt</span><span id="ang-sum-brutto" style="font-family:var(--mono);color:var(--blue)">0,00 €</span></div>
+  <div class="ang-totals-wrap">
+    <div class="ang-totals">
+      <div class="ang-total-row"><span style="color:var(--sub)">Netto</span><span id="ang-sum-netto" style="font-family:var(--mono);font-weight:600">0,00 €</span></div>
+      <div class="ang-total-row" style="border-bottom:1px solid var(--border)"><span style="color:var(--sub)">MwSt.</span><span id="ang-sum-mwst" style="font-family:var(--mono);font-weight:600">0,00 €</span></div>
+      <div class="ang-total-row ang-total-final"><span>Gesamt</span><span id="ang-sum-brutto" style="font-family:var(--mono);color:var(--blue)">0,00 €</span></div>
     </div>
   </div>
 
@@ -880,10 +879,10 @@
     <textarea id="ang-notiz" style="min-height:36px;resize:vertical"></textarea>
   </div>
 
-  <div style="display:flex;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-    <button class="btn primary" style="flex:1;padding:11px" onclick="saveAng()"><i class="fas fa-save"></i> Speichern</button>
-    <button class="btn" style="padding:11px 16px" onclick="angZuRechnung(editAngId||'')"><i class="fas fa-file-invoice"></i> Als Rechnung</button>
-    <button class="btn" style="padding:11px 16px" onclick="closeAngForm()"><i class="fas fa-times"></i> Abbrechen</button>
+  <div class="ang-bottom-actions">
+    <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i> Speichern</button>
+    <button class="btn" onclick="angZuRechnung(editAngId||'')"><i class="fas fa-file-invoice"></i> Als Rechnung</button>
+    <button class="btn" onclick="closeAngForm()"><i class="fas fa-times"></i> Abbrechen</button>
   </div>
 </div>
 </div>

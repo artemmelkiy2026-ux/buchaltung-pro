@@ -1975,30 +1975,104 @@ input, select, textarea {
   .ph-right{ flex-shrink:0 }
 }
 
-/* ── Angebot form: mobile — title on top, back arrow moves to the right ── */
-@media(max-width:768px){
-  .ang-form-ph { flex-wrap:wrap; }
-  .ang-form-ph .ph-left {
-    order: 2;
-    flex: 1;
-    display: flex;
-    align-items: center;
-  }
-  .ang-form-ph .ph-right {
-    order: 3;
-  }
-  .ang-form-ph .ph-title {
-    order: 1;
-    width: 100%;
-    margin-bottom: 4px;
-    font-size: 18px;
-  }
-  .ang-back-btn-left  { display: none !important; }
-  .ang-back-btn-right { display: inline-flex !important; }
+/* ════════════════════════════════════════
+   Angebot-Form — полная адаптивность
+   ════════════════════════════════════════ */
+
+/* Инфо-грид: 2 колонки на десктопе */
+.ang-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 4px;
 }
-@media(min-width:769px){
-  .ang-back-btn-right { display: none !important; }
-  .ang-back-btn-left  { display: inline-flex !important; }
+
+/* Внутренние 2-колоночные поля */
+.ang-fields-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Шапка таблицы продуктов */
+.ang-pos-header {
+  display: grid;
+  grid-template-columns: 3fr 70px 70px 100px 80px 60px 80px 28px;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sub);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+/* Итоги */
+.ang-totals-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.ang-totals {
+  min-width: 260px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.ang-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+.ang-total-final {
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 800;
+  background: var(--s2);
+  border-bottom: none;
+}
+
+/* Кнопки внизу */
+.ang-bottom-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.ang-bottom-actions .btn:first-child { flex: 1; padding: 11px; }
+.ang-bottom-actions .btn { padding: 11px 16px; }
+
+/* ── МОБИЛЕ ≤ 768px ── */
+@media(max-width: 768px) {
+
+  /* Хедер: стрелка + заголовок в одну строку, кнопки справа */
+  .ph-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+  .ph-right { flex-shrink: 0; }
+  .ph-right .btn-label { display: none; }
+
+  /* Инфо-грид в одну колонку */
+  .ang-info-grid { grid-template-columns: 1fr; }
+
+  /* Шапка таблицы скрыта на мобиле */
+  .ang-pos-header { display: none; }
+
+  /* Итоги на всю ширину */
+  .ang-totals-wrap { justify-content: stretch; }
+  .ang-totals { min-width: 0; width: 100%; }
+
+  /* Кнопки внизу — колонкой */
+  .ang-bottom-actions { flex-direction: column; }
+  .ang-bottom-actions .btn:first-child { flex: none; }
+}
+
+@media(max-width: 480px) {
+  .ang-fields-2col { grid-template-columns: 1fr; }
 }
 
 /* ── Schnellrechner §19 ── */
@@ -2520,7 +2594,7 @@ input, select, textarea {
   margin-left: 10px;
 }
 
-/* Мобильный — позиции в одну колонку */
+/* Мобильный — позиции в карточки */
 @media (max-width: 768px) {
   .ang-pos-row {
     grid-template-columns: 1fr 1fr;
@@ -2528,4 +2602,16 @@ input, select, textarea {
     padding: 10px 0;
   }
   .ang-pos-row input:first-child { grid-column: 1 / -1; }
+  .ang-pos-betrag {
+    text-align: left;
+    grid-column: 1 / -1;
+    font-size: 13px;
+    padding: 4px 0 0 0;
+  }
+  .ang-pos-row .del-btn { grid-column: 2 / 3; justify-self: end; }
+}
+@media (max-width: 480px) {
+  .ang-pos-row { grid-template-columns: 1fr; }
+  .ang-pos-row input:first-child { grid-column: 1; }
+  .ang-pos-row .del-btn { justify-self: start; }
 }
