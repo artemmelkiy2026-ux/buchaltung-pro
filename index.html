@@ -35,7 +35,7 @@
 <body>
 
 <!-- ── LOADING SCREEN ────────────────────────────────────────────────────── -->
-<div id="loading-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background: #ffffff;">
+<div id="loading-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f7f8fa;">
   <div style="text-align:center">
     <div style="font-size:48px;margin-bottom:16px"><img src="mini-logo.svg" width="80px" height="auto" alt="mini logo MelaLogic">
 <p style="font-size:13px;color:var(--sub)">Laden...</p></div>
@@ -370,19 +370,19 @@
   <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-inbox"></i></div><p>Keine Einträge gefunden</p></div>
   <!-- Summary -->
   <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;font-family: var(--mono);" id="e-sum">
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px">
       <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einträge</div>
       <div style="font-size:18px;font-weight:700" id="es-cnt">0</div>
     </div>
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px">
       <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
       <div style="font-size:18px;font-weight:700;color:var(--green)" id="es-ein">0,00 €</div>
     </div>
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px">
       <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Ausgaben</div>
       <div style="font-size:18px;font-weight:700;color:var(--red)" id="es-aus">0,00 €</div>
     </div>
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px">
       <div style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Gewinn</div>
       <div style="font-size:18px;font-weight:700" id="es-gew">0,00 €</div>
     </div>
@@ -447,12 +447,12 @@
   <!-- ── TOOLBAR ── -->
   <div id="neu-toolbar" style="
     display:grid;grid-template-columns:1fr 1fr;gap:12px;
-    margin-bottom:20px;border-radius:16px;overflow:hidden">
+    margin-bottom:20px;border-radius:6px;overflow:hidden">
 
     <!-- Einnahmen -->
     <div style="
       background:linear-gradient(135deg,#3d8b4e 0%,#5d9d69 100%);
-      border-radius:14px;padding:16px 20px;position:relative;overflow:hidden">
+      border-radius:6px;padding:16px 20px;position:relative;overflow:hidden">
       <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;
         border-radius:50%;background:rgba(255,255,255,.08)"></div>
       <div style="position:absolute;bottom:-24px;left:-10px;width:100px;height:100px;
@@ -475,7 +475,7 @@
     <!-- Ausgaben -->
     <div style="
       background:linear-gradient(135deg,#b02a37 0%,#dc3545 100%);
-      border-radius:14px;padding:16px 20px;position:relative;overflow:hidden">
+      border-radius:6px;padding:16px 20px;position:relative;overflow:hidden">
       <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;
         border-radius:50%;background:rgba(255,255,255,.08)"></div>
       <div style="position:absolute;bottom:-24px;left:-10px;width:100px;height:100px;
@@ -600,7 +600,7 @@
               <i class="fas fa-chevron-down" id="nf-mwst-arrow" style="font-size:10px;color:var(--sub);transition:transform .2s"></i>
             </button>
             <div id="nf-mwst-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);
-              background:var(--s1);border:1px solid var(--border);border-radius:10px;
+              background:var(--s1);border:1px solid var(--border);border-radius:4px;
               box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:200;padding:4px;min-width:160px">
               <div onclick="setMwstRate(19)" style="display:flex;align-items:center;gap:8px;
                 padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600"
@@ -652,7 +652,7 @@
   <!-- Rechte Spalte Einnahme: Letzte Einnahmen (nur Desktop) -->
   <div id="letzte-einnahmen-box" style="display:none;position:sticky;top:20px">
     <div>
-      <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:#dbe4ec75;border-radius:12px;margin-bottom:10px;">
+      <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:#dbe4ec75;border-radius:4px;margin-bottom:10px;">
         <span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">
           <i class="fas fa-arrow-up" style="#fff;font-size:12px"></i>
           Letzte Einnahmen
@@ -668,7 +668,7 @@
   <!-- Rechte Spalte Ausgabe: Letzte Ausgaben (nur Desktop) -->
   <div id="letzte-ausgaben-box" style="display:none;position:sticky;top:20px">
     <div>
-      <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(239,68,68,.07);border-radius:12px;margin-bottom:10px;">
+      <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(239,68,68,.07);border-radius:4px;margin-bottom:10px;">
         <span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">
           <i class="fas fa-arrow-down" style="color:var(--red);font-size:12px"></i>
           Letzte Ausgaben
@@ -722,7 +722,7 @@
   <div style="display:none"><table><tbody id="rep-tbody"></tbody><tfoot id="rep-tfoot"></tfoot></table></div>
 
   <!-- Итоговый блок -->
-  <div id="rep-total-block" style="margin-top:16px;background:var(--s1);border-radius:14px"></div>
+  <div id="rep-total-block" style="margin-top:16px;background:var(--s1);border-radius:6px"></div>
 </div>
 </div>
 
@@ -900,7 +900,7 @@
           <div class="fg" style="position:relative">
             <label>Kunde</label>
             <input type="text" id="ang-kunde" placeholder="Kontakt suchen..." oninput="angKundeSearch(this.value)" autocomplete="off">
-            <div id="ang-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
+            <div id="ang-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
           </div>
           <div class="fg" style="margin:0">
             <label>Anschrift</label>
@@ -930,7 +930,7 @@
                   </span>
                   <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
-                <div id="ang-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
+                <div id="ang-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
                   <div onclick="setAngStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:12px;width:14px"></i> Offen</div>
                   <div onclick="setAngStatus('angenommen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:12px;width:14px"></i> Angenommen</div>
                   <div onclick="setAngStatus('abgelehnt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-times-circle" style="color:var(--red);font-size:12px;width:14px"></i> Abgelehnt</div>
@@ -1322,7 +1322,7 @@
               </span>
               <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
             </button>
-            <div id="ust-new-rate-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:140px">
+            <div id="ust-new-rate-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:140px">
               <div onclick="setUstRate('ust-new-rate',19,null)" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
               <div onclick="setUstRate('ust-new-rate',7,null)" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
               <div onclick="setUstRate('ust-new-rate',0,null)" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
@@ -1421,7 +1421,7 @@
                   </span>
                   <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
-                <div id="ap-ust-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:140px">
+                <div id="ap-ust-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:140px">
                   <div onclick="setUstRate('ap-ust',19,'apCalcBrutto')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
                   <div onclick="setUstRate('ap-ust',7,'apCalcBrutto')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
                   <div onclick="setUstRate('ap-ust',0,'apCalcBrutto')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
@@ -1587,7 +1587,7 @@
           <div class="fg" style="position:relative">
             <label>Kundenname / Firma</label>
             <input type="text" id="rn-kunde" placeholder="Kontakt suchen..." oninput="rnKundeSearch(this.value)" autocomplete="off">
-            <div id="rn-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
+            <div id="rn-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
           </div>
           <div class="fg" style="margin:0">
             <label>Adresse</label>
@@ -1613,7 +1613,7 @@
                   </span>
                   <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
-                <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
+                <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
                   <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:12px;width:14px"></i> Offen</div>
                   <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:12px;width:14px"></i> Bezahlt</div>
                   <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-exclamation-circle" style="color:var(--red);font-size:12px;width:14px"></i> Überfällig</div>

@@ -147,7 +147,7 @@ function renderLetzteEinnahmen(flashId=null) {
   const total = recent.reduce((s,e) => s + e.betrag, 0);
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
   list.innerHTML = recent.map(e => `
-    <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
+    <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:4px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
       <div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center">
         <i class="fas fa-arrow-up" style="color:var(--green);font-size:11px"></i>
       </div>
@@ -180,7 +180,7 @@ function renderLetzteAusgaben(flashId=null) {
   const total = recent.reduce((s,e) => s + e.betrag, 0);
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
   list.innerHTML = recent.map(e => `
-    <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
+    <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:4px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
       <div style="flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center">
         <i class="fas fa-arrow-down" style="color:var(--red);font-size:11px"></i>
       </div>
@@ -884,7 +884,7 @@ function renderRep(){
     const cc=cumul2>=0?'var(--green)':'var(--red)';
     const hasData=m.count>0;
     return`<div onclick="openMonatDetail('${yr}','${m.mi}')"
-      style="background:var(--s1);border:${isCur?'2px solid var(--blue)':'1px solid var(--border)'};border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;opacity:${hasData?'1':'0.45'}"
+      style="background:var(--s1);border:${isCur?'2px solid var(--blue)':'1px solid var(--border)'};border-radius:6px;padding:14px;cursor:pointer;transition:all .2s;opacity:${hasData?'1':'0.45'}"
       onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
       onmouseout="this.style.boxShadow=''">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
@@ -935,29 +935,29 @@ function renderRep(){
     totBlock.innerHTML=`
     <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Jahresübersicht ${yr}</div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-      <div style="background:rgba(34,197,94,.06);border-radius:12px;padding:14px">
+      <div style="background:rgba(34,197,94,.06);border-radius:4px;padding:14px">
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einnahmen</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">${fmt(tEin)}</div>
       </div>
-      <div style="background:rgba(239,68,68,.06);border-radius:12px;padding:14px">
+      <div style="background:rgba(239,68,68,.06);border-radius:4px;padding:14px">
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Ausgaben</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--red)">${fmt(tAus)}</div>
       </div>
-      <div style="background:${tg>=0?'rgba(26,69,120,.06)':'rgba(239,68,68,.06)'};border:0px solid ${tg>=0?'rgba(26,69,120,.2)':'rgba(239,68,68,.2)'};border-radius:12px;padding:14px">
+      <div style="background:${tg>=0?'rgba(26,69,120,.06)':'rgba(239,68,68,.06)'};border:0px solid ${tg>=0?'rgba(26,69,120,.2)':'rgba(239,68,68,.2)'};border-radius:4px;padding:14px">
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Jahresgewinn</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:${tg>=0?'var(--blue)':'var(--red)'}">${tg>=0?'+':''}${fmt(tg)}</div>
       </div>
-      <div style="background:var(--s2);border-radius:12px;padding:14px">
+      <div style="background:var(--s2);border-radius:4px;padding:14px">
         <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Einträge</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono)">${totCnt}</div>
       </div>
       ${isRegel?`
-      <div style="background:rgba(249,115,22,.06);border-radius:12px;padding:14px">
+      <div style="background:rgba(249,115,22,.06);border-radius:4px;padding:14px">
         <div style="font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">MwSt gesamt</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:#f97316">${fmt(totMwst2)}</div>
         <div style="font-size:11px;color:var(--sub);margin-top:3px">Netto: ${fmt(totNetto2)}</div>
       </div>
-      <div style="background:rgba(13,127,170,.06);border-radius:12px;padding:14px">
+      <div style="background:rgba(13,127,170,.06);border-radius:4px;padding:14px">
         <div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Zahllast</div>
         <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--cyan)">${totZl2>0?'+':''}${fmt(totZl2)}</div>
         <div style="font-size:11px;color:var(--sub);margin-top:3px">USt − VoSt</div>

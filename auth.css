@@ -1,71 +1,67 @@
 /* ═══════════════════════════════════════════════════════════
    AUTH.CSS — стили страницы входа / регистрации
-   Правь этот файл чтобы менять внешний вид формы входа
+   2026 minimal design — consistent with main app
    ═══════════════════════════════════════════════════════════ */
 
-/* Фон всей страницы входа */
 #auth-screen {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: 9999;
-  background: #f8f9fb;
+  background: #f7f8fa;
   overflow-y: auto;
   display: none;
 }
 
-/* Белый блок по центру (десктоп) */
 .auth-inner {
   box-sizing: border-box;
-  width: 420px;
+  width: 400px;
   margin: 60px auto;
   background: #ffffff;
-  border-radius: 16px;
-  padding: 40px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  border-radius: 6px;
+  padding: 36px;
+  border: 1px solid #e4e7ec;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
 }
 
-/* Логотип */
 .auth-logo {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 .auth-logo img {
-  height: 48px;
+  height: 44px;
   width: auto;
 }
 .auth-logo-sub {
   font-size: 12px;
-  color: #94a3b8;
+  color: #8593a3;
   margin-top: 8px;
 }
 
-/* Вкладки Anmelden / Registrieren */
 .auth-tabs {
   display: flex;
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 24px;
+  background: #f3f5f7;
+  border-radius: 4px;
+  padding: 3px;
+  margin-bottom: 22px;
 }
 .auth-tab {
   flex: 1;
-  padding: 9px;
+  padding: 8px;
   border: none;
-  border-radius: 9px;
+  border-radius: 3px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  transition: all .2s;
+  transition: all .15s;
   background: transparent;
-  color: #94a3b8;
+  color: #8593a3;
 }
 .auth-tab.active {
   background: #1a4578;
   color: #ffffff;
 }
 
-/* Кнопка Google */
 .auth-google-btn {
   width: 100%;
   display: flex;
@@ -73,60 +69,56 @@
   justify-content: center;
   gap: 10px;
   background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  color: #1e293b;
-  padding: 13px;
-  font-size: 14px;
+  border: 1px solid #e4e7ec;
+  border-radius: 4px;
+  color: #1a1f26;
+  padding: 11px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  margin-bottom: 20px;
-  transition: all .2s;
+  margin-bottom: 18px;
+  transition: all .15s;
   font-family: inherit;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
 }
 .auth-google-btn:hover {
   border-color: #1a4578;
-  box-shadow: 0 0 0 3px rgba(26,69,120,.1);
+  box-shadow: 0 0 0 2px rgba(26,69,120,.08);
 }
 
-/* Разделитель "oder" */
 .auth-divider {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 .auth-divider-line {
   flex: 1;
   height: 1px;
-  background: #e2e8f0;
+  background: #e4e7ec;
 }
 .auth-divider-text {
   font-size: 11px;
-  color: #94a3b8;
+  color: #8593a3;
   font-weight: 500;
 }
 
-/* Поля ввода */
 .auth-input {
   width: 100%;
   background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  color: #1e293b;
-  padding: 13px 16px;
+  border: 1px solid #e4e7ec;
+  border-radius: 4px;
+  color: #1a1f26;
+  padding: 11px 14px;
   font-size: 14px;
   outline: none;
   box-sizing: border-box;
-  transition: all .2s;
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  transition: all .15s;
   font-family: inherit;
   margin-bottom: 10px;
 }
 .auth-input:focus {
   border-color: #1a4578;
-  box-shadow: 0 0 0 3px rgba(26,69,120,.1);
+  box-shadow: 0 0 0 2px rgba(26,69,120,.08);
 }
 .auth-input-wrap {
   position: relative;
@@ -142,17 +134,16 @@
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #94a3b8;
+  color: #8593a3;
   font-size: 16px;
   user-select: none;
 }
 
-/* Чекбокс "Angemeldet bleiben" */
 .auth-remember {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .auth-remember input {
   width: 15px;
@@ -162,13 +153,12 @@
 }
 .auth-remember label {
   font-size: 12px;
-  color: #64748b;
+  color: #596675;
   cursor: pointer;
 }
 
-/* Сообщение об ошибке */
 .auth-error {
-  color: #ef4444;
+  color: #d63341;
   font-size: 12px;
   min-height: 16px;
   margin-bottom: 10px;
@@ -176,42 +166,38 @@
   font-weight: 500;
 }
 
-/* Кнопка входа */
 .auth-submit-btn {
   width: 100%;
   background: #1a4578;
   border: none;
-  border-radius: 12px;
+  border-radius: 4px;
   color: #ffffff;
-  padding: 14px;
+  padding: 12px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all .2s;
-  box-shadow: 0 4px 12px rgba(26,69,120,.3);
+  transition: all .15s;
   font-family: inherit;
 }
 .auth-submit-btn:hover {
   background: #15365e;
-  box-shadow: 0 6px 16px rgba(26,69,120,.4);
 }
 
-/* Footer */
 .auth-footer {
   text-align: center;
   margin-top: 20px;
   font-size: 11px;
-  color: #94a3b8;
+  color: #8593a3;
 }
 
-/* ── МОБИЛЬНЫЙ (до 520px) ─────────────────────────────────── */
 @media (max-width: 520px) {
   .auth-inner {
     width: 100%;
     margin: 0;
     border-radius: 0;
     min-height: 100vh;
-    padding: 40px 24px;
+    padding: 36px 24px;
     box-shadow: none;
+    border: none;
   }
 }

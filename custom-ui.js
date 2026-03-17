@@ -17,7 +17,7 @@ window._customConfirmResolve = null;
   ].join('');
   div.innerHTML = `
     <div id="app-confirm-box" style="
-      background:var(--s1);border:1px solid var(--border);border-radius:16px;
+      background:var(--s1);border:1px solid var(--border);border-radius:6px;
       padding:28px 24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);
       animation:app-confirm-in .18s ease">
       <div id="app-confirm-icon" style="text-align:center;margin-bottom:14px;font-size:36px"></div>
@@ -62,7 +62,7 @@ function _showAppDialog({ icon='⚠️', title='', message='', buttons=[] }) {
         default:  'background:var(--s2);color:var(--text);border:1px solid var(--border)',
       };
       btn.style.cssText = `
-        padding:10px 22px;border-radius:10px;font-size:14px;font-weight:600;
+        padding:10px 22px;border-radius:4px;font-size:14px;font-weight:600;
         cursor:pointer;min-width:100px;font-family:inherit;
         ${styles[style]||styles.default}`;
       btn.onclick = () => {
@@ -152,7 +152,7 @@ class CustomSelect {
     panel.className = 'cs-panel';
     panel.style.cssText = `
       display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);
-      background:var(--s1);border:1px solid var(--border);border-radius:10px;
+      background:var(--s1);border:1px solid var(--border);border-radius:4px;
       box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:1000;
       max-height:260px;overflow-y:auto;padding:4px;
       min-width:180px;width:max-content;max-width:min(320px, 90vw);
@@ -263,7 +263,7 @@ class CustomSelect {
         animation:cs-fade-in .15s ease`;
       overlay.innerHTML = `
         <div class="cs-mob-sheet" style="
-          background:var(--s1);border-radius:18px 18px 0 0;width:100%;
+          background:var(--s1);border-radius:4px 18px 0 0;width:100%;
           max-height:70vh;overflow:hidden;display:flex;flex-direction:column;
           animation:cs-slide-up .22s ease;padding-bottom:env(safe-area-inset-bottom,0)">
           <div style="display:flex;align-items:center;justify-content:space-between;
@@ -287,7 +287,7 @@ class CustomSelect {
         const item = document.createElement('div');
         const active = opt.value === this.sel.value;
         item.style.cssText = `
-          padding:14px 16px;border-radius:10px;cursor:pointer;font-size:15px;
+          padding:14px 16px;border-radius:4px;cursor:pointer;font-size:15px;
           display:flex;align-items:center;justify-content:space-between;gap:10px;
           background:${active ? 'var(--bdim)' : 'transparent'};
           color:${active ? 'var(--blue)' : 'var(--text)'};

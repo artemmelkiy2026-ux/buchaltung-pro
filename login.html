@@ -30,8 +30,8 @@ body {
 .logo-wrap img { height: 50px; width: auto; }
 .logo-sub { font-size: 12px; color: #343434; margin-top: 8px; }
 
-.tabs { display: flex; background: #f1f5f9; border-radius: 12px; padding: 4px; margin-bottom: 24px; }
-.tab { flex: 1; padding: 10px; border: none; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; background: transparent; color: #727983; }
+.tabs { display: flex; background: #f1f5f9; border-radius:4px; padding: 4px; margin-bottom: 24px; }
+.tab { flex: 1; padding: 10px; border: none; border-radius:3px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; background: transparent; color: #727983; }
 .tab.active { background: #1a4578; color: #fff; }
 
 /* Кнопка Face ID / Fingerprint */
@@ -43,7 +43,7 @@ body {
   gap: 10px;
   background: #000000;
   border: none;
-  border-radius: 12px;
+  border-radius:4px;
   color: #fff;
   padding: 14px;
   font-size: 14px;
@@ -63,8 +63,8 @@ body {
   justify-content: center;
   gap: 10px;
   background: #fff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius:4px;
   color: #1e293b;
   padding: 12px;
   font-size: 14px;
@@ -84,8 +84,8 @@ body {
 .field input {
   width: 100%;
   background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius:4px;
   color: #1e293b;
   padding: 13px 16px;
   font-size: 14px;
@@ -107,7 +107,7 @@ body {
   width: 100%;
   background: #1a4578;
   border: none;
-  border-radius: 12px;
+  border-radius:4px;
   color: #fff;
   padding: 14px;
   font-size: 14px;
@@ -130,7 +130,7 @@ body {
   background: #1a2332;
   color: #fff;
   padding: 12px 20px;
-  border-radius: 10px;
+  border-radius:4px;
   font-size: 13px;
   font-weight: 500;
   z-index: 9999;
@@ -152,7 +152,7 @@ body {
   font-size: 22px;
   font-weight: 700;
   border: 2px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius:4px;
   background: #f8fafc;
   color: #1a2332;
   outline: none;
@@ -465,7 +465,7 @@ async function registerBioLogin(email, password) {
   const banner = document.createElement('div');
   banner.style.cssText = `
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-    background:#1a4578;color:#fff;border-radius:16px;padding:18px 24px;
+    background:#1a4578;color:#fff;border-radius:6px;padding:18px 24px;
     display:flex;align-items:center;gap:16px;z-index:99999;
     box-shadow:0 8px 32px rgba(26,69,120,.35);font-family:inherit;
     max-width:380px;width:calc(100% - 48px);

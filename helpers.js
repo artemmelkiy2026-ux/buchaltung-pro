@@ -402,16 +402,16 @@ function showKundeRechnungen(id) {
   const bezahlt  = rechs.filter(r=>r.status==='bezahlt').reduce((s,r)=>s+r.betrag,0);
   const offen    = rechs.filter(r=>r.status==='offen'||r.status==='ueberfaellig').reduce((s,r)=>s+r.betrag,0);
   stats.innerHTML = `
-    <div style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center">
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;text-align:center">
       <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Gesamt</div>
       <div style="font-family:var(--mono);font-size:15px;font-weight:700">${fmt(gesamt)}</div>
       <div style="font-size:10px;color:var(--sub);margin-top:2px">${rechs.length} Rechnung${rechs.length!==1?'en':''}</div>
     </div>
-    <div style="background:var(--gdim);border:1px solid rgba(93,157,105,.25);border-radius:10px;padding:10px 12px;text-align:center">
+    <div style="background:var(--gdim);border:1px solid rgba(93,157,105,.25);border-radius:4px;padding:10px 12px;text-align:center">
       <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Bezahlt</div>
       <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--green)">${fmt(bezahlt)}</div>
     </div>
-    <div style="background:var(--ydim);border:1px solid rgba(224,140,26,.25);border-radius:10px;padding:10px 12px;text-align:center">
+    <div style="background:var(--ydim);border:1px solid rgba(224,140,26,.25);border-radius:4px;padding:10px 12px;text-align:center">
       <div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Offen</div>
       <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--yellow)">${fmt(offen)}</div>
     </div>`;

@@ -385,7 +385,7 @@ function showDeletionBanner(daysLeft) {
   if (document.getElementById('deletion-banner')) return;
   const banner = document.createElement('div');
   banner.id = 'deletion-banner';
-  banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#e08c1a;color:#fff;border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:9998;box-shadow:0 8px 32px rgba(224,140,26,.4);font-family:inherit;max-width:380px;width:calc(100% - 32px)';
+  banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#e08c1a;color:#fff;border-radius:6px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:9998;box-shadow:0 8px 32px rgba(224,140,26,.4);font-family:inherit;max-width:380px;width:calc(100% - 32px)';
   banner.innerHTML = `
     <i class="fa-solid fa-triangle-exclamation" style="font-size:22px;flex-shrink:0"></i>
     <div style="flex:1;font-size:13px">
@@ -441,7 +441,7 @@ function offerPinSetup() {
   if (document.getElementById('pin-offer-banner')) return;
   const b = document.createElement('div');
   b.id = 'pin-offer-banner';
-  b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a4578;color:#fff;border-radius:16px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;font-family:sans-serif;max-width:400px;width:calc(100% - 48px);flex-direction:column';
+  b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a4578;color:#fff;border-radius:6px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;font-family:sans-serif;max-width:400px;width:calc(100% - 48px);flex-direction:column';
   b.innerHTML = `
     <div style="display:flex;align-items:center;gap:16px;width:100%">
       <span style="font-size:28px">🔒</span>
@@ -465,7 +465,7 @@ function offerPinRestore() {
   if (localStorage.getItem('bp_pin_removed_skipped') === '1') return;
   const b = document.createElement('div');
   b.id = 'pin-offer-banner';
-  b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgb(40 40 40);color:#fff;border-radius:16px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;font-family:sans-serif;max-width:400px;width:calc(100% - 48px);flex-direction:column';
+  b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgb(40 40 40);color:#fff;border-radius:6px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;font-family:sans-serif;max-width:400px;width:calc(100% - 48px);flex-direction:column';
   b.innerHTML = `
     <div style="display:flex;align-items:center;gap:16px;width:100%">
       <span style="font-size:28px">⚠</span>
@@ -604,7 +604,7 @@ async function offerBiometricSetup() {
   const label = isIOS ? 'Face ID einrichten?' : 'Fingerabdruck einrichten?';
   const b = document.createElement('div');
   b.id = 'bio-offer-banner';
-  b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#5d9d69;color:#fff;border-radius:16px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;box-shadow:0 8px 32px rgba(93,157,105,.35);font-family:sans-serif;max-width:380px;width:calc(100% - 48px)';
+  b.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#5d9d69;color:#fff;border-radius:6px;padding:18px 24px;display:flex;align-items:center;gap:16px;z-index:99999;box-shadow:0 8px 32px rgba(93,157,105,.35);font-family:sans-serif;max-width:380px;width:calc(100% - 48px)';
   b.innerHTML = `
     <span style="font-size:28px">${icon}</span>
     <div style="flex:1">

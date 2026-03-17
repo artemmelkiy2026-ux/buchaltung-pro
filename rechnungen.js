@@ -431,7 +431,7 @@ function addRechPosRow(i,p){
 
   if (mob) {
     // Мобильный layout: Bezeichnung на всю ширину, числа в строку
-    div.style.cssText='background:var(--s2,#f7f8fa);border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid var(--border)';
+    div.style.cssText='background:var(--s2,#f7f8fa);border-radius:4px;padding:10px;margin-bottom:8px;border:1px solid var(--border)';
     div.innerHTML=`
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Position ${i+1}</span>
@@ -459,7 +459,7 @@ function addRechPosRow(i,p){
               <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
             </button>
             <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
-            <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:110px">
+            <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
               <div onclick="setRechUstRate(this,0)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
               <div onclick="setRechUstRate(this,7)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
               <div onclick="setRechUstRate(this,19)" style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
@@ -488,7 +488,7 @@ function addRechPosRow(i,p){
           <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
         </button>
         <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
-        <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:110px">
+        <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
           <div onclick="setRechUstRate(this,0)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>0%</div>
           <div onclick="setRechUstRate(this,7)"  style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>7%</div>
           <div onclick="setRechUstRate(this,19)" style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
@@ -806,7 +806,7 @@ function showEmailServicePicker(r) {
   overlay.style.cssText = 'position:fixed;inset:0;background:#00000066;z-index:9999;display:flex;align-items:center;justify-content:center';
 
   const box = document.createElement('div');
-  box.style.cssText = 'background:var(--s1);border-radius:16px;padding:24px;width:320px;max-width:90vw;box-shadow:0 20px 60px #0004';
+  box.style.cssText = 'background:var(--s1);border-radius:6px;padding:24px;width:320px;max-width:90vw;box-shadow:0 20px 60px #0004';
 
   const hdr = document.createElement('div');
   hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:16px';
@@ -825,7 +825,7 @@ function showEmailServicePicker(r) {
 
   services.forEach(function(s) {
     const btn = document.createElement('button');
-    btn.style.cssText = 'display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+    btn.style.cssText = 'display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
     btn.textContent = s.label;
     btn.onclick = function() {
       overlay.remove();

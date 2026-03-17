@@ -129,17 +129,17 @@ function renderJournal() {
       return tb.localeCompare(ta); // новее = выше
     });
 
-    html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden">`;
+    html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;margin-bottom:12px;overflow:hidden">`;
 
     chain.forEach((e, idx) => {
       let badge = '', rowBg = '', opacity = '1';
 
       if (!e.is_storno && !e.korrektur_von && involved.has(e.id)) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
         rowBg = 'background:rgba(224,140,26,.03);';
         opacity = '0.7';
       } else if (e.is_storno) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
         rowBg = 'background:rgba(148,163,184,.03);';
         opacity = '0.6';
       } else if (e.korrektur_von) {
@@ -220,15 +220,15 @@ function renderJournal() {
       return tb2.localeCompare(ta);
     });
 
-    pageHtml += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden">`;
+    pageHtml += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;margin-bottom:12px;overflow:hidden">`;
 
     chain.forEach((e, idx) => {
       let badge = '', rowBg = '', opacity = '1';
       if (!e.is_storno && !e.korrektur_von && involved.has(e.id)) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
         rowBg = 'background:rgba(224,140,26,.03);'; opacity = '0.7';
       } else if (e.is_storno) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
         rowBg = 'background:rgba(148,163,184,.03);'; opacity = '0.6';
       } else if (e.korrektur_von) {
         badge = `<span class="badge-korrektur">● Korrektur</span>`;
@@ -362,7 +362,7 @@ function renderRechnungenLog() {
                   e.aktion==='erstellt'  ? 'background:rgba(34,197,94,.02)'  : '';
 
     const sep = i > 0 ? '' : '';
-    return `<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden">
+    return `<div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden">
       <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 14px;${rowBg}">
         <!-- Иконка -->
         <div style="flex:0 0 38px;height:38px;border-radius:50%;background:${a.color}18;display:flex;align-items:center;justify-content:center;margin-top:1px">
@@ -372,7 +372,7 @@ function renderRechnungenLog() {
         <div style="flex:1;min-width:0">
           <!-- Бейдж + Nr + дата+время -->
           <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px">
-            <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;background:${a.color}18;color:${a.color};border:1px solid ${a.color}33">${a.label}</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:6px;font-size:10px;font-weight:700;background:${a.color}18;color:${a.color};border:1px solid ${a.color}33">${a.label}</span>
             <span style="font-size:12px;font-weight:800;font-family:var(--mono);background:var(--s2);padding:2px 8px;border-radius:6px;border:1px solid var(--border)">Nr.${e.rechnung_nr||'—'}</span>
             <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${dt}</span>
           </div>
