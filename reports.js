@@ -199,7 +199,7 @@ function renderKat(){
   // ── SVG Donut ─────────────────────────────────────────────────────────────
   const donutWrap=document.getElementById('kat-donut-wrap');
   if(donutWrap){
-    const R=90, ri=54, CX=110, CY=110, SZ=220;
+    const R=110, ri=66, CX=130, CY=130, SZ=260;
     const CIRC=2*Math.PI*R;
     const GAP=sorted.length>1?2.5:0; // gap только если несколько сегментов
 
@@ -245,13 +245,13 @@ function renderKat(){
         ${paths}
         <circle cx="${CX}" cy="${CY}" r="${ri-2}" fill="var(--s1)" style="pointer-events:none"/>
         <text x="${CX}" y="${CY-10}" text-anchor="middle" dominant-baseline="middle"
-          font-size="10" fill="var(--sub)" font-family="Inter,sans-serif" font-weight="600"
+          font-size="12" fill="var(--sub)" font-family="Inter,sans-serif" font-weight="600"
           style="pointer-events:none">${isEin?'EINNAHMEN':'AUSGABEN'}</text>
         <text id="kat-cv" x="${CX}" y="${CY+8}" text-anchor="middle" dominant-baseline="middle"
-          font-size="15" fill="var(--text)" font-family="JetBrains Mono,monospace" font-weight="700"
+          font-size="18" fill="var(--text)" font-family="JetBrains Mono,monospace" font-weight="700"
           style="pointer-events:none">${fmt(total)}</text>
         <text id="kat-cs" x="${CX}" y="${CY+26}" text-anchor="middle" dominant-baseline="middle"
-          font-size="10" fill="var(--sub)" font-family="Inter,sans-serif"
+          font-size="12" fill="var(--sub)" font-family="Inter,sans-serif"
           style="pointer-events:none">${sorted.length} Kategorien</text>
       </svg>`;
 
@@ -293,7 +293,7 @@ function renderKat(){
   // ── Stats карточки ────────────────────────────────────────────────────────
   const katStats=document.getElementById('kat-stats');
   if(katStats) katStats.innerHTML=`
-    <div class="kat-stat-card">
+    <div class="kat-stat-card" style="padding:18px 20px">
       <div class="kat-stat-label">Gesamt</div>
       <div class="kat-stat-val" style="color:${isEin?'var(--green)':'var(--red)'}">${fmt(total)}</div>
       <div class="kat-stat-sub">${sorted.length} Kategorien</div>
@@ -413,45 +413,94 @@ function _katClick(idx, segs, total, count){
 function _renderKatTrend(ye, yr, isEin){
   const el=document.getElementById('kat-trend-chart'); if(!el) return;
   const curYear = yr==='Alle' ? new Date().getFullYear()+'' : yr;
-  // По месяцам
-  const monthly=[];
+  const labels=[];
+  const einData=[], ausData=[];
   for(let m=0;m<12;m++){
     const mi=String(m+1).padStart(2,'0');
     const me=ye.filter(e=>e.datum&&e.datum.substring(5,7)===mi);
-    const ein=me.filter(e=>e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
-    const aus=me.filter(e=>e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
-    monthly.push({m,ein,aus,gew:ein-aus,label:(typeof MN!=='undefined'?MN[m]:'M'+(m+1)).substring(0,3)});
+    einData.push(me.filter(e=>e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0));
+    ausData.push(me.filter(e=>e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0));
+    labels.push((typeof MN!=='undefined'?MN[m]:'M'+(m+1)).substring(0,3));
   }
-  const maxVal=Math.max(...monthly.map(m=>Math.max(m.ein,m.aus)),1);
-  const H=80, W=100;
-  // SVG sparkline paths
-  function sparkPath(data,key){
-    return data.map((d,i)=>{
-      const x=(i/(data.length-1))*W;
-      const y=H-((d[key]/maxVal)*H);
-      return (i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
-    }).join(' ');
-  }
-  const einPath=sparkPath(monthly,'ein');
-  const ausPath=sparkPath(monthly,'aus');
-  // Текущий месяц
   const curMon=new Date().getMonth();
-  const curData=monthly[curMon]||monthly[0];
 
   el.innerHTML=`
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:12px">Monatstrend ${curYear}</div>
-    <svg viewBox="-2 -4 ${W+4} ${H+12}" style="width:100%;height:120px;overflow:visible" preserveAspectRatio="none">
-      <path d="${einPath}" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
-      <path d="${ausPath}" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
-      ${monthly.map((d,i)=>{
-        const x=(i/11)*W;
-        return `<text x="${x}" y="${H+10}" text-anchor="middle" font-size="3.5" fill="var(--sub)" font-family="Inter,sans-serif">${d.label}</text>`;
-      }).join('')}
-    </svg>
-    <div style="display:flex;gap:16px;margin-top:10px">
-      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)"><span style="width:10px;height:3px;border-radius:2px;background:var(--green)"></span> Einnahmen</span>
-      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)"><span style="width:10px;height:3px;border-radius:2px;background:var(--red)"></span> Ausgaben</span>
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:14px">Monatstrend ${curYear}</div>
+    <div style="position:relative;height:180px">
+      <canvas id="kat-trend-canvas"></canvas>
+    </div>
+    <div style="display:flex;gap:20px;margin-top:12px">
+      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub)"><span style="width:12px;height:4px;border-radius:2px;background:#22c55e;display:inline-block"></span>Einnahmen</span>
+      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub)"><span style="width:12px;height:4px;border-radius:2px;background:#ef4444;display:inline-block"></span>Ausgaben</span>
     </div>`;
+
+  // Уничтожаем старый Chart если был
+  if(window._katTrendChart) { try{ window._katTrendChart.destroy(); }catch(e){} window._katTrendChart=null; }
+
+  const canvas=document.getElementById('kat-trend-canvas');
+  if(!canvas) return;
+
+  // Highlight текущего месяца
+  const einColors=einData.map((_,i)=>i===curMon?'rgba(34,197,94,1)':'rgba(34,197,94,0.45)');
+  const ausColors=ausData.map((_,i)=>i===curMon?'rgba(239,68,68,1)':'rgba(239,68,68,0.45)');
+
+  window._katTrendChart = new Chart(canvas, {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {
+          label:'Einnahmen',
+          data:einData,
+          backgroundColor:einColors,
+          hoverBackgroundColor:'rgba(34,197,94,1)',
+          borderRadius:4,
+          borderSkipped:false,
+        },
+        {
+          label:'Ausgaben',
+          data:ausData,
+          backgroundColor:ausColors,
+          hoverBackgroundColor:'rgba(239,68,68,1)',
+          borderRadius:4,
+          borderSkipped:false,
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor:'#1e293b',
+          titleColor:'#94a3b8',
+          bodyColor:'#f1f5f9',
+          padding:10,
+          cornerRadius:8,
+          callbacks:{
+            label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales:{
+        x:{
+          grid:{ display:false },
+          ticks:{ color:'var(--sub)', font:{ size:11 } },
+          border:{ display:false }
+        },
+        y:{
+          grid:{ color:'var(--border)', drawBorder:false },
+          ticks:{
+            color:'var(--sub)', font:{ size:11 },
+            callback: v => v>=1000 ? (v/1000).toFixed(0)+'k' : v
+          },
+          border:{ display:false }
+        }
+      }
+    }
+  });
 }
 
 // ── 2. Durchschnittliche Transaktion ──────────────────────────────────
