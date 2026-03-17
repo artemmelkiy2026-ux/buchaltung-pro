@@ -595,6 +595,11 @@ function calcRechTotal(){
   </div>`;
 }
 
+function _getRnRate(row){
+  const h=row.querySelector('.rn-ust-hidden');
+  return h?parseFloat(h.value)||0:19;
+}
+
 function getRechPositionen(){
   const pos=[];
   const rnYr5=document.getElementById('rn-dat')?.value?.substring(0,4)||new Date().getFullYear()+'';
