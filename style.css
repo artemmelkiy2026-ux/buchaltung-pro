@@ -2103,15 +2103,12 @@ input, select, textarea {
   z-index: 100;
 }
 .ang-sticky-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   min-width: 0;
 }
 .ang-sticky-title {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--text);
+  color: #616161;
   line-height: 1.2;
   letter-spacing: -.2px;
 }
