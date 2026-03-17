@@ -27,7 +27,7 @@ function renderWied(){
   if(!wied.length){if(container)container.innerHTML='';em.style.display='block';if(pagination)pagination.innerHTML='';return;}
   em.style.display='none';
   const today=new Date().toISOString().split('T')[0];
-  const faelligCount=wied.filter(w=>w.naechste<=today).length;
+  const faelligCount=wied.filter(w=>w.naechste<=today&&w.status!=='paused').length;
   const hint=document.getElementById('wied-hint');
   if(faelligCount>0){hint.style.display='';hint.innerHTML=`<strong>${faelligCount} fällige Zahlung${faelligCount>1?'en':''}</strong> — jetzt buchen!`;}
   else hint.style.display='none';
@@ -44,23 +44,26 @@ function renderWied(){
   if(wiedPage>totalPages)wiedPage=totalPages;
   const pageItems=sorted.slice((wiedPage-1)*WIED_PER_PAGE, wiedPage*WIED_PER_PAGE);
 
-  const intervallLabel={monatlich:'Monatlich',quartalsweise:'Quartalsweise',halbjaehrlich:'Halbjährlich',jaehrlich:'Jährlich'};
+  const intervallLabel={woechentlich:'Wöchentlich',monatlich:'Monatlich',quartalsweise:'Quartalsweise',halbjaehrlich:'Halbjährlich',jaehrlich:'Jährlich'};
   const cards=pageItems.map(w=>{
-    const isFaellig=w.naechste<=today;
+    const isFaellig=w.naechste<=today&&w.status!=='paused';
+    const isPaused=w.status==='paused';
     const isEin=w.typ==='Einnahme';
-    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}">
-      <div class="wied-card-avatar" style="background:${isEin?'var(--gdim)':'var(--rdim)'};color:${isEin?'var(--green)':'var(--red)'}">
-        <i class="fas fa-${isEin?'arrow-up':'arrow-down'}"></i>
+    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}">
+      <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
+        <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
       </div>
       <div class="wied-card-body">
-        <div class="wied-card-name">${w.bezeichnung}${isFaellig?` <span class="wied-faellig-badge">● Fällig</span>`:''}</div>
+        <div class="wied-card-name">${w.bezeichnung}${isFaellig?` <span class="wied-faellig-badge">● Fällig</span>`:''}${isPaused?' <span style="font-size:10px;font-weight:600;color:var(--sub);background:var(--s2);padding:1px 6px;border-radius:3px">Pausiert</span>':''}</div>
         <div class="wied-card-meta">
           <span><i class="fas fa-tag" style="font-size:10px;margin-right:2px"></i>${w.kategorie}</span>
           <span><i class="fas fa-sync-alt" style="font-size:10px;margin-right:2px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
           <span><i class="fas fa-credit-card" style="font-size:10px;margin-right:2px"></i>${w.zahlungsart}</span>
+          ${w.anbieter?`<span style="color:var(--blue)"><i class="fas fa-building" style="font-size:10px;margin-right:2px"></i>${w.anbieter}</span>`:''}
         </div>
-        <div class="wied-card-next" style="color:${isFaellig?'var(--yellow)':'var(--sub)'}">
+        <div class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
           <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
+          ${w.enddatum?`<span style="margin-left:6px;font-size:10px;color:var(--sub)">bis ${fdm(w.enddatum)}</span>`:''}
         </div>
       </div>
       <div class="wied-card-right">
@@ -102,7 +105,6 @@ let editWiedId = null;
 function openWiedModal(){
   editWiedId = null;
   wiedTyp='Ausgabe';
-  // Navigate to the wied form page
   window._wiedPrevPage = curPage || 'wiederkehrend';
   nav('wiedform', null);
   setTimeout(()=>{
@@ -113,62 +115,259 @@ function openWiedModal(){
     document.getElementById('wied-kat').value='';
     document.getElementById('wied-int').value='monatlich';
     document.getElementById('wied-zahl').value='Überweisung';
-    const hdr = document.getElementById('wied-form-title');
-    if(hdr) hdr.textContent = 'Neue Vorlage';
+    // New fields
+    const bis=document.getElementById('wied-bis');if(bis)bis.value='';
+    const rem=document.getElementById('wied-remind');if(rem)rem.value='3';
+    const auto=document.getElementById('wied-auto');if(auto)auto.value='manual';
+    const anb=document.getElementById('wied-anbieter');if(anb)anb.value='';
+    const vtr=document.getElementById('wied-vertrag');if(vtr)vtr.value='';
+    const ku=document.getElementById('wied-kuendigung');if(ku)ku.value='';
+    const lz=document.getElementById('wied-laufzeit');if(lz)lz.value='';
+    const notiz=document.getElementById('wied-notiz');if(notiz)notiz.value='';
+    // Hide edit-only blocks
+    const sb=document.getElementById('wied-status-block');if(sb)sb.style.display='none';
+    const hb=document.getElementById('wied-history-block');if(hb)hb.style.display='none';
+    // Collapse contract
+    const cf=document.getElementById('wied-contract-fields');if(cf)cf.style.display='none';
+    const ct=document.getElementById('wied-contract-toggle');if(ct)ct.textContent='Einblenden ▾';
+    // Title
+    const hdr=document.getElementById('wied-form-title');if(hdr)hdr.textContent='Neue Vorlage';
+    updateWiedSidebar();
   },30);
 }
 
 function editWied(id){
-  const w = (data.wiederkehrend||[]).find(x=>x.id===id);
-  if(!w) return;
-  editWiedId = id;
-  window._wiedPrevPage = curPage || 'wiederkehrend';
-  nav('wiedform', null);
+  const w=(data.wiederkehrend||[]).find(x=>x.id===id);
+  if(!w)return;
+  editWiedId=id;
+  window._wiedPrevPage=curPage||'wiederkehrend';
+  nav('wiedform',null);
   setTimeout(()=>{
-    wiedTyp = w.typ||'Ausgabe';
+    wiedTyp=w.typ||'Ausgabe';
     setWiedTyp(wiedTyp);
-    document.getElementById('wied-dsc').value = w.bezeichnung||w.beschreibung||'';
-    document.getElementById('wied-bet').value = w.betrag||'';
-    document.getElementById('wied-ab').value  = w.naechste||'';
-    const katSel = document.getElementById('wied-kat');
-    if(katSel){ [...katSel.options].forEach(o=>{ if(o.value===w.kategorie) o.selected=true; }); }
-    const intSel = document.getElementById('wied-int');
-    if(intSel) intSel.value = w.intervall||'monatlich';
-    const zahlSel = document.getElementById('wied-zahl');
-    if(zahlSel) zahlSel.value = w.zahlungsart||'Überweisung';
-    const hdr = document.getElementById('wied-form-title');
-    if(hdr) hdr.textContent = 'Vorlage bearbeiten';
+    document.getElementById('wied-dsc').value=w.bezeichnung||w.beschreibung||'';
+    document.getElementById('wied-bet').value=w.betrag||'';
+    document.getElementById('wied-ab').value=w.naechste||'';
+    const katSel=document.getElementById('wied-kat');
+    if(katSel){[...katSel.options].forEach(o=>{if(o.value===w.kategorie)o.selected=true;});}
+    const intSel=document.getElementById('wied-int');if(intSel)intSel.value=w.intervall||'monatlich';
+    const zahlSel=document.getElementById('wied-zahl');if(zahlSel)zahlSel.value=w.zahlungsart||'Überweisung';
+    // Extended fields
+    const bis=document.getElementById('wied-bis');if(bis)bis.value=w.enddatum||'';
+    const rem=document.getElementById('wied-remind');if(rem)rem.value=(w.erinnerung!=null?w.erinnerung:'3');
+    const auto=document.getElementById('wied-auto');if(auto)auto.value=w.autoBuchung||'manual';
+    const anb=document.getElementById('wied-anbieter');if(anb)anb.value=w.anbieter||'';
+    const vtr=document.getElementById('wied-vertrag');if(vtr)vtr.value=w.vertragsnr||'';
+    const ku=document.getElementById('wied-kuendigung');if(ku)ku.value=w.kuendigung||'';
+    const lz=document.getElementById('wied-laufzeit');if(lz)lz.value=w.laufzeit||'';
+    const notiz=document.getElementById('wied-notiz');if(notiz)notiz.value=w.notiz||'';
+    // Show contract block if any contract data exists
+    if(w.anbieter||w.vertragsnr||w.kuendigung||w.laufzeit||w.notiz){
+      const cf=document.getElementById('wied-contract-fields');if(cf)cf.style.display='';
+      const ct=document.getElementById('wied-contract-toggle');if(ct)ct.textContent='Ausblenden ▴';
+    }
+    // Show status block (edit mode)
+    const sb=document.getElementById('wied-status-block');if(sb)sb.style.display='';
+    setWiedStatus(w.status||'active');
+    // Show history
+    const hb=document.getElementById('wied-history-block');if(hb)hb.style.display='';
+    renderWiedHistory(w);
+    // Title
+    const hdr=document.getElementById('wied-form-title');if(hdr)hdr.textContent='Vorlage bearbeiten';
+    updateWiedSidebar();
   },30);
 }
 function closeWiedForm(){
-  const prev = window._wiedPrevPage || 'wiederkehrend';
-  nav(prev, document.querySelector('.nav-item[onclick*="wiederkehrend"]') || document.querySelector('.nav-item'));
+  const prev=window._wiedPrevPage||'wiederkehrend';
+  nav(prev,document.querySelector('.nav-item[onclick*="wiederkehrend"]')||document.querySelector('.nav-item'));
 }
 function saveWied(){
   const bez=document.getElementById('wied-dsc').value.trim();
   const betrag=parseFloat(document.getElementById('wied-bet').value);
   const ab=document.getElementById('wied-ab').value;
-  if(!bez||!betrag||!ab)return toast('Alle Felder ausfüllen!','err');
+  if(!bez||!betrag||!ab)return toast('Bezeichnung, Betrag und Startdatum sind Pflicht!','err');
   if(!data.wiederkehrend)data.wiederkehrend=[];
   const obj={
-    bezeichnung:bez, typ:wiedTyp, betrag,
+    bezeichnung:bez,typ:wiedTyp,betrag,
     kategorie:normKat(document.getElementById('wied-kat').value),
     zahlungsart:normZahl(document.getElementById('wied-zahl').value),
     intervall:document.getElementById('wied-int').value,
-    naechste:ab
+    naechste:ab,
+    // Extended
+    enddatum:document.getElementById('wied-bis')?.value||'',
+    erinnerung:parseInt(document.getElementById('wied-remind')?.value)||0,
+    autoBuchung:document.getElementById('wied-auto')?.value||'manual',
+    anbieter:document.getElementById('wied-anbieter')?.value.trim()||'',
+    vertragsnr:document.getElementById('wied-vertrag')?.value.trim()||'',
+    kuendigung:document.getElementById('wied-kuendigung')?.value||'',
+    laufzeit:document.getElementById('wied-laufzeit')?.value||'',
+    notiz:document.getElementById('wied-notiz')?.value.trim()||'',
   };
   if(editWiedId){
     const w=data.wiederkehrend.find(x=>x.id===editWiedId);
-    if(w){ Object.assign(w, obj); sbSaveWied(w); }
+    if(w){
+      const prevStatus=w.status;
+      Object.assign(w,obj);
+      w.status=w.status||prevStatus||'active';
+      sbSaveWied(w);
+    }
     editWiedId=null;
     toast('Vorlage aktualisiert','ok');
   } else {
-    const newW={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj};
+    const newW={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),status:'active',buchungen:0,...obj};
     data.wiederkehrend.push(newW);
     sbSaveWied(newW);
     toast('Vorlage gespeichert','ok');
   }
-  renderWied(); closeWiedForm();
+  renderWied();closeWiedForm();
+}
+
+// ── Toggle contract section ─────
+function toggleWiedContract(){
+  const f=document.getElementById('wied-contract-fields');
+  const t=document.getElementById('wied-contract-toggle');
+  if(!f)return;
+  if(f.style.display==='none'){f.style.display='';if(t)t.textContent='Ausblenden ▴';}
+  else{f.style.display='none';if(t)t.textContent='Einblenden ▾';}
+}
+
+// ── Status toggle ───────────────
+function setWiedStatus(status){
+  const ab=document.getElementById('wied-status-active');
+  const pb=document.getElementById('wied-status-paused');
+  const pi=document.getElementById('wied-pause-info');
+  if(ab){ab.style.background=status==='active'?'var(--gdim)':'';ab.style.borderColor=status==='active'?'var(--green)':'';ab.style.color=status==='active'?'var(--green)':'';}
+  if(pb){pb.style.background=status==='paused'?'var(--ydim)':'';pb.style.borderColor=status==='paused'?'var(--yellow)':'';pb.style.color=status==='paused'?'var(--yellow)':'';}
+  if(pi)pi.style.display=status==='paused'?'':'none';
+  if(editWiedId){
+    const w=(data.wiederkehrend||[]).find(x=>x.id===editWiedId);
+    if(w){w.status=status;sbSaveWied(w);}
+  }
+}
+
+// ── History of booked payments ──
+function renderWiedHistory(w){
+  const hc=document.getElementById('wied-history-content');if(!hc)return;
+  // Find entries that match this template
+  const matches=(data.eintraege||[]).filter(e=>
+    !e.is_storno&&!e._storniert&&
+    e.beschreibung===w.bezeichnung&&e.typ===w.typ&&
+    Math.abs(e.betrag-w.betrag)<0.02
+  ).sort((a,b)=>(b.datum||'').localeCompare(a.datum||'')).slice(0,8);
+  if(!matches.length){hc.innerHTML='<div style="color:var(--sub)">Noch keine Buchungen zu dieser Vorlage</div>';return;}
+  const total=matches.reduce((s,e)=>s+e.betrag,0);
+  hc.innerHTML=`<div style="margin-bottom:8px;font-weight:600;color:var(--text)">${matches.length} Buchung${matches.length!==1?'en':''} · ${fmt(total)}</div>`+
+    matches.map(e=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+      <span style="font-family:var(--mono);font-size:11px">${fd(e.datum)}</span>
+      <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${e.typ==='Einnahme'?'var(--green)':'var(--red)'}">${e.typ==='Einnahme'?'+':'−'}${fmt(e.betrag)}</span>
+    </div>`).join('');
+}
+
+// ── Live sidebar update ─────────
+function updateWiedSidebar(){
+  const bet=parseFloat(document.getElementById('wied-bet')?.value)||0;
+  const intv=document.getElementById('wied-int')?.value||'monatlich';
+  const startDate=document.getElementById('wied-ab')?.value||'';
+  const endDate=document.getElementById('wied-bis')?.value||'';
+
+  // 1. Hochrechnung
+  const calcEl=document.getElementById('wied-calc-info');
+  if(calcEl){
+    if(!bet){calcEl.innerHTML='<div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben</div>';}
+    else{
+      const mult={woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
+      const labels={woechentlich:'Woche',monatlich:'Monat',quartalsweise:'Quartal',halbjaehrlich:'Halbjahr',jaehrlich:'Jahr'};
+      const perYear=bet*(mult[intv]||12);
+      const perMonth=perYear/12;
+      const perDay=perYear/365;
+      calcEl.innerHTML=`
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--sub)">Pro ${labels[intv]||'Monat'}</span>
+          <span style="font-family:var(--mono);font-weight:700">${bet.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--sub)">Pro Monat</span>
+          <span style="font-family:var(--mono);font-weight:600">${perMonth.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--sub)">Pro Tag</span>
+          <span style="font-family:var(--mono);font-size:11px">${perDay.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0">
+          <span style="color:var(--sub);font-weight:600">Pro Jahr</span>
+          <span style="font-family:var(--mono);font-weight:700;font-size:15px">${perYear.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+        </div>
+        ${endDate?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
+          <span style="color:var(--sub);font-size:11px">Gesamtkosten bis ${fd(endDate)}</span>
+          <span style="font-family:var(--mono);font-weight:700;font-size:12px">${_calcTotalUntil(bet,intv,startDate,endDate)}</span>
+        </div>`:''}`;
+    }
+  }
+
+  // 2. Next dates
+  const datesEl=document.getElementById('wied-dates-preview');
+  if(datesEl){
+    if(!startDate){datesEl.innerHTML='Startdatum eingeben für Vorschau';}
+    else{
+      const dates=_calcNextDates(startDate,intv,endDate,8);
+      const today=new Date().toISOString().split('T')[0];
+      datesEl.innerHTML=dates.map((d,i)=>{
+        const isPast=d<today;
+        const isNext=!isPast&&(i===0||dates[i-1]<today);
+        return`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;${i<dates.length-1?'border-bottom:1px solid var(--border)':''}${isPast?';opacity:.4':''}">
+          <span style="width:16px;height:16px;border-radius:var(--r);background:${isNext?'var(--blue)':isPast?'var(--border)':'var(--s2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            ${isNext?'<span style="width:5px;height:5px;border-radius:50%;background:#fff"></span>':'<span style="font-size:8px;color:var(--sub)">'+(i+1)+'</span>'}
+          </span>
+          <span style="font-family:var(--mono);font-size:12px;${isNext?'font-weight:700;color:var(--blue)':''}">${fd(d)}</span>
+          ${isNext?'<span style="font-size:9px;font-weight:700;color:var(--blue);background:var(--bdim);padding:1px 5px;border-radius:3px">NÄCHSTE</span>':''}
+          ${isPast?'<span style="font-size:9px;color:var(--sub)">✓</span>':''}
+        </div>`;
+      }).join('')||'<span>Keine Termine</span>';
+    }
+  }
+
+  // 3. Budget share
+  const budgetEl=document.getElementById('wied-budget-info');
+  if(budgetEl&&bet){
+    const mult={woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
+    const yearCost=bet*(mult[intv]||12);
+    const totalAus=(data.eintraege||[]).filter(e=>!e.is_storno&&!e._storniert&&e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
+    const pct=totalAus>0?Math.round(yearCost/totalAus*100):0;
+    const bar=Math.min(pct,100);
+    budgetEl.innerHTML=`
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span>${wiedTyp==='Ausgabe'?'Anteil an Ausgaben':'Anteil an Einnahmen'}</span>
+        <span style="font-family:var(--mono);font-weight:700">${pct}%</span>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${bar}%;background:${pct>50?'var(--red)':pct>25?'var(--yellow)':'var(--blue)'};border-radius:3px;transition:width .4s"></div>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--sub)">${fmt(yearCost)} € / Jahr von ${fmt(totalAus)} € Gesamt</div>`;
+  } else if(budgetEl){budgetEl.innerHTML='—';}
+}
+
+// ── Helpers ─────────────────────
+function _calcNextDates(start,intv,end,count){
+  const dates=[];const d=new Date(start);if(isNaN(d.getTime()))return dates;
+  const day=d.getDate();
+  for(let i=0;i<count;i++){
+    const ds=d.toISOString().split('T')[0];
+    if(end&&ds>end)break;
+    dates.push(ds);
+    // Advance
+    if(intv==='woechentlich'){d.setDate(d.getDate()+7);}
+    else if(intv==='monatlich'){d.setDate(1);d.setMonth(d.getMonth()+1);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));}
+    else if(intv==='quartalsweise'){d.setDate(1);d.setMonth(d.getMonth()+3);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));}
+    else if(intv==='halbjaehrlich'){d.setDate(1);d.setMonth(d.getMonth()+6);d.setDate(Math.min(day,new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));}
+    else{d.setFullYear(d.getFullYear()+1);}
+  }
+  return dates;
+}
+function _calcTotalUntil(bet,intv,start,end){
+  if(!start||!end)return'—';
+  const dates=_calcNextDates(start,intv,end,500);
+  const total=dates.length*bet;
+  return fmt(total)+' €';
 }
 function wBuchenCore(id){
   // Только данные — без renderAll/renderWied
@@ -185,7 +384,9 @@ function wBuchenCore(id){
   const d=new Date(w.naechste);
   if(isNaN(d.getTime())) return newE; // невалидная дата — не обновляем naechste
   const day=d.getDate();
-  if(w.intervall==='monatlich'){
+  if(w.intervall==='woechentlich'){
+    d.setDate(d.getDate()+7);
+  } else if(w.intervall==='monatlich'){
     d.setDate(1); d.setMonth(d.getMonth()+1);
     d.setDate(Math.min(day, new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));
   } else if(w.intervall==='quartalsweise'){
@@ -212,7 +413,7 @@ function wBuchen(id){
 
 function wBuchenAlle(){
   const today=new Date().toISOString().split('T')[0];
-  const faellig=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
+  const faellig=(data.wiederkehrend||[]).filter(w=>w.naechste<=today&&w.status!=='paused');
   if(!faellig.length) return toast('Keine fälligen Zahlungen', 'err');
   // Бронируем все без промежуточных renderAll
   faellig.forEach(w=>wBuchenCore(w.id));

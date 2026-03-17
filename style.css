@@ -3282,3 +3282,15 @@ header { background: #fff; }
     position: static !important;
   }
 }
+
+/* ── Wiedform responsive ── */
+@media(max-width:768px){
+  #wied-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  #wied-form-grid > div:last-child {
+    position: static !important;
+  }
+}
+.wied-card--paused { opacity:.55; }
+.wied-card--paused .wied-card-betrag { color:var(--sub) !important; }

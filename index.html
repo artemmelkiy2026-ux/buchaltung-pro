@@ -1104,97 +1104,151 @@
     </div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;max-width:960px">
+  <div id="wied-form-grid" style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;max-width:1060px">
 
-  <!-- Left: Main form -->
+  <!-- ═══ LEFT: Form ═══ -->
   <div>
-  <div class="form-panel" style="border:1px solid var(--border);padding:20px">
-    <div class="typ-toggle" style="margin-bottom:16px">
-      <button class="tt ae" id="wied-btn-e" onclick="setWiedTyp('Einnahme')">Einnahme</button>
-      <button class="tt" id="wied-btn-a" onclick="setWiedTyp('Ausgabe')">Ausgabe</button>
-    </div>
-    <div class="fg"><label>Bezeichnung</label><input type="text" id="wied-dsc" placeholder="z.B. Miete Büro, Telefonrechnung, Hosting..."></div>
-    <div class="fgrow c2">
-      <div class="fg"><label>Betrag (€)</label><input type="number" id="wied-bet" step="0.01" min="0.01" placeholder="0,00"></div>
-      <div class="fg"><label>Intervall</label>
-        <select id="wied-int">
-          <option value="monatlich">Monatlich</option>
-          <option value="quartalsweise">Quartalsweise</option>
-          <option value="halbjaehrlich">Halbjährlich</option>
-          <option value="jaehrlich">Jährlich</option>
-        </select>
-      </div>
-    </div>
-    <div class="fgrow c2">
-      <div class="fg"><label>Kategorie</label><select id="wied-kat"></select></div>
-      <div class="fg"><label>Zahlungsart</label>
-        <select id="wied-zahl">
-          <option value="Überweisung">Überweisung</option><option value="Barzahlung">Barzahlung</option><option value="PayPal">PayPal</option>
-          <option value="EC-Karte">EC-Karte</option><option value="Lastschrift">Lastschrift</option><option value="Sonstiges">Sonstiges</option>
-        </select>
-      </div>
-    </div>
-    <div class="fgrow c2">
-      <div class="fg"><label>Erste Buchung ab</label><input type="date" id="wied-ab"></div>
-      <div class="fg"><label>Enddatum <span style="font-size:10px;color:var(--sub)">(optional)</span></label><input type="date" id="wied-bis" placeholder="Unbegrenzt"></div>
-    </div>
-    <div class="fg"><label>Notiz <span style="font-size:10px;color:var(--sub)">(optional)</span></label><textarea id="wied-notiz" placeholder="Vertragsnummer, Kündigungsfrist, Anmerkungen..." style="min-height:60px"></textarea></div>
-  </div>
-  </div>
 
-  <!-- Right: Info sidebar -->
-  <div style="position:sticky;top:20px">
-    <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1);margin-bottom:12px">
-      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px"><i class="fas fa-info-circle"></i> Hochrechnung</div>
-      <div id="wied-calc-info" style="font-size:13px;color:var(--text);line-height:1.6">
-        <div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben für eine Vorschau</div>
+    <!-- Block 1: Typ + Grunddaten -->
+    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Grunddaten</div>
+      <div class="typ-toggle" style="margin-bottom:16px">
+        <button class="tt ae" id="wied-btn-e" onclick="setWiedTyp('Einnahme')">Einnahme</button>
+        <button class="tt" id="wied-btn-a" onclick="setWiedTyp('Ausgabe')">Ausgabe</button>
+      </div>
+      <div class="fg"><label>Bezeichnung</label><input type="text" id="wied-dsc" placeholder="z.B. Miete Büro, Telefonrechnung, Hosting..."></div>
+      <div class="fgrow c2">
+        <div class="fg"><label>Betrag (€)</label><input type="number" id="wied-bet" step="0.01" min="0.01" placeholder="0,00" oninput="updateWiedSidebar()"></div>
+        <div class="fg"><label>Intervall</label>
+          <select id="wied-int" onchange="updateWiedSidebar()">
+            <option value="woechentlich">Wöchentlich</option>
+            <option value="monatlich" selected>Monatlich</option>
+            <option value="quartalsweise">Quartalsweise</option>
+            <option value="halbjaehrlich">Halbjährlich</option>
+            <option value="jaehrlich">Jährlich</option>
+          </select>
+        </div>
+      </div>
+      <div class="fgrow c2">
+        <div class="fg"><label>Kategorie</label><select id="wied-kat"></select></div>
+        <div class="fg"><label>Zahlungsart</label>
+          <select id="wied-zahl">
+            <option value="Überweisung">Überweisung</option><option value="Barzahlung">Barzahlung</option><option value="PayPal">PayPal</option>
+            <option value="EC-Karte">EC-Karte</option><option value="Lastschrift">Lastschrift</option><option value="Sonstiges">Sonstiges</option>
+          </select>
+        </div>
       </div>
     </div>
+
+    <!-- Block 2: Zeitraum & Erinnerung -->
+    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Zeitraum & Erinnerung</div>
+      <div class="fgrow c2">
+        <div class="fg"><label>Erste Buchung ab</label><input type="date" id="wied-ab" onchange="updateWiedSidebar()"></div>
+        <div class="fg"><label>Enddatum <span style="font-size:10px;color:var(--sub)">(optional — leer = unbegrenzt)</span></label><input type="date" id="wied-bis" onchange="updateWiedSidebar()"></div>
+      </div>
+      <div class="fgrow c2">
+        <div class="fg"><label>Erinnerung (Tage vorher)</label>
+          <select id="wied-remind">
+            <option value="0">Keine Erinnerung</option>
+            <option value="1">1 Tag vorher</option>
+            <option value="3" selected>3 Tage vorher</option>
+            <option value="7">1 Woche vorher</option>
+            <option value="14">2 Wochen vorher</option>
+          </select>
+        </div>
+        <div class="fg"><label>Auto-Buchung</label>
+          <select id="wied-auto">
+            <option value="manual">Manuell bestätigen</option>
+            <option value="auto">Automatisch buchen</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block 3: Vertrag & Anbieter -->
+    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub)">Vertrag & Anbieter <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></span>
+        <button type="button" id="wied-contract-toggle" onclick="toggleWiedContract()" style="font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit;font-weight:600">Einblenden ▾</button>
+      </div>
+      <div id="wied-contract-fields" style="display:none">
+        <div class="fgrow c2">
+          <div class="fg"><label>Anbieter / Firma</label><input type="text" id="wied-anbieter" placeholder="z.B. Telekom, Allianz, Vodafone..."></div>
+          <div class="fg"><label>Vertragsnummer</label><input type="text" id="wied-vertrag" placeholder="z.B. VN-2024-12345"></div>
+        </div>
+        <div class="fgrow c2">
+          <div class="fg"><label>Kündigungsfrist</label>
+            <select id="wied-kuendigung">
+              <option value="">Nicht angegeben</option>
+              <option value="1m">1 Monat</option>
+              <option value="3m">3 Monate</option>
+              <option value="6m">6 Monate</option>
+              <option value="12m">12 Monate</option>
+              <option value="zum-ende">Zum Vertragsende</option>
+            </select>
+          </div>
+          <div class="fg"><label>Vertragslaufzeit bis</label><input type="date" id="wied-laufzeit"></div>
+        </div>
+        <div class="fg"><label>Notiz</label><textarea id="wied-notiz" placeholder="Anmerkungen, Sonderbedingungen, Zugangsdaten-Referenz..." style="min-height:50px"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Block 4: Status (nur im Edit-Modus) -->
+    <div id="wied-status-block" class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px;display:none">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Status</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="wied-status-active" onclick="setWiedStatus('active')" style="flex:1;padding:10px;text-align:center">
+          <span style="font-size:16px;display:block;margin-bottom:2px">●</span>
+          <span style="font-size:11px">Aktiv</span>
+        </button>
+        <button class="btn" id="wied-status-paused" onclick="setWiedStatus('paused')" style="flex:1;padding:10px;text-align:center">
+          <span style="font-size:16px;display:block;margin-bottom:2px">⏸</span>
+          <span style="font-size:11px">Pausiert</span>
+        </button>
+      </div>
+      <div id="wied-pause-info" style="display:none;margin-top:10px;padding:10px 12px;background:var(--ydim);border-radius:var(--r);font-size:12px;color:var(--yellow)">
+        Pausierte Vorlagen werden bei fälligen Buchungen übersprungen.
+      </div>
+    </div>
+
+  </div><!-- /left -->
+
+  <!-- ═══ RIGHT: Live Sidebar ═══ -->
+  <div style="position:sticky;top:20px;display:flex;flex-direction:column;gap:12px">
+
+    <!-- Hochrechnung -->
     <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
-      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px"><i class="fas fa-lightbulb"></i> Hinweis</div>
-      <div style="font-size:12px;color:var(--sub);line-height:1.6">
-        Fällige Buchungen werden beim Start automatisch erkannt. Sie können jederzeit mit einem Klick gebucht oder übersprungen werden.
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Hochrechnung</div>
+      <div id="wied-calc-info" style="font-size:13px;color:var(--text);line-height:1.6">
+        <div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben</div>
       </div>
     </div>
-  </div>
+
+    <!-- Nächste Termine -->
+    <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Nächste Termine</div>
+      <div id="wied-dates-preview" style="font-size:12px;color:var(--sub);line-height:1.6">
+        Startdatum eingeben für Vorschau
+      </div>
+    </div>
+
+    <!-- Buchungshistorie (nur im Edit-Modus) -->
+    <div id="wied-history-block" style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1);display:none">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Buchungshistorie</div>
+      <div id="wied-history-content" style="font-size:12px;color:var(--sub)">Keine Buchungen</div>
+    </div>
+
+    <!-- Anteil am Budget -->
+    <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Budgetanteil</div>
+      <div id="wied-budget-info" style="font-size:12px;color:var(--sub)">—</div>
+    </div>
+
+  </div><!-- /right -->
 
   </div><!-- /grid -->
 
-  <!-- Live preview script -->
-  <script>
-  (function(){
-    function updateWiedCalc(){
-      const el=document.getElementById('wied-calc-info');
-      if(!el) return;
-      const bet=parseFloat(document.getElementById('wied-bet')?.value)||0;
-      const intv=document.getElementById('wied-int')?.value||'monatlich';
-      if(!bet){el.innerHTML='<div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben für eine Vorschau</div>';return;}
-      const mult={monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
-      const labels={monatlich:'Monat',quartalsweise:'Quartal',halbjaehrlich:'Halbjahr',jaehrlich:'Jahr'};
-      const perYear=bet*(mult[intv]||12);
-      const perMonth=perYear/12;
-      el.innerHTML=`
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-          <span style="color:var(--sub)">Pro ${labels[intv]||'Monat'}</span>
-          <span style="font-family:var(--mono);font-weight:700">${bet.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-          <span style="color:var(--sub)">Pro Monat</span>
-          <span style="font-family:var(--mono);font-weight:600">${perMonth.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0">
-          <span style="color:var(--sub);font-weight:600">Pro Jahr</span>
-          <span style="font-family:var(--mono);font-weight:700;font-size:14px">${perYear.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
-        </div>`;
-    }
-    document.addEventListener('input',function(e){
-      if(e.target.id==='wied-bet'||e.target.id==='wied-int') updateWiedCalc();
-    });
-    document.addEventListener('change',function(e){
-      if(e.target.id==='wied-int') updateWiedCalc();
-    });
-  })();
-  </script>
 </div>
 </div>
 
