@@ -2190,7 +2190,7 @@ input, select, textarea {
 /* Шапка таблицы продуктов */
 .ang-pos-header {
   display: grid;
-  grid-template-columns: 3fr 70px 70px 110px 80px 130px 90px 28px;
+  grid-template-columns: 3fr 70px 70px 110px 80px 90px 90px 57px;
   gap: 6px;
   padding: 6px 8px;
   font-size: 11px;
