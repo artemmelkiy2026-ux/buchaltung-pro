@@ -186,14 +186,14 @@ function renderAngebote() {
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub);padding-top:8px;border-top:1px solid var(--border)">
-        <span><span style="width:12px;opacity:.5">${ic('calendar')}</span> ${fd(a.datum)}</span>
-        <span><span style="width:12px;opacity:.5">${ic('clock')}</span> ${ageLabel}</span>
-        ${posCount ? `<span><span style="width:12px;opacity:.5">${ic('list')}</span> ${posCount} Position${posCount!==1?'en':''}</span>` : ''}
-        ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}"><span style="width:12px;opacity:.5">${ic('hourglass-half')}</span> bis ${fd(a.gueltig)}</span>` : ''}
+        <span><i class="fas fa-calendar" style="width:12px;opacity:.5"></i> ${fd(a.datum)}</span>
+        <span><i class="fas fa-clock" style="width:12px;opacity:.5"></i> ${ageLabel}</span>
+        ${posCount ? `<span><i class="fas fa-list" style="width:12px;opacity:.5"></i> ${posCount} Position${posCount!==1?'en':''}</span>` : ''}
+        ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}"><i class="fas fa-hourglass-half" style="width:12px;opacity:.5"></i> bis ${fd(a.gueltig)}</span>` : ''}
         <span style="margin-left:auto;display:flex;gap:3px" onclick="event.stopPropagation()">
-          <button class="rca-btn" onclick="angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px">${ic('print',11)}</button>
-          <button class="rca-btn rca-green" onclick="angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px">${ic('file-invoice',11)}</button>
-          <button class="rca-btn rca-red" onclick="delAng('${a.id}')" title="Löschen" style="width:26px;height:26px">${ic('trash',11)}</button>
+          <button class="rca-btn" onclick="angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="fas fa-print" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-green" onclick="angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="fas fa-file-invoice" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-red" onclick="delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><i class="fas fa-trash" style="font-size:11px"></i></button>
         </span>
       </div>
       ${expiryHtml}
@@ -300,7 +300,7 @@ function _angAddPos(p={}) {
           <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
           <span class="ust-flag-label">${rate}%</span>
         </span>
-        <span style="color:var(--sub)">${ic('chevron-down',9)}</span>
+        <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
       </button>
       <input type="hidden" class="ust-flag-val" value="${rate}" onchange="recalcAngSumme()">
       <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:120px">
@@ -314,7 +314,7 @@ function _angAddPos(p={}) {
       <button type="button" class="ang-rabatt-suffix" onclick="_angToggleRabatt(this)">${rabattTyp}</button>
     </div>
     <div class="ang-pos-betrag">0,00 €</div>
-    <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px">${ic('trash')}</button>`;
+    <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px"><i class="fas fa-trash"></i></button>`;
   list.appendChild(row);
   recalcAngSumme();
 }
@@ -440,8 +440,8 @@ function updateAngBanner() {
   el.style.background = isKlein ? 'rgba(251,191,36,.1)' : 'rgba(26,69,120,.08)';
   el.style.color = isKlein ? 'var(--yellow)' : 'var(--blue)';
   el.innerHTML = isKlein
-    ? ic('info-circle')+' §19 UStG — Kleinunternehmer: keine MwSt.'
-    : ic('info-circle')+' Regelbesteuerung — MwSt. wird ausgewiesen';
+    ? '<i class="fas fa-info-circle"></i> §19 UStG — Kleinunternehmer: keine MwSt.'
+    : '<i class="fas fa-info-circle"></i> Regelbesteuerung — MwSt. wird ausgewiesen';
 }
 
 // ── SPEICHERN ────────────────────────────────────────────────────────────────
@@ -620,7 +620,7 @@ function angBezSearch(input) {
       ${p.artnr ? `<div style="font-size:11px;color:var(--sub)">Art.-Nr. ${p.artnr}</div>` : ''}
     </div>`).join('') +
     `<div class="ang-bez-suggest-new" id="ang-bez-new-btn">
-      ${ic('plus-circle')} Neues Produkt erstellen
+      <i class="fas fa-plus-circle"></i> Neues Produkt erstellen
     </div>`;
 
   // Вешаем клики через JS — без проблем с кавычками
