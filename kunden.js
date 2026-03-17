@@ -44,7 +44,7 @@ function renderWied(){
   if(wiedPage>totalPages)wiedPage=totalPages;
   const pageItems=sorted.slice((wiedPage-1)*WIED_PER_PAGE, wiedPage*WIED_PER_PAGE);
 
-  const intervallLabel={monatlich:'Monatlich',quartalsweise:'Quartalsweise',jaehrlich:'Jährlich'};
+  const intervallLabel={monatlich:'Monatlich',quartalsweise:'Quartalsweise',halbjaehrlich:'Halbjährlich',jaehrlich:'Jährlich'};
   const cards=pageItems.map(w=>{
     const isFaellig=w.naechste<=today;
     const isEin=w.typ==='Einnahme';
@@ -190,6 +190,9 @@ function wBuchenCore(id){
     d.setDate(Math.min(day, new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));
   } else if(w.intervall==='quartalsweise'){
     d.setDate(1); d.setMonth(d.getMonth()+3);
+    d.setDate(Math.min(day, new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));
+  } else if(w.intervall==='halbjaehrlich'){
+    d.setDate(1); d.setMonth(d.getMonth()+6);
     d.setDate(Math.min(day, new Date(d.getFullYear(),d.getMonth()+1,0).getDate()));
   } else {
     d.setFullYear(d.getFullYear()+1);

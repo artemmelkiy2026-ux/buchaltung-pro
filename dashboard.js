@@ -657,8 +657,7 @@ function renderDash(){
     return `<div class="drc${st?' drc-storno':''}" onclick="${click}" style="border:1px solid var(--border);background:var(--s1)">
       <div class="drc-icon" style="background:${isEin?'rgba(58,138,78,.1)':'rgba(214,51,65,.1)'};color:${color}">
         <i class="fas fa-arrow-${isEin?'up':'down'}"></i>
-      </div>
-      <div class="drc-body">
+      </div>      <div class="drc-body">
         <div class="drc-name">${e.beschreibung||e.kategorie}</div>
         <div class="drc-meta">
           <span>${mob?fdm(e.datum):fd(e.datum)}</span>

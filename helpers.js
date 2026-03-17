@@ -1291,7 +1291,14 @@ function renderUst(){
   if(ustPage < 1) ustPage = 1;
 
   if(!filteredMwst.length){
-    if(empty2) empty2.style.display='';
+    if(empty2){
+      empty2.style.display='';
+      empty2.innerHTML = ustQuartalFilter > 0
+        ? `<div class="ei"><i class="fas fa-calendar-times"></i></div><p>Keine Buchungen in Q${ustQuartalFilter} ${yr}</p><p style="font-size:12px;color:var(--sub);margin-top:4px">Für dieses Quartal liegen keine USt-Buchungen vor</p>`
+        : `<div class="ei"><i class="fas fa-receipt"></i></div><p>Keine USt-Buchungen für ${yr}</p>`;
+    }
+    const detContainer = document.getElementById('ust-detail-list');
+    if(detContainer) detContainer.innerHTML = '';
   } else {
     if(empty2) empty2.style.display='none';
     const pageItems = filteredMwst.slice((ustPage-1)*PER_PAGE, ustPage*PER_PAGE);

@@ -168,9 +168,13 @@ function openNeuEintrag(editEntryId) {
     // Редактирование — заголовок меняется
     const t = document.getElementById('neu-form-title');
     if (t) t.textContent = 'Eintrag bearbeiten';
+    const sub = document.getElementById('neu-form-sub');
+    if (sub) sub.textContent = 'GoBD-konforme Korrektur · Storno + Neubuchung';
   } else {
     const t = document.getElementById('neu-form-title');
     if (t) t.textContent = 'Neuer Eintrag';
+    const sub = document.getElementById('neu-form-sub');
+    if (sub) sub.textContent = 'Einnahme oder Ausgabe erfassen';
     if (typeof clearForm === 'function') clearForm();
     // Reset edit mode — ensure button is set to create mode
     if(typeof editId !== 'undefined') editId=null;

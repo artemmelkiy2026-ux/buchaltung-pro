@@ -139,32 +139,64 @@ function renderAngebote() {
     const st = ANG_ST[a.status] || ANG_ST.offen;
     const isExp = a.gueltig && a.gueltig > today && a.status === 'offen' &&
       (new Date(a.gueltig) - new Date()) < 7*24*60*60*1000;
-    return `<div class="rech-card" onclick="openAngForm('${a.id}')">
-      <div class="rech-card-left">
-        <div class="rech-card-avatar ${st.cls}">
+    // Positionen count
+    const posCount = (a.positionen||[]).length;
+    // Days since creation
+    const ageMs = new Date() - new Date(a.datum);
+    const ageDays = Math.floor(ageMs / (24*60*60*1000));
+    const ageLabel = ageDays === 0 ? 'Heute' : ageDays === 1 ? 'Gestern' : `vor ${ageDays} Tagen`;
+    // Expiry progress for offen
+    let expiryHtml = '';
+    if(a.status === 'offen' && a.gueltig && a.datum) {
+      const totalMs = new Date(a.gueltig) - new Date(a.datum);
+      const elapsedMs = new Date() - new Date(a.datum);
+      const pct = totalMs > 0 ? Math.min(100, Math.round(elapsedMs / totalMs * 100)) : 0;
+      const daysLeft = Math.max(0, Math.ceil((new Date(a.gueltig) - new Date()) / (24*60*60*1000)));
+      const barColor = pct > 80 ? 'var(--red)' : pct > 50 ? 'var(--yellow)' : 'var(--blue)';
+      expiryHtml = `<div style="margin-top:6px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--sub);margin-bottom:3px">
+          <span>${daysLeft} ${daysLeft===1?'Tag':'Tage'} verbleibend</span>
+          <span>${pct}%</span>
+        </div>
+        <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px"></div>
+        </div>
+      </div>`;
+    }
+    // Netto info if USt
+    const hasUst = (a.positionen||[]).some(p => p.mwst > 0);
+    const nettoLabel = hasUst ? `<span style="font-size:10px;color:var(--sub);font-family:var(--mono)">brutto</span>` : '';
+    return `<div class="rech-card" onclick="openAngForm('${a.id}')" style="flex-direction:column;align-items:stretch;gap:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="rech-card-avatar ${st.cls}" style="width:38px;height:38px;border-radius:var(--r);font-size:16px">
           <i class="${st.icon}"></i>
         </div>
-        <div class="rech-card-info">
-          <div class="rech-card-nr">${a.nr||'—'}</div>
-          <div class="rech-card-kunde">${a.kunde||'—'}</div>
-          <div class="rech-card-meta">
-            <span>${fd(a.datum)}</span>
-            ${a.gueltig ? `<span>·</span><span style="${isExp?'color:var(--yellow);font-weight:700':''}">Gültig bis ${fd(a.gueltig)}</span>` : ''}
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--sub)">${a.nr||'—'}</span>
+            <span class="rech-card-status ${st.pill}" style="font-size:10px;padding:2px 6px">
+              ${st.label}
+            </span>
           </div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.kunde||'Kein Kunde'}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)">${fmt(a.betrag)}</div>
+          ${nettoLabel}
         </div>
       </div>
-      <div class="rech-card-right">
-        <div class="rech-card-betrag">${fmt(a.betrag)}</div>
-        <div class="rech-card-status ${st.pill}">
-          <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
-        </div>
-        <div class="rech-card-actions" onclick="event.stopPropagation()">
-          <button class="rca-btn" onclick="openAngForm('${a.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-          <button class="rca-btn" onclick="angDruck('${a.id}')" title="Drucken"><i class="fas fa-print"></i></button>
-          <button class="rca-btn rca-green" onclick="angZuRechnung('${a.id}')" title="Als Rechnung"><i class="fas fa-file-invoice"></i></button>
-          <button class="rca-btn" onclick="delAng('${a.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
-        </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub);padding-top:8px;border-top:1px solid var(--border)">
+        <span><i class="fas fa-calendar" style="width:12px;opacity:.5"></i> ${fd(a.datum)}</span>
+        <span><i class="fas fa-clock" style="width:12px;opacity:.5"></i> ${ageLabel}</span>
+        ${posCount ? `<span><i class="fas fa-list" style="width:12px;opacity:.5"></i> ${posCount} Position${posCount!==1?'en':''}</span>` : ''}
+        ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}"><i class="fas fa-hourglass-half" style="width:12px;opacity:.5"></i> bis ${fd(a.gueltig)}</span>` : ''}
+        <span style="margin-left:auto;display:flex;gap:3px" onclick="event.stopPropagation()">
+          <button class="rca-btn" onclick="angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="fas fa-print" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-green" onclick="angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="fas fa-file-invoice" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-red" onclick="delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><i class="fas fa-trash" style="font-size:11px"></i></button>
+        </span>
       </div>
+      ${expiryHtml}
     </div>`;
   }).join('');
 

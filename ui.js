@@ -34,12 +34,14 @@ function editE(e,id){
     if(en.mwstRate>0) setMwstRate(en.mwstRate);
     else if(en.vorsteuerRate>0) setMwstRate(en.vorsteuerRate);
     calcNfMwst();
-    // Change button text for edit mode
+    // Change button text and subtitle for edit mode
     const saveBtn=document.getElementById('btn-add-bezahlt');
     if(saveBtn){
       saveBtn.innerHTML='<i class="fas fa-save"></i> Korrektur speichern';
       saveBtn.onclick=function(){ saveEditFromForm(); };
     }
+    const sub=document.getElementById('neu-form-sub');
+    if(sub) sub.textContent='GoBD-konforme Korrektur · Storno + Neubuchung';
   },50);
 }
 function setEditTyp(t, skipKat=false){

@@ -301,7 +301,7 @@
 <div class="page-inner">
 
   <div class="ph">
-    <div class="ph-left"><div class="ph-title">Einträge</div></div>
+    <div class="ph-left"><div class="ph-title">Einträge</div><div class="ph-sub">Alle Buchungen · Einnahmen & Ausgaben</div></div>
     <div class="ph-right">
       <button class="btn primary" onclick="openNeuEintrag()"><i class="fas fa-plus"></i> Neuer Eintrag</button>
     </div>
@@ -439,7 +439,7 @@
 
   <!-- Шапка как у Rechnungen -->
   <div class="ph">
-    <div class="ph-left"><div class="ph-title" id="neu-form-title">Neuer Eintrag</div></div>
+    <div class="ph-left"><div class="ph-title" id="neu-form-title">Neuer Eintrag</div><div class="ph-sub" id="neu-form-sub">Einnahme oder Ausgabe erfassen</div></div>
     <div class="ph-right">
       <button class="btn" onclick="closeNeuEintrag()"><i class="fas fa-arrow-left"></i></button>
     </div>
@@ -664,7 +664,7 @@
 <div class="page" id="p-bericht">
 <div class="page-inner">
   <div class="ph">
-    <div class="ph-left"><div class="ph-title">Monatsbericht</div></div>
+    <div class="ph-left"><div class="ph-title">Monatsbericht</div><div class="ph-sub">Monatsübersicht · Jahresvergleich</div></div>
     <div class="ph-right">
       <select id="rep-yr" onchange="renderRep()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--mono)"></select>
       <button class="csv" onclick="exportRepCSV()"><span class="mob-hide">Jahresbericht </span>CSV <i class="fa-solid fa-download"></i></button>
@@ -813,7 +813,7 @@
 <div class="page" id="p-angebote">
 <div class="page-inner">
   <div class="ph">
-    <div class="ph-left"><div class="ph-title">Angebote</div></div>
+    <div class="ph-left"><div class="ph-title">Angebote</div><div class="ph-sub">Kostenvoranschläge erstellen und verwalten</div></div>
     <div class="ph-right">
       <button class="btn primary" onclick="openAngForm(null)"><i class="fas fa-plus"></i> Angebot erstellen</button>
     </div>
@@ -846,6 +846,7 @@
   <div class="ang-sticky-header">
     <div class="ang-sticky-left">
       <div id="ang-form-title" class="ang-sticky-title">Angebot bearbeiten</div>
+      <div id="ang-form-sub" style="font-size:12px;color:var(--muted);margin-top:2px">Angebot erstellen und an Kunden senden</div>
     </div>
     <div class="ang-sticky-right">
       <button class="btn" onclick="angDruck(null)"><i class="fas fa-print"></i><span class="ang-btn-txt"> Drucken</span></button>
@@ -1012,7 +1013,7 @@
 <div class="page" id="p-rechnungen">
 <div class="page-inner">
   <div class="ph">
-    <div class="ph-left"><div class="ph-title">Rechnungen</div></div>
+    <div class="ph-left"><div class="ph-title">Rechnungen</div><div class="ph-sub">Rechnungen erstellen · Zahlungsstatus verfolgen</div></div>
     <div class="ph-right">
       <button class="btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i> Firmenprofil</button>
       <button class="btn primary" onclick="openRechModal()"><i class="fas fa-plus"></i> Rechnung erstellen</button>
@@ -1073,25 +1074,33 @@
 <div class="page" id="p-wiedform">
 <div class="page-inner">
   <div class="ph">
-    <div class="ph-left"><div class="ph-title" id="wied-form-title">Neue Vorlage</div></div>
+    <div class="ph-left">
+      <div class="ph-title" id="wied-form-title">Neue Vorlage</div>
+      <div class="ph-sub">Wiederkehrende Ein- und Ausgaben automatisch buchen</div>
+    </div>
     <div class="ph-right">
       <button class="btn primary" onclick="saveWied()"><i class="fas fa-save"></i> Speichern</button>
       <button class="btn" onclick="closeWiedForm()"><i class="fas fa-arrow-left"></i> Zurück</button>
     </div>
   </div>
 
-  <div class="form-panel" style="border:1px solid var(--border);padding:20px;max-width:640px">
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;max-width:960px">
+
+  <!-- Left: Main form -->
+  <div>
+  <div class="form-panel" style="border:1px solid var(--border);padding:20px">
     <div class="typ-toggle" style="margin-bottom:16px">
       <button class="tt ae" id="wied-btn-e" onclick="setWiedTyp('Einnahme')">Einnahme</button>
       <button class="tt" id="wied-btn-a" onclick="setWiedTyp('Ausgabe')">Ausgabe</button>
     </div>
-    <div class="fg"><label>Bezeichnung</label><input type="text" id="wied-dsc" placeholder="z.B. Miete Büro, Telefonrechnung..."></div>
+    <div class="fg"><label>Bezeichnung</label><input type="text" id="wied-dsc" placeholder="z.B. Miete Büro, Telefonrechnung, Hosting..."></div>
     <div class="fgrow c2">
       <div class="fg"><label>Betrag (€)</label><input type="number" id="wied-bet" step="0.01" min="0.01" placeholder="0,00"></div>
       <div class="fg"><label>Intervall</label>
         <select id="wied-int">
           <option value="monatlich">Monatlich</option>
           <option value="quartalsweise">Quartalsweise</option>
+          <option value="halbjaehrlich">Halbjährlich</option>
           <option value="jaehrlich">Jährlich</option>
         </select>
       </div>
@@ -1105,8 +1114,67 @@
         </select>
       </div>
     </div>
-    <div class="fg"><label>Erste Buchung ab</label><input type="date" id="wied-ab"></div>
+    <div class="fgrow c2">
+      <div class="fg"><label>Erste Buchung ab</label><input type="date" id="wied-ab"></div>
+      <div class="fg"><label>Enddatum <span style="font-size:10px;color:var(--sub)">(optional)</span></label><input type="date" id="wied-bis" placeholder="Unbegrenzt"></div>
+    </div>
+    <div class="fg"><label>Notiz <span style="font-size:10px;color:var(--sub)">(optional)</span></label><textarea id="wied-notiz" placeholder="Vertragsnummer, Kündigungsfrist, Anmerkungen..." style="min-height:60px"></textarea></div>
   </div>
+  </div>
+
+  <!-- Right: Info sidebar -->
+  <div style="position:sticky;top:20px">
+    <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1);margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px"><i class="fas fa-info-circle"></i> Hochrechnung</div>
+      <div id="wied-calc-info" style="font-size:13px;color:var(--text);line-height:1.6">
+        <div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben für eine Vorschau</div>
+      </div>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px"><i class="fas fa-lightbulb"></i> Hinweis</div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.6">
+        Fällige Buchungen werden beim Start automatisch erkannt. Sie können jederzeit mit einem Klick gebucht oder übersprungen werden.
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /grid -->
+
+  <!-- Live preview script -->
+  <script>
+  (function(){
+    function updateWiedCalc(){
+      const el=document.getElementById('wied-calc-info');
+      if(!el) return;
+      const bet=parseFloat(document.getElementById('wied-bet')?.value)||0;
+      const intv=document.getElementById('wied-int')?.value||'monatlich';
+      if(!bet){el.innerHTML='<div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben für eine Vorschau</div>';return;}
+      const mult={monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
+      const labels={monatlich:'Monat',quartalsweise:'Quartal',halbjaehrlich:'Halbjahr',jaehrlich:'Jahr'};
+      const perYear=bet*(mult[intv]||12);
+      const perMonth=perYear/12;
+      el.innerHTML=`
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--sub)">Pro ${labels[intv]||'Monat'}</span>
+          <span style="font-family:var(--mono);font-weight:700">${bet.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--sub)">Pro Monat</span>
+          <span style="font-family:var(--mono);font-weight:600">${perMonth.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0">
+          <span style="color:var(--sub);font-weight:600">Pro Jahr</span>
+          <span style="font-family:var(--mono);font-weight:700;font-size:15px">${perYear.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+        </div>`;
+    }
+    document.addEventListener('input',function(e){
+      if(e.target.id==='wied-bet'||e.target.id==='wied-int') updateWiedCalc();
+    });
+    document.addEventListener('change',function(e){
+      if(e.target.id==='wied-int') updateWiedCalc();
+    });
+  })();
+  </script>
 </div>
 </div>
 
@@ -1353,6 +1421,7 @@
   <div class="ang-sticky-header">
     <div class="ang-sticky-left">
       <div id="km-form-title" class="ang-sticky-title">Neuer Kunde</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Kontaktdaten und Firmendaten erfassen</div>
     </div>
     <div class="ang-sticky-right">
       <button class="btn primary" onclick="saveKunde()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
@@ -1395,6 +1464,7 @@
   <div class="ang-sticky-header">
     <div class="ang-sticky-left">
       <div id="ap-form-title" class="ang-sticky-title">Neues Produkt</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Artikel oder Dienstleistung anlegen</div>
     </div>
     <div class="ang-sticky-right">
       <button class="btn" onclick="saveAngProdukt(true)"><span class="ang-btn-txt">Erstellen und neu</span><span class="ang-btn-txt-short" style="display:none">+ Neu</span></button>
@@ -1574,6 +1644,7 @@
   <div class="ang-sticky-header">
     <div class="ang-sticky-left">
       <div id="rn-form-title" class="ang-sticky-title">Rechnung erstellen</div>
+      <div id="rn-form-sub" style="font-size:12px;color:var(--muted);margin-top:2px">Rechnung erstellen und versenden</div>
     </div>
     <div class="ang-sticky-right">
       <button class="btn" onclick="druckRechnung()"><i class="fas fa-print"></i><span class="ang-btn-txt"> Drucken</span></button>
