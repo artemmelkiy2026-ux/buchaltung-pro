@@ -2137,9 +2137,9 @@ input, select, textarea {
 /* Секция-блок — чистый стиль как sevdesk */
 .ang-block {
   background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  padding: 18px 20px;
+
+  
+
   margin-bottom: 10px;
 }
 
@@ -2222,7 +2222,6 @@ input, select, textarea {
 }
 .ang-totals {
   min-width: 300px;
-  border: 1px solid var(--border);
   border-radius: var(--r2);
   overflow: hidden;
   background: var(--s1);
