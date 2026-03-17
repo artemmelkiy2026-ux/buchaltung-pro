@@ -343,7 +343,7 @@ function updateWiedSidebar(){
       <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${bar}%;background:${pct>50?'var(--red)':pct>25?'var(--yellow)':'var(--blue)'};border-radius:3px;transition:width .4s"></div>
       </div>
-      <div style="margin-top:6px;font-size:11px;color:var(--sub)">${fmt(yearCost)} / Jahr von ${fmt(totalRef)} Gesamt</div>`;
+      <div style="margin-top:6px;font-size:12px;color:var(--sub)">${fmt(yearCost)} / Jahr von ${fmt(totalRef)} Gesamt</div>`;
   } else if(budgetEl){budgetEl.innerHTML='—';}
 }
 
