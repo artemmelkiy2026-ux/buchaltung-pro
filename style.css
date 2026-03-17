@@ -2230,7 +2230,7 @@ input, select, textarea {
   display: flex;
   justify-content: space-between;
   padding: 10px 16px;
-  font-size: 13px;
+  font-size: 14px;
   border-bottom: 1px solid var(--border);
 }
 .ang-total-row:last-child { border-bottom: none; }
