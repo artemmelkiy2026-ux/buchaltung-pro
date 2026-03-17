@@ -51,18 +51,18 @@ function renderWied(){
     const isEin=w.typ==='Einnahme';
     return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}">
       <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
-        <span class="material-symbols-outlined">${isPaused?'pause':isEin?'arrow_upward':'arrow_downward'}</span>
+        <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
       </div>
       <div class="wied-card-body">
         <div class="wied-card-name">${w.bezeichnung}${isFaellig?` <span class="wied-faellig-badge">● Fällig</span>`:''}${isPaused?' <span style="font-size:10px;font-weight:600;color:var(--sub);background:var(--s2);padding:1px 6px;border-radius:3px">Pausiert</span>':''}</div>
         <div class="wied-card-meta">
-          <span><span class="material-symbols-outlined" style="font-size:16px;margin-right:2px">label</span>${w.kategorie}</span>
-          <span><span class="material-symbols-outlined" style="font-size:16px;margin-right:2px">sync</span>${intervallLabel[w.intervall]||w.intervall}</span>
-          <span><span class="material-symbols-outlined" style="font-size:16px;margin-right:2px">credit_card</span>${w.zahlungsart}</span>
-          ${w.anbieter?`<span style="color:var(--blue)"><span class="material-symbols-outlined" style="font-size:16px;margin-right:2px">business</span>${w.anbieter}</span>`:''}
+          <span><i class="fas fa-tag" style="font-size:10px;margin-right:2px"></i>${w.kategorie}</span>
+          <span><i class="fas fa-sync-alt" style="font-size:10px;margin-right:2px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
+          <span><i class="fas fa-credit-card" style="font-size:10px;margin-right:2px"></i>${w.zahlungsart}</span>
+          ${w.anbieter?`<span style="color:var(--blue)"><i class="fas fa-building" style="font-size:10px;margin-right:2px"></i>${w.anbieter}</span>`:''}
         </div>
         <div class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
-          <span class="material-symbols-outlined" style="font-size:16px;margin-right:3px">event</span>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
+          <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
           ${w.enddatum?`<span style="margin-left:6px;font-size:10px;color:var(--sub)">bis ${fdm(w.enddatum)}</span>`:''}
         </div>
       </div>
@@ -71,9 +71,9 @@ function renderWied(){
           ${isEin?'+':'−'}${fmt(w.betrag)}
         </div>
         <div class="wied-card-actions">
-          <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><span class="material-symbols-outlined">play_arrow</span></button>
-          <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><span class="material-symbols-outlined">edit</span></button>
-          <button class="rca-btn" onclick="delWied('${w.id}')" title="Vorlage löschen"><span class="material-symbols-outlined">delete</span></button>
+          <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
+          <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+          <button class="rca-btn" onclick="delWied('${w.id}')" title="Vorlage löschen"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>`;
@@ -409,7 +409,7 @@ function wBuchen(id){
   if(!newE) return;
   renderAll(); renderWied();
   const w=data.wiederkehrend.find(x=>x.id===id);
-  toast(`<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> ${newE.beschreibung} gebucht!`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${newE.beschreibung} gebucht!`, 'ok');
 }
 
 function wBuchenAlle(){
@@ -420,7 +420,7 @@ function wBuchenAlle(){
   faellig.forEach(w=>wBuchenCore(w.id));
   // Один рендер после всех
   renderAll(); renderWied();
-  toast(`<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> ${faellig.length} Zahlungen gebucht!`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} Zahlungen gebucht!`, 'ok');
 }
 async function delWied(id){const _okW=await appConfirm('Vorlage wirklich löschen?',{title:'Vorlage löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_okW)return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
 
@@ -701,7 +701,7 @@ function openMonatDetail(yr, mi){
   const monName = MN[parseInt(mi)-1];
   _monLabel = `${monName} ${yr}`;
 
-  document.getElementById('mon-modal-title').innerHTML = `<span class="material-symbols-outlined">event</span> ${_monLabel}`;
+  document.getElementById('mon-modal-title').innerHTML = `<i class="fas fa-calendar-alt"></i> ${_monLabel}`;
 
   const ein=sum(entries,'Einnahme'), aus=sum(entries,'Ausgabe'), gew=ein-aus;
   document.getElementById('mon-modal-stats').innerHTML=`
@@ -726,7 +726,7 @@ function openMonatDetail(yr, mi){
     document.getElementById('mon-modal-tbody').innerHTML=entries.map(e=>`
       <tr style="border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
         <td style="padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--sub)">${fdm(e.datum)}</td>
-        <td style="padding:8px 12px"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<span class="material-symbols-outlined" style="color:var(--green)">arrow_upward</span>':'<span class="material-symbols-outlined" style="color:var(--red)">arrow_downward</span>'}</span></td>
+        <td style="padding:8px 12px"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}</span></td>
         <td class="mob-hide" style="padding:8px 12px;font-size:12px;color:var(--sub)">${e.kategorie}</td>
         <td class="mob-hide" style="padding:8px 12px;font-size:12px">${e.beschreibung}${e.notiz?` <span title="${e.notiz}" style="color:var(--sub);font-size:10px">[PDF]</span>`:''}</td>
         <td class="mob-hide" style="padding:8px 12px"><span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span></td>
@@ -874,5 +874,5 @@ ${rows}
   a.href=URL.createObjectURL(blob);
   a.download=`buchaltung_${_monLabel.replace(' ','_')}.xls`;
   a.click();
-  toast(`<span class="material-symbols-outlined">bar_chart</span> Excel — ${_monLabel} exportiert`,'ok');
+  toast(`<i class="fas fa-chart-bar"></i> Excel — ${_monLabel} exportiert`,'ok');
 }

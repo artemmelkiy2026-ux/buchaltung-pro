@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MelaLogic — PIN</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
@@ -87,7 +87,7 @@ body {
     <button class="pin-btn" onclick="pinPress('8')">8</button>
     <button class="pin-btn" onclick="pinPress('9')">9</button>
     <button class="pin-btn" id="pin-bio-btn" onclick="pinBiometric()" style="font-size:20px;display:none">
-      <span class="material-symbols-outlined">fingerprint</span>
+      <i class="fa-solid fa-fingerprint"></i>
     </button>
     <button class="pin-btn" onclick="pinPress('0')">0</button>
     <button class="pin-btn" onclick="pinBackspace()" style="font-size:18px"><</button>
@@ -158,12 +158,12 @@ function initBio() {
   const isWindows = /Windows/.test(ua);
   const isMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
 
-  let iconClass = 'fingerprint';
-  if (isIOS) iconClass = 'mood';
-  else if (isMac) iconClass = 'fingerprint';
-  else if (isWindows) iconClass = 'fingerprint';
+  let iconClass = 'fa-solid fa-fingerprint';
+  if (isIOS) iconClass = 'fa-solid fa-face-smile';
+  else if (isMac) iconClass = 'fa-brands fa-apple';
+  else if (isWindows) iconClass = 'fa-brands fa-windows';
 
-  btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:24px">${iconClass}</span>`;
+  btn.innerHTML = `<i class="${iconClass}"></i>`;
   btn.style.display = '';
 }
 
@@ -178,7 +178,7 @@ async function pinBiometric() {
   }
 
   if (!window.PublicKeyCredential) {
-    document.getElementById('pin-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> Biometrie wird von diesem Browser nicht unterstützt';
+    document.getElementById('pin-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie wird von diesem Browser nicht unterstützt';
     setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 2500);
     return;
   }
@@ -220,17 +220,17 @@ async function pinBiometric() {
     if (e.name === 'NotAllowedError') {
       // Пользователь отменил — ничего не показываем
     } else if (e.name === 'SecurityError') {
-      document.getElementById('pin-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> Biometrie nur über HTTPS verfügbar';
+      document.getElementById('pin-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie nur über HTTPS verfügbar';
       setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
     } else if (e.name === 'InvalidStateError' || e.name === 'NotFoundError') {
       // Ключ не найден — убираем биометрию, просим PIN
       localStorage.removeItem('bp_bio_id');
       localStorage.removeItem('bp_bio_login');
       document.getElementById('pin-bio-btn').style.display = 'none';
-      document.getElementById('pin-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> Biometrie zurückgesetzt — bitte PIN eingeben';
+      document.getElementById('pin-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie zurückgesetzt — bitte PIN eingeben';
       setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
     } else {
-      document.getElementById('pin-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> Biometrie fehlgeschlagen — bitte PIN eingeben';
+      document.getElementById('pin-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie fehlgeschlagen — bitte PIN eingeben';
       setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 2500);
     }
   }
@@ -269,7 +269,7 @@ async function checkPin() {
     for (let i = 0; i < 4; i++) {
       document.getElementById('pin-dot-' + i).classList.add('error');
     }
-    document.getElementById('pin-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Falscher PIN';
+    document.getElementById('pin-error').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falscher PIN';
     setTimeout(() => {
       updateDots();
       document.getElementById('pin-error').textContent = '';

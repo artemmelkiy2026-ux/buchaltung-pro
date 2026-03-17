@@ -6,7 +6,7 @@
 <link rel="icon" type="image/x-icon" href="https://artemmelkiy2026-ux.github.io/buchaltung-pro/favicon.ico">
 <title>MelaLogic — Kleinunternehmer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="auth.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -67,19 +67,19 @@
      ══════════════════════════════════════════════════════════ -->
 <nav id="mob-bottom-nav">
   <button class="mob-tab active" id="mobt-dashboard" onclick="mobNav('dashboard',this)">
-    <span class="tab-ic"><span class="material-symbols-outlined">home</span></span><span class="tab-lbl">Dashboard</span>
+    <span class="tab-ic"><i class="fas fa-home"></i></span><span class="tab-lbl">Dashboard</span>
   </button>
   <button class="mob-tab" id="mobt-eintraege" onclick="mobNav('eintraege',this)">
-    <span class="tab-ic"><span class="material-symbols-outlined">list</span></span><span class="tab-lbl">Einträge</span>
+    <span class="tab-ic"><i class="fas fa-list"></i></span><span class="tab-lbl">Einträge</span>
   </button>
   <button class="mob-tab" id="mobt-neu" onclick="openNeuEintrag()">
-    <span class="tab-ic mob-plus-ic"><span class="material-symbols-outlined">add</span></span><span class="tab-lbl">Neu</span>
+    <span class="tab-ic mob-plus-ic"><i class="fa-solid fa-plus"></i></span><span class="tab-lbl">Neu</span>
   </button>
   <button class="mob-tab" id="mobt-rechnungen" onclick="mobNav('rechnungen',this)">
-    <span class="tab-ic"><span class="material-symbols-outlined">description</span></span><span class="tab-lbl">Rechnungen</span>
+    <span class="tab-ic"><i class="fas fa-file-invoice"></i></span><span class="tab-lbl">Rechnungen</span>
   </button>
   <button class="mob-tab more-tab" onclick="openMobDrawer()">
-    <span class="tab-ic"><span class="material-symbols-outlined">menu</span></span><span class="tab-lbl">Mehr</span>
+    <span class="tab-ic"><i class="fas fa-bars"></i></span><span class="tab-lbl">Mehr</span>
   </button>
 </nav>
 
@@ -91,9 +91,9 @@
   <!-- Buchhaltung -->
   <div class="mob-drawer-group">
     <div class="mob-drawer-group-header" onclick="toggleMobGroup(this)">
-      <span class="mob-drawer-group-icon"><span class="material-symbols-outlined">edit</span></span>
+      <span class="mob-drawer-group-icon"><i class="fas fa-pen"></i></span>
       <span>Buchhaltung</span>
-      <span class="material-symbols-outlined mob-drawer-arrow">chevron_right</span>
+      <i class="fas fa-chevron-right mob-drawer-arrow"></i>
     </div>
     <div class="mob-drawer-group-body">
       <div class="mob-drawer-child" onclick="mobNavDrawer('eintraege')">Einträge</div>
@@ -104,9 +104,9 @@
   <!-- Aufträge -->
   <div class="mob-drawer-group">
     <div class="mob-drawer-group-header" onclick="toggleMobGroup(this)">
-      <span class="mob-drawer-group-icon"><span class="material-symbols-outlined">description</span></span>
+      <span class="mob-drawer-group-icon"><i class="fas fa-file-invoice"></i></span>
       <span>Aufträge</span>
-      <span class="material-symbols-outlined mob-drawer-arrow">chevron_right</span>
+      <i class="fas fa-chevron-right mob-drawer-arrow"></i>
     </div>
     <div class="mob-drawer-group-body">
       <div class="mob-drawer-child" onclick="mobNavDrawer('angebote')">Angebote</div>
@@ -117,9 +117,9 @@
   <!-- Kontakte -->
   <div class="mob-drawer-group">
     <div class="mob-drawer-group-header" onclick="toggleMobGroup(this)">
-      <span class="mob-drawer-group-icon"><span class="material-symbols-outlined">contacts</span></span>
+      <span class="mob-drawer-group-icon"><i class="fas fa-address-book"></i></span>
       <span>Kontakte</span>
-      <span class="material-symbols-outlined mob-drawer-arrow">chevron_right</span>
+      <i class="fas fa-chevron-right mob-drawer-arrow"></i>
     </div>
     <div class="mob-drawer-group-body">
       <div class="mob-drawer-child" onclick="mobNavDrawer('kunden')">Kunden (CRM)</div>
@@ -130,9 +130,9 @@
   <!-- Auswertung -->
   <div class="mob-drawer-group">
     <div class="mob-drawer-group-header" onclick="toggleMobGroup(this)">
-      <span class="mob-drawer-group-icon"><span class="material-symbols-outlined">bar_chart</span></span>
+      <span class="mob-drawer-group-icon"><i class="fas fa-chart-bar"></i></span>
       <span>Auswertung</span>
-      <span class="material-symbols-outlined mob-drawer-arrow">chevron_right</span>
+      <i class="fas fa-chevron-right mob-drawer-arrow"></i>
     </div>
     <div class="mob-drawer-group-body">
       <div class="mob-drawer-child" onclick="mobNavDrawer('bericht')">Monatsbericht</div>
@@ -145,9 +145,9 @@
   <!-- GoBD & Finanzamt -->
   <div class="mob-drawer-group">
     <div class="mob-drawer-group-header" onclick="toggleMobGroup(this)">
-      <span class="mob-drawer-group-icon"><span class="material-symbols-outlined">account_balance</span></span>
+      <span class="mob-drawer-group-icon"><i class="fas fa-landmark"></i></span>
       <span>GoBD &amp; Finanzamt</span>
-      <span class="material-symbols-outlined mob-drawer-arrow">chevron_right</span>
+      <i class="fas fa-chevron-right mob-drawer-arrow"></i>
     </div>
     <div class="mob-drawer-group-body">
       <div class="mob-drawer-child" onclick="mobNavDrawer('journal')">Journal</div>
@@ -160,11 +160,11 @@
 
   <!-- Profil & Abmelden -->
   <div class="mob-drawer-group-header" onclick="closeMobDrawer();location.href='profile.html'" style="color:var(--sub)">
-    <span class="mob-drawer-group-icon"><span class="material-symbols-outlined">person</span></span>
+    <span class="mob-drawer-group-icon"><i class="fas fa-user"></i></span>
     <span>Profil & Einstellungen</span>
   </div>
   <div class="mob-drawer-group-header" onclick="closeMobDrawer();sbSignOut()" style="color:var(--sub)">
-    <span class="mob-drawer-group-icon"><span class="material-symbols-outlined">logout</span></span>
+    <span class="mob-drawer-group-icon"><i class="fas fa-right-from-bracket"></i></span>
     <span>Abmelden</span>
   </div>
 
@@ -186,14 +186,14 @@
   </div>
 
   <!-- Dashboard -->
-  <div class="nav-item active" onclick="nav('dashboard',this)"><span class="ic"><span class="material-symbols-outlined">home</span></span> Dashboard</div>
+  <div class="nav-item active" onclick="nav('dashboard',this)"><span class="ic"><i class="fas fa-home"></i></span> Dashboard</div>
   <div class="nav-divider"></div>
 
   <!-- Buchhaltung — раскрывающаяся группа -->
   <div class="nav-group-header" id="buchen-header" onclick="toggleNavGroup('buchen-group','buchen-header')">
-    <span class="nav-group-icon"><span class="material-symbols-outlined">edit</span></span>
+    <span class="nav-group-icon"><i class="fas fa-pen"></i></span>
     <span class="nav-group-label">Buchhaltung</span>
-    <span class="material-symbols-outlined nav-group-arrow">chevron_right</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
   </div>
   <div class="nav-group-children" id="buchen-group">
     <div class="nav-item nav-child" onclick="nav('eintraege',this)">Einträge</div>
@@ -202,9 +202,9 @@
 
   <!-- Aufträge — раскрывающаяся группа -->
   <div class="nav-group-header" id="auftraege-header" onclick="toggleNavGroup('auftraege-group','auftraege-header')">
-    <span class="nav-group-icon"><span class="material-symbols-outlined">description</span></span>
+    <span class="nav-group-icon"><i class="fas fa-file-invoice"></i></span>
     <span class="nav-group-label">Aufträge</span>
-    <span class="material-symbols-outlined nav-group-arrow">chevron_right</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
   </div>
   <div class="nav-group-children" id="auftraege-group">
     <div class="nav-item nav-child" onclick="nav('angebote',this)">Angebote</div>
@@ -213,9 +213,9 @@
 
   <!-- Kontakte — раскрывающаяся группа -->
   <div class="nav-group-header" id="kontakte-header" onclick="toggleNavGroup('kontakte-group','kontakte-header')">
-    <span class="nav-group-icon"><span class="material-symbols-outlined">contacts</span></span>
+    <span class="nav-group-icon"><i class="fas fa-address-book"></i></span>
     <span class="nav-group-label">Kontakte</span>
-    <span class="material-symbols-outlined nav-group-arrow">chevron_right</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
   </div>
   <div class="nav-group-children" id="kontakte-group">
     <div class="nav-item nav-child" onclick="nav('kunden',this)">Kunden (CRM)</div>
@@ -224,9 +224,9 @@
 
   <!-- Auswertung — раскрывающаяся группа -->
   <div class="nav-group-header" id="auswertung-header" onclick="toggleNavGroup('auswertung-group','auswertung-header')">
-    <span class="nav-group-icon"><span class="material-symbols-outlined">bar_chart</span></span>
+    <span class="nav-group-icon"><i class="fas fa-chart-bar"></i></span>
     <span class="nav-group-label">Auswertung</span>
-    <span class="material-symbols-outlined nav-group-arrow">chevron_right</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
   </div>
   <div class="nav-group-children" id="auswertung-group">
     <div class="nav-item nav-child" onclick="nav('bericht',this)">Monatsbericht</div>
@@ -237,9 +237,9 @@
 
   <!-- GoBD & Finanzamt — раскрывающаяся группа -->
   <div class="nav-group-header" id="gobd-header" onclick="toggleNavGroup('gobd-group','gobd-header')">
-    <span class="nav-group-icon"><span class="material-symbols-outlined">account_balance</span></span>
+    <span class="nav-group-icon"><i class="fas fa-landmark"></i></span>
     <span class="nav-group-label">GoBD &amp; Finanzamt</span>
-    <span class="material-symbols-outlined nav-group-arrow">chevron_right</span>
+    <i class="fas fa-chevron-right nav-group-arrow"></i>
   </div>
   <div class="nav-group-children" id="gobd-group">
     <div class="nav-item nav-child" onclick="nav('journal',this)">Journal</div>
@@ -252,10 +252,10 @@
   <!-- Bottom: Profile & Logout -->
   <div style="padding:10px 8px;display:flex;flex-direction:column;gap:2px">
     <div class="nav-item" onclick="location.href='profile.html'" style="font-size:14px;color:var(--sub)">
-      <span class="ic"><span class="material-symbols-outlined">person</span></span> Profil
+      <span class="ic"><i class="fas fa-user"></i></span> Profil
     </div>
     <div class="nav-item" onclick="sbSignOut()" style="font-size:14px;color:var(--sub)">
-      <span class="ic"><span class="material-symbols-outlined">logout</span></span> Abmelden
+      <span class="ic"><i class="fas fa-right-from-bracket"></i></span> Abmelden
     </div>
   </div>
 
@@ -291,7 +291,7 @@
   <!-- Chart -->
   <div style="background:var(--s1);border-radius:var(--r2);padding:5px;margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub)"><span class="material-symbols-outlined">show_chart</span> Monatsverlauf</span>
+      <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--sub)"><i class="fas fa-chart-line"></i> Monatsverlauf</span>
   
     </div>
     <div id="d-chart-container" style="position:relative;height:300px;margin-top:12px;margin-bottom:20px">
@@ -323,7 +323,7 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Einträge</div><div class="ph-sub">Alle Buchungen · Einnahmen & Ausgaben</div></div>
     <div class="ph-right">
-      <button class="btn primary" onclick="openNeuEintrag()"><span class="material-symbols-outlined">add</span> Neuer Eintrag</button>
+      <button class="btn primary" onclick="openNeuEintrag()"><i class="fas fa-plus"></i> Neuer Eintrag</button>
     </div>
   </div>
 
@@ -360,11 +360,11 @@
       </select>
     </div>
     <div class="toolbar-group">
-      <label><span class="material-symbols-outlined">search</span></label>
+      <label><i class="fas fa-search"></i></label>
       <input type="text" id="f-q" placeholder="Suche..." oninput="renderEin()" style="width:140px">
     </div>
-    <button class="csv" onclick="exportCSV()"><span class="material-symbols-outlined">download</span> CSV</button>
-    <button class="csv" onclick="exportPDF()" style="background:var(--blue);color:#fff"><span class="material-symbols-outlined">picture_as_pdf</span> PDF</button>
+    <button class="csv" onclick="exportCSV()"><i class="fa-solid fa-download"></i> CSV</button>
+    <button class="csv" onclick="exportPDF()" style="background:var(--blue);color:#fff"><i class="fa-solid fa-file-pdf"></i> PDF</button>
   </div>
 
   <!-- Sort bar -->
@@ -387,7 +387,7 @@
   </div>
   <div id="e-tbody"></div>
   <div id="e-pagination" style="margin-top:8px"></div>
-  <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><span class="material-symbols-outlined">inbox</span></div><p>Keine Einträge gefunden</p></div>
+  <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-inbox"></i></div><p>Keine Einträge gefunden</p></div>
   <!-- Summary -->
   <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;font-family: var(--mono);" id="e-sum">
     <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px">
@@ -426,16 +426,16 @@
   <div style="display:flex;gap:6px;margin-bottom:14px">
     <button id="jtab-eintraege" onclick="setJournalTab('eintraege')"
       style="padding:7px 14px;border-radius:var(--r);font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:var(--blue);color:#fff;transition:all .12s;font-family:inherit">
-      <span class="material-symbols-outlined">list</span> Einträge (GoBD-Storno)
+      <i class="fas fa-list"></i> Einträge (GoBD-Storno)
     </button>
     <button id="jtab-rechnungen" onclick="setJournalTab('rechnungen')"
       style="padding:7px 14px;border-radius:var(--r);font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:;color:;transition:all .12s;font-family:inherit">
-      <span class="material-symbols-outlined">description</span> Rechnungen-Log
+      <i class="fas fa-file-invoice"></i> Rechnungen-Log
     </button>
   </div>
   <div id="journal-eintraege-controls">
     <div style="background:rgba(26,69,120,.06);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px">
-      <span class="material-symbols-outlined">info</span> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
+      <i class="fas fa-info-circle"></i> Einträge können nicht gelöscht werden (GoBD §146). Korrekturen erfolgen durch Storno-Gegenbuchungen.
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
       <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
@@ -446,7 +446,7 @@
   <div id="journal-tbody"></div>
   <div id="journal-pagination"></div>
   <div id="journal-empty" class="empty-state" style="display:none">
-    <div class="ei"><span class="material-symbols-outlined">menu_book</span></div>
+    <div class="ei"><i class="fas fa-book"></i></div>
     <p>Keine Storno-Buchungen vorhanden</p>
     <p style="font-size:12px;color:var(--sub);margin-top:6px">Alle Einträge sind unverändert</p>
   </div>
@@ -461,14 +461,14 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title" id="neu-form-title">Neuer Eintrag</div><div class="ph-sub" id="neu-form-sub">Einnahme oder Ausgabe erfassen</div></div>
     <div class="ph-right">
-      <button class="btn" onclick="closeNeuEintrag()"><span class="material-symbols-outlined">arrow_back</span></button>
+      <button class="btn" onclick="closeNeuEintrag()"><i class="fas fa-arrow-left"></i></button>
     </div>
   </div>
   <!-- ── TOOLBAR ── -->
   <div id="neu-toolbar" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
     <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
-        <span class="material-symbols-outlined" style="color:var(--green);font-size:16px">arrow_upward</span>
+        <i class="fas fa-arrow-up" style="color:var(--green);font-size:11px"></i>
         <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em">Einnahmen</span>
       </div>
       <div id="toolbar-ein-val" style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--mono)">0,00 €</div>
@@ -476,7 +476,7 @@
     </div>
     <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
-        <span class="material-symbols-outlined" style="color:var(--red);font-size:16px">arrow_downward</span>
+        <i class="fas fa-arrow-down" style="color:var(--red);font-size:11px"></i>
         <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em">Ausgaben</span>
       </div>
       <div id="toolbar-aus-val" style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--mono)">0,00 €</div>
@@ -510,7 +510,7 @@
           style="width:100%;padding:12px 16px;background:rgba(59,130,246,.06);border:2px dashed rgba(59,130,246,.35);color:var(--text);font-size:13px;font-weight:600;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .2s,background .2s;box-sizing:border-box;justify-content: center;"
           onmouseover="this.style.borderColor='var(--blue)';this.style.background='rgba(59,130,246,.1)'"
           onmouseout="this.style.borderColor='rgba(59,130,246,.35)';this.style.background='rgba(59,130,246,.06)'">
-          <span class="material-symbols-outlined" style="font-size:20px;color:var(--blue);flex:0 0 auto">photo_camera</span>
+          <i class="fas fa-camera" style="font-size:20px;color:var(--blue);flex:0 0 auto"></i>
           <span style="display:flex;flex-direction:column;align-items:flex-start;gap:1px">
             <span>Beleg / Rechnung scannen</span>
             <span style="font-size:11px;font-weight:400;color:var(--sub)">Foto hochladen oder Kamera öffnen</span>
@@ -524,7 +524,7 @@
           <img id="scan-preview-img" style="width:100%;max-height:300px;object-fit:contain;display:block;transition:transform .15s ease;cursor:crosshair" onmousemove="if(window.innerWidth>900){const r=this.getBoundingClientRect();const x=((event.clientX-r.left)/r.width*100).toFixed(1);const y=((event.clientY-r.top)/r.height*100).toFixed(1);this.style.transformOrigin=x+'% '+y+'%';this.style.transform='scale(2)'}" onmouseleave="this.style.transform='';this.style.transformOrigin=''">
           <button onclick="scanBelegCancel()"
             style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px">
-            <span class="material-symbols-outlined">close</span>
+            <i class="fas fa-times"></i>
           </button>
         </div>
         <div style="padding:8px 12px 12px;display:flex;gap:8px">
@@ -584,7 +584,7 @@
                 <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
                 <span id="nf-mwst-rate-label">19%</span>
               </span>
-              <span class="material-symbols-outlined" id="nf-mwst-arrow" style="font-size:16px;color:var(--sub);transition:transform .2s">expand_more</span>
+              <i class="fas fa-chevron-down" id="nf-mwst-arrow" style="font-size:10px;color:var(--sub);transition:transform .2s"></i>
             </button>
             <div id="nf-mwst-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);
               background:var(--s1);border:1px solid var(--border);border-radius:4px;
@@ -628,7 +628,7 @@
     </div>
     <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
       <button class="btn btn-bezahlt" id="btn-add-bezahlt" style="flex:1;min-width:140px;padding:11px;background:var(--green);color:#fff;border-color:var(--green)" onclick="addEintrag(true)">
-        <span class="material-symbols-outlined">check_circle</span> Speichern &amp; Bezahlt
+        <i class="fas fa-check-circle"></i> Speichern &amp; Bezahlt
       </button>
       <button class="btn" style="padding:11px 16px" onclick="clearForm()">✕</button>
     </div>
@@ -641,7 +641,7 @@
     <div>
       <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:#dbe4ec75;border-radius:4px;margin-bottom:10px;">
         <span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">
-          <span class="material-symbols-outlined" style="color:#fff;font-size:16px">arrow_upward</span>
+          <i class="fas fa-arrow-up" style="#fff;font-size:12px"></i>
           Letzte Einnahmen
         </span>
         <span id="letzte-ein-summe" style="font-size:14px;font-weight: 600;"></span>
@@ -657,7 +657,7 @@
     <div>
       <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(239,68,68,.07);border-radius:4px;margin-bottom:10px;">
         <span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">
-          <span class="material-symbols-outlined" style="color:var(--red);font-size:16px">arrow_downward</span>
+          <i class="fas fa-arrow-down" style="color:var(--red);font-size:12px"></i>
           Letzte Ausgaben
         </span>
         <span id="letzte-aus-summe" style="font-size:14px;font-weight:600;color:var(--red)"></span>
@@ -672,7 +672,7 @@
 
   <!-- Hinweis Rechnungen -->
   <div style="margin-top:20px;padding:12px 16px;background:var(--bdim);border-radius:var(--r);border:1px solid rgba(30,80,150,.12);font-size:13px;color:var(--sub);line-height:1.6">
-    <span class="material-symbols-outlined" style="color:var(--blue);margin-right:6px">info</span>
+    <i class="fas fa-info-circle" style="color:var(--blue);margin-right:6px"></i>
     Wenn Sie eine Rechnung ausstellen möchten, nutzen Sie dafür den Bereich
     <a href="#" onclick="event.preventDefault();nav('rechnungen',document.querySelector('.nav-item[onclick*=rechnungen]'))" style="color:var(--blue);font-weight:600;text-decoration:none;border-bottom:1px solid var(--blue)">Rechnungen</a>.
   </div>
@@ -687,7 +687,7 @@
     <div class="ph-left"><div class="ph-title">Monatsbericht</div><div class="ph-sub">Monatsübersicht · Jahresvergleich</div></div>
     <div class="ph-right">
       <select id="rep-yr" onchange="renderRep()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--mono)"></select>
-      <button class="csv" onclick="exportRepCSV()"><span class="mob-hide">Jahresbericht </span>CSV <span class="material-symbols-outlined">download</span></button>
+      <button class="csv" onclick="exportRepCSV()"><span class="mob-hide">Jahresbericht </span>CSV <i class="fa-solid fa-download"></i></button>
     </div>
   </div>
 
@@ -736,7 +736,7 @@
   </div>
   <div id="z-tbody"></div>
   <div id="z-pagination" style="margin-top:8px"></div>
-  <div id="z-empty" class="empty-state" style="display:none"><div class="ei"><span class="material-symbols-outlined">credit_card</span></div><p>Keine Einträge</p></div>
+  <div id="z-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-credit-card"></i></div><p>Keine Einträge</p></div>
 </div>
 </div>
 
@@ -758,13 +758,13 @@
 
   <!-- Vorjahresvergleich — на всю ширину -->
   <div style="background:var(--s1);border-radius:var(--r2);margin-bottom:20px">
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><span class="material-symbols-outlined">event</span> Vorjahresvergleich</div>
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><i class="fas fa-calendar-alt"></i> Vorjahresvergleich</div>
     <div id="prog-vergleich"></div>
   </div>
 
   <!-- Hochrechnung KU-Limiten -->
   <div style="background:var(--s1);border-radius:var(--r2)">
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><span class="material-symbols-outlined">speed</span> Kleinunternehmer-Grenzen (§19 UStG)</div>
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:16px"><i class="fas fa-tachometer-alt"></i> Kleinunternehmer-Grenzen (§19 UStG)</div>
     <div id="prog-hochrechnung"></div>
   </div>
 </div>
@@ -830,7 +830,7 @@
       <div class="ph-sub">Kundenverwaltung · Umsatz · Rechnungen</div>
     </div>
     <div class="ph-right">
-      <button class="btn primary" onclick="openKundeModal()"><span class="material-symbols-outlined">add</span> Neuer Kunde</button>
+      <button class="btn primary" onclick="openKundeModal()"><i class="fas fa-plus"></i> Neuer Kunde</button>
     </div>
   </div>
   <!-- Statistik-Cards -->
@@ -845,7 +845,7 @@
   <!-- Kunden Karten -->
   <div id="kunden-list" class="kunden-list"></div>
   <div id="kunden-pagination"></div>
-  <div id="kunden-empty" class="empty-state" style="display:none"><div class="ei"><span class="material-symbols-outlined">group</span></div><p>Keine Kunden vorhanden</p></div>
+  <div id="kunden-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-users"></i></div><p>Keine Kunden vorhanden</p></div>
 </div>
 </div>
 
@@ -855,16 +855,16 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Angebote</div><div class="ph-sub">Kostenvoranschläge erstellen und verwalten</div></div>
     <div class="ph-right">
-      <button class="btn primary" onclick="openAngForm(null)"><span class="material-symbols-outlined">add</span> Angebot erstellen</button>
+      <button class="btn primary" onclick="openAngForm(null)"><i class="fas fa-plus"></i> Angebot erstellen</button>
     </div>
   </div>
   <div id="ang-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px"></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
     <button class="ftab active" onclick="setAngFilter('alle',this)">Alle</button>
-    <button class="ftab" onclick="setAngFilter('offen',this)"><span class="material-symbols-outlined" style="color:var(--yellow)">schedule</span> Offen</button>
-    <button class="ftab" onclick="setAngFilter('angenommen',this)"><span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Angenommen</button>
-    <button class="ftab" onclick="setAngFilter('abgelehnt',this)"><span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Abgelehnt</button>
-    <button class="ftab" onclick="setAngFilter('abgelaufen',this)"><span class="material-symbols-outlined" style="color:var(--sub)">hourglass_bottom</span> Abgelaufen</button>
+    <button class="ftab" onclick="setAngFilter('offen',this)"><i class="fas fa-clock" style="color:var(--yellow)"></i> Offen</button>
+    <button class="ftab" onclick="setAngFilter('angenommen',this)"><i class="fas fa-check-circle" style="color:var(--green)"></i> Angenommen</button>
+    <button class="ftab" onclick="setAngFilter('abgelehnt',this)"><i class="fas fa-times-circle" style="color:var(--red)"></i> Abgelehnt</button>
+    <button class="ftab" onclick="setAngFilter('abgelaufen',this)"><i class="fas fa-hourglass-end" style="color:var(--sub)"></i> Abgelaufen</button>
     <input id="ang-search" type="text" placeholder="Nr. oder Kunde..." oninput="renderAngebote()"
       style="margin-left:auto;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;width:200px">
   </div>
@@ -876,7 +876,7 @@
   </div>
   <div id="ang-list"></div>
   <div id="ang-pagination"></div>
-  <div id="ang-empty" class="empty-state" style="display:none"><div class="ei"><span class="material-symbols-outlined">article</span></div><p>Keine Angebote</p></div>
+  <div id="ang-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-alt"></i></div><p>Keine Angebote</p></div>
 </div>
 </div>
 
@@ -889,9 +889,9 @@
       <div id="ang-form-sub" style="font-size:12px;color:var(--muted);margin-top:2px">Angebot erstellen und an Kunden senden</div>
     </div>
     <div class="ang-sticky-right">
-      <button class="btn" onclick="angDruck(null)"><span class="material-symbols-outlined">print</span><span class="ang-btn-txt"> Drucken</span></button>
-      <button class="btn primary" onclick="saveAng()"><span class="material-symbols-outlined">save</span><span class="ang-btn-txt"> Speichern</span></button>
-      <button class="btn ang-back-btn" onclick="closeAngForm()" title="Zurück"><span class="material-symbols-outlined">arrow_back</span></button>
+      <button class="btn" onclick="angDruck(null)"><i class="fas fa-print"></i><span class="ang-btn-txt"> Drucken</span></button>
+      <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
+      <button class="btn ang-back-btn" onclick="closeAngForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
     </div>
   </div>
 
@@ -909,7 +909,7 @@
             <label>Kunde</label>
             <div style="display:flex;gap:6px">
               <input type="text" id="ang-kunde" placeholder="Kontakt suchen..." oninput="angKundeSearch(this.value)" autocomplete="off" style="flex:1">
-              <button type="button" class="btn" onclick="openKundenPicker('ang')" title="Aus Kundenbuch wählen" style="flex-shrink:0;padding:8px 10px"><span class="material-symbols-outlined">contacts</span></button>
+              <button type="button" class="btn" onclick="openKundenPicker('ang')" title="Aus Kundenbuch wählen" style="flex-shrink:0;padding:8px 10px"><i class="fas fa-address-book"></i></button>
             </div>
             <div id="ang-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
           </div>
@@ -936,16 +936,16 @@
                 <button type="button" id="ang-status-btn" onclick="toggleAngStatusDropdown()"
                   style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 12px;border-radius:var(--r);margin-top:4px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
                   <span id="ang-status-label" style="display:flex;align-items:center;gap:7px">
-                    <span class="material-symbols-outlined" id="ang-status-icon" style="color:var(--yellow);font-size:14px">schedule</span>
+                    <i class="fas fa-clock" id="ang-status-icon" style="color:var(--yellow);font-size:14px"></i>
                     <span id="ang-status-text">Offen</span>
                   </span>
-                  <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
+                  <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
                 <div id="ang-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
-                  <div onclick="setAngStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="material-symbols-outlined" style="color:var(--yellow);font-size:14px;width:14px">schedule</span> Offen</div>
-                  <div onclick="setAngStatus('angenommen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="material-symbols-outlined" style="color:var(--green);font-size:14px;width:14px">check_circle</span> Angenommen</div>
-                  <div onclick="setAngStatus('abgelehnt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="material-symbols-outlined" style="color:var(--red);font-size:14px;width:14px">cancel</span> Abgelehnt</div>
-                  <div onclick="setAngStatus('abgelaufen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="material-symbols-outlined" style="color:var(--sub);font-size:14px;width:14px">hourglass_bottom</span> Abgelaufen</div>
+                  <div onclick="setAngStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:14px;width:14px"></i> Offen</div>
+                  <div onclick="setAngStatus('angenommen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:14px;width:14px"></i> Angenommen</div>
+                  <div onclick="setAngStatus('abgelehnt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-times-circle" style="color:var(--red);font-size:14px;width:14px"></i> Abgelehnt</div>
+                  <div onclick="setAngStatus('abgelaufen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-hourglass-end" style="color:var(--sub);font-size:14px;width:14px"></i> Abgelaufen</div>
                 </div>
               </div>
             </div>
@@ -981,7 +981,7 @@
       </div>
       <div id="ang-pos-list"></div>
       <button class="btn ang-add-pos-btn" onclick="_angAddPos()">
-        <span class="material-symbols-outlined">add</span> Position hinzufügen
+        <i class="fas fa-plus"></i> Position hinzufügen
       </button>
     </div>
 
@@ -1008,9 +1008,9 @@
 
     <!-- Кнопки внизу -->
     <div class="ang-bottom-actions">
-      <button class="btn primary" onclick="saveAng()"><span class="material-symbols-outlined">save</span> Speichern</button>
-      <button class="btn" onclick="angZuRechnung(editAngId||'')"><span class="material-symbols-outlined">description</span> Als Rechnung</button>
-      <button class="btn" onclick="closeAngForm()"><span class="material-symbols-outlined">close</span> Abbrechen</button>
+      <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn" onclick="angZuRechnung(editAngId||'')"><i class="fas fa-file-invoice"></i> Als Rechnung</button>
+      <button class="btn" onclick="closeAngForm()"><i class="fas fa-times"></i> Abbrechen</button>
     </div>
 
   </div>
@@ -1027,7 +1027,7 @@
     <div class="ph-right">
       <input type="text" id="produkte-search" placeholder="Suchen..." oninput="renderProdukte()"
         style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:13px;outline:none;width:200px">
-      <button class="btn primary" onclick="openProduktModal()"><span class="material-symbols-outlined">add</span> Neues Produkt</button>
+      <button class="btn primary" onclick="openProduktModal()"><i class="fas fa-plus"></i> Neues Produkt</button>
     </div>
   </div>
 
@@ -1037,17 +1037,17 @@
   <!-- Фильтр -->
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
     <button class="ftab active" onclick="setProdFilter('alle',this)">Alle</button>
-    <button class="ftab" onclick="setProdFilter('Artikel',this)"><span class="material-symbols-outlined">inventory_2</span> Artikel</button>
-    <button class="ftab" onclick="setProdFilter('Dienstleistung',this)"><span class="material-symbols-outlined">build</span> Dienstleistung</button>
-    <button class="ftab" onclick="setProdFilter('Sonstiges',this)"><span class="material-symbols-outlined">more_horiz</span> Sonstiges</button>
+    <button class="ftab" onclick="setProdFilter('Artikel',this)"><i class="fas fa-box"></i> Artikel</button>
+    <button class="ftab" onclick="setProdFilter('Dienstleistung',this)"><i class="fas fa-tools"></i> Dienstleistung</button>
+    <button class="ftab" onclick="setProdFilter('Sonstiges',this)"><i class="fas fa-ellipsis-h"></i> Sonstiges</button>
   </div>
 
   <!-- Список -->
   <div id="produkte-list"></div>
   <div id="produkte-empty" class="empty-state" style="display:none">
-    <div class="ei"><span class="material-symbols-outlined">unarchive</span></div>
+    <div class="ei"><i class="fas fa-box-open"></i></div>
     <p>Noch keine Produkte oder Leistungen</p>
-    <button class="btn primary" onclick="openProduktModal()"><span class="material-symbols-outlined">add</span> Erstes Produkt anlegen</button>
+    <button class="btn primary" onclick="openProduktModal()"><i class="fas fa-plus"></i> Erstes Produkt anlegen</button>
   </div>
 </div>
 </div>
@@ -1058,16 +1058,16 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Rechnungen</div><div class="ph-sub">Rechnungen erstellen · Zahlungsstatus verfolgen</div></div>
     <div class="ph-right">
-      <button class="btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><span class="material-symbols-outlined">business</span> Firmenprofil</button>
-      <button class="btn primary" onclick="openRechModal()"><span class="material-symbols-outlined">add</span> Rechnung erstellen</button>
+      <button class="btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i> Firmenprofil</button>
+      <button class="btn primary" onclick="openRechModal()"><i class="fas fa-plus"></i> Rechnung erstellen</button>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="rech-cards"></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
     <button class="ftab active" onclick="setRechFilter('alle',this)">Alle</button>
-    <button class="ftab" onclick="setRechFilter('offen',this)"><span class="material-symbols-outlined" style="color:var(--yellow)">schedule</span> Offen</button>
-    <button class="ftab" onclick="setRechFilter('ueberfaellig',this)"><span class="material-symbols-outlined" style="color:var(--red)">error</span> Überfällig</button>
-    <button class="ftab" onclick="setRechFilter('bezahlt',this)"><span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Bezahlt</button>
+    <button class="ftab" onclick="setRechFilter('offen',this)"><i class="fas fa-clock" style="color:var(--yellow)"></i> Offen</button>
+    <button class="ftab" onclick="setRechFilter('ueberfaellig',this)"><i class="fas fa-exclamation-circle" style="color:var(--red)"></i> Überfällig</button>
+    <button class="ftab" onclick="setRechFilter('bezahlt',this)"><i class="fas fa-check-circle" style="color:var(--green)"></i> Bezahlt</button>
     <input id="rech-search" type="text" placeholder="Nr. oder Kunde..." oninput="renderRech()" style="margin-left:auto;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:12px;outline:none;width:200px">
   </div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
@@ -1079,7 +1079,7 @@
   </div>
   <div id="rech-list"></div>
   <div id="rech-pagination"></div>
-  <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><span class="material-symbols-outlined">description</span></div><p>Keine Rechnungen</p></div>
+  <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungen</p></div>
 </div>
 </div>
 
@@ -1092,12 +1092,12 @@
       <div class="ph-sub">Automatisch je Monat / Quartal / Jahr</div>
     </div>
     <div class="ph-right">
-      <button class="btn success" onclick="wBuchenAlle()"><span class="material-symbols-outlined">bolt</span> Alle fälligen buchen</button>
-      <button class="btn primary" onclick="openWiedModal()"><span class="material-symbols-outlined">add</span> Neue Vorlage</button>
+      <button class="btn success" onclick="wBuchenAlle()"><i class="fas fa-bolt"></i> Alle fälligen buchen</button>
+      <button class="btn primary" onclick="openWiedModal()"><i class="fas fa-plus"></i> Neue Vorlage</button>
     </div>
   </div>
   <div style="background:var(--ydim);border:1px solid var(--yellow);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:16px" id="wied-hint" style="display:none">
-    <span class="material-symbols-outlined">lightbulb</span> Beim Programmstart werden fällige Zahlungen automatisch erkannt und können mit einem Klick gebucht werden.
+    <i class="fas fa-lightbulb"></i> Beim Programmstart werden fällige Zahlungen automatisch erkannt und können mit einem Klick gebucht werden.
   </div>
   <!-- Sort bar -->
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
@@ -1109,7 +1109,7 @@
   </div>
   <div id="wied-list" style="display:flex;flex-direction:column;gap:10px"></div>
   <div id="wied-pagination"></div>
-  <div id="wied-empty" class="empty-state" style="display:none"><div class="ei"><span class="material-symbols-outlined">sync</span></div><p>Keine Vorlagen — erstelle wiederkehrende Zahlungen</p></div>
+  <div id="wied-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-sync-alt"></i></div><p>Keine Vorlagen — erstelle wiederkehrende Zahlungen</p></div>
 </div>
 </div>
 
@@ -1122,8 +1122,8 @@
       <div class="ph-sub">Wiederkehrende Ein- und Ausgaben automatisch buchen</div>
     </div>
     <div class="ph-right">
-      <button class="btn primary" onclick="saveWied()"><span class="material-symbols-outlined">save</span> Speichern</button>
-      <button class="btn" onclick="closeWiedForm()"><span class="material-symbols-outlined">arrow_back</span> Zurück</button>
+      <button class="btn primary" onclick="saveWied()"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn" onclick="closeWiedForm()"><i class="fas fa-arrow-left"></i> Zurück</button>
     </div>
   </div>
 
@@ -1307,7 +1307,7 @@
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <label id="ust-lbl-klein" class="ust-mode-lbl" onclick="document.getElementById('ust-mode-klein').checked=true;saveUstMode()">
             <input type="radio" name="ust-mode" value="§19" id="ust-mode-klein" style="accent-color:var(--green)" onclick="saveUstMode()">
-            <div class="ust-mode-icon" style="background:var(--gdim);color:var(--green)"><span class="material-symbols-outlined">store</span></div>
+            <div class="ust-mode-icon" style="background:var(--gdim);color:var(--green)"><i class="fas fa-store"></i></div>
             <div>
               <div style="font-weight:700;font-size:13px">§19 UStG</div>
               <div style="font-size:11px;color:var(--sub);margin-top:2px">Kleinunternehmer</div>
@@ -1315,7 +1315,7 @@
           </label>
           <label id="ust-lbl-regel" class="ust-mode-lbl" onclick="document.getElementById('ust-mode-regel').checked=true;saveUstMode()">
             <input type="radio" name="ust-mode" value="regel" id="ust-mode-regel" style="accent-color:var(--blue)" onclick="saveUstMode()">
-            <div class="ust-mode-icon" style="background:var(--bdim);color:var(--blue)"><span class="material-symbols-outlined">receipt</span></div>
+            <div class="ust-mode-icon" style="background:var(--bdim);color:var(--blue)"><i class="fas fa-receipt"></i></div>
             <div>
               <div style="font-weight:700;font-size:13px">MwSt-Regelbesteuerung</div>
               <div style="font-size:11px;color:var(--sub);margin-top:2px">USt 19% / 7%</div>
@@ -1336,7 +1336,7 @@
       <!-- §19 Info -->
       <div id="ust-klein-info" style="display:none">
         <div class="ust-klein-banner">
-          <div class="ust-klein-banner-icon"><span class="material-symbols-outlined">check_circle</span></div>
+          <div class="ust-klein-banner-icon"><i class="fas fa-check-circle"></i></div>
           <div>
             <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:4px">§19 UStG — kein USt-Ausweis nötig</div>
             <div style="font-size:13px;color:var(--text);line-height:1.6">
@@ -1454,7 +1454,7 @@
 
         <!-- Pflichthinweis -->
         <div class="ku-hinweis">
-          <div class="ku-hinweis-title"><span class="material-symbols-outlined">info</span> Pflichthinweis auf Rechnung</div>
+          <div class="ku-hinweis-title"><i class="fas fa-info-circle"></i> Pflichthinweis auf Rechnung</div>
           <div class="ku-hinweis-text">„Gemäß §19 UStG wird keine Umsatzsteuer berechnet."</div>
         </div>
 
@@ -1493,7 +1493,7 @@
                 <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
                 <span id="ust-new-rate-label">19%</span>
               </span>
-              <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
+              <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
             </button>
             <div id="ust-new-rate-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:140px">
               <div onclick="setUstRate('ust-new-rate',19,null)" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
@@ -1521,8 +1521,8 @@
       <div style="font-size:12px;color:var(--muted);margin-top:2px">Kontaktdaten und Firmendaten erfassen</div>
     </div>
     <div class="ang-sticky-right">
-      <button class="btn primary" onclick="saveKunde()"><span class="material-symbols-outlined">save</span><span class="ang-btn-txt"> Speichern</span></button>
-      <button class="btn ang-back-btn" onclick="closeKundeForm()" title="Zurück"><span class="material-symbols-outlined">arrow_back</span></button>
+      <button class="btn primary" onclick="saveKunde()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
+      <button class="btn ang-back-btn" onclick="closeKundeForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
     </div>
   </div>
   <div class="ang-form-body">
@@ -1551,8 +1551,8 @@
       <div class="fg" style="margin:0"><textarea id="km-notiz" rows="3" placeholder="Interne Notiz..." style="min-height:80px;resize:vertical"></textarea></div>
     </div>
     <div class="ang-bottom-actions">
-      <button class="btn primary" onclick="saveKunde()"><span class="material-symbols-outlined">save</span> Speichern</button>
-      <button class="btn" onclick="closeKundeForm()"><span class="material-symbols-outlined">close</span> Abbrechen</button>
+      <button class="btn primary" onclick="saveKunde()"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn" onclick="closeKundeForm()"><i class="fas fa-times"></i> Abbrechen</button>
     </div>
   </div>
 </div>
@@ -1565,8 +1565,8 @@
     </div>
     <div class="ang-sticky-right">
       <button class="btn" onclick="saveAngProdukt(true)"><span class="ang-btn-txt">Erstellen und neu</span><span class="ang-btn-txt-short" style="display:none">+ Neu</span></button>
-      <button class="btn primary" onclick="saveAngProdukt(false)"><span class="material-symbols-outlined">save</span><span class="ang-btn-txt"> Speichern</span></button>
-      <button class="btn ang-back-btn" onclick="closeProduktForm()" title="Zurück"><span class="material-symbols-outlined">arrow_back</span></button>
+      <button class="btn primary" onclick="saveAngProdukt(false)"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
+      <button class="btn ang-back-btn" onclick="closeProduktForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
     </div>
   </div>
   <div class="ang-form-body">
@@ -1594,7 +1594,7 @@
                     <span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
                     <span id="ap-ust-label">19%</span>
                   </span>
-                  <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
+                  <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
                 <div id="ap-ust-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px;min-width:140px">
                   <div onclick="setUstRate('ap-ust',19,'apCalcBrutto')" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="flag-circle"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>19%</div>
@@ -1632,7 +1632,7 @@
       </div>
       <div class="ap-tab-pane" id="ap-pane-einheiten" style="display:none">
         <div id="ap-einheiten-list"></div>
-        <button class="btn" style="color:var(--blue);border-color:var(--blue);margin-top:8px" onclick="apAddEinheit()"><span class="material-symbols-outlined">add</span> Einheit hinzufügen</button>
+        <button class="btn" style="color:var(--blue);border-color:var(--blue);margin-top:8px" onclick="apAddEinheit()"><i class="fas fa-plus"></i> Einheit hinzufügen</button>
       </div>
       <div class="ap-tab-pane" id="ap-pane-einstellungen" style="display:none">
         <div class="ap-toggle-row">
@@ -1653,9 +1653,9 @@
     </div>
 
     <div class="ang-bottom-actions">
-      <button class="btn primary" onclick="saveAngProdukt(false)"><span class="material-symbols-outlined">save</span> Speichern</button>
+      <button class="btn primary" onclick="saveAngProdukt(false)"><i class="fas fa-save"></i> Speichern</button>
       <button class="btn" onclick="saveAngProdukt(true)">+ Erstellen und neu</button>
-      <button class="btn" onclick="closeProduktForm()"><span class="material-symbols-outlined">close</span> Abbrechen</button>
+      <button class="btn" onclick="closeProduktForm()"><i class="fas fa-times"></i> Abbrechen</button>
     </div>
   </div>
 </div>
@@ -1665,15 +1665,15 @@
 <div class="modal-bg" id="mon-modal">
   <div class="modal" style="max-width:780px;width:95%">
     <div class="modal-hdr">
-      <h2 id="mon-modal-title"><span class="material-symbols-outlined">calendar_today</span> Monatsdetails</h2>
+      <h2 id="mon-modal-title"><i class="fa-solid fa-calendar"></i> Monatsdetails</h2>
       <button class="modal-close" onclick="closeModal('mon-modal')">✕</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px" id="mon-modal-stats"></div>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
       <span style="font-size:12px;color:var(--sub)" id="mon-modal-count"></span>
       <div style="margin-left:auto;display:flex;gap:8px">
-        <button class="btn success" onclick="exportMonatXLS()"><span class="material-symbols-outlined">bar_chart</span> Excel (.xlsx)</button>
-        <button class="csv" onclick="exportMonatCSV()"><span class="material-symbols-outlined">download</span> CSV</button>
+        <button class="btn success" onclick="exportMonatXLS()"><i class="fa-solid fa-chart-bar"></i> Excel (.xlsx)</button>
+        <button class="csv" onclick="exportMonatCSV()"><i class="fa-solid fa-download"></i> CSV</button>
       </div>
     </div>
     <div class="modal-inner-tbl" style="max-height:420px;overflow-y:auto;border-radius:var(--r);border:1px solid var(--border)">
@@ -1699,7 +1699,7 @@
 <div class="modal-bg" id="edit-modal">
   <div class="modal">
     <div class="modal-hdr">
-      <h2><span class="material-symbols-outlined">edit</span>️ Eintrag bearbeiten</h2>
+      <h2><i class="fas fa-pen"></i>️ Eintrag bearbeiten</h2>
       <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
     </div>
     <div class="typ-toggle" style="margin-bottom:16px">
@@ -1725,7 +1725,7 @@
     </div>
     <div class="fg"><label>Notiz</label><textarea id="edit-note" style="min-height:50px"></textarea></div>
     <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="btn primary" style="flex:1;padding:10px" onclick="saveEdit()"><span class="material-symbols-outlined">save</span> Speichern</button>
+      <button class="btn primary" style="flex:1;padding:10px" onclick="saveEdit()"><i class="fas fa-save"></i> Speichern</button>
       <button class="btn" style="padding:10px 18px" onclick="closeModal('edit-modal')">Abbrechen</button>
     </div>
   </div>
@@ -1744,10 +1744,10 @@
       <div id="rn-form-sub" style="font-size:12px;color:var(--muted);margin-top:2px">Rechnung erstellen und versenden</div>
     </div>
     <div class="ang-sticky-right">
-      <button class="btn" onclick="druckRechnung()"><span class="material-symbols-outlined">print</span><span class="ang-btn-txt"> Drucken</span></button>
-      <button class="btn" onclick="emailRechnung()" title="Per E-Mail senden"><span class="material-symbols-outlined">mail</span><span class="ang-btn-txt"> E-Mail</span></button>
-      <button class="btn primary" onclick="saveRechnung()"><span class="material-symbols-outlined">save</span><span class="ang-btn-txt"> Speichern</span></button>
-      <button class="btn ang-back-btn" onclick="closeRechForm()" title="Zurück"><span class="material-symbols-outlined">arrow_back</span></button>
+      <button class="btn" onclick="druckRechnung()"><i class="fas fa-print"></i><span class="ang-btn-txt"> Drucken</span></button>
+      <button class="btn" onclick="emailRechnung()" title="Per E-Mail senden"><i class="fas fa-envelope"></i><span class="ang-btn-txt"> E-Mail</span></button>
+      <button class="btn primary" onclick="saveRechnung()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
+      <button class="btn ang-back-btn" onclick="closeRechForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
     </div>
   </div>
 
@@ -1764,7 +1764,7 @@
             <label>Kundenname / Firma</label>
             <div style="display:flex;gap:6px">
               <input type="text" id="rn-kunde" placeholder="Kontakt suchen..." oninput="rnKundeSearch(this.value)" autocomplete="off" style="flex:1">
-              <button type="button" class="btn" onclick="openKundenPicker('rn')" title="Aus Kundenbuch wählen" style="flex-shrink:0;padding:8px 10px"><span class="material-symbols-outlined">contacts</span></button>
+              <button type="button" class="btn" onclick="openKundenPicker('rn')" title="Aus Kundenbuch wählen" style="flex-shrink:0;padding:8px 10px"><i class="fas fa-address-book"></i></button>
             </div>
             <div id="rn-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
           </div>
@@ -1787,15 +1787,15 @@
                 <button type="button" id="rn-status-btn" onclick="toggleRechStatusDropdown()"
                   style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 12px;border-radius:var(--r);margin-top:4px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
                   <span id="rn-status-label" style="display:flex;align-items:center;gap:7px">
-                    <span class="material-symbols-outlined" id="rn-status-icon" style="color:var(--yellow);font-size:16px">schedule</span>
+                    <i class="fas fa-clock" id="rn-status-icon" style="color:var(--yellow);font-size:13px"></i>
                     <span id="rn-status-text">Offen</span>
                   </span>
-                  <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
+                  <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
                 <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
-                  <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="material-symbols-outlined" style="color:var(--yellow);font-size:14px;width:14px">schedule</span> Offen</div>
-                  <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="material-symbols-outlined" style="color:var(--green);font-size:14px;width:14px">check_circle</span> Bezahlt</div>
-                  <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><span class="material-symbols-outlined" style="color:var(--red);font-size:14px;width:14px">error</span> Überfällig</div>
+                  <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:14px;width:14px"></i> Offen</div>
+                  <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:14px;width:14px"></i> Bezahlt</div>
+                  <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-exclamation-circle" style="color:var(--red);font-size:14px;width:14px"></i> Überfällig</div>
                 </div>
               </div>
             </div>
@@ -1824,7 +1824,7 @@
         <span></span>
       </div>
       <div id="rn-positionen"></div>
-      <button class="btn ang-add-pos-btn" onclick="addRechPos()"><span class="material-symbols-outlined">add</span> Position hinzufügen</button>
+      <button class="btn ang-add-pos-btn" onclick="addRechPos()"><i class="fas fa-plus"></i> Position hinzufügen</button>
     </div>
 
     <!-- Итог -->
@@ -1837,17 +1837,17 @@
     <div class="ang-block" style="padding:14px 0px">
       <div class="ang-block-label" style="margin-bottom:12px">🇩🇪 E-Rechnung (EN 16931)</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" style="padding:8px 12px;background:#1e3a5f;color:#fff;font-size:12px" onclick="downloadZUGFeRD(null)"><span class="material-symbols-outlined">picture_as_pdf</span> ZUGFeRD</button>
-        <button class="btn" style="padding:8px 12px;background:#0d6b3b;color:#fff;font-size:12px" onclick="downloadXRechnung(null)"><span class="material-symbols-outlined">code</span> XRechnung</button>
+        <button class="btn" style="padding:8px 12px;background:#1e3a5f;color:#fff;font-size:12px" onclick="downloadZUGFeRD(null)"><i class="fas fa-file-pdf"></i> ZUGFeRD</button>
+        <button class="btn" style="padding:8px 12px;background:#0d6b3b;color:#fff;font-size:12px" onclick="downloadXRechnung(null)"><i class="fas fa-file-code"></i> XRechnung</button>
       </div>
     </div>
 
     <!-- Кнопки внизу -->
     <div class="ang-bottom-actions">
-      <button class="btn primary" onclick="saveRechnung()"><span class="material-symbols-outlined">save</span> Speichern</button>
-      <button class="btn" onclick="druckRechnung()"><span class="material-symbols-outlined">print</span> Drucken</button>
-      <button class="btn" onclick="emailRechnung()"><span class="material-symbols-outlined">mail</span> E-Mail</button>
-      <button class="btn" onclick="closeRechForm()"><span class="material-symbols-outlined">close</span> Abbrechen</button>
+      <button class="btn primary" onclick="saveRechnung()"><i class="fas fa-save"></i> Speichern</button>
+      <button class="btn" onclick="druckRechnung()"><i class="fas fa-print"></i> Drucken</button>
+      <button class="btn" onclick="emailRechnung()"><i class="fas fa-envelope"></i> E-Mail</button>
+      <button class="btn" onclick="closeRechForm()"><i class="fas fa-times"></i> Abbrechen</button>
     </div>
 
   </div>
@@ -1864,7 +1864,7 @@
 <div class="modal-bg" id="kunden-picker-modal">
   <div class="modal" style="width:620px;max-height:80vh;display:flex;flex-direction:column">
     <div class="modal-hdr">
-      <h2 style="display:flex;align-items:center;gap:8px"><span class="material-symbols-outlined" style="color:var(--blue)">contacts</span> Kunde auswählen</h2>
+      <h2 style="display:flex;align-items:center;gap:8px"><i class="fas fa-address-book" style="color:var(--blue)"></i> Kunde auswählen</h2>
       <button class="modal-close" onclick="closeModal('kunden-picker-modal')">✕</button>
     </div>
     <div style="margin-bottom:12px">
@@ -1889,7 +1889,7 @@
 
     <!-- Уведомление об отказе от ответственности -->
     <div class="footer-section footer-disclaimer">
-      <p class="footer-small"><strong><span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> WICHTIG:</strong> Dies ist eine Beta-Version. Alle Berechnungen sind unverbindlich und ohne Gewähr. Für steuerliche Entscheidungen konsultieren Sie einen zugelassenen Steuerberater (§ 3 StBerG).</p>
+      <p class="footer-small"><strong><i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> WICHTIG:</strong> Dies ist eine Beta-Version. Alle Berechnungen sind unverbindlich und ohne Gewähr. Für steuerliche Entscheidungen konsultieren Sie einen zugelassenen Steuerberater (§ 3 StBerG).</p>
     </div>
   </div>
 
@@ -1926,7 +1926,7 @@
 <div class="modal-bg" id="kunde-pick-modal">
   <div class="modal" style="width:500px">
     <div class="modal-hdr">
-      <h2><span class="material-symbols-outlined">group</span> Kunde auswählen</h2>
+      <h2><i class="fas fa-users"></i> Kunde auswählen</h2>
       <button class="modal-close" onclick="closeModal('kunde-pick-modal')">✕</button>
     </div>
     <input type="text" id="kpick-search" placeholder="Suchen..." oninput="renderKundePick()" style="width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:9px 12px;font-size:13px;outline:none;margin-bottom:12px">
@@ -1940,7 +1940,7 @@
 <div class="modal-bg" id="firma-modal">
   <div class="modal" style="max-width:560px;width:100%">
     <div class="modal-hdr">
-      <h2><span class="material-symbols-outlined">business</span> Firmenprofil</h2>
+      <h2><i class="fas fa-building"></i> Firmenprofil</h2>
       <button class="modal-close" onclick="closeModal('firma-modal')">✕</button>
     </div>
     <p style="font-size:12px;color:var(--sub);margin-bottom:16px">Diese Daten erscheinen auf allen Rechnungen (PDF, Druck, E-Mail).</p>
@@ -1948,23 +1948,23 @@
     <!-- Logo Upload -->
     <div style="margin-bottom:18px;padding:14px 16px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px"><span class="material-symbols-outlined">image</span>️ Firmenlogo</span>
+        <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-image"></i>️ Firmenlogo</span>
         <span style="font-size:11px;color:var(--sub)">Max. 5 MB · wird auf 80 KB komprimiert</span>
       </div>
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <!-- Превью -->
         <div style="width:90px;height:60px;border:2px dashed var(--border);border-radius:var(--r);display:flex;align-items:center;justify-content:center;background:var(--s1);overflow:hidden;flex-shrink:0">
           <img id="firma-logo-preview" src="" alt="Logo" style="display:none;max-width:86px;max-height:56px;object-fit:contain">
-          <span id="firma-logo-placeholder-icon" style="font-size:22px;color:var(--sub)"><span class="material-symbols-outlined">business</span></span>
+          <span id="firma-logo-placeholder-icon" style="font-size:22px;color:var(--sub)"><i class="fas fa-building"></i></span>
         </div>
         <!-- Кнопки -->
         <div style="display:flex;flex-direction:column;gap:8px">
           <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:var(--blue);color:#fff;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:500">
-            <span class="material-symbols-outlined">upload</span> Logo hochladen
+            <i class="fas fa-upload"></i> Logo hochladen
             <input type="file" id="firma-logo-input" accept="image/*" style="display:none" onchange="onLogoChange(this)">
           </label>
           <button id="firma-logo-delete" onclick="deleteFirmaLogo()" style="display:none;align-items:center;gap:6px;padding:7px 14px;background:none;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;font-size:12px;color:var(--sub)">
-            <span class="material-symbols-outlined">delete</span> Entfernen
+            <i class="fas fa-trash"></i> Entfernen
           </button>
         </div>
         <div style="font-size:11px;color:var(--sub);line-height:1.5">
@@ -2014,7 +2014,7 @@
     <!-- E-Mail Vorlage -->
     <div style="border-top:1px solid var(--border);margin:14px 0 10px;padding-top:10px">
       <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px"><span class="material-symbols-outlined">mail</span> E-Mail Vorlage</span>
+        <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-envelope"></i> E-Mail Vorlage</span>
         <button onclick="resetEmailTemplate()" style="background:none;border:none;font-size:11px;color:var(--sub);cursor:pointer;text-decoration:underline">Zurücksetzen</button>
       </div>
       <p style="font-size:11px;color:var(--sub);margin:6px 0 10px">Verfügbare Variablen: <code>{{NR}}</code> <code>{{KUNDE}}</code> <code>{{BETRAG}}</code> <code>{{FAELLIG}}</code> <code>{{FIRMA}}</code> <code>{{TEL}}</code></p>
@@ -2029,7 +2029,7 @@
     </div>
     <!-- Buttons -->
     <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn primary" style="flex:1;padding:11px" onclick="saveFirmaData()"><span class="material-symbols-outlined">save</span> Speichern</button>
+      <button class="btn primary" style="flex:1;padding:11px" onclick="saveFirmaData()"><i class="fas fa-save"></i> Speichern</button>
       <button class="btn" style="padding:11px 18px" onclick="closeModal('firma-modal')">Abbrechen</button>
     </div>
   </div>
@@ -2041,7 +2041,7 @@
   <div class="modal" style="max-width:580px;width:100%">
     <div class="modal-hdr">
       <div>
-        <h2><span class="material-symbols-outlined">description</span> Rechnungen</h2>
+        <h2><i class="fas fa-file-invoice"></i> Rechnungen</h2>
         <p id="kunde-rech-name" style="font-size:12px;color:var(--sub);margin-top:2px"></p>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -2053,7 +2053,7 @@
     <div id="kunde-rech-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px"></div>
     <!-- Карточки счетов -->
     <div id="kunde-rech-empty" style="display:none;text-align:center;padding:40px;color:var(--sub)">
-      <div style="font-size:32px;margin-bottom:8px"><span class="material-symbols-outlined">article</span></div>
+      <div style="font-size:32px;margin-bottom:8px"><i class="fas fa-file-alt"></i></div>
       <div>Noch keine Rechnungen für diesen Kunden</div>
     </div>
     <div id="kunde-rech-list" style="display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto"></div>

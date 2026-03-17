@@ -1,8 +1,8 @@
 // ── RECHNUNG STATUS DROPDOWN ─────────────────────────────────────────────
 const _RECH_ST_CFG = {
-  'offen':       {icon:'schedule',              color:'var(--yellow)', label:'Offen'},
-  'bezahlt':     {icon:'check_circle',       color:'var(--green)',  label:'Bezahlt'},
-  'ueberfaellig':{icon:'error', color:'var(--red)',    label:'Überfällig'},
+  'offen':       {icon:'fas fa-clock',              color:'var(--yellow)', label:'Offen'},
+  'bezahlt':     {icon:'fas fa-check-circle',       color:'var(--green)',  label:'Bezahlt'},
+  'ueberfaellig':{icon:'fas fa-exclamation-circle', color:'var(--red)',    label:'Überfällig'},
 };
 
 function setRechStatus(val){
@@ -11,7 +11,7 @@ function setRechStatus(val){
   const icon = document.getElementById('rn-status-icon');
   const txt  = document.getElementById('rn-status-text');
   if(inp)  inp.value = val;
-  if(icon) { icon.className = 'material-symbols-outlined'; icon.textContent = cfg.icon; icon.style.color = cfg.color; icon.style.fontSize = '16px'; }
+  if(icon) { icon.className = cfg.icon; icon.style.color = cfg.color; }
   if(txt)  txt.textContent = cfg.label;
   const panel = document.getElementById('rn-status-panel');
   if(panel) panel.style.display = 'none';
@@ -86,9 +86,9 @@ function renderRech(){
   });
 
   const statusCfg = {
-    offen:       {cls:'rech-badge-offen',    icon:'schedule',              label:'Offen',      color:'var(--yellow)'},
-    ueberfaellig:{cls:'rech-badge-ueber',    icon:'error', label:'Überfällig', color:'var(--red)'},
-    bezahlt:     {cls:'rech-badge-bezahlt',  icon:'check_circle',       label:'Bezahlt',    color:'var(--green)'}
+    offen:       {cls:'rech-badge-offen',    icon:'fas fa-clock',              label:'Offen',      color:'var(--yellow)'},
+    ueberfaellig:{cls:'rech-badge-ueber',    icon:'fas fa-exclamation-circle', label:'Überfällig', color:'var(--red)'},
+    bezahlt:     {cls:'rech-badge-bezahlt',  icon:'fas fa-check-circle',       label:'Bezahlt',    color:'var(--green)'}
   };
 
   const cards = filtered.map(r=>{
@@ -110,7 +110,7 @@ function renderRech(){
     return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" onclick="editRech('${r.id}')">
       <div class="rech-card-left">
         <div class="rech-card-avatar ${st.cls}">
-          <span class="material-symbols-outlined" style="font-size:18px">${st.icon}</span>
+          <i class="${st.icon}"></i>
         </div>
         <div class="rech-card-info">
           <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
@@ -126,13 +126,13 @@ function renderRech(){
       <div class="rech-card-right">
         <div class="rech-card-betrag">${fmt(r.betrag)}</div>
         <div class="rech-card-status ${st.cls}-pill">
-          <span class="material-symbols-outlined" style="font-size:14px">${st.icon}</span> ${st.label}
+          <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
         </div>
         <div class="rech-card-actions" onclick="event.stopPropagation()">
-          ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><span class="material-symbols-outlined">check</span></button>`:''}
-          <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><span class="material-symbols-outlined">print</span></button>
-          <button class="rca-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><span class="material-symbols-outlined">edit</span></button>
-          <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><span class="material-symbols-outlined">delete</span></button>
+          ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
+          <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
+          <button class="rca-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+          <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>`;
@@ -324,12 +324,12 @@ async function rechBezahlt(id){
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
     renderAll();
-    toast(`<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
     renderRech();
-    toast(`<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Rechnung ${r.nr} als bezahlt markiert`,'ok');
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
 }
 async function delRech(id){
@@ -456,7 +456,7 @@ function addRechPosRow(i,p){
                 <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
                 <span class="ust-flag-label">${rateVal}%</span>
               </span>
-              <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
+              <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
             </button>
             <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
             <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
@@ -485,7 +485,7 @@ function addRechPosRow(i,p){
             <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
             <span class="ust-flag-label">${rateVal}%</span>
           </span>
-          <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
+          <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
         </button>
         <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
         <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
@@ -495,7 +495,7 @@ function addRechPosRow(i,p){
         </div>
       </div>
       <input type="number" placeholder="Brutto" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue)">
-      <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0"><span class="material-symbols-outlined">delete</span></button>`;
+      <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0"><i class="fas fa-trash"></i></button>`;
   }
   document.getElementById('rn-positionen').appendChild(div);
 }
@@ -691,7 +691,7 @@ function buildRechnungHTML(r){
     .btn-close{padding:10px 20px;background:#e5e7eb;border:none;border-radius:6px;cursor:pointer;font-size:13px}
   </style></head><body>
   <div class="btn-bar">
-    <button class="btn-print" onclick="window.print()"><span class="material-symbols-outlined">print</span>️ Drucken / Als PDF speichern</button>
+    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i>️ Drucken / Als PDF speichern</button>
     <button class="btn-close" onclick="window.close()">✕ Schließen</button>
   </div>
   <div class="header">
@@ -922,7 +922,7 @@ async function onLogoChange(input) {
   // Сохраняем во временный атрибут — применится при Speichern
   input.dataset.b64 = b64;
   const kb = Math.round(b64.length * 0.75 / 1024);
-  toast(`<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Logo geladen (${kb} KB)`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Logo geladen (${kb} KB)`, 'ok');
 }
 
 // Удалить логотип

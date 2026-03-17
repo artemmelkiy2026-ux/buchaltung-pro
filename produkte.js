@@ -45,15 +45,14 @@ function renderProdukte() {
   }
   empty.style.display = 'none';
 
-  // katIcon removed — using katMatIcon instead
-  const katMatIcon = k => k === 'Artikel' ? 'inventory_2' : k === 'Dienstleistung' ? 'build' : 'more_horiz';
+  const katIcon = k => k === 'Artikel' ? 'fa-box' : k === 'Dienstleistung' ? 'fa-tools' : 'fa-ellipsis-h';
   const katColor = k => k === 'Artikel' ? 'var(--blue)' : k === 'Dienstleistung' ? 'var(--green)' : 'var(--sub)';
 
   list.innerHTML = items.map(p => `
     <div class="prod-card" onclick="openProduktModal('${p.id}')">
       <div class="prod-card-left">
         <div class="prod-avatar" style="background:${katColor(p.kategorie)}22;color:${katColor(p.kategorie)}">
-          <span class="material-symbols-outlined" style="font-size:18px">${katMatIcon(p.kategorie)}</span>
+          <i class="fas ${katIcon(p.kategorie)}"></i>
         </div>
         <div class="prod-info">
           <div class="prod-name">${p.name}</div>
@@ -71,8 +70,8 @@ function renderProdukte() {
           <div class="prod-price-sub">${fmt(p.vkBrutto || 0)} € Brutto</div>
         </div>
         <div class="prod-actions">
-          <button class="rca-btn" onclick="event.stopPropagation();openProduktModal('${p.id}')" title="Bearbeiten"><span class="material-symbols-outlined">edit</span></button>
-          <button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><span class="material-symbols-outlined">delete</span></button>
+          <button class="rca-btn" onclick="event.stopPropagation();openProduktModal('${p.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+          <button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>`).join('');
@@ -204,7 +203,7 @@ function apAddEinheit() {
     <span class="ap-op">=</span>
     <input type="number" placeholder="Preis (Brutto)" min="0" step="0.01">
     <button class="btn" style="padding:4px 8px;color:var(--blue)" onclick="this.closest('.ap-einheit-row').remove()">
-      <span class="material-symbols-outlined">delete</span>
+      <i class="fas fa-trash"></i>
     </button>`;
   list.appendChild(row);
 }
