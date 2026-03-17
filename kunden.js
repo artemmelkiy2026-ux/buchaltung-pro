@@ -291,11 +291,11 @@ function updateWiedSidebar(){
         </div>
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)">
           <span style="color:var(--sub)">Pro Tag</span>
-          <span style="font-family:var(--mono);font-size:11px">${perDay.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+          <span style="font-family:var(--mono);font-size:14px">${perDay.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
         </div>
         <div style="display:flex;justify-content:space-between;padding:5px 0">
           <span style="color:var(--sub);font-weight:600">Pro Jahr</span>
-          <span style="font-family:var(--mono);font-weight:700;font-size:15px">${perYear.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+          <span style="font-family:var(--mono);font-weight:700;font-size:14px">${perYear.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
         </div>
         ${endDate?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
           <span style="color:var(--sub);font-size:14px">Gesamtkosten bis ${fd(endDate)}</span>
