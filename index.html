@@ -1110,7 +1110,7 @@
   <div>
 
     <!-- Block 1: Typ + Grunddaten -->
-    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
+    <div class="form-panel" style="margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Grunddaten</div>
       <div class="typ-toggle" style="margin-bottom:16px">
         <button class="tt ae" id="wied-btn-e" onclick="setWiedTyp('Einnahme')">Einnahme</button>
@@ -1141,7 +1141,7 @@
     </div>
 
     <!-- Block 2: Zeitraum & Erinnerung -->
-    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
+    <div class="form-panel" style="margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Zeitraum & Erinnerung</div>
       <div class="fgrow c2">
         <div class="fg"><label>Erste Buchung ab</label><input type="date" id="wied-ab" onchange="updateWiedSidebar()"></div>
@@ -1167,7 +1167,7 @@
     </div>
 
     <!-- Block 3: Vertrag & Anbieter -->
-    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
+    <div class="form-panel" style="margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub)">Vertrag & Anbieter <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></span>
         <button type="button" id="wied-contract-toggle" onclick="toggleWiedContract()" style="font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit;font-weight:600">Einblenden ▾</button>
@@ -1221,14 +1221,14 @@
     <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Hochrechnung</div>
       <div id="wied-calc-info" style="font-size:13px;color:var(--text);line-height:1.6">
-        <div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben</div>
+        <div style="color:var(--sub);font-size:14px">Betrag und Intervall eingeben</div>
       </div>
     </div>
 
     <!-- Nächste Termine -->
     <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Nächste Termine</div>
-      <div id="wied-dates-preview" style="font-size:12px;color:var(--sub);line-height:1.6">
+      <div id="wied-dates-preview" style="font-size:14px;color:var(--sub);line-height:1.6">
         Startdatum eingeben für Vorschau
       </div>
     </div>
@@ -1236,13 +1236,13 @@
     <!-- Buchungshistorie (nur im Edit-Modus) -->
     <div id="wied-history-block" style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1);display:none">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Buchungshistorie</div>
-      <div id="wied-history-content" style="font-size:12px;color:var(--sub)">Keine Buchungen</div>
+      <div id="wied-history-content" style="font-size:14px;color:var(--sub)">Keine Buchungen</div>
     </div>
 
     <!-- Anteil am Budget -->
     <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Budgetanteil</div>
-      <div id="wied-budget-info" style="font-size:12px;color:var(--sub)">—</div>
+      <div id="wied-budget-info" style="font-size:14px;color:var(--sub)">—</div>
     </div>
 
   </div><!-- /right -->
