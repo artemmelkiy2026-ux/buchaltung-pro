@@ -49,7 +49,7 @@ function toast(msg,type='ok',onClick=null){
   // Убираем лишние пробелы
   clean = clean.trim();
   t.textContent = clean;
-  t.className=`toast ${type}`;
+  t.className=`toast ${type}${onClick?' clickable':''}`;
   void t.offsetWidth;
   t.classList.add('show');
   t._toastTimer=setTimeout(()=>{
