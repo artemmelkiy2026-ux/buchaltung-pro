@@ -570,19 +570,19 @@ function calcRechTotal(){
 
   if(klein){
     rows=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
-      <span style="font-size:12px;color:var(--sub)">Netto-Summe</span>
-      <span style="font-family:var(--mono);font-size:13px">${fmt(totalNetto)}</span>
+      <span style="font-size:14px;color:var(--sub)">Netto-Summe</span>
+      <span style="font-family:var(--mono);font-size:14px">${fmt(totalNetto)}</span>
     </div>
-    <div style="font-size:11px;color:var(--green);margin-bottom:6px">§19 UStG — keine Umsatzsteuer</div>`;
+    <div style="font-size:14px;color:var(--green);margin-bottom:6px">§19 UStG — keine Umsatzsteuer</div>`;
   } else {
     const totNetto=rates.reduce((s,r)=>s+groups[r].netto,0);
     const totMwst =rates.reduce((s,r)=>s+groups[r].mwst,0);
-    rows+=`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:var(--sub)">
+    rows+=`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;color:var(--sub)">
       <span>Netto gesamt</span><span style="font-family:var(--mono)">${fmt(r2(totNetto))}</span></div>`;
     rates.forEach(rate=>{
       const g=groups[rate];
       if(g.netto===0&&g.mwst===0) return;
-      rows+=`<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:var(--sub)">
+      rows+=`<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:14px;color:var(--sub)">
         <span>USt. ${rate}% (auf ${fmt(g.netto)})</span>
         <span style="font-family:var(--mono);color:var(--red)">+ ${fmt(g.mwst)}</span>
       </div>`;
