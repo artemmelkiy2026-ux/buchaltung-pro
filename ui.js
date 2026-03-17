@@ -37,7 +37,7 @@ function editE(e,id){
     // Change button text and subtitle for edit mode
     const saveBtn=document.getElementById('btn-add-bezahlt');
     if(saveBtn){
-      saveBtn.innerHTML='<i class="fas fa-save"></i> Korrektur speichern';
+      saveBtn.innerHTML='<span class="material-symbols-outlined">save</span> Korrektur speichern';
       saveBtn.onclick=function(){ saveEditFromForm(); };
     }
     const sub=document.getElementById('neu-form-sub');
@@ -93,7 +93,7 @@ async function saveEditFromForm(){
   editId=null;
   const saveBtn=document.getElementById('btn-add-bezahlt');
   if(saveBtn){
-    saveBtn.innerHTML='<i class="fas fa-check-circle"></i> Speichern &amp; Bezahlt';
+    saveBtn.innerHTML='<span class="material-symbols-outlined">check_circle</span> Speichern &amp; Bezahlt';
     saveBtn.onclick=function(){ addEintrag(true); };
   }
   renderAll();
@@ -117,7 +117,7 @@ async function delFromEdit(){
   // Reset button
   const saveBtn=document.getElementById('btn-add-bezahlt');
   if(saveBtn){
-    saveBtn.innerHTML='<i class="fas fa-check-circle"></i> Speichern &amp; Bezahlt';
+    saveBtn.innerHTML='<span class="material-symbols-outlined">check_circle</span> Speichern &amp; Bezahlt';
     saveBtn.onclick=function(){ addEintrag(true); };
   }
   renderAll();

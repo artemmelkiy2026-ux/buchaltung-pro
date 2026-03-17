@@ -3,7 +3,7 @@ const SK='buch_pro_v1';
 const KE=['Dienstleistung','Honorar','Warenverkauf','Miete (Einnahme)','Zinsen/Dividenden','Erstattung','Sonstiges Einnahme'];
 const KA=['Büromaterial','Software / IT','Telefon / Internet','Fahrtkosten','Miete / Büro','Marketing / Werbung','Fortbildung','Versicherung','Bankgebühren','Steuern / Abgaben','Hardware','Fremdleistungen','Bewirtung','Sonstiges Ausgabe'];
 const ZAHL=['Überweisung','Barzahlung','PayPal','EC-Karte','Lastschrift','Sonstiges'];
-const ZICONS={'Überweisung':'<i class="fas fa-university"></i>','Barzahlung':'<i class="fas fa-solid fa-euro-sign"></i>','PayPal':'<i class="fa-brands fa-paypal"></i>','EC-Karte':'<i class="fas fa-credit-card"></i>','Lastschrift':'<i class="fas fa-exchange-alt"></i>','Sonstiges':'<i class="fas fa-solid fa-euro-sign"></i>'};
+const ZICONS={'Überweisung':'<span class="material-symbols-outlined">account_balance</span>','Barzahlung':'<span class="material-symbols-outlined">euro</span>','PayPal':'<span class="material-symbols-outlined">account_balance_wallet</span>','EC-Karte':'<span class="material-symbols-outlined">credit_card</span>','Lastschrift':'<span class="material-symbols-outlined">swap_horiz</span>','Sonstiges':'<span class="material-symbols-outlined">euro</span>'};
 const ZCOLS={'Überweisung':'var(--blue)','Barzahlung':'var(--yellow)','PayPal':'var(--purple)','EC-Karte':'var(--cyan)','Lastschrift':'var(--green)','Sonstiges':'var(--muted)'};
 const ZBADGE={'Überweisung':'b-bar','Barzahlung':'b-cash','PayPal':'b-pp','EC-Karte':'b-trans','Lastschrift':'b-ein','Sonstiges':''};
 // ── НОРМАЛИЗАЦИЯ: русский/украинский → немецкий ключ ────────────
@@ -112,9 +112,9 @@ window.addEventListener('supabase-ready', () => {
 });
 let curTyp='Einnahme', fTyp='Alle', sortCol='datum', sortAsc=false;
 let fileHandle=null, asOn=false, asTimer=null, curPage='dashboard';
-// <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для сортировки Dashboard "Letzte 10"
+// <span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Переменные для сортировки Dashboard "Letzte 10"
 let dashSortCol='datum', dashSortAsc=false;
-// <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для пагинации Einträge
+// <span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Переменные для пагинации Einträge
 let einPage=1, einPerPage=10;
 let zPage=1, zPerPage=10;  // Пагинация für Zahlungsarten
 let zSortCol='datum', zSortAsc=false;  // Сортировка Zahlungsarten
@@ -180,7 +180,7 @@ function openNeuEintrag(editEntryId) {
     if(typeof editId !== 'undefined') editId=null;
     const saveBtn=document.getElementById('btn-add-bezahlt');
     if(saveBtn){
-      saveBtn.innerHTML='<i class="fas fa-check-circle"></i> Speichern &amp; Bezahlt';
+      saveBtn.innerHTML='<span class="material-symbols-outlined">check_circle</span> Speichern &amp; Bezahlt';
       saveBtn.onclick=function(){ addEintrag(true); };
     }
   }
@@ -203,7 +203,7 @@ function appInit(){
   setTimeout(()=>{
     const today=new Date().toISOString().split('T')[0];
     const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
-    if(due.length) toast(`<i class="fas fa-sync-alt"></i> ${due.length} ${'wiederkehrende Zahlung'}${due.length>1?'en':''} ${'fällig!'}`, 'ok');
+    if(due.length) toast(`<span class="material-symbols-outlined">sync</span> ${due.length} ${'wiederkehrende Zahlung'}${due.length>1?'en':''} ${'fällig!'}`, 'ok');
   },800);
 }
 

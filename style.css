@@ -3297,3 +3297,45 @@ header { background: #fff; }
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Google Material Symbols — global styling
+   ═══════════════════════════════════════════════════════════════ */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 300,
+    'GRAD' 0,
+    'opsz' 20;
+}
+/* Smaller icons inside buttons, badges, meta text */
+.btn .material-symbols-outlined,
+.rca-btn .material-symbols-outlined,
+.badge .material-symbols-outlined,
+.wied-card-meta .material-symbols-outlined,
+.ein-row .material-symbols-outlined,
+.drc .material-symbols-outlined,
+.krech-card .material-symbols-outlined,
+.ust-row .material-symbols-outlined,
+.rech-card-meta .material-symbols-outlined,
+.prod-meta .material-symbols-outlined { font-size: 16px; }
+/* Tiny icons */
+.nav-item .material-symbols-outlined { font-size: 18px; }
+.del-btn .material-symbols-outlined { font-size: 14px; }
+/* Sidebar icons */
+.nav-group-icon .material-symbols-outlined { font-size: 18px; }

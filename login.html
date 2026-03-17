@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MelaLogic — Anmelden</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -240,7 +240,7 @@ body {
 
   <!-- Face ID / Fingerprint кнопка (только на вкладке входа) -->
   <button class="bio-btn" id="bio-login-btn" onclick="loginBiometric()" style="display:none">
-    <i id="bio-btn-icon" class="fa-solid fa-face-smile" style="font-size:18px"></i>
+    <span class="material-symbols-outlined" style="font-size:18px">mood</span>
     <span id="bio-btn-label">Mit Face ID anmelden</span>
   </button>
 
@@ -418,27 +418,27 @@ function getBioLabel() {
 
   if (isIOS) {
     return {
-      iconClass: 'fa-solid fa-face-smile',
+      iconClass: 'mood',
       label: 'Mit Face ID anmelden'
     };
   } else if (isMac) {
     return {
-      iconClass: 'fa-brands fa-apple',
+      iconClass: 'fingerprint',
       label: 'Mit Touch ID anmelden'
     };
   } else if (isWindows) {
     return {
-      iconClass: 'fa-brands fa-windows',
+      iconClass: 'fingerprint',
       label: 'Mit Windows Hello anmelden'
     };
   } else if (isAndroid) {
     return {
-      iconClass: 'fa-solid fa-fingerprint',
+      iconClass: 'fingerprint',
       label: 'Mit Fingerabdruck anmelden'
     };
   } else {
     return {
-      iconClass: 'fa-solid fa-fingerprint',
+      iconClass: 'fingerprint',
       label: 'Mit Biometrie anmelden'
     };
   }
@@ -451,7 +451,7 @@ async function initBioButton() {
   if (!await isBioAvailable()) return;
 
   const { iconClass, label } = getBioLabel();
-  document.getElementById('bio-btn-icon').className = iconClass + ' bio-btn-icon-el';
+  const _bel=document.getElementById('bio-btn-icon');if(_bel){_bel.className='material-symbols-outlined bio-btn-icon-el';_bel.textContent=iconClass;}
   document.getElementById('bio-btn-label').textContent = label;
   document.getElementById('bio-login-btn').style.display = 'flex';
 }
@@ -472,7 +472,7 @@ async function registerBioLogin(email, password) {
   `;
   const bioName = label.replace('Mit ', '').replace(' anmelden', '');
   banner.innerHTML = `
-    <i class="${iconClass}" style="font-size:28px"></i>
+    <span class="material-symbols-outlined" style="font-size:28px">${iconClass}</span>
     <div style="flex:1">
       <div style="font-weight:600;font-size:14px;margin-bottom:4px">${bioName} einrichten?</div>
       <div style="font-size:12px;opacity:.8">Nächstes Mal schneller einloggen</div>
@@ -512,12 +512,12 @@ async function registerBioLogin(email, password) {
             encodedPwd: encoded,
             credId: credIdBase64
           }));
-          showToast('<i class="fas fa-check-circle" style="color:var(--green)"></i> ' + bioName + ' aktiviert!');
+          showToast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> ' + bioName + ' aktiviert!');
           resolve(true);
         }
       } catch(e) {
         console.log('Bio register error:', e.message);
-        showToast('<i class="fas fa-times-circle" style="color:var(--red)"></i> Nicht verfügbar');
+        showToast('<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Nicht verfügbar');
         resolve(false);
       }
     };
@@ -537,7 +537,7 @@ async function loginBiometric() {
     // Данные неполные — сбрасываем биометрию
     localStorage.removeItem(BIO_LOGIN_KEY);
     document.getElementById('bio-login-btn').style.display = 'none';
-    document.getElementById('auth-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Bitte neu anmelden und Biometrie neu einrichten.';
+    document.getElementById('auth-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> Bitte neu anmelden und Biometrie neu einrichten.';
     return;
   }
 
@@ -567,7 +567,7 @@ async function loginBiometric() {
       // Пароль изменился — удаляем биометрию
       localStorage.removeItem(BIO_LOGIN_KEY);
       document.getElementById('bio-login-btn').style.display = 'none';
-      document.getElementById('auth-error').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Bitte neu anmelden und Biometrie neu einrichten.';
+      document.getElementById('auth-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Bitte neu anmelden und Biometrie neu einrichten.';
       btn.disabled = false;
       btn.style.opacity = '1';
       return;
@@ -585,9 +585,9 @@ async function loginBiometric() {
     } else if (e.name === 'InvalidStateError' || e.name === 'NotFoundError') {
       localStorage.removeItem(BIO_LOGIN_KEY);
       document.getElementById('bio-login-btn').style.display = 'none';
-      document.getElementById('auth-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie zurückgesetzt — bitte neu anmelden.';
+      document.getElementById('auth-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> Biometrie zurückgesetzt — bitte neu anmelden.';
     } else {
-      document.getElementById('auth-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie fehlgeschlagen — bitte Passwort eingeben.';
+      document.getElementById('auth-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> Biometrie fehlgeschlagen — bitte Passwort eingeben.';
     }
   }
 }
@@ -644,11 +644,11 @@ function checkPwStrength(val) {
 
   const levels = [
     { pct: '0%',   color: '#e2e8f0', text: 'Passwort eingeben' },
-    { pct: '20%',  color: '#ef4444', text: '<i class="fas fa-circle" style="color:var(--red)"></i> Sehr schwach' },
-    { pct: '40%',  color: '#f97316', text: '<i class="fas fa-circle" style="color:#f97316"></i> Schwach' },
-    { pct: '60%',  color: '#eab308', text: '<i class="fas fa-circle" style="color:var(--yellow)"></i> Mittel' },
-    { pct: '80%',  color: '#22c55e', text: '<i class="fas fa-circle" style="color:var(--green)"></i> Stark' },
-    { pct: '100%', color: '#16a34a', text: '<i class="fas fa-circle" style="color:var(--green)"></i> Sehr stark' },
+    { pct: '20%',  color: '#ef4444', text: '<span class="material-symbols-outlined" style="color:var(--red)">circle</span> Sehr schwach' },
+    { pct: '40%',  color: '#f97316', text: '<span class="material-symbols-outlined" style="color:#f97316">circle</span> Schwach' },
+    { pct: '60%',  color: '#eab308', text: '<span class="material-symbols-outlined" style="color:var(--yellow)">circle</span> Mittel' },
+    { pct: '80%',  color: '#22c55e', text: '<span class="material-symbols-outlined" style="color:var(--green)">circle</span> Stark' },
+    { pct: '100%', color: '#16a34a', text: '<span class="material-symbols-outlined" style="color:var(--green)">circle</span> Sehr stark' },
   ];
 
   const lvl = val.length === 0 ? levels[0] : levels[score];
@@ -681,12 +681,12 @@ async function submit() {
   const btn = document.getElementById('auth-btn');
 
   err.textContent = '';
-  if (!email || !password) { err.innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Bitte Email und Passwort eingeben.'; return; }
-  if (password.length < 6) { err.innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Passwort mindestens 6 Zeichen.'; return; }
+  if (!email || !password) { err.innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Bitte Email und Passwort eingeben.'; return; }
+  if (password.length < 6) { err.innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Passwort mindestens 6 Zeichen.'; return; }
 
   if (!isLogin) {
     const pw2 = document.getElementById('auth-password2').value;
-    if (password !== pw2) { err.innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Passwörter stimmen nicht überein.'; return; }
+    if (password !== pw2) { err.innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Passwörter stimmen nicht überein.'; return; }
   }
 
   btn.textContent = '...';
@@ -721,11 +721,11 @@ async function submit() {
 }
 
 function translateError(msg) {
-  if (!msg) return '<i class="fas fa-times-circle" style="color:var(--red)"></i> Unbekannter Fehler.';
-  if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) return '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falsche Email oder Passwort.';
-  if (msg.includes('already registered')) return '<i class="fas fa-times-circle" style="color:var(--red)"></i> Diese Email ist bereits registriert.';
-  if (msg.includes('valid email')) return '<i class="fas fa-times-circle" style="color:var(--red)"></i> Bitte gültige Email eingeben.';
-  return '<i class="fas fa-times-circle" style="color:var(--red)"></i> ' + msg;
+  if (!msg) return '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Unbekannter Fehler.';
+  if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) return '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Falsche Email oder Passwort.';
+  if (msg.includes('already registered')) return '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Diese Email ist bereits registriert.';
+  if (msg.includes('valid email')) return '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Bitte gültige Email eingeben.';
+  return '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> ' + msg;
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
@@ -775,7 +775,7 @@ async function verifyOtp() {
     code += document.getElementById('otp-' + i).value;
   }
   if (code.length < 6) {
-    document.getElementById('otp-error').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Bitte alle 6 Ziffern eingeben';
+    document.getElementById('otp-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Bitte alle 6 Ziffern eingeben';
     return;
   }
 
@@ -791,7 +791,7 @@ async function verifyOtp() {
   });
 
   if (error) {
-    document.getElementById('otp-error').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falscher oder abgelaufener Code';
+    document.getElementById('otp-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Falscher oder abgelaufener Code';
     for (let i = 0; i < 6; i++) {
       document.getElementById('otp-' + i).classList.add('error-box');
     }
@@ -822,10 +822,10 @@ async function resendOtp() {
   if (!otpEmail) return;
   const { error } = await sb.auth.resend({ type: 'signup', email: otpEmail });
   if (error) {
-    document.getElementById('otp-error').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> ' + error.message;
+    document.getElementById('otp-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> ' + error.message;
     return;
   }
-  document.getElementById('resend-link').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green)"></i> Code gesendet!';
+  document.getElementById('resend-link').innerHTML = '<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Code gesendet!';
   setTimeout(() => {
     document.getElementById('resend-link').textContent = 'Code erneut senden';
   }, 3000);
@@ -841,16 +841,16 @@ function backToLogin() {
 async function forgotPassword() {
   const email = document.getElementById('auth-email').value.trim();
   if (!email) {
-    document.getElementById('auth-error').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Bitte zuerst Ihre E-Mail eingeben.';
+    document.getElementById('auth-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Bitte zuerst Ihre E-Mail eingeben.';
     document.getElementById('auth-email').focus();
     return;
   }
   const { error } = await sb.auth.resetPasswordForEmail(email, {
     redirectTo: location.origin + '/buchaltung-pro/login.html'
   });
-  if (error) { document.getElementById('auth-error').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> ' + error.message; return; }
+  if (error) { document.getElementById('auth-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> ' + error.message; return; }
   document.getElementById('auth-error').style.color = '#22c55e';
-  document.getElementById('auth-error').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green)"></i> Reset-Link wurde an ' + email + ' gesendet.';
+  document.getElementById('auth-error').innerHTML = '<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Reset-Link wurde an ' + email + ' gesendet.';
 }
 
 // Инициализация — проверяем есть ли биометрия
@@ -866,7 +866,7 @@ async function forgotPassword() {
 
   if (!bioBtn || !bioIcon || !bioLabel) return;
 
-  bioIcon.className = iconClass + ' bio-btn-icon-el';
+  bioIcon.className='material-symbols-outlined bio-btn-icon-el';bioIcon.textContent=iconClass;
   bioLabel.textContent = label;
   bioBtn.style.display = 'flex';
   bioBtn.dataset.available = 'true';

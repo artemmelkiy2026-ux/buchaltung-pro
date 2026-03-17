@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MelaLogic — Profil</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -237,7 +237,7 @@ body {
 
 <!-- Шапка -->
 <div class="header">
-  <div class="header-back" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i></div>
+  <div class="header-back" onclick="goBack()"><span class="material-symbols-outlined">arrow_back</span></div>
   <div class="header-title">Mein Profil</div>
 </div>
 
@@ -246,14 +246,14 @@ body {
 
   <!-- Аватар -->
   <div class="avatar-block">
-    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="avatar"><span class="material-symbols-outlined">person</span></div>
     <div class="avatar-info">
       <h2 id="profile-name">Laden...</h2>
       <p id="profile-email">–</p>
       <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
         <span style="font-size:11px;color:var(--muted)">Kunden-ID:</span>
         <span id="client-id-display" style="font-size:12px;font-weight:600;color:var(--blue);letter-spacing:.05em;cursor:pointer" onclick="copyClientId()" title="Kopieren">–</span>
-        <i class="fa-regular fa-copy" style="font-size:11px;color:var(--muted);cursor:pointer" onclick="copyClientId()"></i>
+        <span class="material-symbols-outlined" style="font-size:11px;color:var(--muted);cursor:pointer" onclick="copyClientId()">help_outline</span>
       </div>
     </div>
   </div>
@@ -263,20 +263,20 @@ body {
     <div class="section-title">Konto</div>
     <div class="settings-card">
       <div class="setting-row" onclick="openModal('modal-email')">
-        <div class="setting-icon blue"><i class="fa-solid fa-envelope"></i></div>
+        <div class="setting-icon blue"><span class="material-symbols-outlined">mail</span></div>
         <div class="setting-body">
           <div class="setting-label">E-Mail ändern</div>
           <div class="setting-sub" id="current-email-sub">–</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <span class="material-symbols-outlined setting-arrow">chevron_right</span>
       </div>
       <div class="setting-row" onclick="openModal('modal-password')">
-        <div class="setting-icon blue"><i class="fa-solid fa-lock"></i></div>
+        <div class="setting-icon blue"><span class="material-symbols-outlined">lock</span></div>
         <div class="setting-body">
           <div class="setting-label">Passwort ändern</div>
           <div class="setting-sub">Sicherheit Ihres Kontos</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <span class="material-symbols-outlined setting-arrow">chevron_right</span>
       </div>
 
     </div>
@@ -288,7 +288,7 @@ body {
     <div class="settings-card">
       <!-- PIN вкл/выкл -->
       <div class="setting-row" style="cursor:default">
-        <div class="setting-icon green"><i class="fa-solid fa-hashtag"></i></div>
+        <div class="setting-icon green"><span class="material-symbols-outlined">tag</span></div>
         <div class="setting-body">
           <div class="setting-label">PIN-Code</div>
           <div class="setting-sub" id="pin-status-sub">Nicht aktiv</div>
@@ -300,16 +300,16 @@ body {
       </div>
       <!-- Сменить PIN (только если включён) -->
       <div class="setting-row" id="change-pin-row" style="display:none" onclick="openChangePinModal()">
-        <div class="setting-icon green"><i class="fa-solid fa-rotate"></i></div>
+        <div class="setting-icon green"><span class="material-symbols-outlined">refresh</span></div>
         <div class="setting-body">
           <div class="setting-label">PIN ändern</div>
           <div class="setting-sub">Alten PIN bestätigen</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <span class="material-symbols-outlined setting-arrow">chevron_right</span>
       </div>
       <!-- Face ID вкл/выкл -->
       <div class="setting-row" id="bio-row" style="cursor:default">
-        <div class="setting-icon purple"><i class="fa-solid fa-fingerprint" id="bio-icon-fa"></i></div>
+        <div class="setting-icon purple"><span class="material-symbols-outlined" id="bio-icon-fa">fingerprint</span></div>
         <div class="setting-body">
           <div class="setting-label" id="bio-label-text">Face ID / Fingerabdruck</div>
           <div class="setting-sub" id="bio-status-sub">Nicht aktiv</div>
@@ -327,20 +327,20 @@ body {
     <div class="section-title">Sitzung</div>
     <div class="settings-card">
       <div class="setting-row" onclick="confirmLogout()">
-        <div class="setting-icon red"><i class="fa-solid fa-right-from-bracket"></i></div>
+        <div class="setting-icon red"><span class="material-symbols-outlined">logout</span></div>
         <div class="setting-body">
           <div class="setting-label">Abmelden</div>
           <div class="setting-sub">Von diesem Gerät abmelden</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <span class="material-symbols-outlined setting-arrow">chevron_right</span>
       </div>
       <div class="setting-row" id="delete-account-row" onclick="openDeleteModal()">
-        <div class="setting-icon red"><i class="fa-solid fa-trash"></i></div>
+        <div class="setting-icon red"><span class="material-symbols-outlined">delete</span></div>
         <div class="setting-body">
           <div class="setting-label">Konto löschen</div>
           <div class="setting-sub" id="delete-account-sub">Konto und alle Daten löschen</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <span class="material-symbols-outlined setting-arrow">chevron_right</span>
       </div>
     </div>
   </div>
@@ -353,7 +353,7 @@ body {
 <div class="modal-overlay" id="modal-email">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-envelope" style="color:var(--blue);margin-right:8px"></i>E-Mail ändern</h3>
+    <h3><span class="material-symbols-outlined" style="color:var(--blue);margin-right:8px">mail</span>E-Mail ändern</h3>
     <div class="field">
       <label>Neue E-Mail</label>
       <input type="email" id="new-email" placeholder="neue@email.de">
@@ -372,7 +372,7 @@ body {
 <div class="modal-overlay" id="modal-password">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-lock" style="color:var(--blue);margin-right:8px"></i>Passwort ändern</h3>
+    <h3><span class="material-symbols-outlined" style="color:var(--blue);margin-right:8px">lock</span>Passwort ändern</h3>
     <div class="field">
       <label>Aktuelles Passwort</label>
       <input type="password" id="old-pwd" placeholder="••••••••">
@@ -395,7 +395,7 @@ body {
 <div class="modal-overlay" id="modal-pin-disable">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-hashtag" style="color:var(--green);margin-right:8px"></i>PIN deaktivieren</h3>
+    <h3><span class="material-symbols-outlined" style="color:var(--green);margin-right:8px">tag</span>PIN deaktivieren</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:8px">Bitte aktuellen PIN eingeben</p>
     <div class="pin-dots">
       <div class="pin-dot" id="pd-dot-0"></div>
@@ -426,7 +426,7 @@ body {
 <div class="modal-overlay" id="modal-pin-change">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-rotate" style="color:var(--green);margin-right:8px"></i>PIN ändern</h3>
+    <h3><span class="material-symbols-outlined" style="color:var(--green);margin-right:8px">refresh</span>PIN ändern</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:4px" id="pc-subtitle">Aktuellen PIN eingeben</p>
     <div class="pin-dots">
       <div class="pin-dot" id="pc-dot-0"></div>
@@ -457,7 +457,7 @@ body {
 <div class="modal-overlay" id="modal-pin-setup">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-hashtag" style="color:var(--green);margin-right:8px"></i>PIN einrichten</h3>
+    <h3><span class="material-symbols-outlined" style="color:var(--green);margin-right:8px">tag</span>PIN einrichten</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:4px" id="ps-subtitle">Neuen PIN festlegen (1/2)</p>
     <div class="pin-dots">
       <div class="pin-dot" id="ps-dot-0"></div>
@@ -488,7 +488,7 @@ body {
 <div class="modal-overlay" id="modal-delete">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3 style="color:var(--red)"><i class="fa-solid fa-trash" style="margin-right:8px"></i>Konto löschen</h3>
+    <h3 style="color:var(--red)"><span class="material-symbols-outlined" style="margin-right:8px">delete</span>Konto löschen</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.5">
       Ihr Konto wird <strong>nach 30 Tagen</strong> endgültig gelöscht. Sie können die Löschung jederzeit in Ihrem Profil widerrufen.
     </p>
@@ -497,7 +497,7 @@ body {
       <input type="password" id="delete-pwd" placeholder="Ihr aktuelles Passwort">
     </div>
     <div class="msg" id="delete-msg"></div>
-    <button class="btn-danger" onclick="deleteAccount()"><i class="fa-solid fa-trash" style="margin-right:6px"></i>Konto zur Löschung markieren</button>
+    <button class="btn-danger" onclick="deleteAccount()"><span class="material-symbols-outlined" style="margin-right:6px">delete</span>Konto zur Löschung markieren</button>
     <button class="btn-cancel" onclick="closeModal('modal-delete')">Abbrechen</button>
   </div>
 </div>
@@ -506,12 +506,12 @@ body {
 <div class="modal-overlay" id="modal-cancel-delete">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3 style="color:var(--green)"><i class="fa-solid fa-rotate-left" style="margin-right:8px"></i>Löschung widerrufen</h3>
+    <h3 style="color:var(--green)"><span class="material-symbols-outlined" style="margin-right:8px">undo</span>Löschung widerrufen</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.5">
       Möchten Sie die Kontolöschung wirklich abbrechen? Ihr Konto bleibt dann erhalten.
     </p>
     <div class="msg" id="cancel-delete-msg"></div>
-    <button class="btn-primary" onclick="cancelDeleteAccount()"><i class="fa-solid fa-rotate-left" style="margin-right:6px"></i>Löschung abbrechen</button>
+    <button class="btn-primary" onclick="cancelDeleteAccount()"><span class="material-symbols-outlined" style="margin-right:6px">undo</span>Löschung abbrechen</button>
     <button class="btn-cancel" onclick="closeModal('modal-cancel-delete')">Schließen</button>
   </div>
 </div>
@@ -585,12 +585,12 @@ function initBioUI() {
   const isMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 0;
   const isWindows = /Windows/.test(ua);
 
-  let icon = 'fa-fingerprint', label = 'Fingerabdruck';
+  let icon = 'fingerprint', label = 'Fingerabdruck';
   if (isIOS) { icon = 'fa-face-smile'; label = 'Face ID'; }
-  else if (isMac) { icon = 'fa-apple fa-brands'; label = 'Touch ID'; }
-  else if (isWindows) { icon = 'fa-windows fa-brands'; label = 'Windows Hello'; }
+  else if (isMac) { icon = 'fingerprint'; label = 'Touch ID'; }
+  else if (isWindows) { icon = 'fingerprint'; label = 'Windows Hello'; }
 
-  document.getElementById('bio-icon-fa').className = `fa-solid ${icon}`;
+  const _bw2=document.getElementById('bio-icon-wrap');if(_bw2)_bw2.innerHTML='<span class="material-symbols-outlined" style="font-size:14px">'+icon+'</span>';
   document.getElementById('bio-label-text').textContent = label;
 
   const hasBio = !!localStorage.getItem('bp_bio_login') || !!localStorage.getItem('bp_bio_id');
@@ -630,16 +630,16 @@ async function changeEmail() {
   const password = document.getElementById('email-confirm-pwd').value;
   const msg = document.getElementById('email-msg');
 
-  if (!newEmail || !password) { setMsg('email-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Alle Felder ausfüllen', 'error'); return; }
+  if (!newEmail || !password) { setMsg('email-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Alle Felder ausfüllen', 'error'); return; }
 
   // Сначала проверяем пароль через повторный вход
   const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password });
-  if (signInErr) { setMsg('email-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falsches Passwort', 'error'); return; }
+  if (signInErr) { setMsg('email-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Falsches Passwort', 'error'); return; }
 
   const { error } = await sb.auth.updateUser({ email: newEmail });
-  if (error) { setMsg('email-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> ' + error.message, 'error'); return; }
+  if (error) { setMsg('email-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> ' + error.message, 'error'); return; }
 
-  setMsg('email-msg', '<i class="fas fa-check-circle" style="color:var(--green)"></i> Bestätigungs-E-Mail gesendet', 'success');
+  setMsg('email-msg', '<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Bestätigungs-E-Mail gesendet', 'success');
   setTimeout(() => closeModal('modal-email'), 2000);
 }
 
@@ -649,16 +649,16 @@ async function changePassword() {
   const newPwd = document.getElementById('new-pwd').value;
   const newPwd2 = document.getElementById('new-pwd2').value;
 
-  if (!oldPwd || !newPwd || !newPwd2) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Alle Felder ausfüllen', 'error'); return; }
-  if (newPwd.length < 6) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Mindestens 6 Zeichen', 'error'); return; }
-  if (newPwd !== newPwd2) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Passwörter stimmen nicht überein', 'error'); return; }
+  if (!oldPwd || !newPwd || !newPwd2) { setMsg('pwd-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Alle Felder ausfüllen', 'error'); return; }
+  if (newPwd.length < 6) { setMsg('pwd-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Mindestens 6 Zeichen', 'error'); return; }
+  if (newPwd !== newPwd2) { setMsg('pwd-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Passwörter stimmen nicht überein', 'error'); return; }
 
   // Проверяем старый пароль
   const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password: oldPwd });
-  if (signInErr) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Aktuelles Passwort falsch', 'error'); return; }
+  if (signInErr) { setMsg('pwd-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Aktuelles Passwort falsch', 'error'); return; }
 
   const { error } = await sb.auth.updateUser({ password: newPwd });
-  if (error) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> ' + error.message, 'error'); return; }
+  if (error) { setMsg('pwd-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> ' + error.message, 'error'); return; }
 
   // Обновляем сохранённые данные биометрии
   const bioData = localStorage.getItem('bp_bio_login');
@@ -668,7 +668,7 @@ async function changePassword() {
     localStorage.setItem('bp_bio_login', JSON.stringify(parsed));
   }
 
-  setMsg('pwd-msg', '<i class="fas fa-check-circle" style="color:var(--green)"></i> Passwort geändert', 'success');
+  setMsg('pwd-msg', '<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Passwort geändert', 'success');
   setTimeout(() => closeModal('modal-password'), 2000);
 }
 
@@ -677,8 +677,8 @@ async function forgotPassword() {
   const { error } = await sb.auth.resetPasswordForEmail(currentEmail, {
     redirectTo: location.origin + '/buchaltung-pro/login.html'
   });
-  if (error) { toast('<i class="fas fa-times-circle" style="color:var(--red)"></i> Fehler: ' + error.message); return; }
-  toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Reset-Link an ' + currentEmail + ' gesendet');
+  if (error) { toast('<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Fehler: ' + error.message); return; }
+  toast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Reset-Link an ' + currentEmail + ' gesendet');
 }
 
 // ── PIN тоггл ─────────────────────────────────────────────────────────────
@@ -745,7 +745,7 @@ async function pcConfirm() {
     updatePcDots();
   } else {
     if (pcValue !== pcNewValue) {
-      document.getElementById('pc-msg').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> PINs stimmen nicht überein';
+      document.getElementById('pc-msg').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> PINs stimmen nicht überein';
       pcValue = ''; pcStep = 'new1'; pcNewValue = '';
       document.getElementById('pc-subtitle').textContent = 'Neuen PIN festlegen (1/2)';
       setTimeout(() => { updatePcDots(); document.getElementById('pc-msg').textContent=''; }, 1000);
@@ -758,7 +758,7 @@ async function pcConfirm() {
     // Сессия остаётся разблокированной после смены PIN
     sessionStorage.setItem('pin_unlocked', '1');
     closeModal('modal-pin-change');
-    toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> PIN geändert');
+    toast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> PIN geändert');
   }
 }
 
@@ -802,7 +802,7 @@ async function pdConfirm() {
   document.getElementById('pin-status-sub').textContent = 'Nicht aktiv';
   document.getElementById('change-pin-row').style.display = 'none';
   closeModal('modal-pin-disable');
-  toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> PIN deaktiviert');
+  toast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> PIN deaktiviert');
 }
 function cancelPinDisable() {
   document.getElementById('pin-toggle').checked = true;
@@ -814,7 +814,7 @@ function pcPinError(prefix) {
   else { pdValue = ''; updatePdDots(); }
   if (navigator.vibrate) navigator.vibrate([100,50,100]);
   for(let i=0;i<4;i++) document.getElementById(`${prefix}-dot-${i}`).classList.add('error');
-  document.getElementById(`${prefix}-msg`).innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falscher PIN';
+  document.getElementById(`${prefix}-msg`).innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Falscher PIN';
   setTimeout(() => {
     if (prefix==='pc') updatePcDots(); else updatePdDots();
     document.getElementById(`${prefix}-msg`).textContent = '';
@@ -847,19 +847,19 @@ async function handleBioToggle() {
         const credIdBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
         localStorage.setItem('bp_bio_id', credIdBase64);
         document.getElementById('bio-status-sub').textContent = 'Aktiv';
-        toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Biometrie aktiviert');
+        toast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Biometrie aktiviert');
       }
     } catch(e) {
       document.getElementById('bio-toggle').checked = false;
       document.getElementById('bio-status-sub').textContent = 'Nicht aktiv';
-      toast('<i class="fas fa-times-circle" style="color:var(--red)"></i> Biometrie nicht verfügbar');
+      toast('<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Biometrie nicht verfügbar');
     }
   } else {
     // Выключаем
     localStorage.removeItem('bp_bio_id');
     localStorage.removeItem('bp_bio_login');
     document.getElementById('bio-status-sub').textContent = 'Nicht aktiv';
-    toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Biometrie deaktiviert');
+    toast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Biometrie deaktiviert');
   }
 }
 
@@ -913,7 +913,7 @@ async function psConfirm() {
     return;
   }
   if (psValue !== psFirst) {
-    document.getElementById('ps-msg').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> PINs stimmen nicht überein';
+    document.getElementById('ps-msg').innerHTML = '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> PINs stimmen nicht überein';
     if (navigator.vibrate) navigator.vibrate([100,50,100]);
     for(let i=0;i<4;i++) document.getElementById('ps-dot-'+i).classList.add('error');
     psValue = ''; psFirst = ''; psStep = 1;
@@ -936,7 +936,7 @@ async function psConfirm() {
   document.getElementById('pin-status-sub').textContent = 'Aktiv';
   document.getElementById('change-pin-row').style.display = 'flex';
   closeModal('modal-pin-setup');
-  toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> PIN eingerichtet');
+  toast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> PIN eingerichtet');
 }
 function cancelPinSetup() {
   document.getElementById('pin-toggle').checked = false;
@@ -956,10 +956,10 @@ function openDeleteModal() {
 
 async function deleteAccount() {
   const password = document.getElementById('delete-pwd').value;
-  if (!password) { setMsg('delete-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Bitte Passwort eingeben', 'error'); return; }
+  if (!password) { setMsg('delete-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Bitte Passwort eingeben', 'error'); return; }
 
   const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password });
-  if (signInErr) { setMsg('delete-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falsches Passwort', 'error'); return; }
+  if (signInErr) { setMsg('delete-msg', '<span class="material-symbols-outlined" style="color:var(--red)">cancel</span> Falsches Passwort', 'error'); return; }
 
   const now = new Date().toISOString();
   await sb.from('user_data').upsert({ user_id: currentUser.id, deleted_at: now }, { onConflict: 'user_id' });
@@ -968,7 +968,7 @@ async function deleteAccount() {
   // Обновляем UI
   updateDeleteUI(now);
   closeModal('modal-delete');
-  toast('<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Konto wird in 30 Tagen gelöscht');
+  toast('<span class="material-symbols-outlined" style="color:var(--yellow)">warning</span> Konto wird in 30 Tagen gelöscht');
 }
 
 async function cancelDeleteAccount() {
@@ -976,7 +976,7 @@ async function cancelDeleteAccount() {
   window._deletedAt = null;
   updateDeleteUI(null);
   closeModal('modal-cancel-delete');
-  toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Löschung abgebrochen');
+  toast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> Löschung abgebrochen');
 }
 
 function updateDeleteUI(deletedAt) {
@@ -1001,7 +1001,7 @@ function updateDeleteUI(deletedAt) {
 
 function copyClientId() {
   const id = document.getElementById('client-id-display').textContent;
-  navigator.clipboard.writeText(id).then(() => toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> ' + id + ' kopiert'));
+  navigator.clipboard.writeText(id).then(() => toast('<span class="material-symbols-outlined" style="color:var(--green)">check_circle</span> ' + id + ' kopiert'));
 }
 
 init();
