@@ -417,9 +417,9 @@ function showKundeRechnungen(id) {
     </div>`;
 
   const statusCfg = {
-    offen:       {icon:'fas fa-clock',              label:'Offen',      avatarCls:'rech-badge-offen',   pillCls:'rech-badge-offen-pill'},
-    ueberfaellig:{icon:'fas fa-exclamation-circle', label:'Überfällig', avatarCls:'rech-badge-ueber',   pillCls:'rech-badge-ueber-pill'},
-    bezahlt:     {icon:'fas fa-check-circle',       label:'Bezahlt',    avatarCls:'rech-badge-bezahlt', pillCls:'rech-badge-bezahlt-pill'}
+    offen:       {icon:'schedule',              label:'Offen',      avatarCls:'rech-badge-offen',   pillCls:'rech-badge-offen-pill'},
+    ueberfaellig:{icon:'error', label:'Überfällig', avatarCls:'rech-badge-ueber',   pillCls:'rech-badge-ueber-pill'},
+    bezahlt:     {icon:'check_circle',       label:'Bezahlt',    avatarCls:'rech-badge-bezahlt', pillCls:'rech-badge-bezahlt-pill'}
   };
 
   const today = new Date().toISOString().split('T')[0];
@@ -432,7 +432,7 @@ function showKundeRechnungen(id) {
       if(diff>0) overdueTxt = `<span class="rech-overdue">+${diff}T</span>`;
     }
     return `<div class="krech-card" onclick="openRechFromKunde('${r.id}')">
-      <div class="krech-avatar ${st.avatarCls}"><i class="${st.icon}"></i></div>
+      <div class="krech-avatar ${st.avatarCls}"><span class="material-symbols-outlined" style="font-size:18px">${st.icon}</span></div>
       <div class="krech-info">
         <div class="krech-nr">${r.nr}</div>
         <div class="krech-desc">${r.beschreibung||'—'}</div>
@@ -444,7 +444,7 @@ function showKundeRechnungen(id) {
       </div>
       <div class="krech-right">
         <div class="krech-betrag">${fmt(r.betrag)}</div>
-        <div class="${st.pillCls}"><i class="${st.icon}" style="font-size:9px"></i> ${st.label}</div>
+        <div class="${st.pillCls}"><span class="material-symbols-outlined" style="font-size:14px">${st.icon}</span> ${st.label}</div>
       </div>
     </div>`;
   }).join('');

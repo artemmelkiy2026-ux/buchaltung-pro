@@ -45,7 +45,7 @@ function renderProdukte() {
   }
   empty.style.display = 'none';
 
-  const katIcon = k => k === 'Artikel' ? 'fa-box' : k === 'Dienstleistung' ? 'fa-tools' : 'fa-ellipsis-h';
+  // katIcon removed — using katMatIcon instead
   const katMatIcon = k => k === 'Artikel' ? 'inventory_2' : k === 'Dienstleistung' ? 'build' : 'more_horiz';
   const katColor = k => k === 'Artikel' ? 'var(--blue)' : k === 'Dienstleistung' ? 'var(--green)' : 'var(--sub)';
 

@@ -57,9 +57,9 @@ function renderProg(){
     verglEl.innerHTML=`<div class="pg-empty"><span class="material-symbols-outlined">show_chart</span><span>Keine Daten für ${prevYr}</span></div>`;
   } else {
     const pairs=[
-      {lbl:'Einnahmen',cur:istEin,prev:prevEin,col:'var(--green)',icon:'fa-arrow-up',matIcon:'arrow_upward'},
-      {lbl:'Ausgaben', cur:istAus,prev:prevAus,col:'var(--red)',  icon:'fa-arrow-down',matIcon:'arrow_downward'},
-      {lbl:'Gewinn',   cur:istEin-istAus,prev:prevEin-prevAus,col:istEin-istAus>=0?'var(--green)':'var(--red)',icon:'fa-wallet',matIcon:'account_balance_wallet'},
+      {lbl:'Einnahmen',cur:istEin,prev:prevEin,col:'var(--green)',icon:'arrow_upward',matIcon:'arrow_upward'},
+      {lbl:'Ausgaben', cur:istAus,prev:prevAus,col:'var(--red)',  icon:'arrow_downward',matIcon:'arrow_downward'},
+      {lbl:'Gewinn',   cur:istEin-istAus,prev:prevEin-prevAus,col:istEin-istAus>=0?'var(--green)':'var(--red)',icon:'account_balance_wallet',matIcon:'account_balance_wallet'},
     ];
     const bigCards=pairs.map(p=>{
       const d=p.prev!==0?Math.round((p.cur/Math.abs(p.prev)-1)*100):null;

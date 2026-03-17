@@ -309,7 +309,7 @@ body {
       </div>
       <!-- Face ID вкл/выкл -->
       <div class="setting-row" id="bio-row" style="cursor:default">
-        <div class="setting-icon purple"><span class="material-symbols-outlined" id="bio-icon-fa">fingerprint</span></div>
+        <div class="setting-icon purple" id="bio-icon-wrap"><span class="material-symbols-outlined" id="bio-icon-fa">fingerprint</span></div>
         <div class="setting-body">
           <div class="setting-label" id="bio-label-text">Face ID / Fingerabdruck</div>
           <div class="setting-sub" id="bio-status-sub">Nicht aktiv</div>
@@ -586,7 +586,7 @@ function initBioUI() {
   const isWindows = /Windows/.test(ua);
 
   let icon = 'fingerprint', label = 'Fingerabdruck';
-  if (isIOS) { icon = 'fa-face-smile'; label = 'Face ID'; }
+  if (isIOS) { icon = 'mood'; label = 'Face ID'; }
   else if (isMac) { icon = 'fingerprint'; label = 'Touch ID'; }
   else if (isWindows) { icon = 'fingerprint'; label = 'Windows Hello'; }
 

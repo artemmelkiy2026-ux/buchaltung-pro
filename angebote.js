@@ -9,10 +9,10 @@ let angPreisMode = 'brutto';
 const ANG_PER = 10;
 
 const ANG_ST = {
-  offen:      { label:'Offen',      icon:'fas fa-clock',         color:'var(--yellow)', cls:'ang-badge-offen',      pill:'ang-badge-offen-pill'      },
-  angenommen: { label:'Angenommen', icon:'fas fa-check-circle',  color:'var(--green)',  cls:'ang-badge-angenommen', pill:'ang-badge-angenommen-pill' },
-  abgelehnt:  { label:'Abgelehnt',  icon:'fas fa-times-circle',  color:'var(--red)',    cls:'ang-badge-abgelehnt',  pill:'ang-badge-abgelehnt-pill'  },
-  abgelaufen: { label:'Abgelaufen', icon:'fas fa-hourglass-end', color:'var(--sub)',    cls:'ang-badge-abgelaufen', pill:'ang-badge-abgelaufen-pill' },
+  offen:      { label:'Offen',      icon:'schedule',         color:'var(--yellow)', cls:'ang-badge-offen',      pill:'ang-badge-offen-pill'      },
+  angenommen: { label:'Angenommen', icon:'check_circle',  color:'var(--green)',  cls:'ang-badge-angenommen', pill:'ang-badge-angenommen-pill' },
+  abgelehnt:  { label:'Abgelehnt',  icon:'cancel',  color:'var(--red)',    cls:'ang-badge-abgelehnt',  pill:'ang-badge-abgelehnt-pill'  },
+  abgelaufen: { label:'Abgelaufen', icon:'hourglass_bottom', color:'var(--sub)',    cls:'ang-badge-abgelaufen', pill:'ang-badge-abgelaufen-pill' },
 };
 
 // ── STATUS DROPDOWN ──────────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ function renderAngebote() {
     return `<div class="rech-card" onclick="openAngForm('${a.id}')" style="flex-direction:column;align-items:stretch;gap:10px">
       <div style="display:flex;align-items:center;gap:12px">
         <div class="rech-card-avatar ${st.cls}" style="width:38px;height:38px;border-radius:var(--r);font-size:16px">
-          <i class="${st.icon}"></i>
+          <span class="material-symbols-outlined" style="font-size:18px">${st.icon}</span>
         </div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">

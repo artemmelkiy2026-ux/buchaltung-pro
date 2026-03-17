@@ -1,8 +1,8 @@
 // ── RECHNUNG STATUS DROPDOWN ─────────────────────────────────────────────
 const _RECH_ST_CFG = {
-  'offen':       {icon:'fas fa-clock',              color:'var(--yellow)', label:'Offen'},
-  'bezahlt':     {icon:'fas fa-check-circle',       color:'var(--green)',  label:'Bezahlt'},
-  'ueberfaellig':{icon:'fas fa-exclamation-circle', color:'var(--red)',    label:'Überfällig'},
+  'offen':       {icon:'schedule',              color:'var(--yellow)', label:'Offen'},
+  'bezahlt':     {icon:'check_circle',       color:'var(--green)',  label:'Bezahlt'},
+  'ueberfaellig':{icon:'error', color:'var(--red)',    label:'Überfällig'},
 };
 
 function setRechStatus(val){
@@ -11,7 +11,7 @@ function setRechStatus(val){
   const icon = document.getElementById('rn-status-icon');
   const txt  = document.getElementById('rn-status-text');
   if(inp)  inp.value = val;
-  if(icon) { icon.className = cfg.icon; icon.style.color = cfg.color; }
+  if(icon) { icon.className = 'material-symbols-outlined'; icon.textContent = cfg.icon; icon.style.color = cfg.color; icon.style.fontSize = '16px'; }
   if(txt)  txt.textContent = cfg.label;
   const panel = document.getElementById('rn-status-panel');
   if(panel) panel.style.display = 'none';
@@ -86,9 +86,9 @@ function renderRech(){
   });
 
   const statusCfg = {
-    offen:       {cls:'rech-badge-offen',    icon:'fas fa-clock',              label:'Offen',      color:'var(--yellow)'},
-    ueberfaellig:{cls:'rech-badge-ueber',    icon:'fas fa-exclamation-circle', label:'Überfällig', color:'var(--red)'},
-    bezahlt:     {cls:'rech-badge-bezahlt',  icon:'fas fa-check-circle',       label:'Bezahlt',    color:'var(--green)'}
+    offen:       {cls:'rech-badge-offen',    icon:'schedule',              label:'Offen',      color:'var(--yellow)'},
+    ueberfaellig:{cls:'rech-badge-ueber',    icon:'error', label:'Überfällig', color:'var(--red)'},
+    bezahlt:     {cls:'rech-badge-bezahlt',  icon:'check_circle',       label:'Bezahlt',    color:'var(--green)'}
   };
 
   const cards = filtered.map(r=>{
@@ -110,7 +110,7 @@ function renderRech(){
     return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" onclick="editRech('${r.id}')">
       <div class="rech-card-left">
         <div class="rech-card-avatar ${st.cls}">
-          <i class="${st.icon}"></i>
+          <span class="material-symbols-outlined" style="font-size:18px">${st.icon}</span>
         </div>
         <div class="rech-card-info">
           <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
@@ -126,7 +126,7 @@ function renderRech(){
       <div class="rech-card-right">
         <div class="rech-card-betrag">${fmt(r.betrag)}</div>
         <div class="rech-card-status ${st.cls}-pill">
-          <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
+          <span class="material-symbols-outlined" style="font-size:14px">${st.icon}</span> ${st.label}
         </div>
         <div class="rech-card-actions" onclick="event.stopPropagation()">
           ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><span class="material-symbols-outlined">check</span></button>`:''}
