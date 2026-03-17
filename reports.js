@@ -344,6 +344,13 @@ function renderKat(){
       }).join('');
     }
   }
+
+  // ── NEW: Extended metrics ─────────────────────────────────────────────────
+  _renderKatTrend(ye, yr, isEin);
+  _renderKatAvg(ye, isEin);
+  _renderKatTopKunden(ye, yr, isEin);
+  _renderKatTopProdukte(yr);
+  _renderKatGrowth(yr, isEin);
 }
 
 // ── Highlight / Reset / Toggle ─────────────────────────────────────────────
@@ -396,4 +403,279 @@ function _katClick(idx, segs, total, count){
     window._katSel.add(idx);
   }
   _katReset(segs, total, count);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// KATEGORIENANALYSE — Extended Metrics (Canva-style)
+// ═══════════════════════════════════════════════════════════════════════
+
+// ── 1. Trend Sparkline — Einnahmen vs Ausgaben по месяцам ─────────────
+function _renderKatTrend(ye, yr, isEin){
+  const el=document.getElementById('kat-trend-chart'); if(!el) return;
+  const curYear = yr==='Alle' ? new Date().getFullYear()+'' : yr;
+  // По месяцам
+  const monthly=[];
+  for(let m=0;m<12;m++){
+    const mi=String(m+1).padStart(2,'0');
+    const me=ye.filter(e=>e.datum&&e.datum.substring(5,7)===mi);
+    const ein=me.filter(e=>e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
+    const aus=me.filter(e=>e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
+    monthly.push({m,ein,aus,gew:ein-aus,label:(typeof MN!=='undefined'?MN[m]:'M'+(m+1)).substring(0,3)});
+  }
+  const maxVal=Math.max(...monthly.map(m=>Math.max(m.ein,m.aus)),1);
+  const H=80, W=100;
+  // SVG sparkline paths
+  function sparkPath(data,key){
+    return data.map((d,i)=>{
+      const x=(i/(data.length-1))*W;
+      const y=H-((d[key]/maxVal)*H);
+      return (i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
+    }).join(' ');
+  }
+  const einPath=sparkPath(monthly,'ein');
+  const ausPath=sparkPath(monthly,'aus');
+  // Текущий месяц
+  const curMon=new Date().getMonth();
+  const curData=monthly[curMon]||monthly[0];
+
+  el.innerHTML=`
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:12px">Monatstrend ${curYear}</div>
+    <svg viewBox="-2 -4 ${W+4} ${H+12}" style="width:100%;height:120px;overflow:visible" preserveAspectRatio="none">
+      <path d="${einPath}" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+      <path d="${ausPath}" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+      ${monthly.map((d,i)=>{
+        const x=(i/11)*W;
+        return `<text x="${x}" y="${H+10}" text-anchor="middle" font-size="3.5" fill="var(--sub)" font-family="Inter,sans-serif">${d.label}</text>`;
+      }).join('')}
+    </svg>
+    <div style="display:flex;gap:16px;margin-top:10px">
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)"><span style="width:10px;height:3px;border-radius:2px;background:var(--green)"></span> Einnahmen</span>
+      <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)"><span style="width:10px;height:3px;border-radius:2px;background:var(--red)"></span> Ausgaben</span>
+    </div>`;
+}
+
+// ── 2. Durchschnittliche Transaktion ──────────────────────────────────
+function _renderKatAvg(ye, isEin){
+  const el=document.getElementById('kat-avg-card'); if(!el) return;
+  const einArr=ye.filter(e=>e.typ==='Einnahme');
+  const ausArr=ye.filter(e=>e.typ==='Ausgabe');
+  const avgEin=einArr.length?einArr.reduce((s,e)=>s+e.betrag,0)/einArr.length:0;
+  const avgAus=ausArr.length?ausArr.reduce((s,e)=>s+e.betrag,0)/ausArr.length:0;
+  // Median
+  function median(arr){
+    if(!arr.length) return 0;
+    const s=[...arr].sort((a,b)=>a-b);
+    const m=Math.floor(s.length/2);
+    return s.length%2?s[m]:(s[m-1]+s[m])/2;
+  }
+  const medEin=median(einArr.map(e=>e.betrag));
+  const medAus=median(ausArr.map(e=>e.betrag));
+  // Max
+  const maxEin=einArr.length?Math.max(...einArr.map(e=>e.betrag)):0;
+  const maxAus=ausArr.length?Math.max(...ausArr.map(e=>e.betrag)):0;
+
+  el.innerHTML=`
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:14px">Transaktionsanalyse</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Ø Einnahme</div>
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--green)">${fmt(avgEin)}</div>
+        <div style="font-size:10px;color:var(--sub);margin-top:6px">Median: ${fmt(medEin)}</div>
+        <div style="font-size:10px;color:var(--sub)">Max: ${fmt(maxEin)}</div>
+        <div style="font-size:10px;color:var(--sub)">${einArr.length} Buchungen</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Ø Ausgabe</div>
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--red)">${fmt(avgAus)}</div>
+        <div style="font-size:10px;color:var(--sub);margin-top:6px">Median: ${fmt(medAus)}</div>
+        <div style="font-size:10px;color:var(--sub)">Max: ${fmt(maxAus)}</div>
+        <div style="font-size:10px;color:var(--sub)">${ausArr.length} Buchungen</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
+      <span style="font-size:11px;color:var(--sub)">Ø Gewinn pro Buchung</span>
+      <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:${avgEin-avgAus>=0?'var(--green)':'var(--red)'}">${avgEin-avgAus>=0?'+':''}${fmt(avgEin-avgAus)}</span>
+    </div>`;
+}
+
+// ── 3. TOP 5 Kunden nach Umsatz ──────────────────────────────────────
+function _renderKatTopKunden(ye, yr, isEin){
+  const el=document.getElementById('kat-top-kunden'); if(!el) return;
+  // Match eintraege to kunden by beschreibung matching or via rechnungen.kundeId
+  const kundenUmsatz={};
+  // From rechnungen
+  (data.rechnungen||[]).forEach(r=>{
+    if(yr!=='Alle'&&r.datum&&!r.datum.startsWith(yr)) return;
+    if(r.status==='storniert') return;
+    const name=r.kunde||'Unbekannt';
+    if(!kundenUmsatz[name]) kundenUmsatz[name]=0;
+    kundenUmsatz[name]+=parseFloat(r.betrag)||0;
+  });
+  // Fallback: from kunden data with computed umsatz
+  if(!Object.keys(kundenUmsatz).length){
+    (data.kunden||[]).forEach(k=>{
+      const umsatz=(data.rechnungen||[]).filter(r=>r.kunde===k.name&&r.status!=='storniert').reduce((s,r)=>s+(parseFloat(r.betrag)||0),0);
+      if(umsatz>0) kundenUmsatz[k.name]=umsatz;
+    });
+  }
+  const sorted=Object.entries(kundenUmsatz).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxV=sorted[0]?sorted[0][1]:1;
+  const totalK=sorted.reduce((s,[,v])=>s+v,0);
+
+  if(!sorted.length){
+    el.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Top Kunden</div>
+    <div style="color:var(--sub);font-size:12px;padding:20px 0;text-align:center">Keine Kundendaten vorhanden</div>`;
+    return;
+  }
+
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)">Top ${sorted.length} Kunden</span>
+      <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text)">${fmt(totalK)}</span>
+    </div>
+    ${sorted.map(([name,val],i)=>{
+      const pct=Math.round(val/maxV*100);
+      const share=Math.round(val/totalK*100);
+      const initials=name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+      const colors=['var(--blue)','var(--green)','var(--yellow)','var(--purple)','var(--cyan)'];
+      const c=colors[i%colors.length];
+      return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:30px;height:30px;border-radius:var(--r);background:${c}15;color:${c};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>
+            <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:${c};flex-shrink:0;margin-left:8px">${fmt(val)}</span>
+          </div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${c};border-radius:2px;opacity:.6;transition:width .5s"></div>
+          </div>
+          <div style="font-size:9px;color:var(--sub);margin-top:2px">${share}% vom Gesamtumsatz</div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ── 4. TOP 5 Produkte & Leistungen ───────────────────────────────────
+function _renderKatTopProdukte(yr){
+  const el=document.getElementById('kat-top-produkte'); if(!el) return;
+  // Collect from rechnungen positionen
+  const prodMap={};
+  (data.rechnungen||[]).forEach(r=>{
+    if(yr!=='Alle'&&r.datum&&!r.datum.startsWith(yr)) return;
+    if(r.status==='storniert') return;
+    (r.positionen||[]).forEach(p=>{
+      const name=p.beschreibung||p.bez||'Unbenannt';
+      if(!prodMap[name]) prodMap[name]={umsatz:0,menge:0,count:0};
+      const ep=parseFloat(p.einzelpreis||p.netto)||0;
+      const m=parseInt(p.menge)||1;
+      prodMap[name].umsatz+=ep*m;
+      prodMap[name].menge+=m;
+      prodMap[name].count++;
+    });
+  });
+  // Also from angebote
+  (data.angebote||[]).forEach(a=>{
+    if(yr!=='Alle'&&a.datum&&!a.datum.startsWith(yr)) return;
+    if(a.status==='abgelehnt') return;
+    (a.positionen||[]).forEach(p=>{
+      const name=p.beschreibung||p.bez||'Unbenannt';
+      if(!prodMap[name]) prodMap[name]={umsatz:0,menge:0,count:0};
+      const ep=parseFloat(p.einzelpreis||p.netto)||0;
+      const m=parseInt(p.menge)||1;
+      prodMap[name].umsatz+=ep*m;
+      prodMap[name].menge+=m;
+      prodMap[name].count++;
+    });
+  });
+
+  const sorted=Object.entries(prodMap).sort((a,b)=>b[1].umsatz-a[1].umsatz).slice(0,5);
+  const maxU=sorted[0]?sorted[0][1].umsatz:1;
+
+  if(!sorted.length){
+    el.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Top Produkte & Leistungen</div>
+    <div style="color:var(--sub);font-size:12px;padding:20px 0;text-align:center">Keine Positionen in Rechnungen / Angeboten</div>`;
+    return;
+  }
+
+  el.innerHTML=`
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:14px">Top ${sorted.length} Produkte & Leistungen</div>
+    ${sorted.map(([name,d],i)=>{
+      const pct=Math.round(d.umsatz/maxU*100);
+      const icons=['📦','⚡','🔧','📋','💡'];
+      return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:30px;height:30px;border-radius:var(--r);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${icons[i%icons.length]}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>
+            <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);flex-shrink:0;margin-left:8px">${fmt(d.umsatz)}</span>
+          </div>
+          <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:var(--blue);border-radius:2px;opacity:.5;transition:width .5s"></div>
+          </div>
+          <div style="font-size:9px;color:var(--sub);margin-top:2px">${d.menge}× verkauft · ${d.count} Aufträge</div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ── 5. Kategorie-Wachstum vs Vorjahr ─────────────────────────────────
+function _renderKatGrowth(yr, isEin){
+  const el=document.getElementById('kat-growth'); if(!el) return;
+  if(yr==='Alle'){
+    el.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Kategorie-Wachstum</div>
+    <div style="color:var(--sub);font-size:12px;text-align:center;padding:16px 0">Bitte ein bestimmtes Jahr auswählen</div>`;
+    return;
+  }
+  const typ=isEin?'Einnahme':'Ausgabe';
+  const prevYr=String(parseInt(yr)-1);
+  const curEntries=activeEintraegeMitRech(yr).filter(e=>e.typ===typ);
+  const prevEntries=activeEintraegeMitRech(prevYr).filter(e=>e.typ===typ);
+  const curByKat={}, prevByKat={};
+  curEntries.forEach(e=>{curByKat[e.kategorie]=(curByKat[e.kategorie]||0)+e.betrag;});
+  prevEntries.forEach(e=>{prevByKat[e.kategorie]=(prevByKat[e.kategorie]||0)+e.betrag;});
+  const allKats=[...new Set([...Object.keys(curByKat),...Object.keys(prevByKat)])];
+  const growth=allKats.map(k=>{
+    const cur=curByKat[k]||0;
+    const prev=prevByKat[k]||0;
+    const diff=cur-prev;
+    const pct=prev>0?Math.round((diff/prev)*100):cur>0?100:0;
+    return {k,cur,prev,diff,pct};
+  }).sort((a,b)=>b.diff-a.diff);
+
+  if(!growth.length){
+    el.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Kategorie-Wachstum ${yr} vs ${prevYr}</div>
+    <div style="color:var(--sub);font-size:12px;text-align:center;padding:16px 0">Keine Vergleichsdaten</div>`;
+    return;
+  }
+
+  const maxAbs=Math.max(...growth.map(g=>Math.abs(g.diff)),1);
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)">Kategorie-Wachstum ${yr} vs ${prevYr}</span>
+      <div style="display:flex;gap:12px">
+        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--sub)"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue)"></span>${yr}</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--sub)"><span style="width:8px;height:8px;border-radius:50%;background:var(--border2)"></span>${prevYr}</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+      ${growth.map(g=>{
+        const isUp=g.diff>=0;
+        const barW=Math.round(Math.abs(g.diff)/maxAbs*100);
+        return`<div style="border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${g.k}</span>
+            <span style="font-size:11px;font-weight:700;color:${isUp?'var(--green)':'var(--red)'};flex-shrink:0;margin-left:6px">${isUp?'+':''}${g.pct}%</span>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
+            <div style="height:4px;flex:1;background:var(--border);border-radius:2px;overflow:hidden">
+              <div style="height:100%;width:${barW}%;background:${isUp?'var(--green)':'var(--red)'};border-radius:2px;opacity:.5"></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--sub)">
+            <span>${yr}: <strong style="color:var(--text)">${fmt(g.cur)}</strong></span>
+            <span>${prevYr}: ${fmt(g.prev)}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
 }

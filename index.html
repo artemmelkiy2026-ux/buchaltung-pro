@@ -786,7 +786,7 @@
   </div>
 
   <!-- Stat-карточки -->
-  <div id="kat-stats" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px"></div>
+  <div id="kat-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
 
   <!-- Donut + Плитки -->
   <div class="kat-layout">
@@ -797,6 +797,26 @@
     <!-- Правая колонка — Плитки Канва -->
     <div id="kat-grid" class="kat-grid"></div>
   </div>
+
+  <!-- ═══ NEW METRICS ═══ -->
+
+  <!-- Trend Sparkline + Durchschnitt -->
+  <div id="kat-trend-section" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px">
+    <div id="kat-trend-chart" class="kat-stat-card" style="padding:18px"></div>
+    <div id="kat-avg-card" class="kat-stat-card" style="padding:18px"></div>
+  </div>
+
+  <!-- TOP Kunden + TOP Produkte -->
+  <div id="kat-tops-section" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+    <div id="kat-top-kunden" class="kat-stat-card" style="padding:18px"></div>
+    <div id="kat-top-produkte" class="kat-stat-card" style="padding:18px"></div>
+  </div>
+
+  <!-- Kategorie-Wachstum vs Vorjahr -->
+  <div id="kat-growth-section" style="margin-top:14px">
+    <div id="kat-growth" class="kat-stat-card" style="padding:18px"></div>
+  </div>
+
 </div>
 </div>
 

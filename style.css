@@ -3290,3 +3290,10 @@ header { background: #fff; }
 }
 .wied-card--paused { opacity:.55; }
 .wied-card--paused .wied-card-betrag { color:var(--sub) !important; }
+
+/* ── Kategorienanalyse: extended metrics ── */
+@media(max-width:768px){
+  #kat-trend-section, #kat-tops-section {
+    grid-template-columns: 1fr !important;
+  }
+}
