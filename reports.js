@@ -650,7 +650,7 @@ function _renderKatTopProdukte(yr){
     <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:16px">Top ${sorted.length} Produkte & Leistungen</div>
     ${sorted.map(([name,d],i)=>{
       const pct=Math.round(d.umsatz/maxU*100);
-      const icons=['📦','⚡','🔧','📋','💡'];
+      const icons=['1','2','3','4','5'];
       return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <div style="width:30px;height:30px;border-radius:var(--r);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${icons[i%icons.length]}</div>
         <div style="flex:1;min-width:0">
