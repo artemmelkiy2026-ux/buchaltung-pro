@@ -54,17 +54,17 @@ function renderProg(){
   const verglEl=document.getElementById('prog-vergleich');
   const hasVorjahr=pe.length>0;
   if(!hasVorjahr){
-    verglEl.innerHTML=`<div class="pg-empty">${ic('chart-line')}<span>Keine Daten für ${prevYr}</span></div>`;
+    verglEl.innerHTML=`<div class="pg-empty"><i class="fas fa-chart-line"></i><span>Keine Daten für ${prevYr}</span></div>`;
   } else {
     const pairs=[
-      {lbl:'Einnahmen',cur:istEin,prev:prevEin,col:'var(--green)',icon:'fa-arrow-up',iconName:'arrow-up'},
-      {lbl:'Ausgaben', cur:istAus,prev:prevAus,col:'var(--red)',  icon:'fa-arrow-down',iconName:'arrow-down'},
-      {lbl:'Gewinn',   cur:istEin-istAus,prev:prevEin-prevAus,col:istEin-istAus>=0?'var(--green)':'var(--red)',icon:'fa-wallet',iconName:'credit-card'},
+      {lbl:'Einnahmen',cur:istEin,prev:prevEin,col:'var(--green)',icon:'fa-arrow-up'},
+      {lbl:'Ausgaben', cur:istAus,prev:prevAus,col:'var(--red)',  icon:'fa-arrow-down'},
+      {lbl:'Gewinn',   cur:istEin-istAus,prev:prevEin-prevAus,col:istEin-istAus>=0?'var(--green)':'var(--red)',icon:'fa-wallet'},
     ];
     const bigCards=pairs.map(p=>{
       const d=p.prev!==0?Math.round((p.cur/Math.abs(p.prev)-1)*100):null;
       return `<div class="pg-vj-card">
-        <div class="pg-vj-label">${ic(p.iconName||"chart-bar")} ${p.lbl}</div>
+        <div class="pg-vj-label"><i class="fas ${p.icon}"></i> ${p.lbl}</div>
         <div class="pg-vj-cur" style="color:${p.col}">${p.cur>=0?'':'-'}${fmt(Math.abs(p.cur))}</div>
         <div class="pg-vj-prev">Vorjahr ${prevYr}:&nbsp;<strong>${fmt(p.prev)}</strong></div>
         ${d!==null?`<div class="pg-badge ${d>=0?'pg-badge-up':'pg-badge-down'}" style="margin-top:8px">${d>=0?'+':''+ d}%</div>`:''}

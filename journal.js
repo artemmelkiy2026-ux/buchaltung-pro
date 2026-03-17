@@ -171,7 +171,7 @@ function renderJournal() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              ${ic(isEin?'arrow-up':'arrow-down')}
+              <i class="fas fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
@@ -256,7 +256,7 @@ function renderJournal() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              ${ic(isEin?'arrow-up':'arrow-down')}
+              <i class="fas fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
@@ -303,17 +303,17 @@ function renderRechnungenLog() {
 
   const log = (data.rechnungenLog || []).slice();
   const AKTION = {
-    'erstellt':  { label:'Erstellt',           color:'var(--green)',  iconName:'plus',          bg:'rgba(58,138,78,.08)' },
-    'geaendert': { label:'Geändert',            color:'var(--blue)',   iconName:'pen',           bg:'rgba(26,69,120,.08)' },
-    'geloescht': { label:'Gelöscht',            color:'var(--red)',    iconName:'trash',         bg:'rgba(214,51,65,.08)' },
-    'bezahlt':   { label:'Bezahlt + Einnahme',  color:'var(--green)',  iconName:'check-circle',  bg:'rgba(58,138,78,.08)' },
-    'status':    { label:'Status geändert',     color:'var(--yellow)', iconName:'exchange-alt',  bg:'rgba(196,122,18,.08)' },
+    'erstellt':  { label:'Erstellt',           color:'var(--green)',  icon:'fa-plus',          bg:'rgba(58,138,78,.08)' },
+    'geaendert': { label:'Geändert',            color:'var(--blue)',   icon:'fa-pen',           bg:'rgba(26,69,120,.08)' },
+    'geloescht': { label:'Gelöscht',            color:'var(--red)',    icon:'fa-trash',         bg:'rgba(214,51,65,.08)' },
+    'bezahlt':   { label:'Bezahlt + Einnahme',  color:'var(--green)',  icon:'fa-check-circle',  bg:'rgba(58,138,78,.08)' },
+    'status':    { label:'Status geändert',     color:'var(--yellow)', icon:'fa-exchange-alt',  bg:'rgba(196,122,18,.08)' },
   };
 
   if (!log.length) {
     tb.innerHTML = '';
     em.style.display = 'block';
-    em.innerHTML = '<div class="ei">'+ic('file-invoice',40)+'</div><p>Keine Rechnungs-Änderungen</p>';
+    em.innerHTML = '<div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungs-Änderungen</p>';
     if(pg) pg.innerHTML = '';
     return;
   }
@@ -345,7 +345,7 @@ function renderRechnungenLog() {
     html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:10px;overflow:hidden">`;
 
     events.forEach((e, idx) => {
-      const a = AKTION[e.aktion] || { label:e.aktion, color:'var(--sub)', iconName:'circle', bg:'var(--s2)' };
+      const a = AKTION[e.aktion] || { label:e.aktion, color:'var(--sub)', icon:'fa-circle', bg:'var(--s2)' };
       const dt = e.created_at ? fdt(e.created_at) : '—';
 
       // Parse changes
@@ -385,7 +385,7 @@ function renderRechnungenLog() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}${rowOpacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:${changeHtml?'8':'0'}px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${a.bg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              ${ic(a.iconName||'circle',12)}
+              <i class="fas ${a.icon}" style="color:${a.color};font-size:12px"></i>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">

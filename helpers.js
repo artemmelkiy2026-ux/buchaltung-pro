@@ -55,7 +55,7 @@ function showMobDetail(entry){
   const modal=document.getElementById('mob-detail-modal');
   if(!modal)return;
   const isEin=entry.typ==='Einnahme';
-  document.getElementById('mdm-title').innerHTML=`<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<span style="color:var(--green)">${ic('arrow-up')}</span> Einnahme':'<span style="color:var(--red)">${ic('arrow-down')}</span> Ausgabe'}</span>`;
+  document.getElementById('mdm-title').innerHTML=`<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`;
   document.getElementById('mdm-body').innerHTML=`
     <div class="mdm-row">
       <span class="mdm-key">Betrag</span>
@@ -80,7 +80,7 @@ function showMobDetail(entry){
     ${entry.notiz?`<div class="mdm-row"><span class="mdm-key">Notiz</span><span class="mdm-val">${entry.notiz}</span></div>`:''}
   `;
   document.getElementById('mdm-btns').innerHTML=`
-    <button class="btn primary" style="flex:1" onclick="closeMobDetail();editE(event,'${entry.id}')">${ic('edit')} Bearbeiten</button>
+    <button class="btn primary" style="flex:1" onclick="closeMobDetail();editE(event,'${entry.id}')"><i class="fas fa-edit"></i> Bearbeiten</button>
     <button class="btn" style="color:var(--red);border-color:var(--red)" onclick="closeMobDetail();delE(event,'${entry.id}')"> Löschen</button>
   `;
   modal.classList.remove('hidden');
@@ -241,17 +241,17 @@ function renderKunden(){
         <div class="kunde-card-name">${k.name||'—'}</div>
         ${k.ansprechpartner?`<div class="kunde-card-role">${k.ansprechpartner}</div>`:''}
         <div class="kunde-card-meta">
-          ${k.email?`<a href="mailto:${k.email}" onclick="event.stopPropagation()" class="kunde-meta-link">${ic('envelope')} ${k.email}</a>`:''}
-          ${k.tel?`<span class="kunde-meta-item">${ic('phone')} ${k.tel}</span>`:''}
-          ${k.ort?`<span class="kunde-meta-item">${ic('map-marker-alt')} ${k.plz?k.plz+' ':''}${k.ort}</span>`:''}
+          ${k.email?`<a href="mailto:${k.email}" onclick="event.stopPropagation()" class="kunde-meta-link"><i class="fas fa-envelope"></i> ${k.email}</a>`:''}
+          ${k.tel?`<span class="kunde-meta-item"><i class="fas fa-phone"></i> ${k.tel}</span>`:''}
+          ${k.ort?`<span class="kunde-meta-item"><i class="fas fa-map-marker-alt"></i> ${k.plz?k.plz+' ':''}${k.ort}</span>`:''}
         </div>
       </div>
       <div class="kunde-card-right">
         ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div><div class="kunde-rech-cnt">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:'<div class="kunde-rech-cnt" style="color:var(--muted)">Keine Rechnungen</div>'}
         <div class="kunde-card-actions" onclick="event.stopPropagation()">
-          <button class="rca-btn" onclick="editKunde('${k.id}')" title="Bearbeiten">${ic('edit')}</button>
-          <button class="rca-btn" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen">${ic('file-invoice')}</button>
-          <button class="rca-btn rca-red" onclick="delKunde('${k.id}')" title="Löschen">${ic('trash')}</button>
+          <button class="rca-btn" onclick="editKunde('${k.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+          <button class="rca-btn" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen"><i class="fas fa-file-invoice"></i></button>
+          <button class="rca-btn rca-red" onclick="delKunde('${k.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>`;
@@ -970,8 +970,8 @@ function saveUstMode(){
   renderUst();
   _ustSaving = false;
   toast(sel.value==='§19'
-    ? `<span style="color:var(--green)">${ic('check-circle')}</span> ${yr}: §19 Kleinunternehmer gesetzt`
-    : `${ic('chart-bar')} ${yr}: MwSt gesetzt`, 'ok');
+    ? `<i class="fas fa-check-circle" style="color:var(--green)"></i> ${yr}: §19 Kleinunternehmer gesetzt`
+    : `<i class="fas fa-chart-bar"></i> ${yr}: MwSt gesetzt`, 'ok');
 }
 
 
@@ -1294,8 +1294,8 @@ function renderUst(){
     if(empty2){
       empty2.style.display='';
       empty2.innerHTML = ustQuartalFilter > 0
-        ? `<div class="ei">${ic('calendar-times')}</div><p>Keine Buchungen in Q${ustQuartalFilter} ${yr}</p><p style="font-size:12px;color:var(--sub);margin-top:4px">Für dieses Quartal liegen keine USt-Buchungen vor</p>`
-        : `<div class="ei">${ic('receipt')}</div><p>Keine USt-Buchungen für ${yr}</p>`;
+        ? `<div class="ei"><i class="fas fa-calendar-times"></i></div><p>Keine Buchungen in Q${ustQuartalFilter} ${yr}</p><p style="font-size:12px;color:var(--sub);margin-top:4px">Für dieses Quartal liegen keine USt-Buchungen vor</p>`
+        : `<div class="ei"><i class="fas fa-receipt"></i></div><p>Keine USt-Buchungen für ${yr}</p>`;
     }
     const detContainer = document.getElementById('ust-detail-list');
     if(detContainer) detContainer.innerHTML = '';
@@ -1341,8 +1341,8 @@ function renderUst(){
             </div>
             <div class="ust-row-brutto">${e.brutto>0?fmt(e.brutto):'—'}</div>
             ${canDel
-              ? `<button class="rca-btn rca-red" onclick="delUstEintrag('${e.id}')" title="Löschen">${ic('trash')}</button>`
-              : `<span class="ust-src-lock" title="Aus ${e.quelle} — dort löschen">${ic('lock')}</span>`
+              ? `<button class="rca-btn rca-red" onclick="delUstEintrag('${e.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`
+              : `<span class="ust-src-lock" title="Aus ${e.quelle} — dort löschen"><i class="fas fa-lock"></i></span>`
             }
           </div>
         </div>`;

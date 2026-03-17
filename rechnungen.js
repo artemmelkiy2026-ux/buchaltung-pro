@@ -129,10 +129,10 @@ function renderRech(){
           <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
         </div>
         <div class="rech-card-actions" onclick="event.stopPropagation()">
-          ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren">${ic('check')}</button>`:''}
-          <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF">${ic('print')}</button>
-          <button class="rca-btn" onclick="editRech('${r.id}')" title="Bearbeiten">${ic('edit')}</button>
-          <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen">${ic('trash')}</button>
+          ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
+          <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
+          <button class="rca-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+          <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>`;
@@ -324,12 +324,12 @@ async function rechBezahlt(id){
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
     renderAll();
-    toast(`<span style="color:var(--green)">${ic('check-circle')}</span> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
     renderRech();
-    toast(`<span style="color:var(--green)">${ic('check-circle')}</span> Rechnung ${r.nr} als bezahlt markiert`,'ok');
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
 }
 async function delRech(id){
@@ -456,7 +456,7 @@ function addRechPosRow(i,p){
                 <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
                 <span class="ust-flag-label">${rateVal}%</span>
               </span>
-              <span style="color:var(--sub)">${ic('chevron-down',9)}</span>
+              <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
             </button>
             <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
             <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
@@ -485,7 +485,7 @@ function addRechPosRow(i,p){
             <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
             <span class="ust-flag-label">${rateVal}%</span>
           </span>
-          <span style="color:var(--sub)">${ic('chevron-down',9)}</span>
+          <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
         </button>
         <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
         <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
@@ -495,7 +495,7 @@ function addRechPosRow(i,p){
         </div>
       </div>
       <input type="number" placeholder="Brutto" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue)">
-      <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0">${ic('trash')}</button>`;
+      <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0"><i class="fas fa-trash"></i></button>`;
   }
   document.getElementById('rn-positionen').appendChild(div);
 }
@@ -686,7 +686,7 @@ function buildRechnungHTML(r){
     .btn-close{padding:10px 20px;background:#e5e7eb;border:none;border-radius:6px;cursor:pointer;font-size:13px}
   </style></head><body>
   <div class="btn-bar">
-    <button class="btn-print" onclick="window.print()">${ic('print')}️ Drucken / Als PDF speichern</button>
+    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i>️ Drucken / Als PDF speichern</button>
     <button class="btn-close" onclick="window.close()">✕ Schließen</button>
   </div>
   <div class="header">
@@ -917,7 +917,7 @@ async function onLogoChange(input) {
   // Сохраняем во временный атрибут — применится при Speichern
   input.dataset.b64 = b64;
   const kb = Math.round(b64.length * 0.75 / 1024);
-  toast(`<span style="color:var(--green)">${ic('check-circle')}</span> Logo geladen (${kb} KB)`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Logo geladen (${kb} KB)`, 'ok');
 }
 
 // Удалить логотип

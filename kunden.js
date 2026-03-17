@@ -50,17 +50,17 @@ function renderWied(){
     const isEin=w.typ==='Einnahme';
     return`<div class="wied-card${isFaellig?' wied-card--faellig':''}">
       <div class="wied-card-avatar" style="background:${isEin?'var(--gdim)':'var(--rdim)'};color:${isEin?'var(--green)':'var(--red)'}">
-        ${ic(isEin?'arrow-up':'arrow-down')}
+        <i class="fas fa-${isEin?'arrow-up':'arrow-down'}"></i>
       </div>
       <div class="wied-card-body">
         <div class="wied-card-name">${w.bezeichnung}${isFaellig?` <span class="wied-faellig-badge">● Fällig</span>`:''}</div>
         <div class="wied-card-meta">
-          <span><span style="margin-right:2px">${ic('tag',10)}</span>${w.kategorie}</span>
-          <span><span style="margin-right:2px">${ic('sync-alt',10)}</span>${intervallLabel[w.intervall]||w.intervall}</span>
-          <span><span style="margin-right:2px">${ic('credit-card',10)}</span>${w.zahlungsart}</span>
+          <span><i class="fas fa-tag" style="font-size:10px;margin-right:2px"></i>${w.kategorie}</span>
+          <span><i class="fas fa-sync-alt" style="font-size:10px;margin-right:2px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
+          <span><i class="fas fa-credit-card" style="font-size:10px;margin-right:2px"></i>${w.zahlungsart}</span>
         </div>
         <div class="wied-card-next" style="color:${isFaellig?'var(--yellow)':'var(--sub)'}">
-          <span style="margin-right:3px">${ic('calendar-alt',10)}</span>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
+          <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
         </div>
       </div>
       <div class="wied-card-right">
@@ -68,9 +68,9 @@ function renderWied(){
           ${isEin?'+':'−'}${fmt(w.betrag)}
         </div>
         <div class="wied-card-actions">
-          <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen">${ic('play')}</button>
-          <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten">${ic('edit')}</button>
-          <button class="rca-btn" onclick="delWied('${w.id}')" title="Vorlage löschen">${ic('trash')}</button>
+          <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
+          <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+          <button class="rca-btn" onclick="delWied('${w.id}')" title="Vorlage löschen"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>`;
@@ -207,7 +207,7 @@ function wBuchen(id){
   if(!newE) return;
   renderAll(); renderWied();
   const w=data.wiederkehrend.find(x=>x.id===id);
-  toast(`<span style="color:var(--green)">${ic('check-circle')}</span> ${newE.beschreibung} gebucht!`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${newE.beschreibung} gebucht!`, 'ok');
 }
 
 function wBuchenAlle(){
@@ -218,7 +218,7 @@ function wBuchenAlle(){
   faellig.forEach(w=>wBuchenCore(w.id));
   // Один рендер после всех
   renderAll(); renderWied();
-  toast(`<span style="color:var(--green)">${ic('check-circle')}</span> ${faellig.length} Zahlungen gebucht!`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} Zahlungen gebucht!`, 'ok');
 }
 async function delWied(id){const _okW=await appConfirm('Vorlage wirklich löschen?',{title:'Vorlage löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_okW)return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
 
@@ -499,7 +499,7 @@ function openMonatDetail(yr, mi){
   const monName = MN[parseInt(mi)-1];
   _monLabel = `${monName} ${yr}`;
 
-  document.getElementById('mon-modal-title').innerHTML = `${ic('calendar-alt')} ${_monLabel}`;
+  document.getElementById('mon-modal-title').innerHTML = `<i class="fas fa-calendar-alt"></i> ${_monLabel}`;
 
   const ein=sum(entries,'Einnahme'), aus=sum(entries,'Ausgabe'), gew=ein-aus;
   document.getElementById('mon-modal-stats').innerHTML=`
@@ -524,7 +524,7 @@ function openMonatDetail(yr, mi){
     document.getElementById('mon-modal-tbody').innerHTML=entries.map(e=>`
       <tr style="border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
         <td style="padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--sub)">${fdm(e.datum)}</td>
-        <td style="padding:8px 12px"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<span style="color:var(--green)">${ic('arrow-up')}</span>':'<span style="color:var(--red)">${ic('arrow-down')}</span>'}</span></td>
+        <td style="padding:8px 12px"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}</span></td>
         <td class="mob-hide" style="padding:8px 12px;font-size:12px;color:var(--sub)">${e.kategorie}</td>
         <td class="mob-hide" style="padding:8px 12px;font-size:12px">${e.beschreibung}${e.notiz?` <span title="${e.notiz}" style="color:var(--sub);font-size:10px">[PDF]</span>`:''}</td>
         <td class="mob-hide" style="padding:8px 12px"><span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span></td>
@@ -672,6 +672,6 @@ ${rows}
   a.href=URL.createObjectURL(blob);
   a.download=`buchaltung_${_monLabel.replace(' ','_')}.xls`;
   a.click();
-  toast(`${ic('chart-bar')} Excel — ${_monLabel} exportiert`,'ok');
+  toast(`<i class="fas fa-chart-bar"></i> Excel — ${_monLabel} exportiert`,'ok');
 }
 
