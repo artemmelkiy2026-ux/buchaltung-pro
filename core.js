@@ -203,7 +203,11 @@ function appInit(){
   setTimeout(()=>{
     const today=new Date().toISOString().split('T')[0];
     const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
-    if(due.length) toast(`<i class="fas fa-sync-alt"></i> ${due.length} ${'wiederkehrende Zahlung'}${due.length>1?'en':''} ${'fällig!'}`, 'ok');
+    if(due.length) toast(
+      `<i class="fas fa-sync-alt"></i> ${due.length} wiederkehrende Zahlung${due.length>1?'en':''} fällig — Anzeigen →`,
+      'ok',
+      ()=>{ nav('wiederkehrend', document.querySelector('.nav-item[onclick*="wiederkehrend"]')); }
+    );
   },800);
 }
 

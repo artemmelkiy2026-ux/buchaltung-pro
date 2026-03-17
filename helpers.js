@@ -29,11 +29,19 @@ function isKleinunternehmer(yr){ return getUstModeForYear(yr)==='§19'; }
 
 function g(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
 function dl(csv,name){const b=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click()}
-function toast(msg,type='ok'){
+function toast(msg,type='ok',onClick=null){
   const t=document.getElementById('toast');
   if(!t) return;
   if(t._toastTimer) clearTimeout(t._toastTimer);
   if(t._toastFadeTimer) clearTimeout(t._toastFadeTimer);
+  // Сбрасываем старый обработчик клика
+  t.onclick = null;
+  if(onClick){
+    t.classList.add('clickable');
+    t.onclick = ()=>{ onClick(); t.classList.remove('show'); clearTimeout(t._toastTimer); };
+  } else {
+    t.classList.remove('clickable');
+  }
   // Убираем HTML-теги (<i class="fas...">, <span> и т.д.)
   let clean = msg.replace(/<[^>]*>/g, '');
   // Убираем иконки-символы в начале строки: ✓ ✗ ↩️ ⚡ и пробелы после них
