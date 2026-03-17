@@ -212,7 +212,7 @@ header{display:none}
 .nav-item.active{background:var(--bdim);color:var(--blue);font-weight:600;border-color:transparent}
 .nav-item .ic{width:16px;text-align:center;font-size:15px}
 .nav-divider{height:1px;background:var(--border);margin:8px 14px}
-.page{display:none;flex-direction:column;width:100%}
+.page{display:none;flex-direction:column;width:100%;max-width:1200px;}
 .page.active{display:flex}
 .page-inner{padding:20px;flex:1;width:100%;box-sizing:border-box}
 
@@ -3295,9 +3295,25 @@ header { background: #fff; }
 .wied-card--paused .wied-card-betrag { color:var(--sub) !important; }
 
 /* ── Angebote/Rechnungen cards: mobile text truncation ── */
-.rech-card { overflow: hidden; min-width: 0; }
+.rech-card { overflow: hidden; min-width: 0; max-width: 100%; box-sizing: border-box; }
+.rech-card > div { min-width: 0; }
+.rech-card > div > div { min-width: 0; }
 @media(max-width:768px){
-  .rech-card { max-width: 100%; }
-  .rech-card > div { min-width: 0; overflow: hidden; }
-  .rech-card > div > div { min-width: 0; }
+  .main { overflow-x: hidden !important; }
+  .page-inner { overflow-x: hidden; }
+  #ang-list, #rech-list { overflow: hidden; }
+  .rech-card { padding: 12px; word-break: break-word; }
+  /* Price column: allow shrink on mobile */
+  .rech-card > div > div[style*="flex-shrink:0"],
+  .rech-card > div > div[style*="flex-shrink: 0"] { 
+    flex-shrink: 1 !important; 
+    max-width: 110px; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Force font size down for price on narrow screens */
+  .rech-card [style*="font-size:16px"][style*="font-family:var(--mono)"] {
+    font-size: 14px !important;
+    white-space: nowrap;
+  }
 }
