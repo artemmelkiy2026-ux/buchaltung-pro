@@ -273,7 +273,7 @@ function updateWiedSidebar(){
   // 1. Hochrechnung
   const calcEl=document.getElementById('wied-calc-info');
   if(calcEl){
-    if(!bet){calcEl.innerHTML='<div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben</div>';}
+    if(!bet){calcEl.innerHTML='<div style="color:var(--sub);font-size:14px">Betrag und Intervall eingeben</div>';}
     else{
       const mult={woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
       const labels={woechentlich:'Woche',monatlich:'Monat',quartalsweise:'Quartal',halbjaehrlich:'Halbjahr',jaehrlich:'Jahr'};
@@ -298,8 +298,8 @@ function updateWiedSidebar(){
           <span style="font-family:var(--mono);font-weight:700;font-size:15px">${perYear.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
         </div>
         ${endDate?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
-          <span style="color:var(--sub);font-size:11px">Gesamtkosten bis ${fd(endDate)}</span>
-          <span style="font-family:var(--mono);font-weight:700;font-size:12px">${_calcTotalUntil(bet,intv,startDate,endDate)}</span>
+          <span style="color:var(--sub);font-size:14px">Gesamtkosten bis ${fd(endDate)}</span>
+          <span style="font-family:var(--mono);font-weight:700;font-size:14px">${_calcTotalUntil(bet,intv,startDate,endDate)}</span>
         </div>`:''}`;
     }
   }
