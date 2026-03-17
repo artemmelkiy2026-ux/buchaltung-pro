@@ -916,16 +916,16 @@
                 <button type="button" id="ang-status-btn" onclick="toggleAngStatusDropdown()"
                   style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 12px;border-radius:var(--r);margin-top:4px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
                   <span id="ang-status-label" style="display:flex;align-items:center;gap:7px">
-                    <i class="fas fa-clock" id="ang-status-icon" style="color:var(--yellow);font-size:11px"></i>
+                    <i class="fas fa-clock" id="ang-status-icon" style="color:var(--yellow);font-size:14px"></i>
                     <span id="ang-status-text">Offen</span>
                   </span>
                   <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
                 <div id="ang-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
                   <div onclick="setAngStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:12px;width:14px"></i> Offen</div>
-                  <div onclick="setAngStatus('angenommen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:12px;width:14px"></i> Angenommen</div>
-                  <div onclick="setAngStatus('abgelehnt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-times-circle" style="color:var(--red);font-size:12px;width:14px"></i> Abgelehnt</div>
-                  <div onclick="setAngStatus('abgelaufen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-hourglass-end" style="color:var(--sub);font-size:12px;width:14px"></i> Abgelaufen</div>
+                  <div onclick="setAngStatus('angenommen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:14px;width:14px"></i> Angenommen</div>
+                  <div onclick="setAngStatus('abgelehnt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-times-circle" style="color:var(--red);font-size:14px;width:14px"></i> Abgelehnt</div>
+                  <div onclick="setAngStatus('abgelaufen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-hourglass-end" style="color:var(--sub);font-size:14px;width:14px"></i> Abgelaufen</div>
                 </div>
               </div>
             </div>
@@ -1767,15 +1767,15 @@
                 <button type="button" id="rn-status-btn" onclick="toggleRechStatusDropdown()"
                   style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 12px;border-radius:var(--r);margin-top:4px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
                   <span id="rn-status-label" style="display:flex;align-items:center;gap:7px">
-                    <i class="fas fa-clock" id="rn-status-icon" style="color:var(--yellow);font-size:11px"></i>
+                    <i class="fas fa-clock" id="rn-status-icon" style="color:var(--yellow);font-size:13px"></i>
                     <span id="rn-status-text">Offen</span>
                   </span>
                   <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
                 <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
-                  <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:12px;width:14px"></i> Offen</div>
-                  <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:12px;width:14px"></i> Bezahlt</div>
-                  <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-exclamation-circle" style="color:var(--red);font-size:12px;width:14px"></i> Überfällig</div>
+                  <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:14px;width:14px"></i> Offen</div>
+                  <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:14px;width:14px"></i> Bezahlt</div>
+                  <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-exclamation-circle" style="color:var(--red);font-size:14px;width:14px"></i> Überfällig</div>
                 </div>
               </div>
             </div>
