@@ -102,42 +102,47 @@ let editWiedId = null;
 function openWiedModal(){
   editWiedId = null;
   wiedTyp='Ausgabe';
-  setWiedTyp('Ausgabe');
-  document.getElementById('wied-dsc').value='';
-  document.getElementById('wied-bet').value='';
-  document.getElementById('wied-ab').value=new Date().toISOString().split('T')[0];
-  document.getElementById('wied-kat').value='';
-  document.getElementById('wied-int').value='monatlich';
-  document.getElementById('wied-zahl').value='Überweisung';
-  const hdr = document.getElementById('wied-modal-title');
-  if(hdr) hdr.textContent = 'Wiederkehrende Zahlung';
-  openModal('wied-modal');
+  // Navigate to the wied form page
+  window._wiedPrevPage = curPage || 'wiederkehrend';
+  nav('wiedform', null);
+  setTimeout(()=>{
+    setWiedTyp('Ausgabe');
+    document.getElementById('wied-dsc').value='';
+    document.getElementById('wied-bet').value='';
+    document.getElementById('wied-ab').value=new Date().toISOString().split('T')[0];
+    document.getElementById('wied-kat').value='';
+    document.getElementById('wied-int').value='monatlich';
+    document.getElementById('wied-zahl').value='Überweisung';
+    const hdr = document.getElementById('wied-form-title');
+    if(hdr) hdr.textContent = 'Neue Vorlage';
+  },30);
 }
 
 function editWied(id){
   const w = (data.wiederkehrend||[]).find(x=>x.id===id);
   if(!w) return;
   editWiedId = id;
-  // Тип
-  wiedTyp = w.typ||'Ausgabe';
-  setWiedTyp(wiedTyp);
-  // Поля
-  document.getElementById('wied-dsc').value = w.bezeichnung||w.beschreibung||'';
-  document.getElementById('wied-bet').value = w.betrag||'';
-  document.getElementById('wied-ab').value  = w.naechste||'';
-  // Категория
-  const katSel = document.getElementById('wied-kat');
-  if(katSel){ [...katSel.options].forEach(o=>{ if(o.value===w.kategorie) o.selected=true; }); }
-  // Интервал
-  const intSel = document.getElementById('wied-int');
-  if(intSel) intSel.value = w.intervall||'monatlich';
-  // Zahlungsart
-  const zahlSel = document.getElementById('wied-zahl');
-  if(zahlSel) zahlSel.value = w.zahlungsart||'Überweisung';
-  // Заголовок
-  const hdr = document.getElementById('wied-modal-title');
-  if(hdr) hdr.textContent = 'Vorlage bearbeiten';
-  openModal('wied-modal');
+  window._wiedPrevPage = curPage || 'wiederkehrend';
+  nav('wiedform', null);
+  setTimeout(()=>{
+    wiedTyp = w.typ||'Ausgabe';
+    setWiedTyp(wiedTyp);
+    document.getElementById('wied-dsc').value = w.bezeichnung||w.beschreibung||'';
+    document.getElementById('wied-bet').value = w.betrag||'';
+    document.getElementById('wied-ab').value  = w.naechste||'';
+    const katSel = document.getElementById('wied-kat');
+    if(katSel){ [...katSel.options].forEach(o=>{ if(o.value===w.kategorie) o.selected=true; }); }
+    const intSel = document.getElementById('wied-int');
+    if(intSel) intSel.value = w.intervall||'monatlich';
+    const zahlSel = document.getElementById('wied-zahl');
+    if(zahlSel) zahlSel.value = w.zahlungsart||'Überweisung';
+    const hdr = document.getElementById('wied-form-title');
+    if(hdr) hdr.textContent = 'Vorlage bearbeiten';
+  },30);
+}
+function closeWiedForm(){
+  const prev = window._wiedPrevPage || 'wiederkehrend';
+  nav(prev, document.querySelector('.nav-item[onclick*="wiederkehrend"]') || document.querySelector('.nav-item'));
 }
 function saveWied(){
   const bez=document.getElementById('wied-dsc').value.trim();
@@ -153,19 +158,17 @@ function saveWied(){
     naechste:ab
   };
   if(editWiedId){
-    // Редактирование
     const w=data.wiederkehrend.find(x=>x.id===editWiedId);
     if(w){ Object.assign(w, obj); sbSaveWied(w); }
     editWiedId=null;
-    toast('✓ Vorlage aktualisiert!','ok');
+    toast('Vorlage aktualisiert','ok');
   } else {
-    // Новая запись
     const newW={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj};
     data.wiederkehrend.push(newW);
     sbSaveWied(newW);
-    toast('✓ Vorlage gespeichert!','ok');
+    toast('Vorlage gespeichert','ok');
   }
-  renderWied(); closeModal('wied-modal');
+  renderWied(); closeWiedForm();
 }
 function wBuchenCore(id){
   // Только данные — без renderAll/renderWied

@@ -163,8 +163,8 @@ function openNavGroupIfNeeded(id) {
 }
 
 // Открыть форму нового/редактирования записи
-function openNeuEintrag(editId) {
-  if (editId) {
+function openNeuEintrag(editEntryId) {
+  if (editEntryId) {
     // Редактирование — заголовок меняется
     const t = document.getElementById('neu-form-title');
     if (t) t.textContent = 'Eintrag bearbeiten';
@@ -172,6 +172,13 @@ function openNeuEintrag(editId) {
     const t = document.getElementById('neu-form-title');
     if (t) t.textContent = 'Neuer Eintrag';
     if (typeof clearForm === 'function') clearForm();
+    // Reset edit mode — ensure button is set to create mode
+    if(typeof editId !== 'undefined') editId=null;
+    const saveBtn=document.getElementById('btn-add-bezahlt');
+    if(saveBtn){
+      saveBtn.innerHTML='<i class="fas fa-check-circle"></i> Speichern &amp; Bezahlt';
+      saveBtn.onclick=function(){ addEintrag(true); };
+    }
   }
   // Запоминаем откуда пришли
   window._neuPrevPage = curPage || 'eintraege';
@@ -261,7 +268,7 @@ function activeEintraegeMitRech(yr) {
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────
-const FORM_PAGES = ['angebote-form','rechnungen-form','kunden-form','produkte-form','neu'];
+const FORM_PAGES = ['angebote-form','rechnungen-form','kunden-form','produkte-form','neu','wiedform'];
 function nav(id, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   openNavGroupIfNeeded(id);

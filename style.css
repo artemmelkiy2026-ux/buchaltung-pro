@@ -56,9 +56,9 @@
 
   
   /* Фоны */
-  --bg:#f7f8fa;
+  --bg:#ffffff;
   --s1:#ffffff;
-  --s2:#f3f5f7;
+  --s2:#f5f6f8;
   --s3:#ebeef2;
   --border:#e4e7ec;
   --border2:#d0d5dd;
@@ -3244,3 +3244,34 @@ header { box-shadow: none; }
 /* ── Transitions: snappier ── */
 * { transition-timing-function: cubic-bezier(.2,0,.38,.9); }
 a, button, input, select, textarea { transition-duration: .12s; }
+
+/* ═══════════════════════════════════════════════════════════════
+   WHITE BG POLISH — clean WISO-style on white background
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Sidebar subtle bg */
+.sidebar { background: #fafbfc; }
+header { background: #fff; }
+
+/* Stats cards on white — need border */
+.sc { background: #fff; }
+
+/* DRC cards — clean white on white */
+.drc { background: #fff; }
+
+/* Form panel on white */
+.form-panel { background: #fff; }
+
+/* Charts container */
+#d-chart-container { background: transparent; }
+
+/* Entry summary cards */
+#e-sum > div { background: #fff !important; }
+
+/* Ang block on white */
+.ang-block { background: #fff; }
+.ang-sticky-header { background: #fff; }
+.ang-form-body { background: var(--bg); }
+
+/* Wiedform panel */
+#p-wiedform .form-panel { background: #fff; }

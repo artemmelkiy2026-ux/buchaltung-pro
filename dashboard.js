@@ -654,10 +654,8 @@ function renderDash(){
     const barW=Math.round(e.betrag/maxBet*100);
     const click=mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:`editE(event,'${e.id}')`;
     const color=isEin?'var(--green)':'var(--red)';
-    const bgDim=isEin?'rgba(93,157,105,.06)':'rgba(220,53,69,.06)';
-    const borderCol=isEin?'rgba(93,157,105,.18)':'rgba(220,53,69,.18)';
-    return `<div class="drc${st?' drc-storno':''}" onclick="${click}" style="border-color:${borderCol};background:${bgDim}">
-      <div class="drc-icon" style="background:${isEin?'rgba(93,157,105,.14)':'rgba(220,53,69,.14)'};color:${color}">
+    return `<div class="drc${st?' drc-storno':''}" onclick="${click}" style="border:1px solid var(--border);background:var(--s1)">
+      <div class="drc-icon" style="background:${isEin?'rgba(58,138,78,.1)':'rgba(214,51,65,.1)'};color:${color}">
         <i class="fas fa-arrow-${isEin?'up':'down'}"></i>
       </div>
       <div class="drc-body">
@@ -670,9 +668,6 @@ function renderDash(){
       </div>
       <div class="drc-right">
         <div class="drc-amt" style="color:${color}">${isEin?'+':'−'}${fmt(e.betrag)}</div>
-        <div class="drc-bar-track">
-          <div class="drc-bar-fill" style="width:${barW}%;background:${color}"></div>
-        </div>
       </div>
     </div>`;
   }).join('');
