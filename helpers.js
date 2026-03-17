@@ -1497,3 +1497,95 @@ function toggleAngUstDropdown(btn) {
     }), 0);
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// KUNDEN PICKER — Aus Kundenbuch wählen (Angebot + Rechnung)
+// ═══════════════════════════════════════════════════════════════
+let _kpTarget = ''; // 'ang' or 'rn'
+
+function openKundenPicker(target) {
+  _kpTarget = target;
+  const search = document.getElementById('kp-search');
+  if (search) search.value = '';
+  renderKundenPicker();
+  openModal('kunden-picker-modal');
+  setTimeout(() => { if (search) search.focus(); }, 100);
+}
+
+function filterKundenPicker() {
+  renderKundenPicker();
+}
+
+function renderKundenPicker() {
+  const list = document.getElementById('kp-list');
+  const empty = document.getElementById('kp-empty');
+  if (!list) return;
+
+  const q = (document.getElementById('kp-search')?.value || '').toLowerCase();
+  let kunden = (data.kunden || []).slice();
+
+  if (q) {
+    kunden = kunden.filter(k =>
+      (k.name || '').toLowerCase().includes(q) ||
+      (k.firma || '').toLowerCase().includes(q) ||
+      (k.ort || '').toLowerCase().includes(q) ||
+      (k.email || '').toLowerCase().includes(q)
+    );
+  }
+
+  // Sort: last used first, then alphabetical
+  kunden.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+  if (!kunden.length) {
+    list.innerHTML = '';
+    if (empty) empty.style.display = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  list.innerHTML = kunden.map(k => {
+    const initials = (k.name || '??').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const adr = [k.strasse, [k.plz, k.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+    const hasEmail = k.email;
+    const hasTel = k.tel;
+
+    return `<div onclick="selectKundenPicker('${k.id}')"
+      style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .12s"
+      onmouseover="this.style.borderColor='var(--blue)';this.style.background='var(--bdim)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.background=''">
+      <div style="width:38px;height:38px;border-radius:var(--r);background:var(--bdim);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${initials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px">${k.name || '—'}</div>
+        <div style="font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adr || 'Keine Adresse'}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;font-size:11px;color:var(--sub)">
+        ${hasEmail ? '<span title="'+k.email+'"><i class="fas fa-envelope" style="font-size:11px"></i></span>' : ''}
+        ${hasTel ? '<span title="'+k.tel+'"><i class="fas fa-phone" style="font-size:11px"></i></span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectKundenPicker(id) {
+  const k = (data.kunden || []).find(x => x.id === id);
+  if (!k) return;
+
+  if (_kpTarget === 'ang') {
+    // Angebot form
+    document.getElementById('ang-kunde').value = k.name || '';
+    const adr = [k.strasse, [k.plz, k.ort].filter(Boolean).join(' ')].filter(Boolean).join('\n');
+    document.getElementById('ang-adresse').value = adr;
+  } else if (_kpTarget === 'rn') {
+    // Rechnung form
+    document.getElementById('rn-kunde').value = k.name || '';
+    const adr = [k.strasse, [k.plz, k.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+    document.getElementById('rn-adresse').value = adr;
+    if (k.email) document.getElementById('rn-email').value = k.email;
+    if (k.tel) document.getElementById('rn-tel').value = k.tel;
+    const rnNr = document.getElementById('rn-nr');
+    if (rnNr) rnNr.dataset.kundeId = id;
+  }
+
+  closeModal('kunden-picker-modal');
+  toast('Kunde übernommen: ' + (k.name || ''), 'ok');
+}

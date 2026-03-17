@@ -887,7 +887,10 @@
         <div class="ang-col-left">
           <div class="fg" style="position:relative">
             <label>Kunde</label>
-            <input type="text" id="ang-kunde" placeholder="Kontakt suchen..." oninput="angKundeSearch(this.value)" autocomplete="off">
+            <div style="display:flex;gap:6px">
+              <input type="text" id="ang-kunde" placeholder="Kontakt suchen..." oninput="angKundeSearch(this.value)" autocomplete="off" style="flex:1">
+              <button type="button" class="btn" onclick="openKundenPicker('ang')" title="Aus Kundenbuch wählen" style="flex-shrink:0;padding:8px 10px"><i class="fas fa-address-book"></i></button>
+            </div>
             <div id="ang-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
           </div>
           <div class="fg" style="margin:0">
@@ -1104,13 +1107,13 @@
     </div>
   </div>
 
-  <div id="wied-form-grid" style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+  <div id="wied-form-grid" style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;max-width:1060px">
 
   <!-- ═══ LEFT: Form ═══ -->
   <div>
 
     <!-- Block 1: Typ + Grunddaten -->
-    <div class="form-panel" style="margin-bottom:14px">
+    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Grunddaten</div>
       <div class="typ-toggle" style="margin-bottom:16px">
         <button class="tt ae" id="wied-btn-e" onclick="setWiedTyp('Einnahme')">Einnahme</button>
@@ -1141,7 +1144,7 @@
     </div>
 
     <!-- Block 2: Zeitraum & Erinnerung -->
-    <div class="form-panel" style="margin-bottom:14px">
+    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Zeitraum & Erinnerung</div>
       <div class="fgrow c2">
         <div class="fg"><label>Erste Buchung ab</label><input type="date" id="wied-ab" onchange="updateWiedSidebar()"></div>
@@ -1167,7 +1170,7 @@
     </div>
 
     <!-- Block 3: Vertrag & Anbieter -->
-    <div class="form-panel" style="margin-bottom:14px">
+    <div class="form-panel" style="border:1px solid var(--border);padding:20px;margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub)">Vertrag & Anbieter <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></span>
         <button type="button" id="wied-contract-toggle" onclick="toggleWiedContract()" style="font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit;font-weight:600">Einblenden ▾</button>
@@ -1220,15 +1223,15 @@
     <!-- Hochrechnung -->
     <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Hochrechnung</div>
-      <div id="wied-calc-info" style="font-size:14px;color:var(--text);line-height:1.6">
-        <div style="color:var(--sub);font-size:14px">Betrag und Intervall eingeben</div>
+      <div id="wied-calc-info" style="font-size:13px;color:var(--text);line-height:1.6">
+        <div style="color:var(--sub);font-size:12px">Betrag und Intervall eingeben</div>
       </div>
     </div>
 
     <!-- Nächste Termine -->
     <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Nächste Termine</div>
-      <div id="wied-dates-preview" style="font-size:14px;color:var(--sub);line-height:1.6">
+      <div id="wied-dates-preview" style="font-size:12px;color:var(--sub);line-height:1.6">
         Startdatum eingeben für Vorschau
       </div>
     </div>
@@ -1236,13 +1239,13 @@
     <!-- Buchungshistorie (nur im Edit-Modus) -->
     <div id="wied-history-block" style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1);display:none">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Buchungshistorie</div>
-      <div id="wied-history-content" style="font-size:14px;color:var(--sub)">Keine Buchungen</div>
+      <div id="wied-history-content" style="font-size:12px;color:var(--sub)">Keine Buchungen</div>
     </div>
 
     <!-- Anteil am Budget -->
     <div style="border:1px solid var(--border);border-radius:var(--r2);padding:16px;background:var(--s1)">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Budgetanteil</div>
-      <div id="wied-budget-info" style="font-size:14px;color:var(--sub)">—</div>
+      <div id="wied-budget-info" style="font-size:12px;color:var(--sub)">—</div>
     </div>
 
   </div><!-- /right -->
@@ -1316,7 +1319,7 @@
           <div class="ust-klein-banner-icon"><i class="fas fa-check-circle"></i></div>
           <div>
             <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:4px">§19 UStG — kein USt-Ausweis nötig</div>
-            <div style="font-size:14px;color:var(--text);line-height:1.6">
+            <div style="font-size:13px;color:var(--text);line-height:1.6">
               Rechnungen <strong>ohne Umsatzsteuer</strong> · Keine Voranmeldung erforderlich
             </div>
           </div>
@@ -1739,7 +1742,10 @@
         <div class="ang-col-left">
           <div class="fg" style="position:relative">
             <label>Kundenname / Firma</label>
-            <input type="text" id="rn-kunde" placeholder="Kontakt suchen..." oninput="rnKundeSearch(this.value)" autocomplete="off">
+            <div style="display:flex;gap:6px">
+              <input type="text" id="rn-kunde" placeholder="Kontakt suchen..." oninput="rnKundeSearch(this.value)" autocomplete="off" style="flex:1">
+              <button type="button" class="btn" onclick="openKundenPicker('rn')" title="Aus Kundenbuch wählen" style="flex-shrink:0;padding:8px 10px"><i class="fas fa-address-book"></i></button>
+            </div>
             <div id="rn-kunde-suggest" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:300;background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto"></div>
           </div>
           <div class="fg" style="margin:0">
@@ -1833,6 +1839,26 @@
 
 
 </div><!-- /app -->
+
+<!-- ── KUNDENBUCH PICKER MODAL ── -->
+<div class="modal-bg" id="kunden-picker-modal">
+  <div class="modal" style="width:620px;max-height:80vh;display:flex;flex-direction:column">
+    <div class="modal-hdr">
+      <h2 style="display:flex;align-items:center;gap:8px"><i class="fas fa-address-book" style="color:var(--blue)"></i> Kunde auswählen</h2>
+      <button class="modal-close" onclick="closeModal('kunden-picker-modal')">✕</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <input type="text" id="kp-search" placeholder="Suche nach Name, Firma, Ort..." oninput="filterKundenPicker()" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:14px;outline:none;font-family:inherit" autofocus>
+    </div>
+    <div id="kp-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:100px">
+    </div>
+    <div id="kp-empty" style="display:none;text-align:center;padding:30px;color:var(--sub)">
+      <div style="font-size:24px;margin-bottom:8px">📋</div>
+      <div>Keine Kunden gefunden</div>
+      <div style="font-size:12px;margin-top:4px">Kunden können unter <strong>Kontakte → Kunden</strong> angelegt werden</div>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
