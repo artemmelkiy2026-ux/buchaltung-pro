@@ -99,6 +99,7 @@ function setWiedTyp(t){
   document.getElementById('wied-btn-e').className='tt'+(t==='Einnahme'?' ae':'');
   document.getElementById('wied-btn-a').className='tt'+(t==='Ausgabe'?' aa':'');
   document.getElementById('wied-kat').innerHTML=(t==='Einnahme'?KE:KA).map(k=>`<option value="${k}">${k}</option>`).join('');
+  if(typeof updateWiedSidebar==='function') updateWiedSidebar();
 }
 let editWiedId = null;
 
@@ -295,11 +296,11 @@ function updateWiedSidebar(){
         </div>
         <div style="display:flex;justify-content:space-between;padding:5px 0">
           <span style="color:var(--sub);font-weight:600">Pro Jahr</span>
-          <span style="font-family:var(--mono);font-weight:700;font-size:14px">${perYear.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
+          <span style="font-family:var(--mono);font-weight:700;font-size:15px">${perYear.toLocaleString('de-DE',{minimumFractionDigits:2})} €</span>
         </div>
         ${endDate?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
           <span style="color:var(--sub);font-size:14px">Gesamtkosten bis ${fd(endDate)}</span>
-          <span style="font-family:var(--mono);font-weight:700;font-size:14px">${_calcTotalUntil(bet,intv,startDate,endDate)}</span>
+          <span style="font-family:var(--mono);font-weight:700;font-size:12px">${_calcTotalUntil(bet,intv,startDate,endDate)}</span>
         </div>`:''}`;
     }
   }
@@ -331,8 +332,8 @@ function updateWiedSidebar(){
   if(budgetEl&&bet){
     const mult={woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
     const yearCost=bet*(mult[intv]||12);
-    const totalAus=(data.eintraege||[]).filter(e=>!e.is_storno&&!e._storniert&&e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
-    const pct=totalAus>0?Math.round(yearCost/totalAus*100):0;
+    const totalRef=(data.eintraege||[]).filter(e=>!e.is_storno&&!e._storniert&&e.typ===wiedTyp).reduce((s,e)=>s+e.betrag,0);
+    const pct=totalRef>0?Math.round(yearCost/totalRef*100):0;
     const bar=Math.min(pct,100);
     budgetEl.innerHTML=`
       <div style="display:flex;justify-content:space-between;margin-bottom:6px">
@@ -342,7 +343,7 @@ function updateWiedSidebar(){
       <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${bar}%;background:${pct>50?'var(--red)':pct>25?'var(--yellow)':'var(--blue)'};border-radius:3px;transition:width .4s"></div>
       </div>
-      <div style="margin-top:6px;font-size:11px;color:var(--sub)">${fmt(yearCost)} € / Jahr von ${fmt(totalAus)} € Gesamt</div>`;
+      <div style="margin-top:6px;font-size:11px;color:var(--sub)">${fmt(yearCost)} / Jahr von ${fmt(totalRef)} Gesamt</div>`;
   } else if(budgetEl){budgetEl.innerHTML='—';}
 }
 
@@ -367,7 +368,7 @@ function _calcTotalUntil(bet,intv,start,end){
   if(!start||!end)return'—';
   const dates=_calcNextDates(start,intv,end,500);
   const total=dates.length*bet;
-  return fmt(total)+' €';
+  return fmt(total);
 }
 function wBuchenCore(id){
   // Только данные — без renderAll/renderWied
@@ -875,4 +876,3 @@ ${rows}
   a.click();
   toast(`<i class="fas fa-chart-bar"></i> Excel — ${_monLabel} exportiert`,'ok');
 }
-
