@@ -318,7 +318,7 @@ function updateWiedSidebar(){
           <span style="width:16px;height:16px;border-radius:var(--r);background:${isNext?'var(--blue)':isPast?'var(--border)':'var(--s2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
             ${isNext?'<span style="width:5px;height:5px;border-radius:50%;background:#fff"></span>':'<span style="font-size:8px;color:var(--sub)">'+(i+1)+'</span>'}
           </span>
-          <span style="font-family:var(--mono);font-size:12px;${isNext?'font-weight:700;color:var(--blue)':''}">${fd(d)}</span>
+          <span style="font-family:var(--mono);font-size:14px;${isNext?'font-weight:700;color:var(--blue)':''}">${fd(d)}</span>
           ${isNext?'<span style="font-size:9px;font-weight:700;color:var(--blue);background:var(--bdim);padding:1px 5px;border-radius:3px">NÄCHSTE</span>':''}
           ${isPast?'<span style="font-size:9px;color:var(--sub)">✓</span>':''}
         </div>`;
