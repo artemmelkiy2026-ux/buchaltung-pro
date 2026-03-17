@@ -213,7 +213,7 @@ header{display:none}
 .nav-item.active{background:var(--bdim);color:var(--blue);font-weight:600;border-color:transparent}
 .nav-item .ic{width:16px;text-align:center;font-size:15px}
 .nav-divider{height:1px;background:var(--border);margin:8px 14px}
-.page{display:none;flex-direction:column;width:100%}
+.page{display:none;flex-direction:column;width:100%;max-width:1200px}
 .page.active{display:flex}
 .page-inner{padding:20px;flex:1;width:100%;box-sizing:border-box}
 
