@@ -667,11 +667,11 @@ function _renderKatTopProdukte(yr){
     }).join('')}`;
 }
 
-// ── 5. Kategorie-Wachstum vs Vorjahr ─────────────────────────────────
+// ── 5. Wachstum vs Vorjahr ─────────────────────────────────
 function _renderKatGrowth(yr, isEin){
   const el=document.getElementById('kat-growth'); if(!el) return;
   if(yr==='Alle'){
-    el.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Kategorie-Wachstum</div>
+    el.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Wachstum</div>
     <div style="color:var(--sub);font-size:12px;text-align:center;padding:16px 0">Bitte ein bestimmtes Jahr auswählen</div>`;
     return;
   }
@@ -692,7 +692,7 @@ function _renderKatGrowth(yr, isEin){
   }).sort((a,b)=>b.diff-a.diff);
 
   if(!growth.length){
-    el.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Kategorie-Wachstum ${yr} vs ${prevYr}</div>
+    el.innerHTML=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:10px">Wachstum ${yr} vs ${prevYr}</div>
     <div style="color:var(--sub);font-size:12px;text-align:center;padding:16px 0">Keine Vergleichsdaten</div>`;
     return;
   }
@@ -700,7 +700,7 @@ function _renderKatGrowth(yr, isEin){
   const maxAbs=Math.max(...growth.map(g=>Math.abs(g.diff)),1);
   el.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)">Kategorie-Wachstum ${yr} vs ${prevYr}</span>
+      <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)">Wachstum ${yr} vs ${prevYr}</span>
       <div style="display:flex;gap:12px">
         <span style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:50%;background:var(--blue)"></span>${yr}</span>
         <span style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:50%;background:var(--border2)"></span>${prevYr}</span>
@@ -712,15 +712,15 @@ function _renderKatGrowth(yr, isEin){
         const barW=Math.round(Math.abs(g.diff)/maxAbs*100);
         return`<div style="border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${g.k}</span>
-            <span style="font-size:11px;font-weight:700;color:${isUp?'var(--green)':'var(--red)'};flex-shrink:0;margin-left:6px">${isUp?'+':''}${g.pct}%</span>
+            <span style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${g.k}</span>
+            <span style="font-size:13px;font-weight:700;color:${isUp?'var(--green)':'var(--red)'};flex-shrink:0;margin-left:6px">${isUp?'+':''}${g.pct}%</span>
           </div>
           <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
             <div style="height:4px;flex:1;background:var(--border);border-radius:2px;overflow:hidden">
               <div style="height:100%;width:${barW}%;background:${isUp?'var(--green)':'var(--red)'};border-radius:2px;opacity:.5"></div>
             </div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--sub)">
             <span>${yr}: <strong style="color:var(--text)">${fmt(g.cur)}</strong></span>
             <span>${prevYr}: ${fmt(g.prev)}</span>
           </div>
