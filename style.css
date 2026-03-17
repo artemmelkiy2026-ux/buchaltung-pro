@@ -54,7 +54,7 @@
     
   }
 
-  
+  .rech-card { overflow: hidden; min-width: 0 }
   /* Фоны */
   --bg:#ffffff;
   --s1:#ffffff;
