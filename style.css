@@ -96,7 +96,7 @@
   --shadow-hover:0 2px 8px rgba(0,0,0,.08);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;font-weight:500;line-height:20px;min-height:100vh;display:flex;flex-direction:column;overflow-y:scroll;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font:500 14px/22px var(--sans);min-height:100vh;display:flex;flex-direction:column;overflow-y:scroll;-webkit-font-smoothing:antialiased}
 html{scrollbar-gutter:stable}
 #loading-screen{position:fixed;inset:0;z-index:9998}
 #loading-screen[style*="display: none"],
@@ -387,7 +387,7 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
   padding:12px 18px;
   font-size:14px;
   font-weight:400;
-  font-family:'Google Sans','Roboto',system-ui,sans-serif;
+  font-family:var(--sans);
   letter-spacing:.01em;
   line-height:1.5;
   z-index:99999;
