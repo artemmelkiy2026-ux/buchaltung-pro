@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MelaLogic — Profil</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -237,7 +236,7 @@ body {
 
 <!-- Шапка -->
 <div class="header">
-  <div class="header-back" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i></div>
+  <div class="header-back" onclick="goBack()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M19 12H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <div class="header-title">Mein Profil</div>
 </div>
 
@@ -246,7 +245,7 @@ body {
 
   <!-- Аватар -->
   <div class="avatar-block">
-    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11a4 4 0 100-8 4 4 0 000 8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <div class="avatar-info">
       <h2 id="profile-name">Laden...</h2>
       <p id="profile-email">–</p>
@@ -263,20 +262,20 @@ body {
     <div class="section-title">Konto</div>
     <div class="settings-card">
       <div class="setting-row" onclick="openModal('modal-email')">
-        <div class="setting-icon blue"><i class="fa-solid fa-envelope"></i></div>
+        <div class="setting-icon blue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 6l-10 7L2 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="setting-body">
           <div class="setting-label">E-Mail ändern</div>
           <div class="setting-sub" id="current-email-sub">–</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <svg class="setting-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="setting-row" onclick="openModal('modal-password')">
-        <div class="setting-icon blue"><i class="fa-solid fa-lock"></i></div>
+        <div class="setting-icon blue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M5 11V7a7 7 0 0114 0v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11h18v11H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="setting-body">
           <div class="setting-label">Passwort ändern</div>
           <div class="setting-sub">Sicherheit Ihres Kontos</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <svg class="setting-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M9 18l6-6-6-6"/></svg>
       </div>
 
     </div>
@@ -288,7 +287,7 @@ body {
     <div class="settings-card">
       <!-- PIN вкл/выкл -->
       <div class="setting-row" style="cursor:default">
-        <div class="setting-icon green"><i class="fa-solid fa-hashtag"></i></div>
+        <div class="setting-icon green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M4 9h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 3v18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 3v18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="setting-body">
           <div class="setting-label">PIN-Code</div>
           <div class="setting-sub" id="pin-status-sub">Nicht aktiv</div>
@@ -300,16 +299,16 @@ body {
       </div>
       <!-- Сменить PIN (только если включён) -->
       <div class="setting-row" id="change-pin-row" style="display:none" onclick="openChangePinModal()">
-        <div class="setting-icon green"><i class="fa-solid fa-rotate"></i></div>
+        <div class="setting-icon green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M1 4v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 20v-6h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 0014.85 3.36L23 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="setting-body">
           <div class="setting-label">PIN ändern</div>
           <div class="setting-sub">Alten PIN bestätigen</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <svg class="setting-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <!-- Face ID вкл/выкл -->
       <div class="setting-row" id="bio-row" style="cursor:default">
-        <div class="setting-icon purple"><i class="fa-solid fa-fingerprint" id="bio-icon-fa"></i></div>
+        <div class="setting-icon purple" id="bio-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 14a4 4 0 008 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="setting-body">
           <div class="setting-label" id="bio-label-text">Face ID / Fingerabdruck</div>
           <div class="setting-sub" id="bio-status-sub">Nicht aktiv</div>
@@ -327,20 +326,20 @@ body {
     <div class="section-title">Sitzung</div>
     <div class="settings-card">
       <div class="setting-row" onclick="confirmLogout()">
-        <div class="setting-icon red"><i class="fa-solid fa-right-from-bracket"></i></div>
+        <div class="setting-icon red"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 17l5-5-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12H9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="setting-body">
           <div class="setting-label">Abmelden</div>
           <div class="setting-sub">Von diesem Gerät abmelden</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <svg class="setting-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="setting-row" id="delete-account-row" onclick="openDeleteModal()">
-        <div class="setting-icon red"><i class="fa-solid fa-trash"></i></div>
+        <div class="setting-icon red"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M3 6h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="setting-body">
           <div class="setting-label">Konto löschen</div>
           <div class="setting-sub" id="delete-account-sub">Konto und alle Daten löschen</div>
         </div>
-        <i class="fa-solid fa-chevron-right setting-arrow"></i>
+        <svg class="setting-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle"><path d="M9 18l6-6-6-6"/></svg>
       </div>
     </div>
   </div>
@@ -353,7 +352,7 @@ body {
 <div class="modal-overlay" id="modal-email">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-envelope" style="color:var(--blue);margin-right:8px"></i>E-Mail ändern</h3>
+    <h3><span style="color:var(--blue);margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 6l-10 7L2 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>E-Mail ändern</h3>
     <div class="field">
       <label>Neue E-Mail</label>
       <input type="email" id="new-email" placeholder="neue@email.de">
@@ -372,7 +371,7 @@ body {
 <div class="modal-overlay" id="modal-password">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-lock" style="color:var(--blue);margin-right:8px"></i>Passwort ändern</h3>
+    <h3><span style="color:var(--blue);margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M5 11V7a7 7 0 0114 0v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11h18v11H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Passwort ändern</h3>
     <div class="field">
       <label>Aktuelles Passwort</label>
       <input type="password" id="old-pwd" placeholder="••••••••">
@@ -395,7 +394,7 @@ body {
 <div class="modal-overlay" id="modal-pin-disable">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-hashtag" style="color:var(--green);margin-right:8px"></i>PIN deaktivieren</h3>
+    <h3><span style="color:var(--green);margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M4 9h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 3v18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 3v18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>PIN deaktivieren</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:8px">Bitte aktuellen PIN eingeben</p>
     <div class="pin-dots">
       <div class="pin-dot" id="pd-dot-0"></div>
@@ -426,7 +425,7 @@ body {
 <div class="modal-overlay" id="modal-pin-change">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-rotate" style="color:var(--green);margin-right:8px"></i>PIN ändern</h3>
+    <h3><span style="color:var(--green);margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M1 4v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 20v-6h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 0014.85 3.36L23 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>PIN ändern</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:4px" id="pc-subtitle">Aktuellen PIN eingeben</p>
     <div class="pin-dots">
       <div class="pin-dot" id="pc-dot-0"></div>
@@ -457,7 +456,7 @@ body {
 <div class="modal-overlay" id="modal-pin-setup">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-hashtag" style="color:var(--green);margin-right:8px"></i>PIN einrichten</h3>
+    <h3><span style="color:var(--green);margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M4 9h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 3v18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 3v18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>PIN einrichten</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:4px" id="ps-subtitle">Neuen PIN festlegen (1/2)</p>
     <div class="pin-dots">
       <div class="pin-dot" id="ps-dot-0"></div>
@@ -488,7 +487,7 @@ body {
 <div class="modal-overlay" id="modal-delete">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3 style="color:var(--red)"><i class="fa-solid fa-trash" style="margin-right:8px"></i>Konto löschen</h3>
+    <h3 style="color:var(--red)"><span style="margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M3 6h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Konto löschen</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.5">
       Ihr Konto wird <strong>nach 30 Tagen</strong> endgültig gelöscht. Sie können die Löschung jederzeit in Ihrem Profil widerrufen.
     </p>
@@ -497,7 +496,7 @@ body {
       <input type="password" id="delete-pwd" placeholder="Ihr aktuelles Passwort">
     </div>
     <div class="msg" id="delete-msg"></div>
-    <button class="btn-danger" onclick="deleteAccount()"><i class="fa-solid fa-trash" style="margin-right:6px"></i>Konto zur Löschung markieren</button>
+    <button class="btn-danger" onclick="deleteAccount()"><span style="margin-right:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M3 6h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Konto zur Löschung markieren</button>
     <button class="btn-cancel" onclick="closeModal('modal-delete')">Abbrechen</button>
   </div>
 </div>
@@ -506,12 +505,12 @@ body {
 <div class="modal-overlay" id="modal-cancel-delete">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3 style="color:var(--green)"><i class="fa-solid fa-rotate-left" style="margin-right:8px"></i>Löschung widerrufen</h3>
+    <h3 style="color:var(--green)"><span style="margin-right:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M1 4v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 0014.85 3.36L23 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 20v-6h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Löschung widerrufen</h3>
     <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.5">
       Möchten Sie die Kontolöschung wirklich abbrechen? Ihr Konto bleibt dann erhalten.
     </p>
     <div class="msg" id="cancel-delete-msg"></div>
-    <button class="btn-primary" onclick="cancelDeleteAccount()"><i class="fa-solid fa-rotate-left" style="margin-right:6px"></i>Löschung abbrechen</button>
+    <button class="btn-primary" onclick="cancelDeleteAccount()"><span style="margin-right:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M1 4v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 0014.85 3.36L23 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 20v-6h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Löschung abbrechen</button>
     <button class="btn-cancel" onclick="closeModal('modal-cancel-delete')">Schließen</button>
   </div>
 </div>
@@ -590,7 +589,8 @@ function initBioUI() {
   else if (isMac) { icon = 'fa-apple fa-brands'; label = 'Touch ID'; }
   else if (isWindows) { icon = 'fa-windows fa-brands'; label = 'Windows Hello'; }
 
-  document.getElementById('bio-icon-fa').className = `fa-solid ${icon}`;
+  const _bioIcons={'fa-fingerprint':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6"/><path d="M8 14a4 4 0 008 0"/></svg>','fa-face-smile':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>'};
+  const _bw=document.getElementById('bio-icon-wrap');if(_bw)_bw.innerHTML=_bioIcons[icon]||_bioIcons['fa-fingerprint'];
   document.getElementById('bio-label-text').textContent = label;
 
   const hasBio = !!localStorage.getItem('bp_bio_login') || !!localStorage.getItem('bp_bio_id');
@@ -630,16 +630,16 @@ async function changeEmail() {
   const password = document.getElementById('email-confirm-pwd').value;
   const msg = document.getElementById('email-msg');
 
-  if (!newEmail || !password) { setMsg('email-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Alle Felder ausfüllen', 'error'); return; }
+  if (!newEmail || !password) { setMsg('email-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Alle Felder ausfüllen', 'error'); return; }
 
   // Сначала проверяем пароль через повторный вход
   const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password });
-  if (signInErr) { setMsg('email-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falsches Passwort', 'error'); return; }
+  if (signInErr) { setMsg('email-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Falsches Passwort', 'error'); return; }
 
   const { error } = await sb.auth.updateUser({ email: newEmail });
-  if (error) { setMsg('email-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> ' + error.message, 'error'); return; }
+  if (error) { setMsg('email-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> ' + error.message, 'error'); return; }
 
-  setMsg('email-msg', '<i class="fas fa-check-circle" style="color:var(--green)"></i> Bestätigungs-E-Mail gesendet', 'success');
+  setMsg('email-msg', '<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> Bestätigungs-E-Mail gesendet', 'success');
   setTimeout(() => closeModal('modal-email'), 2000);
 }
 
@@ -649,16 +649,16 @@ async function changePassword() {
   const newPwd = document.getElementById('new-pwd').value;
   const newPwd2 = document.getElementById('new-pwd2').value;
 
-  if (!oldPwd || !newPwd || !newPwd2) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Alle Felder ausfüllen', 'error'); return; }
-  if (newPwd.length < 6) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Mindestens 6 Zeichen', 'error'); return; }
-  if (newPwd !== newPwd2) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Passwörter stimmen nicht überein', 'error'); return; }
+  if (!oldPwd || !newPwd || !newPwd2) { setMsg('pwd-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Alle Felder ausfüllen', 'error'); return; }
+  if (newPwd.length < 6) { setMsg('pwd-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Mindestens 6 Zeichen', 'error'); return; }
+  if (newPwd !== newPwd2) { setMsg('pwd-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Passwörter stimmen nicht überein', 'error'); return; }
 
   // Проверяем старый пароль
   const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password: oldPwd });
-  if (signInErr) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Aktuelles Passwort falsch', 'error'); return; }
+  if (signInErr) { setMsg('pwd-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Aktuelles Passwort falsch', 'error'); return; }
 
   const { error } = await sb.auth.updateUser({ password: newPwd });
-  if (error) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> ' + error.message, 'error'); return; }
+  if (error) { setMsg('pwd-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> ' + error.message, 'error'); return; }
 
   // Обновляем сохранённые данные биометрии
   const bioData = localStorage.getItem('bp_bio_login');
@@ -668,7 +668,7 @@ async function changePassword() {
     localStorage.setItem('bp_bio_login', JSON.stringify(parsed));
   }
 
-  setMsg('pwd-msg', '<i class="fas fa-check-circle" style="color:var(--green)"></i> Passwort geändert', 'success');
+  setMsg('pwd-msg', '<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> Passwort geändert', 'success');
   setTimeout(() => closeModal('modal-password'), 2000);
 }
 
@@ -677,8 +677,8 @@ async function forgotPassword() {
   const { error } = await sb.auth.resetPasswordForEmail(currentEmail, {
     redirectTo: location.origin + '/buchaltung-pro/login.html'
   });
-  if (error) { toast('<i class="fas fa-times-circle" style="color:var(--red)"></i> Fehler: ' + error.message); return; }
-  toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Reset-Link an ' + currentEmail + ' gesendet');
+  if (error) { toast('<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Fehler: ' + error.message); return; }
+  toast('<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> Reset-Link an ' + currentEmail + ' gesendet');
 }
 
 // ── PIN тоггл ─────────────────────────────────────────────────────────────
@@ -745,7 +745,7 @@ async function pcConfirm() {
     updatePcDots();
   } else {
     if (pcValue !== pcNewValue) {
-      document.getElementById('pc-msg').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> PINs stimmen nicht überein';
+      document.getElementById('pc-msg').innerHTML = '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> PINs stimmen nicht überein';
       pcValue = ''; pcStep = 'new1'; pcNewValue = '';
       document.getElementById('pc-subtitle').textContent = 'Neuen PIN festlegen (1/2)';
       setTimeout(() => { updatePcDots(); document.getElementById('pc-msg').textContent=''; }, 1000);
@@ -758,7 +758,7 @@ async function pcConfirm() {
     // Сессия остаётся разблокированной после смены PIN
     sessionStorage.setItem('pin_unlocked', '1');
     closeModal('modal-pin-change');
-    toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> PIN geändert');
+    toast('<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> PIN geändert');
   }
 }
 
@@ -802,7 +802,7 @@ async function pdConfirm() {
   document.getElementById('pin-status-sub').textContent = 'Nicht aktiv';
   document.getElementById('change-pin-row').style.display = 'none';
   closeModal('modal-pin-disable');
-  toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> PIN deaktiviert');
+  toast('<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> PIN deaktiviert');
 }
 function cancelPinDisable() {
   document.getElementById('pin-toggle').checked = true;
@@ -814,7 +814,7 @@ function pcPinError(prefix) {
   else { pdValue = ''; updatePdDots(); }
   if (navigator.vibrate) navigator.vibrate([100,50,100]);
   for(let i=0;i<4;i++) document.getElementById(`${prefix}-dot-${i}`).classList.add('error');
-  document.getElementById(`${prefix}-msg`).innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falscher PIN';
+  document.getElementById(`${prefix}-msg`).innerHTML = '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Falscher PIN';
   setTimeout(() => {
     if (prefix==='pc') updatePcDots(); else updatePdDots();
     document.getElementById(`${prefix}-msg`).textContent = '';
@@ -847,19 +847,19 @@ async function handleBioToggle() {
         const credIdBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
         localStorage.setItem('bp_bio_id', credIdBase64);
         document.getElementById('bio-status-sub').textContent = 'Aktiv';
-        toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Biometrie aktiviert');
+        toast('<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> Biometrie aktiviert');
       }
     } catch(e) {
       document.getElementById('bio-toggle').checked = false;
       document.getElementById('bio-status-sub').textContent = 'Nicht aktiv';
-      toast('<i class="fas fa-times-circle" style="color:var(--red)"></i> Biometrie nicht verfügbar');
+      toast('<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Biometrie nicht verfügbar');
     }
   } else {
     // Выключаем
     localStorage.removeItem('bp_bio_id');
     localStorage.removeItem('bp_bio_login');
     document.getElementById('bio-status-sub').textContent = 'Nicht aktiv';
-    toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Biometrie deaktiviert');
+    toast('<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> Biometrie deaktiviert');
   }
 }
 
@@ -913,7 +913,7 @@ async function psConfirm() {
     return;
   }
   if (psValue !== psFirst) {
-    document.getElementById('ps-msg').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> PINs stimmen nicht überein';
+    document.getElementById('ps-msg').innerHTML = '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> PINs stimmen nicht überein';
     if (navigator.vibrate) navigator.vibrate([100,50,100]);
     for(let i=0;i<4;i++) document.getElementById('ps-dot-'+i).classList.add('error');
     psValue = ''; psFirst = ''; psStep = 1;
@@ -936,7 +936,7 @@ async function psConfirm() {
   document.getElementById('pin-status-sub').textContent = 'Aktiv';
   document.getElementById('change-pin-row').style.display = 'flex';
   closeModal('modal-pin-setup');
-  toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> PIN eingerichtet');
+  toast('<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> PIN eingerichtet');
 }
 function cancelPinSetup() {
   document.getElementById('pin-toggle').checked = false;
@@ -956,10 +956,10 @@ function openDeleteModal() {
 
 async function deleteAccount() {
   const password = document.getElementById('delete-pwd').value;
-  if (!password) { setMsg('delete-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Bitte Passwort eingeben', 'error'); return; }
+  if (!password) { setMsg('delete-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Bitte Passwort eingeben', 'error'); return; }
 
   const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password });
-  if (signInErr) { setMsg('delete-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falsches Passwort', 'error'); return; }
+  if (signInErr) { setMsg('delete-msg', '<span style="color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></span> Falsches Passwort', 'error'); return; }
 
   const now = new Date().toISOString();
   await sb.from('user_data').upsert({ user_id: currentUser.id, deleted_at: now }, { onConflict: 'user_id' });
@@ -968,7 +968,7 @@ async function deleteAccount() {
   // Обновляем UI
   updateDeleteUI(now);
   closeModal('modal-delete');
-  toast('<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Konto wird in 30 Tagen gelöscht');
+  toast('<span style="color:var(--yellow)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span> Konto wird in 30 Tagen gelöscht');
 }
 
 async function cancelDeleteAccount() {
@@ -976,7 +976,7 @@ async function cancelDeleteAccount() {
   window._deletedAt = null;
   updateDeleteUI(null);
   closeModal('modal-cancel-delete');
-  toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> Löschung abgebrochen');
+  toast('<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> Löschung abgebrochen');
 }
 
 function updateDeleteUI(deletedAt) {
@@ -1001,7 +1001,7 @@ function updateDeleteUI(deletedAt) {
 
 function copyClientId() {
   const id = document.getElementById('client-id-display').textContent;
-  navigator.clipboard.writeText(id).then(() => toast('<i class="fas fa-check-circle" style="color:var(--green)"></i> ' + id + ' kopiert'));
+  navigator.clipboard.writeText(id).then(() => toast('<span style="color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span> ' + id + ' kopiert'));
 }
 
 init();

@@ -387,7 +387,7 @@ function showDeletionBanner(daysLeft) {
   banner.id = 'deletion-banner';
   banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#e08c1a;color:#fff;border-radius:6px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:9998;box-shadow:0 8px 32px rgba(224,140,26,.4);font-family:inherit;max-width:380px;width:calc(100% - 32px)';
   banner.innerHTML = `
-    <i class="fa-solid fa-triangle-exclamation" style="font-size:22px;flex-shrink:0"></i>
+    <span style="flex-shrink:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     <div style="flex:1;font-size:13px">
       <div style="font-weight:600;margin-bottom:2px">Konto wird gelöscht</div>
       <div style="opacity:.9;font-size:12px">Noch ${daysLeft} Tage bis zur Löschung</div>

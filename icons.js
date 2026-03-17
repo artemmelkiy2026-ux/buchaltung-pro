@@ -1,0 +1,86 @@
+/* icons.js — Buchaltung Pro SVG Icons
+   Original 24×24 stroke icons, 1.5px stroke
+   ic(name, size?) → inline SVG string */
+
+var _IC={
+'home':'M4 10.5L12 4l8 6.5V20a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1z',
+'bars':'M4 6h16M4 12h16M4 18h16',
+'search':'M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15zM21 21l-4-4',
+'chevron-right':'M9 6l6 6-6 6',
+'chevron-down':'M6 9l6 6 6-6',
+'arrow-up':'M12 20V4M5 11l7-7 7 7',
+'arrow-down':'M12 4v16M19 13l-7 7-7-7',
+'arrow-left':'M20 12H4M11 5l-7 7 7 7',
+'plus':'M12 4v16M4 12h16',
+'times':'M6 6l12 12M18 6L6 18',
+'check':'M4 12.5l5.5 5.5L20 6',
+'ellipsis-h':'M6 12a1 1 0 100-2 1 1 0 000 2zM12 12a1 1 0 100-2 1 1 0 000 2zM18 12a1 1 0 100-2 1 1 0 000 2z',
+'check-circle':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zM8 12l3 3 5.5-5.5',
+'times-circle':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zM9 9l6 6M15 9l-6 6',
+'info-circle':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zM12 11v5M12 8h.01',
+'exclamation-triangle':'M12 3L2 20h20zM12 10v4M12 17h.01',
+'exclamation-circle':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zM12 8v5M12 16h.01',
+'circle':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19z',
+'plus-circle':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zM12 8v8M8 12h8',
+'clock':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zM12 7v5l3 2',
+'edit':'M16.5 3.5a2.12 2.12 0 013 3L7 19l-4.5 1.5L4 16z',
+'trash':'M4 7h16M10 11v5M14 11v5M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2',
+'save':'M5 3h11l5 5v11a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zM7 3v5h8V3M7 14h10v7H7z',
+'print':'M7 9V3h10v6M7 15v6h10v-6M3 9h18v7a1 1 0 01-1 1H4a1 1 0 01-1-1z',
+'download':'M12 3v12M7 11l5 5 5-5M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2',
+'upload':'M12 15V3M17 8l-5-5-5 5M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2',
+'lock':'M6 11V8a6 6 0 1112 0v3M4 11h16v10a1 1 0 01-1 1H5a1 1 0 01-1-1z',
+'bolt':'M13 2L4 14h8l-1 8 9-12h-8z',
+'play':'M6 4l14 8-14 8z',
+'sync-alt':'M4 12a8 8 0 0114-5.3L21 4v5h-5M20 12a8 8 0 01-14 5.3L3 20v-5h5',
+'exchange-alt':'M4 17h16l-4 4M20 7H4l4-4',
+'file-invoice':'M6 2h8l5 5v14a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1zM14 2v5h5M9 13h6M9 17h4',
+'file-alt':'M6 2h8l5 5v14a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1zM14 2v5h5M9 10h6M9 14h6M9 18h3',
+'file-pdf':'M6 2h8l5 5v14a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1zM14 2v5h5M10 13v4M10 13a1.5 1.5 0 110 3',
+'file-code':'M6 2h8l5 5v14a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1zM14 2v5h5M10 14l-2 2 2 2M14 14l2 2-2 2',
+'sticky-note':'M4 4h12a2 2 0 012 2v8l-6 6H4a2 2 0 01-2-2V6a2 2 0 012-2zM12 14v6l6-6h-6',
+'book':'M4 19V5a2 2 0 012-2h12v16H6a2 2 0 00-2 2zM6 21h14',
+'receipt':'M5 2l2 2 2-2 2 2 2-2 2 2 2-2v20l-2-2-2 2-2-2-2 2-2-2-2 2zM9 10h6M9 14h4',
+'inbox':'M3 12l4-8h10l4 8M3 12v6a2 2 0 002 2h14a2 2 0 002-2v-6M3 12h5l2 3h4l2-3h5',
+'euro-sign':'M17 7a7 7 0 100 10M5 10h9M5 14h7',
+'credit-card':'M2 6h20a1 1 0 011 1v10a1 1 0 01-1 1H2a1 1 0 01-1-1V7a1 1 0 011-1zM1 10h22',
+'landmark':'M3 21h18M5 21v-9M9 21v-9M15 21v-9M19 21v-9M12 3L2 9h20z',
+'university':'M2 21h20M12 3L2 8h20zM5 8v10M9 8v10M15 8v10M19 8v10M2 18h20',
+'store':'M4 7l-1 5h18l-1-5zM3 12v8a1 1 0 001 1h16a1 1 0 001-1v-8M10 16v5h4v-5M4 7h16l-2-4H6z',
+'tachometer-alt':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zM12 7v5M16 8l-3 4',
+'envelope':'M3 5h18a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1zM22 6l-10 7L2 6',
+'phone':'M5 2h4l2 5-2.5 1.5a11 11 0 005 5L15 11l5 2v4a2 2 0 01-2 2A16 16 0 013 4a2 2 0 012-2',
+'camera':'M3 8a2 2 0 012-2h2l1.5-2h7L17 6h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2zM12 16a3.5 3.5 0 100-7 3.5 3.5 0 000 7z',
+'image':'M3 5h18a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1zM8 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM22 16l-5-5-4 4-3-3-8 8',
+'user':'M12 11a4 4 0 100-8 4 4 0 000 8zM4 21v-1a6 6 0 0112 0v1',
+'users':'M9 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM2 21v-1a5 5 0 0110 0v1M16 7.13a3.5 3.5 0 010 6.74M22 21v-1a5 5 0 00-4-4.9',
+'address-book':'M4 3h14a2 2 0 012 2v14a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2zM11 10a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM7 17c0-2.2 1.8-4 4-4s4 1.8 4 4',
+'building':'M6 3h12a1 1 0 011 1v17H5V4a1 1 0 011-1zM9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2M10 21v-3h4v3',
+'right-from-bracket':'M15 3l6 6-6 6M21 9H9M5 3h2a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2',
+'chart-bar':'M6 20V14M12 20V8M18 20V4',
+'chart-line':'M4 18l5-6 4 3 7-9',
+'tag':'M2 4h8l10 10-8 8L2 12zM6 8h.01',
+'calendar':'M4 5h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1zM16 3v4M8 3v4M3 10h18',
+'calendar-alt':'M4 5h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1zM16 3v4M8 3v4M3 10h18M8 14h3M8 17h2',
+'calendar-times':'M4 5h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1zM16 3v4M8 3v4M3 10h18M10 14l4 4M14 14l-4 4',
+'hourglass-end':'M6 2h12M6 22h12M16 2v4c0 3-4 5-4 5s-4-2-4-5V2M8 22v-4c0-3 4-5 4-5s4 2 4 5v4',
+'hourglass-half':'M6 2h12M6 22h12M16 2v3c0 2-2 4-4 5M8 2v3c0 2 2 4 4 5M8 22v-3c0-2 2-4 4-5M16 22v-3c0-2-2-4-4-5',
+'map-marker-alt':'M19 10c0 6-7 12-7 12s-7-6-7-12a7 7 0 0114 0zM12 13a3 3 0 100-6 3 3 0 000 6z',
+'pen':'M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z',
+'list':'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+'lightbulb':'M9 18h6M12 2a7 7 0 00-4 12.7V18h8v-3.3A7 7 0 0012 2zM10 22h4',
+'tools':'M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94z',
+'box':'M21 16V8l-9-5-9 5v8l9 5zM3.3 7L12 12l8.7-5M12 22V12',
+'box-open':'M21 16V8l-9-5-9 5v8l9 5zM3 8l9 5 9-5M12 13v9',
+'solid':'M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19z',
+};
+
+function ic(n,s){
+  s=s||14;
+  var d=_IC[n];
+  if(!d)return '<span style="display:inline-block;width:'+s+'px;height:'+s+'px"></span>';
+  var paths=d.split('M').filter(Boolean).map(function(p){return 'M'+p;});
+  // rebuild as single multi-move path
+  var pathStr=paths.join('');
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex-shrink:0"><path d="'+d+'"/></svg>';
+}
