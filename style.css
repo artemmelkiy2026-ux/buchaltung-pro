@@ -2595,7 +2595,7 @@ input, select, textarea {
 
 /* Дочерние пункты — без иконок, компактные */
 .nav-item.nav-child {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   padding: 6px 10px;
   margin: 0 4px;
