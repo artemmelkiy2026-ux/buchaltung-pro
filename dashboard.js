@@ -442,6 +442,19 @@ function sortDash(col){
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────
 function renderDash(){
+  // Обновляем баннер фälligen Wiederkehrenden
+  const _banner = document.getElementById('dash-wied-banner');
+  const _bannerTitle = document.getElementById('dash-wied-banner-title');
+  if(_banner && _bannerTitle){
+    const _today = new Date().toISOString().split('T')[0];
+    const _due = (data.wiederkehrend||[]).filter(w=>w.naechste<=_today&&w.status!=='paused');
+    if(_due.length){
+      _bannerTitle.textContent = `${_due.length} wiederkehrende Zahlung${_due.length>1?'en':''} fällig!`;
+      _banner.style.display = 'flex';
+    } else {
+      _banner.style.display = 'none';
+    }
+  }
   buildYearFilters();
   const yr=document.getElementById('dash-yr').value;
   document.getElementById('dash-yr-lbl').textContent=yr==='Alle'?'Alle Jahre':yr;

@@ -203,11 +203,14 @@ function appInit(){
   setTimeout(()=>{
     const today=new Date().toISOString().split('T')[0];
     const due=(data.wiederkehrend||[]).filter(w=>w.naechste<=today);
-    if(due.length) toast(
-      `<i class="fas fa-sync-alt"></i> ${due.length} wiederkehrende Zahlung${due.length>1?'en':''} fällig — Anzeigen →`,
-      'ok',
-      ()=>{ nav('wiederkehrend', document.querySelector('.nav-item[onclick*="wiederkehrend"]')); }
-    );
+    const banner = document.getElementById('dash-wied-banner');
+    const bannerTitle = document.getElementById('dash-wied-banner-title');
+    if(due.length && banner && bannerTitle){
+      bannerTitle.textContent = `${due.length} wiederkehrende Zahlung${due.length>1?'en':''} fällig!`;
+      banner.style.display = 'flex';
+    } else if(banner){
+      banner.style.display = 'none';
+    }
   },800);
 }
 
