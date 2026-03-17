@@ -141,7 +141,25 @@ function dbToRechnung(r, allPos) {
   return { id:r.id, nr:r.nr||'', datum:r.datum||'', created_at:r.created_at||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', tel:r.tel||'', betrag:parseFloat(r.betrag)||0, netto:_posNetto||parseFloat(r.betrag)||0, mwstBetrag:_posMwst, mwstRate:_posRate, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', beschreibung:_extra.beschreibung||'', kategorie:_extra.kategorie||'', zahlungsart:_extra.zahlungsart||'', positionen:pos };
 }
 function dbToWied(r) {
-  return { id:r.id, typ:r.typ||'Ausgabe', kategorie:r.kategorie||'', bezeichnung:r.bezeichnung||r.beschreibung||'', beschreibung:r.beschreibung||r.bezeichnung||'', betrag:parseFloat(r.betrag)||0, zahlungsart:r.zahlungsart||'Sonstiges', intervall:r.intervall||'monatlich', naechste:r.naechste||'' };
+  // Unpack extended meta from beschreibung if present
+  let bez = r.beschreibung||'', meta = {};
+  if (bez.includes('§META:')) {
+    const parts = bez.split('§META:');
+    bez = parts[0].trim();
+    try { meta = JSON.parse(parts[1]); } catch(e){}
+  }
+  return {
+    id:r.id, typ:r.typ||'Ausgabe', kategorie:r.kategorie||'',
+    bezeichnung:r.bezeichnung||bez||'', beschreibung:bez||'',
+    betrag:parseFloat(r.betrag)||0, zahlungsart:r.zahlungsart||'Sonstiges',
+    intervall:meta.intervall||r.intervall||'monatlich', naechste:r.naechste||'',
+    // Extended fields from meta
+    enddatum:meta.enddatum||'', erinnerung:meta.erinnerung||0,
+    autoBuchung:meta.autoBuchung||'manual', anbieter:meta.anbieter||'',
+    vertragsnr:meta.vertragsnr||'', kuendigung:meta.kuendigung||'',
+    laufzeit:meta.laufzeit||'', notiz:meta.notiz||'',
+    status:meta.status||'active', buchungen:meta.buchungen||0
+  };
 }
 function dbToUstEintrag(r) {
   const m = { 'Ausgang':'ust', 'Vorsteuer':'vorsteuer', 'ust':'ust', 'vorsteuer':'vorsteuer' };
@@ -167,7 +185,33 @@ function posToDb(pos, rechnungId) {
   return { id, user_id:currentUser.id, rechnung_id:rechnungId, beschreibung, menge:pos.menge||1, einheit:pos.einheit||'Stk.', einzelpreis, mwst_rate };
 }
 function wiedToDb(w) {
-  return { id:w.id, user_id:currentUser.id, typ:w.typ||'Ausgabe', kategorie:w.kategorie||null, bezeichnung:w.bezeichnung||w.beschreibung||null, beschreibung:w.bezeichnung||w.beschreibung||null, betrag:w.betrag||0, zahlungsart:w.zahlungsart||null, intervall:w.intervall||'monatlich', naechste:w.naechste||null };
+  // Pack extended fields as JSON suffix in beschreibung
+  const meta = {};
+  if(w.enddatum)   meta.enddatum=w.enddatum;
+  if(w.erinnerung)  meta.erinnerung=w.erinnerung;
+  if(w.autoBuchung && w.autoBuchung!=='manual') meta.autoBuchung=w.autoBuchung;
+  if(w.anbieter)    meta.anbieter=w.anbieter;
+  if(w.vertragsnr)  meta.vertragsnr=w.vertragsnr;
+  if(w.kuendigung)  meta.kuendigung=w.kuendigung;
+  if(w.laufzeit)    meta.laufzeit=w.laufzeit;
+  if(w.notiz)       meta.notiz=w.notiz;
+  if(w.status && w.status!=='active') meta.status=w.status;
+  if(w.buchungen)   meta.buchungen=w.buchungen;
+  // Valid intervals the DB accepts
+  const validIntervals = ['monatlich','quartalsweise','halbjaehrlich','jaehrlich'];
+  const intv = validIntervals.includes(w.intervall) ? w.intervall : 'monatlich';
+  if(w.intervall && !validIntervals.includes(w.intervall)) meta.intervall=w.intervall;
+  // Build beschreibung with optional meta suffix
+  const bez = w.bezeichnung||w.beschreibung||'';
+  const hasMeta = Object.keys(meta).length > 0;
+  const beschreibung = hasMeta ? bez+' §META:'+JSON.stringify(meta) : bez;
+  return {
+    id:w.id, user_id:currentUser.id,
+    typ:w.typ||'Ausgabe', kategorie:w.kategorie||null,
+    beschreibung:beschreibung||null,
+    betrag:w.betrag||0, zahlungsart:w.zahlungsart||null,
+    intervall:intv, naechste:w.naechste||null
+  };
 }
 function ustEintragToDb(e) {
   const m = { 'ust':'Ausgang', 'vorsteuer':'Vorsteuer', 'Ausgang':'Ausgang', 'Vorsteuer':'Vorsteuer' };
@@ -357,7 +401,14 @@ async function sbDeleteRechnung(id) {
   await sb.from('rechnungen_pos').delete().eq('rechnung_id',id).eq('user_id',currentUser.id);
   await sb.from('rechnungen').delete().eq('id',id).eq('user_id',currentUser.id);
 }
-async function sbSaveWied(w)       { if(!currentUser) return; await sb.from('wiederkehrend').upsert(wiedToDb(w), {onConflict:'id'}); }
+async function sbSaveWied(w) {
+  if(!currentUser) return;
+  try {
+    const payload = wiedToDb(w);
+    const {error} = await sb.from('wiederkehrend').upsert(payload, {onConflict:'id'});
+    if(error) console.error('sbSaveWied error:', error, 'payload:', payload);
+  } catch(e) { console.error('sbSaveWied exception:', e); }
+}
 async function sbDeleteWied(id)    { if(!currentUser) return; await sb.from('wiederkehrend').delete().eq('id',id).eq('user_id',currentUser.id); }
 async function sbSaveUstMode(j,m)  { if(!currentUser) return; await sb.from('ust_mode').upsert({user_id:currentUser.id,jahr:j,mode:m},{onConflict:'user_id,jahr'}); }
 async function sbSaveUstEintrag(e) {
