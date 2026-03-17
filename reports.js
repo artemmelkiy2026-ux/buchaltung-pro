@@ -199,7 +199,7 @@ function renderKat(){
   // ── SVG Donut ─────────────────────────────────────────────────────────────
   const donutWrap=document.getElementById('kat-donut-wrap');
   if(donutWrap){
-    const R=110, ri=66, CX=130, CY=130, SZ=260;
+    const R=90, ri=54, CX=110, CY=110, SZ=220;
     const CIRC=2*Math.PI*R;
     const GAP=sorted.length>1?2.5:0; // gap только если несколько сегментов
 
@@ -245,13 +245,13 @@ function renderKat(){
         ${paths}
         <circle cx="${CX}" cy="${CY}" r="${ri-2}" fill="var(--s1)" style="pointer-events:none"/>
         <text x="${CX}" y="${CY-10}" text-anchor="middle" dominant-baseline="middle"
-          font-size="12" fill="var(--sub)" font-family="Inter,sans-serif" font-weight="600"
+          font-size="10" fill="var(--sub)" font-family="Inter,sans-serif" font-weight="600"
           style="pointer-events:none">${isEin?'EINNAHMEN':'AUSGABEN'}</text>
         <text id="kat-cv" x="${CX}" y="${CY+8}" text-anchor="middle" dominant-baseline="middle"
-          font-size="18" fill="var(--text)" font-family="JetBrains Mono,monospace" font-weight="700"
+          font-size="15" fill="var(--text)" font-family="JetBrains Mono,monospace" font-weight="700"
           style="pointer-events:none">${fmt(total)}</text>
         <text id="kat-cs" x="${CX}" y="${CY+26}" text-anchor="middle" dominant-baseline="middle"
-          font-size="12" fill="var(--sub)" font-family="Inter,sans-serif"
+          font-size="10" fill="var(--sub)" font-family="Inter,sans-serif"
           style="pointer-events:none">${sorted.length} Kategorien</text>
       </svg>`;
 
@@ -293,7 +293,7 @@ function renderKat(){
   // ── Stats карточки ────────────────────────────────────────────────────────
   const katStats=document.getElementById('kat-stats');
   if(katStats) katStats.innerHTML=`
-    <div class="kat-stat-card" style="padding:18px 20px">
+    <div class="kat-stat-card">
       <div class="kat-stat-label">Gesamt</div>
       <div class="kat-stat-val" style="color:${isEin?'var(--green)':'var(--red)'}">${fmt(total)}</div>
       <div class="kat-stat-sub">${sorted.length} Kategorien</div>
@@ -425,13 +425,13 @@ function _renderKatTrend(ye, yr, isEin){
   const curMon=new Date().getMonth();
 
   el.innerHTML=`
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:14px">Monatstrend ${curYear}</div>
+    <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:16px">Monatstrend ${curYear}</div>
     <div style="position:relative;height:180px">
       <canvas id="kat-trend-canvas"></canvas>
     </div>
     <div style="display:flex;gap:20px;margin-top:12px">
-      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub)"><span style="width:12px;height:4px;border-radius:2px;background:#22c55e;display:inline-block"></span>Einnahmen</span>
-      <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub)"><span style="width:12px;height:4px;border-radius:2px;background:#ef4444;display:inline-block"></span>Ausgaben</span>
+      <span style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--sub)"><span style="width:14px;height:4px;border-radius:2px;background:#22c55e;display:inline-block"></span>Einnahmen</span>
+      <span style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--sub)"><span style="width:14px;height:4px;border-radius:2px;background:#ef4444;display:inline-block"></span>Ausgaben</span>
     </div>`;
 
   // Уничтожаем старый Chart если был
@@ -487,13 +487,13 @@ function _renderKatTrend(ye, yr, isEin){
       scales:{
         x:{
           grid:{ display:false },
-          ticks:{ color:'var(--sub)', font:{ size:11 } },
+          ticks:{ color:'var(--sub)', font:{ size:13 } },
           border:{ display:false }
         },
         y:{
           grid:{ color:'var(--border)', drawBorder:false },
           ticks:{
-            color:'var(--sub)', font:{ size:11 },
+            color:'var(--sub)', font:{ size:13 },
             callback: v => v>=1000 ? (v/1000).toFixed(0)+'k' : v
           },
           border:{ display:false }
@@ -524,26 +524,26 @@ function _renderKatAvg(ye, isEin){
   const maxAus=ausArr.length?Math.max(...ausArr.map(e=>e.betrag)):0;
 
   el.innerHTML=`
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:14px">Transaktionsanalyse</div>
+    <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:16px">Transaktionsanalyse</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div>
-        <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Ø Einnahme</div>
-        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--green)">${fmt(avgEin)}</div>
-        <div style="font-size:10px;color:var(--sub);margin-top:6px">Median: ${fmt(medEin)}</div>
-        <div style="font-size:10px;color:var(--sub)">Max: ${fmt(maxEin)}</div>
-        <div style="font-size:10px;color:var(--sub)">${einArr.length} Buchungen</div>
+        <div style="font-size:13px;color:var(--sub);margin-bottom:6px">Ø Einnahme</div>
+        <div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--green)">${fmt(avgEin)}</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:8px">Median: ${fmt(medEin)}</div>
+        <div style="font-size:12px;color:var(--sub)">Max: ${fmt(maxEin)}</div>
+        <div style="font-size:12px;color:var(--sub)">${einArr.length} Buchungen</div>
       </div>
       <div>
-        <div style="font-size:10px;color:var(--sub);margin-bottom:4px">Ø Ausgabe</div>
-        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--red)">${fmt(avgAus)}</div>
-        <div style="font-size:10px;color:var(--sub);margin-top:6px">Median: ${fmt(medAus)}</div>
-        <div style="font-size:10px;color:var(--sub)">Max: ${fmt(maxAus)}</div>
-        <div style="font-size:10px;color:var(--sub)">${ausArr.length} Buchungen</div>
+        <div style="font-size:13px;color:var(--sub);margin-bottom:6px">Ø Ausgabe</div>
+        <div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--red)">${fmt(avgAus)}</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:8px">Median: ${fmt(medAus)}</div>
+        <div style="font-size:12px;color:var(--sub)">Max: ${fmt(maxAus)}</div>
+        <div style="font-size:12px;color:var(--sub)">${ausArr.length} Buchungen</div>
       </div>
     </div>
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
-      <span style="font-size:11px;color:var(--sub)">Ø Gewinn pro Buchung</span>
-      <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:${avgEin-avgAus>=0?'var(--green)':'var(--red)'}">${avgEin-avgAus>=0?'+':''}${fmt(avgEin-avgAus)}</span>
+      <span style="font-size:13px;color:var(--sub)">Ø Gewinn pro Buchung</span>
+      <span style="font-family:var(--mono);font-size:16px;font-weight:700;color:${avgEin-avgAus>=0?'var(--green)':'var(--red)'}">${avgEin-avgAus>=0?'+':''}${fmt(avgEin-avgAus)}</span>
     </div>`;
 }
 
@@ -578,9 +578,9 @@ function _renderKatTopKunden(ye, yr, isEin){
   }
 
   el.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)">Top ${sorted.length} Kunden</span>
-      <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text)">${fmt(totalK)}</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)">Top ${sorted.length} Kunden</span>
+      <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text)">${fmt(totalK)}</span>
     </div>
     ${sorted.map(([name,val],i)=>{
       const pct=Math.round(val/maxV*100);
@@ -592,13 +592,13 @@ function _renderKatTopKunden(ye, yr, isEin){
         <div style="width:30px;height:30px;border-radius:var(--r);background:${c}15;color:${c};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${initials}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-            <span style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>
-            <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:${c};flex-shrink:0;margin-left:8px">${fmt(val)}</span>
+            <span style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>
+            <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:${c};flex-shrink:0;margin-left:8px">${fmt(val)}</span>
           </div>
           <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
             <div style="height:100%;width:${pct}%;background:${c};border-radius:2px;opacity:.6;transition:width .5s"></div>
           </div>
-          <div style="font-size:9px;color:var(--sub);margin-top:2px">${share}% vom Gesamtumsatz</div>
+          <div style="font-size:12px;color:var(--sub);margin-top:3px">${share}% vom Gesamtumsatz</div>
         </div>
       </div>`;
     }).join('')}`;
@@ -647,7 +647,7 @@ function _renderKatTopProdukte(yr){
   }
 
   el.innerHTML=`
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:14px">Top ${sorted.length} Produkte & Leistungen</div>
+    <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:16px">Top ${sorted.length} Produkte & Leistungen</div>
     ${sorted.map(([name,d],i)=>{
       const pct=Math.round(d.umsatz/maxU*100);
       const icons=['📦','⚡','🔧','📋','💡'];
@@ -655,13 +655,13 @@ function _renderKatTopProdukte(yr){
         <div style="width:30px;height:30px;border-radius:var(--r);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${icons[i%icons.length]}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-            <span style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>
-            <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);flex-shrink:0;margin-left:8px">${fmt(d.umsatz)}</span>
+            <span style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>
+            <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);flex-shrink:0;margin-left:8px">${fmt(d.umsatz)}</span>
           </div>
           <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
             <div style="height:100%;width:${pct}%;background:var(--blue);border-radius:2px;opacity:.5;transition:width .5s"></div>
           </div>
-          <div style="font-size:9px;color:var(--sub);margin-top:2px">${d.menge}× verkauft · ${d.count} Aufträge</div>
+          <div style="font-size:12px;color:var(--sub);margin-top:3px">${d.menge}× verkauft · ${d.count} Aufträge</div>
         </div>
       </div>`;
     }).join('')}`;
@@ -700,17 +700,17 @@ function _renderKatGrowth(yr, isEin){
   const maxAbs=Math.max(...growth.map(g=>Math.abs(g.diff)),1);
   el.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)">Kategorie-Wachstum ${yr} vs ${prevYr}</span>
+      <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub)">Kategorie-Wachstum ${yr} vs ${prevYr}</span>
       <div style="display:flex;gap:12px">
-        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--sub)"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue)"></span>${yr}</span>
-        <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--sub)"><span style="width:8px;height:8px;border-radius:50%;background:var(--border2)"></span>${prevYr}</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:50%;background:var(--blue)"></span>${yr}</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:50%;background:var(--border2)"></span>${prevYr}</span>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
       ${growth.map(g=>{
         const isUp=g.diff>=0;
         const barW=Math.round(Math.abs(g.diff)/maxAbs*100);
-        return`<div style="border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+        return`<div style="border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <span style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${g.k}</span>
             <span style="font-size:11px;font-weight:700;color:${isUp?'var(--green)':'var(--red)'};flex-shrink:0;margin-left:6px">${isUp?'+':''}${g.pct}%</span>
@@ -720,7 +720,7 @@ function _renderKatGrowth(yr, isEin){
               <div style="height:100%;width:${barW}%;background:${isUp?'var(--green)':'var(--red)'};border-radius:2px;opacity:.5"></div>
             </div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--sub)">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub)">
             <span>${yr}: <strong style="color:var(--text)">${fmt(g.cur)}</strong></span>
             <span>${prevYr}: ${fmt(g.prev)}</span>
           </div>
