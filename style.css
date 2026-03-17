@@ -2005,9 +2005,9 @@ input, select, textarea {
 }
 .ph-left{ min-width:0 }
 .ph-title{
-  font-size:20px;
+  font-size:16px;
   font-weight:600;
-  color:var(--text);
+  color:#616161;
   line-height:1.2;
   letter-spacing:-.2px;
 }
