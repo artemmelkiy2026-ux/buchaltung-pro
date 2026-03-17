@@ -244,15 +244,15 @@ function exportCSV() {
   popup.innerHTML = `
     <div style="font-weight:600;font-size:13px;margin-bottom:12px;color:var(--text)">&#128229; CSV-Format w&#228;hlen</div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button onclick="exportCSVFormat('datev')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit">
+      <button onclick="exportCSVFormat('datev')" style="background:var(--blue);color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit">
         <strong>DATEV-kompatibel</strong><br>
         <span style="opacity:.8;font-size:11px">Semikolon &middot; Komma als Dezimal &middot; TT.MM.JJJJ &middot; f&#252;r Steuerberater</span>
       </button>
-      <button onclick="exportCSVFormat('universal')" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit">
+      <button onclick="exportCSVFormat('universal')" style="background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit">
         <strong>Universal (RFC 4180)</strong><br>
         <span style="opacity:.8;font-size:11px">Semikolon &middot; Punkt als Dezimal &middot; JJJJ-MM-TT &middot; f&#252;r Excel / Google Sheets</span>
       </button>
-      <button onclick="document.getElementById('csv-fmt-popup').remove()" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;color:var(--sub);font-family:inherit">Abbrechen</button>
+      <button onclick="document.getElementById('csv-fmt-popup').remove()" style="background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:8px;font-size:12px;cursor:pointer;color:var(--sub);font-family:inherit">Abbrechen</button>
     </div>`;
   document.body.appendChild(popup);
   setTimeout(() => { if (popup.parentNode) popup.remove(); }, 15000);
@@ -543,9 +543,9 @@ function exportMonatCSV(){
   popup.innerHTML = `
     <div style="font-weight:600;font-size:13px;margin-bottom:12px">&#128229; CSV-Format</div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button onclick="exportMonatCSVFormat('datev')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit"><strong>DATEV-kompatibel</strong><br><span style="opacity:.8;font-size:11px">f&#252;r Steuerberater</span></button>
-      <button onclick="exportMonatCSVFormat('universal')" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit"><strong>Universal (RFC 4180)</strong><br><span style="opacity:.8;font-size:11px">f&#252;r Excel / Google Sheets</span></button>
-      <button onclick="document.getElementById('csv-fmt-popup').remove()" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;color:var(--sub);font-family:inherit">Abbrechen</button>
+      <button onclick="exportMonatCSVFormat('datev')" style="background:var(--blue);color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit"><strong>DATEV-kompatibel</strong><br><span style="opacity:.8;font-size:11px">f&#252;r Steuerberater</span></button>
+      <button onclick="exportMonatCSVFormat('universal')" style="background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit"><strong>Universal (RFC 4180)</strong><br><span style="opacity:.8;font-size:11px">f&#252;r Excel / Google Sheets</span></button>
+      <button onclick="document.getElementById('csv-fmt-popup').remove()" style="background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:8px;font-size:12px;cursor:pointer;color:var(--sub);font-family:inherit">Abbrechen</button>
     </div>`;
   document.body.appendChild(popup);
   setTimeout(()=>{if(popup.parentNode)popup.remove();},15000);

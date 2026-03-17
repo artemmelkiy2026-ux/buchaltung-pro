@@ -129,17 +129,17 @@ function renderJournal() {
       return tb.localeCompare(ta); // новее = выше
     });
 
-    html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;margin-bottom:12px;overflow:hidden">`;
+    html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:10px;overflow:hidden">`;
 
     chain.forEach((e, idx) => {
       let badge = '', rowBg = '', opacity = '1';
 
       if (!e.is_storno && !e.korrektur_von && involved.has(e.id)) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
         rowBg = 'background:rgba(224,140,26,.03);';
         opacity = '0.7';
       } else if (e.is_storno) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
         rowBg = 'background:rgba(148,163,184,.03);';
         opacity = '0.6';
       } else if (e.korrektur_von) {
@@ -220,15 +220,15 @@ function renderJournal() {
       return tb2.localeCompare(ta);
     });
 
-    pageHtml += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;margin-bottom:12px;overflow:hidden">`;
+    pageHtml += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:10px;overflow:hidden">`;
 
     chain.forEach((e, idx) => {
       let badge = '', rowBg = '', opacity = '1';
       if (!e.is_storno && !e.korrektur_von && involved.has(e.id)) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:600;background:rgba(224,140,26,.12);color:var(--yellow);border:1px solid rgba(224,140,26,.3)">● Storniert</span>`;
         rowBg = 'background:rgba(224,140,26,.03);'; opacity = '0.7';
       } else if (e.is_storno) {
-        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
+        badge = `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:600;background:rgba(148,163,184,.12);color:var(--sub);border:1px solid var(--border)">↩ Gegenbuchung</span>`;
         rowBg = 'background:rgba(148,163,184,.03);'; opacity = '0.6';
       } else if (e.korrektur_von) {
         badge = `<span class="badge-korrektur">● Korrektur</span>`;
@@ -301,88 +301,108 @@ function renderRechnungenLog() {
   const pg  = document.getElementById('journal-pagination');
   if (!tb) return;
 
-  const log = (data.rechnungenLog || []).slice(); // уже отсортирован по created_at desc
-  const AKTION_LABEL = {
-    'erstellt':  { label:'Erstellt',       color:'var(--green)', icon:'fa-plus-circle' },
-    'geaendert': { label:'Geändert',        color:'var(--blue)',  icon:'fa-edit' },
-    'geloescht': { label:'Gelöscht',        color:'var(--red)',   icon:'fa-trash' },
-    'bezahlt':   { label:'Bezahlt + Einnahme', color:'var(--green)', icon:'fa-check-circle' },
-    'status':    { label:'Status geändert', color:'var(--yellow)', icon:'fa-exchange-alt' },
+  const log = (data.rechnungenLog || []).slice();
+  const AKTION = {
+    'erstellt':  { label:'Erstellt',           color:'var(--green)',  icon:'fa-plus',          bg:'rgba(58,138,78,.08)' },
+    'geaendert': { label:'Geändert',            color:'var(--blue)',   icon:'fa-pen',           bg:'rgba(26,69,120,.08)' },
+    'geloescht': { label:'Gelöscht',            color:'var(--red)',    icon:'fa-trash',         bg:'rgba(214,51,65,.08)' },
+    'bezahlt':   { label:'Bezahlt + Einnahme',  color:'var(--green)',  icon:'fa-check-circle',  bg:'rgba(58,138,78,.08)' },
+    'status':    { label:'Status geändert',     color:'var(--yellow)', icon:'fa-exchange-alt',  bg:'rgba(196,122,18,.08)' },
   };
 
   if (!log.length) {
     tb.innerHTML = '';
     em.style.display = 'block';
+    em.innerHTML = '<div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungs-Änderungen</p>';
     if(pg) pg.innerHTML = '';
     return;
   }
   em.style.display = 'none';
 
-  const PER = 10;
-  const totalPages = Math.max(1, Math.ceil(log.length / PER));
+  // Group by rechnung_nr
+  const groups = {};
+  log.forEach(e => {
+    const key = e.rechnung_nr || '—';
+    if(!groups[key]) groups[key] = [];
+    groups[key].push(e);
+  });
+  // Sort groups by latest event
+  const groupList = Object.entries(groups).sort((a,b) => {
+    const ta = a[1][0]?.created_at || '';
+    const tb2 = b[1][0]?.created_at || '';
+    return tb2.localeCompare(ta);
+  });
+
+  const PER = 5;
+  const totalPages = Math.max(1, Math.ceil(groupList.length / PER));
   if(journalPage > totalPages) journalPage = totalPages;
-  const items = log.slice((journalPage-1)*PER, journalPage*PER);
+  const pageGroups = groupList.slice((journalPage-1)*PER, journalPage*PER);
 
-  tb.innerHTML = items.map((e,i) => {
-    const a = AKTION_LABEL[e.aktion] || { label:e.aktion, color:'var(--sub)', icon:'fa-circle' };
-    const dt = e.created_at ? fdt(e.created_at) : '—';
+  let html = '';
+  pageGroups.forEach(([nr, events]) => {
+    events.sort((a,b) => (b.created_at||'').localeCompare(a.created_at||''));
 
-    // Парсим alt/neu значения
-    let alt = null, neu = null;
-    try { alt = e.alt_wert ? JSON.parse(e.alt_wert) : null; } catch(ex){}
-    try { neu = e.neu_wert ? JSON.parse(e.neu_wert) : null; } catch(ex){}
+    html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:10px;overflow:hidden">`;
 
-    // Строим строки изменений
-    let changeRows = '';
-    if(alt && neu) {
-      const FIELD_LABELS = { nr:'Nr.', betrag:'Betrag', status:'Status', kunde:'Kunde', faellig:'Fällig', einnahme_betrag:'Einnahme', datum_bezahlt:'Datum' };
-      const changes = Object.keys({...alt,...neu}).filter(k => JSON.stringify(alt?.[k]) !== JSON.stringify(neu?.[k]));
-      changeRows = changes.map(k => {
-        const av = alt?.[k] !== undefined ? alt[k] : null;
-        const nv = neu?.[k] !== undefined ? neu[k] : null;
-        const fmtV = v => v===null||v===undefined ? '—' : (typeof v==='number' ? fmt(v) : String(v));
-        const label = FIELD_LABELS[k] || k;
-        return `<div style="display:flex;align-items:center;gap:6px;font-size:11px;padding:3px 0">
-          <span style="color:var(--sub);min-width:50px">${label}</span>
-          ${av!==null ? `<span style="color:var(--red);text-decoration:line-through;font-family:var(--mono)">${fmtV(av)}</span><span style="color:var(--sub)">→</span>` : ''}
-          <span style="color:var(--green);font-weight:600;font-family:var(--mono)">${fmtV(nv)}</span>
-        </div>`;
-      }).join('');
-    } else if(neu) {
-      const FIELD_LABELS = { nr:'Nr.', betrag:'Betrag', status:'Status', kunde:'Kunde' };
-      changeRows = Object.entries(neu).filter(([,v])=>v!=null).slice(0,4).map(([k,v])=>{
-        const label = FIELD_LABELS[k] || k;
-        return `<div style="font-size:11px;color:var(--sub);padding:2px 0"><span style="min-width:50px;display:inline-block">${label}</span> <span style="color:var(--text);font-family:var(--mono);font-weight:600">${typeof v==='number'?fmt(v):v}</span></div>`;
-      }).join('');
-    }
+    events.forEach((e, idx) => {
+      const a = AKTION[e.aktion] || { label:e.aktion, color:'var(--sub)', icon:'fa-circle', bg:'var(--s2)' };
+      const dt = e.created_at ? fdt(e.created_at) : '—';
 
-    // Цвет фона строки
-    const rowBg = e.aktion==='geloescht' ? 'background:rgba(239,68,68,.03)' :
-                  e.aktion==='bezahlt'   ? 'background:rgba(34,197,94,.03)'  :
-                  e.aktion==='erstellt'  ? 'background:rgba(34,197,94,.02)'  : '';
+      // Parse changes
+      let alt = null, neu = null;
+      try { alt = e.alt_wert ? JSON.parse(e.alt_wert) : null; } catch(ex){}
+      try { neu = e.neu_wert ? JSON.parse(e.neu_wert) : null; } catch(ex){}
 
-    const sep = i > 0 ? '' : '';
-    return `<div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden">
-      <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 14px;${rowBg}">
-        <!-- Иконка -->
-        <div style="flex:0 0 32px;height:32px;border-radius:var(--r);background:${a.color}18;display:flex;align-items:center;justify-content:center;margin-top:1px">
-          <i class="fas ${a.icon}" style="color:${a.color};font-size:13px"></i>
-        </div>
-        <!-- Контент -->
-        <div style="flex:1;min-width:0">
-          <!-- Бейдж + Nr + дата+время -->
-          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px">
-            <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:6px;font-size:10px;font-weight:700;background:${a.color}18;color:${a.color};border:1px solid ${a.color}33">${a.label}</span>
-            <span style="font-size:12px;font-weight:800;font-family:var(--mono);background:var(--s2);padding:2px 8px;border-radius:6px;border:1px solid var(--border)">Nr.${e.rechnung_nr||'—'}</span>
-            <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${dt}</span>
+      const FIELD_LABELS = { nr:'Nr.', betrag:'Betrag', status:'Status', kunde:'Kunde', faellig:'Fällig', einnahme_betrag:'Einnahme', datum_bezahlt:'Bezahlt am' };
+
+      let changeHtml = '';
+      if(alt && neu) {
+        const changes = Object.keys({...alt,...neu}).filter(k => JSON.stringify(alt?.[k]) !== JSON.stringify(neu?.[k]));
+        if(changes.length) {
+          changeHtml = changes.map(k => {
+            const av = alt?.[k], nv = neu?.[k];
+            const fmtV = v => v==null ? '—' : (typeof v==='number' ? fmt(v) : String(v));
+            return `<span style="font-size:11px;color:var(--sub)">${FIELD_LABELS[k]||k}: </span>`
+              + (av!=null ? `<span style="font-size:11px;color:var(--red);text-decoration:line-through;font-family:var(--mono)">${fmtV(av)}</span> → ` : '')
+              + `<span style="font-size:11px;color:var(--green);font-weight:600;font-family:var(--mono)">${fmtV(nv)}</span>`;
+          }).join('<span style="color:var(--border);margin:0 6px">·</span>');
+        }
+      } else if(neu) {
+        const entries = Object.entries(neu).filter(([,v])=>v!=null).slice(0,4);
+        if(entries.length) {
+          changeHtml = entries.map(([k,v]) => {
+            return `<span style="font-size:11px;color:var(--sub)">${FIELD_LABELS[k]||k}: </span><span style="font-size:11px;color:var(--text);font-family:var(--mono);font-weight:600">${typeof v==='number'?fmt(v):v}</span>`;
+          }).join('<span style="color:var(--border);margin:0 6px">·</span>');
+        }
+      }
+
+      const rowBg = e.aktion==='geloescht' ? 'background:rgba(214,51,65,.02);' :
+                    e.aktion==='bezahlt'   ? 'background:rgba(58,138,78,.02);' : '';
+      const rowOpacity = e.aktion==='geloescht' ? 'opacity:.65;' : '';
+      const sep = idx > 0 ? `<div style="height:1px;background:var(--border);margin:0 14px"></div>` : '';
+
+      html += `${sep}
+        <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}${rowOpacity}">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:${changeHtml?'8':'0'}px">
+            <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${a.bg};display:flex;align-items:center;justify-content:center;margin-top:2px">
+              <i class="fas ${a.icon}" style="color:${a.color};font-size:12px"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+                <span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;background:${a.bg};color:${a.color}">${a.label}</span>
+                <span style="font-size:11px;font-weight:700;font-family:var(--mono);background:var(--s2);padding:1px 6px;border-radius:3px;border:1px solid var(--border)">Nr.${nr}</span>
+                <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${dt}</span>
+              </div>
+              ${changeHtml ? `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px">${changeHtml}</div>` : ''}
+            </div>
           </div>
-          <!-- Изменения -->
-          ${changeRows ? `<div style="border-top:1px solid var(--border);padding-top:7px;margin-top:3px">${changeRows}</div>` : ''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+        </div>`;
+    });
 
+    html += `</div>`;
+  });
+
+  tb.innerHTML = html;
   window._rlPagerCb = function(p){ journalPage=p; renderRechnungenLog(); };
-  renderPager('journal-pagination', journalPage, totalPages, log.length, '_rlPagerCb');
+  renderPager('journal-pagination', journalPage, totalPages, groupList.length, '_rlPagerCb');
 }

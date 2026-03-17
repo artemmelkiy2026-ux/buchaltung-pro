@@ -193,7 +193,7 @@ class CustomSelect {
       item.dataset.value = opt.value;
       item.dataset.index = i;
       item.style.cssText = `
-        padding:8px 12px;border-radius:7px;cursor:pointer;font-size:13px;
+        padding:8px 12px;border-radius:var(--r);cursor:pointer;font-size:13px;
         color:var(--text);transition:background .12s;display:flex;align-items:center;gap:8px;`;
       item.innerHTML = `<span style="flex:1">${opt.innerHTML||opt.text}</span>`;
       item.addEventListener('mouseenter', () => { item.style.background = 'var(--s2)'; });
