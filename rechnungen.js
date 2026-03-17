@@ -473,7 +473,7 @@ function addRechPosRow(i,p){
       </div>`;
   } else {
     // Desktop layout: оригинальный grid
-    div.style.cssText='display:grid;grid-template-columns:1fr 60px 90px 70px 90px 28px;gap:6px;margin-bottom:6px;align-items:center';
+    div.style.cssText='display:grid;grid-template-columns:1fr 60px 90px 90px 90px 28px;gap:6px;margin-bottom:6px;align-items:center';
     div.innerHTML=`
       <input type="text"   placeholder="Bezeichnung" value="${p.bez||''}" oninput="calcRechTotal()" style="${INP};font-size:13px">
       <input type="number" placeholder="Menge" value="${p.menge||1}" min="0.01" step="0.01" oninput="posNettoChanged(this)" style="${INP};text-align:center">
