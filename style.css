@@ -2236,9 +2236,8 @@ input, select, textarea {
 .ang-total-row:last-child { border-bottom: none; }
 .ang-total-final {
   padding: 12px 16px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
-  background: var(--s2);
 }
 
 /* Кнопки внизу */
