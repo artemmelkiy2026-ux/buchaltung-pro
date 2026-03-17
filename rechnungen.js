@@ -456,7 +456,7 @@ function addRechPosRow(i,p){
                 <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
                 <span class="ust-flag-label">${rateVal}%</span>
               </span>
-              <span class="material-symbols-outlined" style="font-size:9px;color:var(--sub)">expand_more</span>
+              <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
             </button>
             <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
             <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
@@ -485,7 +485,7 @@ function addRechPosRow(i,p){
             <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
             <span class="ust-flag-label">${rateVal}%</span>
           </span>
-          <span class="material-symbols-outlined" style="font-size:9px;color:var(--sub)">expand_more</span>
+          <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
         </button>
         <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
         <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">

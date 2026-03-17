@@ -1559,8 +1559,8 @@ function renderKundenPicker() {
         <div style="font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adr || 'Keine Adresse'}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;font-size:11px;color:var(--sub)">
-        ${hasEmail ? '<span title="'+k.email+'"><span class="material-symbols-outlined" style="font-size:11px">mail</span></span>' : ''}
-        ${hasTel ? '<span title="'+k.tel+'"><span class="material-symbols-outlined" style="font-size:11px">phone</span></span>' : ''}
+        ${hasEmail ? '<span title="'+k.email+'"><span class="material-symbols-outlined" style="font-size:16px">mail</span></span>' : ''}
+        ${hasTel ? '<span title="'+k.tel+'"><span class="material-symbols-outlined" style="font-size:16px">phone</span></span>' : ''}
       </div>
     </div>`;
   }).join('');

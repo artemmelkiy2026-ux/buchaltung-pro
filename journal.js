@@ -171,7 +171,7 @@ function renderJournal() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              <span class="material-symbols-outlined" style="color:${iconColor};font-size:11px">help_outline</span>
+              <span class="material-symbols-outlined" style="color:${iconColor};font-size:16px">help</span>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
@@ -256,7 +256,7 @@ function renderJournal() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              <span class="material-symbols-outlined" style="color:${iconColor};font-size:11px">help_outline</span>
+              <span class="material-symbols-outlined" style="color:${iconColor};font-size:16px">help</span>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">

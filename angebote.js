@@ -191,9 +191,9 @@ function renderAngebote() {
         ${posCount ? `<span><span class="material-symbols-outlined" style="width:12px;opacity:.5">list</span> ${posCount} Position${posCount!==1?'en':''}</span>` : ''}
         ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}"><span class="material-symbols-outlined" style="width:12px;opacity:.5">hourglass_top</span> bis ${fd(a.gueltig)}</span>` : ''}
         <span style="margin-left:auto;display:flex;gap:3px" onclick="event.stopPropagation()">
-          <button class="rca-btn" onclick="angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><span class="material-symbols-outlined" style="font-size:11px">print</span></button>
-          <button class="rca-btn rca-green" onclick="angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><span class="material-symbols-outlined" style="font-size:11px">description</span></button>
-          <button class="rca-btn rca-red" onclick="delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><span class="material-symbols-outlined" style="font-size:11px">delete</span></button>
+          <button class="rca-btn" onclick="angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><span class="material-symbols-outlined" style="font-size:16px">print</span></button>
+          <button class="rca-btn rca-green" onclick="angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><span class="material-symbols-outlined" style="font-size:16px">description</span></button>
+          <button class="rca-btn rca-red" onclick="delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><span class="material-symbols-outlined" style="font-size:16px">delete</span></button>
         </span>
       </div>
       ${expiryHtml}
@@ -300,7 +300,7 @@ function _angAddPos(p={}) {
           <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
           <span class="ust-flag-label">${rate}%</span>
         </span>
-        <span class="material-symbols-outlined" style="font-size:9px;color:var(--sub)">expand_more</span>
+        <span class="material-symbols-outlined" style="font-size:16px;color:var(--sub)">expand_more</span>
       </button>
       <input type="hidden" class="ust-flag-val" value="${rate}" onchange="recalcAngSumme()">
       <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:120px">

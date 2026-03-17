@@ -139,7 +139,7 @@ class CustomSelect {
     if (isCompact) wrap.style.width = 'auto';
     trigger.innerHTML = `
       <span class="cs-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-      <span class="material-symbols-outlined cs-arrow" style="font-size:10px;color:var(--sub);flex-shrink:0;transition:transform .2s">expand_more</span>`;
+      <span class="material-symbols-outlined cs-arrow" style="font-size:16px;color:var(--sub);flex-shrink:0;transition:transform .2s">expand_more</span>`;
 
     // Копируем font-size если был задан
     const origFs = sel.style.fontSize || sel.style.getPropertyValue('font-size');
@@ -293,7 +293,7 @@ class CustomSelect {
           color:${active ? 'var(--blue)' : 'var(--text)'};
           font-weight:${active ? '700' : '400'};
           margin-bottom:2px;`;
-        item.innerHTML = `<span>${opt.innerHTML||opt.text}</span>${active ? '<span class="material-symbols-outlined" style="color:var(--blue);font-size:13px">check</span>' : ''}`;
+        item.innerHTML = `<span>${opt.innerHTML||opt.text}</span>${active ? '<span class="material-symbols-outlined" style="color:var(--blue);font-size:16px">check</span>' : ''}`;
         item.addEventListener('click', () => {
           this.sel.value = opt.value;
           this._updateLabel();

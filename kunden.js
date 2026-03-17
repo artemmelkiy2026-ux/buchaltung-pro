@@ -56,13 +56,13 @@ function renderWied(){
       <div class="wied-card-body">
         <div class="wied-card-name">${w.bezeichnung}${isFaellig?` <span class="wied-faellig-badge">● Fällig</span>`:''}${isPaused?' <span style="font-size:10px;font-weight:600;color:var(--sub);background:var(--s2);padding:1px 6px;border-radius:3px">Pausiert</span>':''}</div>
         <div class="wied-card-meta">
-          <span><span class="material-symbols-outlined" style="font-size:10px;margin-right:2px">label</span>${w.kategorie}</span>
-          <span><span class="material-symbols-outlined" style="font-size:10px;margin-right:2px">sync</span>${intervallLabel[w.intervall]||w.intervall}</span>
-          <span><span class="material-symbols-outlined" style="font-size:10px;margin-right:2px">credit_card</span>${w.zahlungsart}</span>
-          ${w.anbieter?`<span style="color:var(--blue)"><span class="material-symbols-outlined" style="font-size:10px;margin-right:2px">business</span>${w.anbieter}</span>`:''}
+          <span><span class="material-symbols-outlined" style="font-size:16px;margin-right:2px">label</span>${w.kategorie}</span>
+          <span><span class="material-symbols-outlined" style="font-size:16px;margin-right:2px">sync</span>${intervallLabel[w.intervall]||w.intervall}</span>
+          <span><span class="material-symbols-outlined" style="font-size:16px;margin-right:2px">credit_card</span>${w.zahlungsart}</span>
+          ${w.anbieter?`<span style="color:var(--blue)"><span class="material-symbols-outlined" style="font-size:16px;margin-right:2px">business</span>${w.anbieter}</span>`:''}
         </div>
         <div class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
-          <span class="material-symbols-outlined" style="font-size:10px;margin-right:3px">event</span>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
+          <span class="material-symbols-outlined" style="font-size:16px;margin-right:3px">event</span>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
           ${w.enddatum?`<span style="margin-left:6px;font-size:10px;color:var(--sub)">bis ${fdm(w.enddatum)}</span>`:''}
         </div>
       </div>
