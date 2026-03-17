@@ -644,7 +644,6 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   overflow: hidden;
   max-height: 0;
   transition: max-height .25s cubic-bezier(.4,0,.2,1);
-  background: var(--s2);
 }
 .mob-drawer-group.open .mob-drawer-group-body { max-height: 400px; }
 .mob-drawer-child {
