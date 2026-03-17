@@ -1563,7 +1563,7 @@ input, select, textarea {
 
 /* Stat-карточки */
 .kat-stat-card{
-  background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);
+  background:var(--s1);
   padding:14px 16px;
 }
 .kat-stat-label{font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
