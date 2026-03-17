@@ -591,7 +591,7 @@ function calcRechTotal(){
 
   el.innerHTML=rows+`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0 4px;border-top:2px solid var(--border);margin-top:4px">
     <strong style="font-size:14px">Gesamtbetrag (Brutto)</strong>
-    <strong style="font-family:var(--mono);font-size:16px;color:var(--blue)">${fmt(totalBrutto)}</strong>
+    <strong style="font-family:var(--mono);font-size:14px;color:var(--blue)">${fmt(totalBrutto)}</strong>
   </div>`;
 }
 
