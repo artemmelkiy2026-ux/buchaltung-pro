@@ -269,7 +269,7 @@ class CustomSelect {
           <div style="display:flex;align-items:center;justify-content:space-between;
             padding:14px 18px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
             <span style="font-size:15px;font-weight:700;color:var(--text)" id="cs-mob-title"></span>
-            <button style="background:var(--s2);border:1px solid var(--border);border-radius:50%;
+            <button style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
               width:30px;height:30px;cursor:pointer;font-size:16px;color:var(--sub);
               display:flex;align-items:center;justify-content:center"
               onclick="this.closest('.cs-mob-overlay').remove()">✕</button>

@@ -56,27 +56,11 @@
 
 
 
-<!-- HEADER -->
-<header>
-  <div class="logo" onclick="lockApp()" style="cursor:pointer"><img src="MelaLogic-logo.svg" width="140px" height="auto" alt="mini logo MelaLogic">  </div>
-  
-
-  <div class="hd">
-
-  </div>
-
-  <div class="hr">
-    <!-- Индикатор сохранения в облако -->
-    <span id="save-indicator" style="font-size:11px;color:var(--sub);opacity:0;transition:opacity .4s;margin-right:8px"></span>
-    <!-- Пользователь -->
-    <div style="display:flex;align-items:center;gap:8px">
-      <button onclick="location.href='profile.html'" class="btn" title="Profil" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-user" style="font-size:1.3rem"></i></button>
-
-      <button id="signout-btn" class="btn" title="Abmelden" onclick="sbSignOut()" style="padding:6px 10px;font-size:11px"><i class="fa-solid fa-right-from-bracket" style="font-size:1.3rem"></i></button>
-    </div>
-  </div>
+<!-- HEADER removed — logo moved to sidebar, profile to sidebar bottom -->
+<div id="header-utils" style="display:none">
+  <span id="save-indicator" style="font-size:11px;color:var(--sub);opacity:0;transition:opacity .4s"></span>
   <input type="file" id="fi" accept=".json" style="display:none" onchange="onLoad(event)">
-</header>
+</div>
 
 <!-- ══════════════════════════════════════════════════════════
      MOBILE BOTTOM NAVIGATION (только мобильный)
@@ -171,12 +155,35 @@
     </div>
   </div>
 
+  <!-- Divider -->
+  <div style="border-top:1px solid var(--border);margin:4px 0"></div>
+
+  <!-- Profil & Abmelden -->
+  <div class="mob-drawer-group-header" onclick="closeMobDrawer();location.href='profile.html'" style="color:var(--sub)">
+    <span class="mob-drawer-group-icon"><i class="fas fa-user"></i></span>
+    <span>Profil & Einstellungen</span>
+  </div>
+  <div class="mob-drawer-group-header" onclick="closeMobDrawer();sbSignOut()" style="color:var(--sub)">
+    <span class="mob-drawer-group-icon"><i class="fas fa-right-from-bracket"></i></span>
+    <span>Abmelden</span>
+  </div>
+
+  <!-- Logo bottom -->
+  <div style="padding:16px 20px 20px;text-align:center;border-top:1px solid var(--border);margin-top:4px">
+    <img src="MelaLogic-logo.svg" width="100" height="auto" alt="MelaLogic" style="opacity:.4">
+  </div>
+
 </div>
 
 <div class="app">
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
+
+  <!-- Logo -->
+  <div class="sidebar-logo" onclick="lockApp()" style="padding:16px 14px 12px;cursor:pointer;border-bottom:1px solid var(--border);margin-bottom:4px">
+    <img src="MelaLogic-logo.svg" width="130" height="auto" alt="MelaLogic">
+  </div>
 
   <!-- Dashboard -->
   <div class="nav-item active" onclick="nav('dashboard',this)"><span class="ic"><i class="fas fa-home"></i></span> Dashboard</div>
@@ -237,6 +244,19 @@
   <div class="nav-group-children" id="gobd-group">
     <div class="nav-item nav-child" onclick="nav('journal',this)">Journal</div>
     <div class="nav-item nav-child" onclick="nav('ust',this)">Umsatzsteuer</div>
+  </div>
+
+  <!-- Spacer -->
+  <div style="flex:1"></div>
+
+  <!-- Bottom: Profile & Logout -->
+  <div style="border-top:1px solid var(--border);padding:10px 8px;display:flex;flex-direction:column;gap:2px">
+    <div class="nav-item" onclick="location.href='profile.html'" style="font-size:12px;color:var(--sub)">
+      <span class="ic"><i class="fas fa-user"></i></span> Profil
+    </div>
+    <div class="nav-item" onclick="sbSignOut()" style="font-size:12px;color:var(--sub)">
+      <span class="ic"><i class="fas fa-right-from-bracket"></i></span> Abmelden
+    </div>
   </div>
 
 </nav>

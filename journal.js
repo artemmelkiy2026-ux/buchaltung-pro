@@ -170,7 +170,7 @@ function renderJournal() {
       html += `${sep}
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
-            <div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
+            <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
               <i class="fas fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
             </div>
             <div style="flex:1;min-width:0">
@@ -255,7 +255,7 @@ function renderJournal() {
       pageHtml += `${sep}
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
-            <div style="flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
+            <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
               <i class="fas fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
             </div>
             <div style="flex:1;min-width:0">
@@ -365,7 +365,7 @@ function renderRechnungenLog() {
     return `<div style="background:var(--s1);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden">
       <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 14px;${rowBg}">
         <!-- Иконка -->
-        <div style="flex:0 0 38px;height:38px;border-radius:50%;background:${a.color}18;display:flex;align-items:center;justify-content:center;margin-top:1px">
+        <div style="flex:0 0 32px;height:32px;border-radius:var(--r);background:${a.color}18;display:flex;align-items:center;justify-content:center;margin-top:1px">
           <i class="fas ${a.icon}" style="color:${a.color};font-size:13px"></i>
         </div>
         <!-- Контент -->
