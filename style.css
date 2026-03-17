@@ -87,7 +87,7 @@
   --muted:#8593a3;
 
   /* Прочее */
-  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;
+  --mono:'JetBrains Mono',monospace;--sans:Inter,-apple-system,BlinkMacSystemFont,arial,sans-serif;
   --r:4px;--r2:6px;
 
   /* Тени */
@@ -96,7 +96,7 @@
   --shadow-hover:0 2px 8px rgba(0,0,0,.08);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;display:flex;flex-direction:column;overflow-y:scroll;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;font-weight:500;line-height:20px;min-height:100vh;display:flex;flex-direction:column;overflow-y:scroll;-webkit-font-smoothing:antialiased}
 html{scrollbar-gutter:stable}
 #loading-screen{position:fixed;inset:0;z-index:9998}
 #loading-screen[style*="display: none"],
