@@ -170,7 +170,7 @@ function renderAngebote() {
     const _aClick = _aSelMode ? '' : `onclick="openAngForm('${a.id}')"`;
     return `<div class="rech-card" ${_aClick} style="flex-direction:row;align-items:center;gap:0;cursor:${_aSelMode?'default':'pointer'}">
       ${_aSelMode ? `<div style="padding:0 10px 0 14px;display:flex;align-items:center;flex-shrink:0">${_selCb('angebote', a.id)}</div>` : ''}
-      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;padding:14px 14px 14px ${_aSelMode?'0':'14px'}">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
       <div style="display:flex;align-items:center;gap:12px">
         <div class="rech-card-avatar ${st.cls}" style="width:38px;height:38px;border-radius:var(--r);font-size:16px">
           <i class="${st.icon}"></i>
