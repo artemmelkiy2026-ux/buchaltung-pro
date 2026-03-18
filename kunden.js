@@ -74,7 +74,7 @@ function renderWied(){
             <span><i class="fas fa-credit-card" style="font-size:10px"></i>${w.zahlungsart}</span>
             ${w.anbieter?`<span style="color:var(--blue)"><i class="fas fa-building" style="font-size:10px"></i>${w.anbieter}</span>`:''}
           </div>
-          <div style="display:flex;gap:14px;margin-top:4px;flex-wrap:wrap">
+          <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap">
             <span class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
               <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste: <strong>${fdm(w.naechste)}</strong>
               ${w.enddatum?`<span style="margin-left:4px;opacity:.7">· bis ${fdm(w.enddatum)}</span>`:''}
