@@ -879,7 +879,7 @@ function renderEin(){
           +'<div class="ein-row-r1">'
             +'<div class="ein-row-meta">'+_row1+'</div>'
             +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
-        
+         +'<div class="ein-row-bot">'+_row2left+'</div>'
           +'</div>'
           // Row 2: time/category + payment/⋮
           +'<div class="ein-row-r2">'
@@ -894,7 +894,7 @@ function renderEin(){
             +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'
               +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i>'
             +'</div>'
-         +'<div class="ein-row-bot">'+_row2left+'</div>'
+        
             +'<div class="ein-row-desc">'+(e.beschreibung||e.kategorie)+'</div>'
           +'</div>'
         +'</div>'
