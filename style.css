@@ -539,7 +539,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
   .rech-card{ flex-wrap:wrap; }
   .rech-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:end; }
   .kunde-card{ flex-wrap:wrap; }
-  .kunde-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:space-between; min-width:0; }
+  .kunde-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:end; min-width:0; }
 }
 
 /* ── PROGNOSE ── */
