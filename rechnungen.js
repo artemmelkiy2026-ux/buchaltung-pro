@@ -115,41 +115,41 @@ function renderRech(){
     const _rDaysSince = r.datum ? Math.floor((Date.now()-new Date(r.datum))/(864e5)) : null;
     const _rAgeLabel = _rDaysSince===0?'Heute':_rDaysSince===1?'Gestern':_rDaysSince!==null?`vor ${_rDaysSince} Tagen`:'';
     return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" ${_rClick} style="cursor:${_rSelMode?'default':'pointer'}">
-      <div class="rech-card-left">
-        ${_rSelMode ? `<div style="padding-right:10px;display:flex;align-items:center;flex-shrink:0">${_selCb('rechnungen', r.id)}</div>` : ''}
-        <div class="rech-card-avatar ${st.cls}">
-          <i class="${st.icon}"></i>
-        </div>
-        <div class="rech-card-info">
+      ${_rSelMode ? `<div class="rech-card-cb">${_selCb('rechnungen', r.id)}</div>` : ''}
+      <div class="rech-card-avatar ${st.cls}">
+        <i class="${st.icon}"></i>
+      </div>
+      <div class="rech-card-content">
+        <div class="rech-card-row1">
           <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
+          <div class="rech-card-betrag">${fmt(r.betrag)}</div>
+        </div>
+        <div class="rech-card-row2">
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
-          <div class="rech-card-meta">
-            <span><i class="fas fa-calendar" style="opacity:.5;width:10px"></i>${fd(r.datum)}</span>
-            ${_rAgeLabel?`<span style="opacity:.5">·</span><span style="font-size:10px;color:var(--sub)">${_rAgeLabel}</span>`:''}
-            ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}"><i class="fas fa-hourglass-half" style="opacity:.5;width:10px"></i>Fällig ${fd(r.faellig)}</span>` : ''}
-            ${overdueTxt}
-            ${_rPosCount?`<span style="color:var(--sub)">·</span><span style="font-size:10px;color:var(--sub)"><i class="fas fa-list" style="opacity:.5;width:10px"></i>${_rPosCount} Pos.</span>`:''}
+          <div class="rech-card-end" onclick="event.stopPropagation()">
+            <div class="rech-card-status ${st.cls}-pill">
+              <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
+            </div>
+            ${isMob() ? _moreBtn([
+              ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt('${r.id}')}] : []),
+              {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId('${r.id}')},
+              {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren('${r.id}')},
+              {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech('${r.id}')},
+              {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech('${r.id}')}
+            ]) : `<div class="rech-card-actions">
+              ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
+              <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
+              <button class="rca-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
+              <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+            </div>`}
           </div>
         </div>
-      </div>
-      <div class="rech-card-right">
-        <div class="rech-card-betrag">${fmt(r.betrag)}</div>
-        <div class="rech-card-status ${st.cls}-pill">
-          <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
-        </div>
-        <div class="rech-card-actions" onclick="event.stopPropagation()">
-          ${isMob() ? _moreBtn([
-            ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt('${r.id}')}] : []),
-            {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId('${r.id}')},
-            {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren('${r.id}')},
-            {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech('${r.id}')},
-            {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech('${r.id}')}
-          ]) : `
-            ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
-            <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
-            <button class="rca-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
-            <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
-          `}
+        <div class="rech-card-meta">
+          <span><i class="fas fa-calendar" style="opacity:.5;width:10px"></i>${fd(r.datum)}</span>
+          ${_rAgeLabel?`<span style="opacity:.5">·</span><span style="font-size:10px;color:var(--sub)">${_rAgeLabel}</span>`:''}
+          ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}"><i class="fas fa-hourglass-half" style="opacity:.5;width:10px"></i>Fällig ${fd(r.faellig)}</span>` : ''}
+          ${overdueTxt}
+          ${_rPosCount?`<span style="color:var(--sub)">·</span><span style="font-size:10px;color:var(--sub)"><i class="fas fa-list" style="opacity:.5;width:10px"></i>${_rPosCount} Pos.</span>`:''}
         </div>
       </div>
     </div>`;
