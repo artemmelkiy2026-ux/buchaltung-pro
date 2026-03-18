@@ -874,9 +874,6 @@ function renderEin(){
       return '<div class="ein-row'+(st?' ein-row-st':'')+(_selMode?' ein-row-selmode':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':_selMode?'default':'pointer')+'">'
         +(_cb ? '<div style="display:flex;align-items:center;padding-right:6px">'+_cb+'</div>' : '')
         +'<div class="ein-row-body">'
-          +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'
-            +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i>'
-          +'</div>'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
               +'<div class="ein-row-desc">'+(e.beschreibung||e.kategorie)+'</div>'
