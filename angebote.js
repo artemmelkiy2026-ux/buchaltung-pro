@@ -189,7 +189,7 @@ function renderAngebote() {
           ${nettoLabel}
         </div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub);padding-top:8px;border-top:1px solid var(--border)">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub);padding-top:8px;border-top:1px solid var(--border); margin-top:10px">
         <span><i class="fas fa-calendar" style="width:12px;opacity:.5"></i> ${fd(a.datum)}</span>
         <span><i class="fas fa-clock" style="width:12px;opacity:.5"></i> ${ageLabel}</span>
         ${posCount ? `<span><i class="fas fa-list" style="width:12px;opacity:.5"></i> ${posCount} Position${posCount!==1?'en':''}</span>` : ''}
