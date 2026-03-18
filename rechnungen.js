@@ -184,7 +184,7 @@ function _updateRechSortBtns(){
 
 
 function openRechModal(){
-  document.getElementById('rn-nr').value=autoRechNr();
+  document.getElementById('rn-nr').value=autoRechNr(new Date().getFullYear());
   const _rnDatEl=document.getElementById('rn-dat');
   _rnDatEl.value=new Date().toISOString().split('T')[0];
   const faellig=new Date();faellig.setDate(faellig.getDate()+14);
@@ -248,6 +248,7 @@ function _buchRechnungAlsEinnahme(r) {
     kategorie: r.kategorie||'Dienstleistung',
     zahlungsart: r.zahlungsart||'Überweisung',
     beschreibung: `Rechnung ${r.nr}: ${r.beschreibung||r.kunde||''}`,
+    belegnr: r.nr||'',
     notiz: '',
     betrag: r.betrag,
     nettoBetrag: _rNetto,
@@ -259,23 +260,76 @@ function _buchRechnungAlsEinnahme(r) {
   return newE;
 }
 
-function autoRechNr(){
-  // §14 UStG — единая сквозная нумерация
-  // Учитываем и Rechnungen и Einträge с Beleg-Nr.
+// Извлекает порядковый номер N из формата "YYYY-N" или просто "N"
+function _parseSeqNr(raw){
+  if(!raw) return 0;
+  raw=String(raw).trim();
+  const part=raw.includes('-')?raw.split('-').pop():raw;
+  const n=parseInt(part,10);
+  return isNaN(n)?0:n;
+}
+
+function autoRechNr(yr){
+  // §14 UStG — единая сквозная нумерация (Einnahmen + Rechnungen)
+  // Формат: YYYY-N, где N — глобальный счётчик
+  if(!yr) yr=new Date().getFullYear();
   let maxN=0;
   // Из Rechnungen — поле nr
   (data.rechnungen||[]).forEach(r=>{
-    const raw=(r.nr||'');
-    const part=raw.includes('-')?raw.split('-').pop():raw;
-    const n=parseInt(part,10);
-    if(!isNaN(n)&&n>maxN) maxN=n;
+    const n=_parseSeqNr(r.nr);
+    if(n>maxN) maxN=n;
   });
   // Из Einträge — поле belegnr
   (data.eintraege||[]).forEach(e=>{
-    const n=parseInt(e.belegnr||'',10);
-    if(!isNaN(n)&&n>maxN) maxN=n;
+    if(e.is_storno||e._storniert) return;
+    const n=_parseSeqNr(e.belegnr);
+    if(n>maxN) maxN=n;
   });
-  return String(maxN+1);
+  return yr+'-'+(maxN+1);
+}
+
+// Проверяет, заблокирован ли номер (занят оплаченным документом)
+// Возвращает описание блокировки или null если свободен
+function isNrLocked(nr, excludeRechId, excludeEintragId){
+  if(!nr) return null;
+  const seq=_parseSeqNr(nr);
+  if(seq===0) return null;
+  // При редактировании Rechnung — находим её текущий seq, чтобы не блокировать свой собственный номер
+  let excludeSeqFromRech=0;
+  if(excludeRechId){
+    const exR=(data.rechnungen||[]).find(r=>r.id===excludeRechId);
+    if(exR) excludeSeqFromRech=_parseSeqNr(exR.nr);
+  }
+  // Проверяем Rechnungen со статусом bezahlt
+  const lockedRech=(data.rechnungen||[]).find(r=>{
+    if(excludeRechId && r.id===excludeRechId) return false;
+    return _parseSeqNr(r.nr)===seq && r.status==='bezahlt';
+  });
+  if(lockedRech) return `Nr. ${lockedRech.nr} ist bereits durch eine bezahlte Rechnung belegt.`;
+  // Проверяем Einnahmen (belegnr)
+  // Пропускаем Einnahmen с тем же seq, что и редактируемая Rechnung (связанная пара)
+  const lockedEin=(data.eintraege||[]).find(e=>{
+    if(excludeEintragId && e.id===excludeEintragId) return false;
+    if(e.is_storno||e._storniert) return false;
+    if(e.typ!=='Einnahme') return false;
+    const eSeq=_parseSeqNr(e.belegnr);
+    if(excludeSeqFromRech>0 && eSeq===excludeSeqFromRech && eSeq===seq) return false;
+    return eSeq===seq;
+  });
+  if(lockedEin) return `Nr. ${nr} ist bereits durch eine gebuchte Einnahme belegt.`;
+  return null;
+}
+// При смене даты в форме Rechnung — обновляем год в номере (только если не редактирование)
+function _rechDatumNrSync(){
+  if(editRechId) return; // при редактировании не трогаем номер
+  const nrEl=document.getElementById('rn-nr');
+  const datEl=document.getElementById('rn-dat');
+  if(!nrEl||!datEl) return;
+  const curNr=nrEl.value.trim();
+  const newYr=datEl.value?.substring(0,4);
+  if(!newYr||newYr.length!==4) return;
+  const seq=_parseSeqNr(curNr);
+  if(seq>0) nrEl.value=newYr+'-'+seq;
 }
 function saveRechnung(){
   const nr=document.getElementById('rn-nr').value.trim();
@@ -288,6 +342,9 @@ function saveRechnung(){
   const dsc=positionen.map(p=>p.bez).join(', ')||document.getElementById('rn-kunde').value.trim();
   if(!nr||!betrag||!datum)return toast('Rechnungs-Nr., Datum und mind. 1 Position erforderlich!','err');
   if(!data.rechnungen)data.rechnungen=[];
+  // Проверка блокировки номера (занят оплаченным документом)
+  const lockMsg=isNrLocked(nr, editRechId, null);
+  if(lockMsg) return toast(lockMsg,'err');
   const obj={
     nr, betrag:Math.round(betrag*100)/100,
     beschreibung:dsc,
@@ -319,8 +376,11 @@ function saveRechnung(){
     }
     editRechId=null;
   } else {
-    const dupNr = (data.rechnungen||[]).find(r=>r.nr===nr);
+    const seq=_parseSeqNr(nr);
+    const dupNr = (data.rechnungen||[]).find(r=>_parseSeqNr(r.nr)===seq);
     if(dupNr) return toast(`Rechnungs-Nr. ${nr} bereits vergeben!`,'err');
+    const dupEin = (data.eintraege||[]).find(e=>!e.is_storno&&!e._storniert&&e.typ==='Einnahme'&&_parseSeqNr(e.belegnr)===seq);
+    if(dupEin) return toast(`Nr. ${nr} ist bereits durch eine Einnahme belegt!`,'err');
     const newR={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj};
     data.rechnungen.push(newR);
     sbSaveRechnung(newR);
@@ -353,8 +413,8 @@ function _rechDuplizieren(id){
   const orig = data.rechnungen.find(r=>r.id===id); if(!orig) return;
   const newR = JSON.parse(JSON.stringify(orig));
   newR.id = 'r-' + Date.now() + '_' + Math.random().toString(36).slice(2,5);
-  // Neue Nr: füge "-Kopie" hinzu
-  newR.nr = orig.nr + '-K';
+  // Neue Nr: nächste fortlaufende Nummer
+  newR.nr = autoRechNr(new Date().getFullYear());
   newR.datum = new Date().toISOString().split('T')[0];
   newR.status = 'offen';
   newR.created_at = new Date().toISOString();

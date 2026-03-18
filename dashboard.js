@@ -101,7 +101,8 @@ function setTyp(t){
   // Bei Einnahme: nächste Beleg-Nr vorschlagen
   if(t==='Einnahme'){
     const _bnEl=document.getElementById('nf-belegnr');
-    if(_bnEl && !_bnEl.value) _bnEl.value=autoRechNr();
+    const _datYr=document.getElementById('nf-dat')?.value?.substring(0,4);
+    if(_bnEl && !_bnEl.value) _bnEl.value=autoRechNr(_datYr);
   } else {
     const _bnEl=document.getElementById('nf-belegnr');
     if(_bnEl) _bnEl.value='';
@@ -309,13 +310,26 @@ function updateMwstFormVisibility(){
 function updateKatSel(){
   document.getElementById('nf-kat').innerHTML=(curTyp==='Einnahme'?KE:KA).map(k=>`<option value="${k}">${k}</option>`).join('');
 }
+// При смене даты — обновляем год в Beleg-Nr для Einnahme
+function _einDatumNrSync(){
+  if(curTyp!=='Einnahme') return;
+  const bnEl=document.getElementById('nf-belegnr');
+  const datEl=document.getElementById('nf-dat');
+  if(!bnEl||!datEl) return;
+  const curNr=bnEl.value.trim();
+  const newYr=datEl.value?.substring(0,4);
+  if(!newYr||newYr.length!==4) return;
+  const seq=_parseSeqNr(curNr);
+  if(seq>0) bnEl.value=newYr+'-'+seq;
+}
 function clearForm(){
   document.getElementById('nf-bet').value='';
   document.getElementById('nf-dsc').value='';
   document.getElementById('nf-note').value='';
   // Beleg-Nr: для Einnahme ставим следующий номер, для Ausgabe очищаем
   const _bnEl=document.getElementById('nf-belegnr');
-  if(_bnEl) _bnEl.value = curTyp==='Einnahme' ? autoRechNr() : '';
+  const _datYr=document.getElementById('nf-dat')?.value?.substring(0,4);
+  if(_bnEl) _bnEl.value = curTyp==='Einnahme' ? autoRechNr(_datYr) : '';
   // Дату НЕ сбрасываем — пользователь мог выбрать другой год
   setMwstRate(19); // Сбрасываем MwSt на 19%
 }
@@ -340,6 +354,19 @@ function addEintrag(){
   const daysInMonth=[0,31,febMax,31,30,31,30,31,31,30,31,30,31];
   if(dd<1||dd>daysInMonth[dm])return toast(`Ungültiges Datum!`,'err');
   if(!betrag || betrag <= 0) return toast('Betrag eingeben!', 'err');
+  // Проверка блокировки номера для Einnahme
+  if(curTyp==='Einnahme' && belegnr){
+    const lockMsg=isNrLocked(belegnr, null, null);
+    if(lockMsg) return toast(lockMsg,'err');
+    // Проверка дубликатов по seq-номеру
+    const seq=_parseSeqNr(belegnr);
+    if(seq>0){
+      const dupRech=(data.rechnungen||[]).find(r=>_parseSeqNr(r.nr)===seq);
+      if(dupRech) return toast(`Nr. ${belegnr} ist bereits durch Rechnung ${dupRech.nr} belegt!`,'err');
+      const dupEin=(data.eintraege||[]).find(e=>!e.is_storno&&!e._storniert&&e.typ==='Einnahme'&&_parseSeqNr(e.belegnr)===seq);
+      if(dupEin) return toast(`Nr. ${belegnr} ist bereits vergeben!`,'err');
+    }
+  }
   const entryYear=datum.substring(0,4);
 
   // MwSt / Vorsteuer bei Regelbesteuerung
@@ -389,7 +416,7 @@ function addEintrag(){
     renderLetzteEinnahmen(entry.id);
     // Автозаполняем следующий номер для Einnahme
     const _bnElAfter=document.getElementById('nf-belegnr');
-    if(_bnElAfter) _bnElAfter.value=autoRechNr();
+    if(_bnElAfter) _bnElAfter.value=autoRechNr(document.getElementById('nf-dat')?.value?.substring(0,4));
   } else { renderLetzteAusgaben(entry.id); }
 }
 

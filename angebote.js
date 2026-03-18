@@ -530,7 +530,7 @@ async function angZuRechnung(id) {
   if (!data.rechnungen) data.rechnungen = [];
   const newR = {
     id: Date.now()+'_'+Math.random().toString(36).slice(2,6),
-    nr: autoRechNr(), datum: new Date().toISOString().split('T')[0],
+    nr: autoRechNr(new Date().getFullYear()), datum: new Date().toISOString().split('T')[0],
     faellig:'', status:'offen', kunde:a.kunde||'', adresse:a.adresse||'',
     email:'', tel:'', betrag:a.betrag, positionen:a.positionen||[],
     notiz:`Aus Angebot ${a.nr}`, beschreibung:a.positionen?.map(p=>p.bez).join(', ')||'',

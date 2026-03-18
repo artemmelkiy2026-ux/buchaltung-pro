@@ -55,6 +55,12 @@ async function saveEditFromForm(){
   const datum=document.getElementById('nf-dat').value;
   const betrag=parseFloat(document.getElementById('nf-bet').value);
   if(!datum||!betrag||betrag<=0)return toast('Datum und Betrag prüfen!','err');
+  // Проверка блокировки номера при редактировании Einnahme
+  const _editBelegnr=document.getElementById('nf-belegnr')?.value.trim()||'';
+  if(curTyp==='Einnahme' && _editBelegnr){
+    const lockMsg=isNrLocked(_editBelegnr, null, editId);
+    if(lockMsg) return toast(lockMsg,'err');
+  }
   const i=data.eintraege.findIndex(x=>x.id===editId);
   if(i<0)return;
   const origEntry = {...data.eintraege[i]};
