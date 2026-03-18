@@ -1296,7 +1296,7 @@ input, select, textarea {
 
 @media(max-width:768px){
   .wied-card{flex-wrap:wrap}
-  .wied-card-right{flex-direction:row;width:100%;justify-content:space-between}
+  .wied-card-right{flex-direction:row;width:100%;justify-content:end}
   .kat-card-val{min-width:60px}
   .prog-bar-val{width:60px}
   .prog-month-gew{width:65px}
