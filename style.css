@@ -444,7 +444,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
   transition:border-color .15s, box-shadow .15s, transform .1s;
 }
 .rech-card:hover{ border-color:var(--border2); box-shadow:var(--shadow-hover); }
-.rech-card-left{ display:flex; align-items:center; gap:14px; flex:1; min-width:0; }
+.rech-card-left{ display:flex; align-items: flex-start; gap:14px; flex:1; min-width:0; }
 .rech-card-avatar{
   flex-shrink:0; width:44px; height:44px; border-radius:var(--r2);
   display:flex; align-items:center; justify-content:center; font-size:18px;
