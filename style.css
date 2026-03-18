@@ -1294,13 +1294,8 @@ input, select, textarea {
 .prog-month-gew{font-family:var(--mono);font-size:12px;font-weight:700;width:86px;text-align:right;flex-shrink:0}
 
 @media(max-width:768px){
-  .wied-card{flex-wrap:wrap;padding:14px}
-  .wied-card > div:first-child { width:100%; }
-  .wied-card-right{flex-direction:row;width:100%;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border);margin-top:6px}
-  .wied-card-betrag{font-size:18px}
-  .wied-card-actions{gap:4px}
-  .wied-stat-extra{display:none!important}
-  .wied-card-avatar{width:36px;height:36px;font-size:15px}
+  .wied-card{flex-wrap:wrap}
+  .wied-card-right{flex-direction:row;width:100%;justify-content:space-between}
   .kat-card-val{min-width:60px}
   .prog-bar-val{width:60px}
   .prog-month-gew{width:65px}
@@ -2047,7 +2042,11 @@ input, select, textarea {
   .ph-right{
     flex-shrink: 0;
     flex-wrap: wrap;
+    gap: 6px;
   }
+  /* Wiederkehrend header: icon-only on mobile */
+  .wied-hdr-txt { display: none; }
+  .wied-hdr-btn { padding: 8px 10px !important; min-width: 36px; justify-content: center; }
 }
 
 /* ════════════════════════════════════════════════════════
