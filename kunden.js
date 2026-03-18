@@ -51,22 +51,37 @@ function renderWied(){
     const isEin=w.typ==='Einnahme';
     const _wSelMode = window._selectMode && window._selectMode['wiederkehrend'];
     const _wClick = _wSelMode ? '' : `onclick="editWied('${w.id}')"`;
-    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'};display:flex;align-items:center;gap:0">
-      ${_wSelMode ? `<div style="padding:0 10px 0 14px;display:flex;align-items:center;flex-shrink:0">${_selCb('wiederkehrend', w.id)}</div>` : ''}
-      <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
-        <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
-      </div>
-      <div class="wied-card-body">
-        <div class="wied-card-name">${w.bezeichnung}${isFaellig?` <span class="wied-faellig-badge">● Fällig</span>`:''}${isPaused?' <span style="font-size:10px;font-weight:600;color:var(--sub);background:var(--s2);padding:1px 6px;border-radius:3px">Pausiert</span>':''}</div>
-        <div class="wied-card-meta">
-          <span><i class="fas fa-tag" style="font-size:10px;margin-right:2px"></i>${w.kategorie}</span>
-          <span><i class="fas fa-sync-alt" style="font-size:10px;margin-right:2px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
-          <span><i class="fas fa-credit-card" style="font-size:10px;margin-right:2px"></i>${w.zahlungsart}</span>
-          ${w.anbieter?`<span style="color:var(--blue)"><i class="fas fa-building" style="font-size:10px;margin-right:2px"></i>${w.anbieter}</span>`:''}
+    // Нет ещё записей истории — кол-во раз забуканных
+    const _wBookedCount = (data.eintraege||[]).filter(e=>e.beschreibung===w.bezeichnung&&e.notiz==='Wiederkehrend').length;
+    // Годовой эквивалент
+    const _wMultiplier = {woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
+    const _wJahres = w.betrag * (_wMultiplier[w.intervall]||1);
+    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'}">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+        ${_wSelMode ? `<div style="padding-right:2px;flex-shrink:0">${_selCb('wiederkehrend', w.id)}</div>` : ''}
+        <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
+          <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
         </div>
-        <div class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
-          <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste Buchung: <strong>${fdm(w.naechste)}</strong>
-          ${w.enddatum?`<span style="margin-left:6px;font-size:10px;color:var(--sub)">bis ${fdm(w.enddatum)}</span>`:''}
+        <div class="wied-card-body">
+          <div class="wied-card-name">
+            ${w.bezeichnung}
+            ${isFaellig?'<span class="wied-faellig-badge">● Fällig</span>':''}
+            ${isPaused?'<span style="font-size:10px;font-weight:600;color:var(--sub);background:var(--s2);padding:1px 6px;border-radius:3px;margin-left:4px">Pausiert</span>':''}
+          </div>
+          <div class="wied-card-meta">
+            <span><i class="fas fa-tag" style="font-size:10px"></i>${w.kategorie}</span>
+            <span><i class="fas fa-sync-alt" style="font-size:10px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
+            <span><i class="fas fa-credit-card" style="font-size:10px"></i>${w.zahlungsart}</span>
+            ${w.anbieter?`<span style="color:var(--blue)"><i class="fas fa-building" style="font-size:10px"></i>${w.anbieter}</span>`:''}
+          </div>
+          <div style="display:flex;gap:14px;margin-top:4px;flex-wrap:wrap">
+            <span class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
+              <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste: <strong>${fdm(w.naechste)}</strong>
+              ${w.enddatum?`<span style="margin-left:4px;opacity:.7">· bis ${fdm(w.enddatum)}</span>`:''}
+            </span>
+            ${_wBookedCount>0?`<span style="font-size:11px;color:var(--sub)"><i class="fas fa-history" style="font-size:10px;margin-right:2px"></i>${_wBookedCount}× gebucht</span>`:''}
+            <span style="font-size:11px;color:var(--sub)"><i class="fas fa-calendar-check" style="font-size:10px;margin-right:2px"></i>≈ ${fmt(_wJahres)}/Jahr</span>
+          </div>
         </div>
       </div>
       <div class="wied-card-right">
@@ -75,13 +90,15 @@ function renderWied(){
         </div>
         <div class="wied-card-actions" onclick="event.stopPropagation()">
           ${isMob() ? _moreBtn([
-            {icon:'fa-play',  label:'Jetzt buchen', action:()=>wBuchen('${w.id}')},
-            {icon:'fa-edit',  label:'Bearbeiten',   action:()=>editWied('${w.id}')},
-            {icon:'fa-trash', label:'Löschen',      danger:true, action:()=>delWied('${w.id}')}
+            {icon:'fa-play',         label:'Jetzt buchen',  action:()=>wBuchen('${w.id}')},
+            {icon:'fa-pause',        label:w.status==='paused'?'Fortsetzen':'Pausieren', action:()=>_wTogglePause('${w.id}')},
+            {icon:'fa-edit',         label:'Bearbeiten',    action:()=>editWied('${w.id}')},
+            {icon:'fa-trash',        label:'Löschen',       danger:true, action:()=>delWied('${w.id}')}
           ]) : `
             <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
+            <button class="rca-btn" onclick="_wTogglePause('${w.id}')" title="${isPaused?'Fortsetzen':'Pausieren'}" style="${isPaused?'color:var(--green)':''}"><i class="fas fa-${isPaused?'play-circle':'pause'}"></i></button>
             <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-            <button class="rca-btn" onclick="delWied('${w.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+            <button class="rca-btn rca-red" onclick="delWied('${w.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
           `}
         </div>
       </div>
@@ -432,6 +449,13 @@ function wBuchenAlle(){
   toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} Zahlungen gebucht!`, 'ok');
 }
 async function delWied(id){const _okW=await appConfirm('Vorlage wirklich löschen?',{title:'Vorlage löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_okW)return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
+
+function _wTogglePause(id){
+  const w=data.wiederkehrend.find(x=>x.id===id); if(!w) return;
+  w.status = w.status==='paused' ? 'active' : 'paused';
+  sbSaveWied(w); renderWied();
+  toast(w.status==='paused' ? '⏸ Pausiert' : '▶ Fortgesetzt', 'ok');
+}
 
 
 

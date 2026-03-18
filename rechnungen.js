@@ -109,9 +109,14 @@ function renderRech(){
       ? `<span class="badge-storno" style="font-size:10px;padding:2px 6px;border-radius:4px">↩ Storniert</span>` : '';
     const _rSelMode = window._selectMode && window._selectMode['rechnungen'];
     const _rClick = _rSelMode ? '' : `onclick="editRech('${r.id}')"`;
+    // Anzahl Positionen
+    const _rPosCount = (r.positionen||[]).length;
+    // Wie alt ist die Rechnung?
+    const _rDaysSince = r.datum ? Math.floor((Date.now()-new Date(r.datum))/(864e5)) : null;
+    const _rAgeLabel = _rDaysSince===0?'Heute':_rDaysSince===1?'Gestern':_rDaysSince!==null?`vor ${_rDaysSince} Tagen`:'';
     return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" ${_rClick} style="cursor:${_rSelMode?'default':'pointer'}">
       <div class="rech-card-left">
-        ${_rSelMode ? `<div style="padding-right:10px;display:flex;align-items:center">${_selCb('rechnungen', r.id)}</div>` : ''}
+        ${_rSelMode ? `<div style="padding-right:10px;display:flex;align-items:center;flex-shrink:0">${_selCb('rechnungen', r.id)}</div>` : ''}
         <div class="rech-card-avatar ${st.cls}">
           <i class="${st.icon}"></i>
         </div>
@@ -119,10 +124,11 @@ function renderRech(){
           <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
           <div class="rech-card-meta">
-            <span>${fd(r.datum)}</span>
-            ${r.created_at ? `<span style="color:var(--sub);opacity:.5">·</span><span style="font-size:10px;color:var(--sub);font-family:var(--mono)">${fdt(r.created_at).slice(11)}</span>` : ''}
-            ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}">Fällig ${fd(r.faellig)}</span>` : ''}
+            <span><i class="fas fa-calendar" style="opacity:.5;width:10px"></i>${fd(r.datum)}</span>
+            ${_rAgeLabel?`<span style="opacity:.5">·</span><span style="font-size:10px;color:var(--sub)">${_rAgeLabel}</span>`:''}
+            ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}"><i class="fas fa-hourglass-half" style="opacity:.5;width:10px"></i>Fällig ${fd(r.faellig)}</span>` : ''}
             ${overdueTxt}
+            ${_rPosCount?`<span style="color:var(--sub)">·</span><span style="font-size:10px;color:var(--sub)"><i class="fas fa-list" style="opacity:.5;width:10px"></i>${_rPosCount} Pos.</span>`:''}
           </div>
         </div>
       </div>
@@ -131,14 +137,17 @@ function renderRech(){
         <div class="rech-card-status ${st.cls}-pill">
           <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
         </div>
+        <div class="rech-card-actions" onclick="event.stopPropagation()">
           ${isMob() ? _moreBtn([
-            ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt', action:()=>rechBezahlt('${r.id}')}] : []),
-            {icon:'fa-print', label:'Drucken / PDF', action:()=>druckRechnungId('${r.id}')},
-            {icon:'fa-edit',  label:'Bearbeiten',    action:()=>editRech('${r.id}')},
-            {icon:'fa-trash', label:'Löschen',       danger:true, action:()=>delRech('${r.id}')}
+            ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt('${r.id}')}] : []),
+            {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId('${r.id}')},
+            {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren('${r.id}')},
+            {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech('${r.id}')},
+            {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech('${r.id}')}
           ]) : `
-            ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt"><i class="fas fa-check"></i></button>`:''}
-            <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken"><i class="fas fa-print"></i></button>
+            ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
+            <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
+            <button class="rca-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
             <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
           `}
         </div>
@@ -340,6 +349,22 @@ async function rechBezahlt(id){
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
 }
+function _rechDuplizieren(id){
+  const orig = data.rechnungen.find(r=>r.id===id); if(!orig) return;
+  const newR = JSON.parse(JSON.stringify(orig));
+  newR.id = 'r-' + Date.now() + '_' + Math.random().toString(36).slice(2,5);
+  // Neue Nr: füge "-Kopie" hinzu
+  newR.nr = orig.nr + '-K';
+  newR.datum = new Date().toISOString().split('T')[0];
+  newR.status = 'offen';
+  newR.created_at = new Date().toISOString();
+  delete newR.bezahlt_am;
+  data.rechnungen.unshift(newR);
+  if(typeof sbSaveRechnung==='function') sbSaveRechnung(newR);
+  renderRech();
+  toast('Rechnung dupliziert — als Entwurf gespeichert', 'ok');
+}
+
 async function delRech(id){
   const _rDel=data.rechnungen.find(r=>r.id===id); if(!_rDel) return;
   const warBezahlt = _rDel.status==='bezahlt';
