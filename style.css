@@ -3074,7 +3074,7 @@ input, select, textarea {
 .prod-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
 .prod-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .prod-meta span { font-size: 11px; color: var(--sub); }
-.prod-card-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.prod-card-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; line-height:1.2 }
 .prod-prices { text-align: right; }
 .prod-price-main { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); }
 .prod-price-sub { font-family: var(--mono); font-size: 11px; color: var(--sub); margin-top: 2px; }
