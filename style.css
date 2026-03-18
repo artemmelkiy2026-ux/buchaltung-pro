@@ -3390,7 +3390,7 @@ header { background: #fff; }
 /* Mobile ⋮ button */
 .mob-more-btn {
   background: none; border: none; color: var(--sub);
-  font-size: 17px; padding:0px; cursor: pointer;
+  font-size: 17px; padding:0px; cursor: pointer; padding:2px;
   border-radius: 6px; flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center;
  -webkit-tap-highlight-color: transparent;
