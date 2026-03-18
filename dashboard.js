@@ -855,50 +855,42 @@ function renderEin(){
           ])
         : '';
       // Layout:
-      // Desktop (column-reverse): r3(top) icon+desc, r2 time+cat|pay, r1 badges+nr+date|amount
-      // Mobile (grid): icon spans left, desc / cat / badges+amt+pay / date stacked right
+      // Desktop: [icon] [desc] [time·kat·mwst] [badges·nr·date] →→ [amount] [payment] [⋮]
+      // Mobile:  [icon]  desc .......................... amount
+      //                  time · kat · mwst        payment  ⋮
+      //                  [●badge] [Nr.XX] date
 
-      const _metaBadges = ''
-        +(stLbl ? stLbl : '')
-        +(e.belegnr ? '<span class="ein-row-nr">Nr.'+e.belegnr+'</span>' : '');
-
-      const _row2left = ''
+      const _catLine = ''
         +(e.created_at ? '<span class="ein-row-time">'+fdt(e.created_at).slice(11)+'</span><span class="ein-row-sep">·</span>' : '')
         +'<span class="ein-row-kat">'+e.kategorie+'</span>'
         +(mwstBadge ? '<span class="ein-row-sep">·</span>'+mwstBadge : '')
         +(e.notiz ? '<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>' : '');
 
+      const _tagLine = ''
+        +(stLbl ? stLbl : '')
+        +(e.belegnr ? '<span class="ein-row-nr">Nr.'+e.belegnr+'</span>' : '')
+        +'<span class="ein-row-date">'+fd(e.datum)+'</span>';
+
       return '<div class="ein-row'+(st?' ein-row-st':'')+(_selMode?' ein-row-selmode':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':_selMode?'default':'pointer')+'">'
-        // checkbox
         +(_cb ? '<div style="display:flex;align-items:center;padding-right:6px">'+_cb+'</div>' : '')
-        // main body
         +'<div class="ein-row-body">'
-          // Row 1: meta + date(desktop) + amount + pay(mobile)
-          +'<div class="ein-row-r1">'
-            +'<div class="ein-row-meta">'+_metaBadges+'<span class="ein-row-date ein-row--d">'+fd(e.datum)+'</span></div>'
-            +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
-            +'<div class="ein-row-sub ein-row--m" onclick="event.stopPropagation()">'
-              +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
-              +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>' : _mobBtn)
-            +'</div>'
+          +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'
+            +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i>'
           +'</div>'
-          // Row 2: time/category + payment(desktop)
-          +'<div class="ein-row-r2">'
-            +'<div class="ein-row-bot">'+_row2left+'</div>'
-            +'<div class="ein-row-sub ein-row--d" onclick="event.stopPropagation()">'
-              +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
-              +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>' : _mobBtn)
+          +'<div class="ein-row-content">'
+            +'<div class="ein-row-head">'
+              +'<div class="ein-row-desc">'+(e.beschreibung||e.kategorie)+'</div>'
+              +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
             +'</div>'
-          +'</div>'
-          // Row 3: icon + description (on mobile: display:contents to dissolve)
-          +'<div class="ein-row-r3">'
-            +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'
-              +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i>'
+            +'<div class="ein-row-mid">'
+              +'<div class="ein-row-cat">'+_catLine+'</div>'
+              +'<div class="ein-row-pay" onclick="event.stopPropagation()">'
+                +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
+                +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>' : _mobBtn)
+              +'</div>'
             +'</div>'
-            +'<div class="ein-row-desc">'+(e.beschreibung||e.kategorie)+'</div>'
+            +'<div class="ein-row-tags">'+_tagLine+'</div>'
           +'</div>'
-          // Date row (mobile only)
-          +'<div class="ein-row-rdate ein-row--m">'+fd(e.datum)+'</div>'
         +'</div>'
         +'</div>';
     }).join('');
