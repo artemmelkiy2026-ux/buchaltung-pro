@@ -3334,69 +3334,61 @@ header { background: #fff; }
    ═══════════════════════════════════════════════════════════════ */
 
 /* Auswählen button active state */
-#btn-select-eintraege.active,
-#btn-select-wiederkehrend.active,
-#btn-select-angebote.active,
-#btn-select-rechnungen.active,
-#btn-select-kunden.active,
-#btn-select-produkte.active {
-  background: var(--blue);
-  color: #fff;
-  border-color: var(--blue);
+#btn-select-eintraege.active,#btn-select-wiederkehrend.active,
+#btn-select-angebote.active,#btn-select-rechnungen.active,
+#btn-select-kunden.active,#btn-select-produkte.active {
+  background: var(--blue); color: #fff; border-color: var(--blue);
 }
 
-/* Row in select mode — no hover glow */
+/* Checkbox alignment */
+.sel-cb { transition: transform .1s; }
+.sel-cb:hover { transform: scale(1.1); }
+
+/* Row in select mode */
 .ein-row-selmode { cursor: default !important; }
 .ein-row-selmode:hover { background: var(--s1) !important; box-shadow: none !important; }
 
-/* Checkbox in rows */
-.sel-cb-row {
-  transition: transform .1s;
-}
-.sel-cb-row:hover { transform: scale(1.1); }
-
-/* Mobile more button */
+/* Mobile ⋮ button */
 .mob-more-btn {
-  background: none;
-  border: none;
-  color: var(--sub);
-  font-size: 16px;
-  padding: 4px 8px;
-  cursor: pointer;
-  border-radius: 6px;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 28px;
+  background: none; border: none; color: var(--sub);
+  font-size: 17px; padding: 6px 10px; cursor: pointer;
+  border-radius: 6px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 36px; height: 36px; -webkit-tap-highlight-color: transparent;
 }
-.mob-more-btn:hover { background: var(--s2); color: var(--text); }
+.mob-more-btn:active { background: var(--s2); }
 
 /* Context menu */
-.ctx-menu { animation: ctx-in .12s ease; }
+.ctx-menu {
+  position: fixed; z-index: 99999;
+  background: var(--s1); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 6px 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,.22);
+  animation: ctx-in .12s ease;
+}
 @keyframes ctx-in {
-  from { opacity:0; transform:scale(.95) translateY(-4px); }
+  from { opacity:0; transform:scale(.93) translateY(-6px); }
   to   { opacity:1; transform:scale(1)   translateY(0); }
 }
-.ctx-menu-item { transition: background .1s; }
+.ctx-menu-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 18px; font-size: 15px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .1s;
+}
+.ctx-menu-item:active { background: var(--s2) !important; }
 
-/* Vorschau modal animation */
-#vorschau-modal { animation: none; }
-#vorschau-modal[style*="flex"] { animation: modal-in .2s ease; }
+/* Vorschau modal */
 @keyframes modal-in {
   from { opacity:0; transform:scale(.97); }
   to   { opacity:1; transform:scale(1); }
 }
+#vorschau-modal > div { animation: modal-in .18s ease; }
 
-/* Wied card clickable */
+/* Clickable rows */
 .wied-card { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
 .wied-card:hover { border-color: var(--border2) !important; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-
-/* ein-row clickable */
 .ein-row { cursor: pointer; }
 .ein-row:hover { background: var(--s2); }
-
-/* Kunde card clickable */
 .kunde-card { cursor: pointer; }
 

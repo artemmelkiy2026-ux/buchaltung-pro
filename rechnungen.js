@@ -108,11 +108,10 @@ function renderRech(){
     const stornoBadge = _rechStorno.length > 0
       ? `<span class="badge-storno" style="font-size:10px;padding:2px 6px;border-radius:4px">↩ Storniert</span>` : '';
     const _rSelMode = window._selectMode && window._selectMode['rechnungen'];
-    const _rCb = _rSelMode ? _selCb('rechnungen', r.id) : '';
     const _rClick = _rSelMode ? '' : `onclick="editRech('${r.id}')"`;
     return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" ${_rClick} style="cursor:${_rSelMode?'default':'pointer'}">
-      ${_rCb ? `<div style="display:flex;align-items:center;padding-left:4px">${_rCb}</div>` : ''}
       <div class="rech-card-left">
+        ${_rSelMode ? `<div style="padding-right:10px;display:flex;align-items:center">${_selCb('rechnungen', r.id)}</div>` : ''}
         <div class="rech-card-avatar ${st.cls}">
           <i class="${st.icon}"></i>
         </div>
@@ -132,13 +131,16 @@ function renderRech(){
         <div class="rech-card-status ${st.cls}-pill">
           <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
         </div>
-        <div class="rech-card-actions" onclick="event.stopPropagation()">
-          ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
-          <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
-          ${isMob() && !window._selectMode?.['rechnungen'] ? _moreBtn([
-            {icon:'fa-edit',  label:'Bearbeiten', action:()=>editRech('${r.id}')},
-            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delRech('${r.id}')}
-          ]) : `<button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`}
+          ${isMob() ? _moreBtn([
+            ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt', action:()=>rechBezahlt('${r.id}')}] : []),
+            {icon:'fa-print', label:'Drucken / PDF', action:()=>druckRechnungId('${r.id}')},
+            {icon:'fa-edit',  label:'Bearbeiten',    action:()=>editRech('${r.id}')},
+            {icon:'fa-trash', label:'Löschen',       danger:true, action:()=>delRech('${r.id}')}
+          ]) : `
+            ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt"><i class="fas fa-check"></i></button>`:''}
+            <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken"><i class="fas fa-print"></i></button>
+            <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+          `}
         </div>
       </div>
     </div>`;

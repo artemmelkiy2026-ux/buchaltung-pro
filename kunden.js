@@ -50,10 +50,9 @@ function renderWied(){
     const isPaused=w.status==='paused';
     const isEin=w.typ==='Einnahme';
     const _wSelMode = window._selectMode && window._selectMode['wiederkehrend'];
-    const _wCb = _wSelMode ? _selCb('wiederkehrend', w.id) : '';
     const _wClick = _wSelMode ? '' : `onclick="editWied('${w.id}')"`;
-    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'}">
-      ${_wCb ? `<div style="display:flex;align-items:center;padding:12px 0 12px 14px">${_wCb}</div>` : ''}
+    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'};display:flex;align-items:center;gap:0">
+      ${_wSelMode ? `<div style="padding:0 10px 0 14px;display:flex;align-items:center;flex-shrink:0">${_selCb('wiederkehrend', w.id)}</div>` : ''}
       <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
         <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
       </div>
@@ -75,11 +74,15 @@ function renderWied(){
           ${isEin?'+':'−'}${fmt(w.betrag)}
         </div>
         <div class="wied-card-actions" onclick="event.stopPropagation()">
-          <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
-          ${isMob() && !window._selectMode['wiederkehrend'] ? _moreBtn([
-            {icon:'fa-edit',  label:'Bearbeiten', action:()=>editWied('${w.id}')},
-            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delWied('${w.id}')}
-          ]) : ''}
+          ${isMob() ? _moreBtn([
+            {icon:'fa-play',  label:'Jetzt buchen', action:()=>wBuchen('${w.id}')},
+            {icon:'fa-edit',  label:'Bearbeiten',   action:()=>editWied('${w.id}')},
+            {icon:'fa-trash', label:'Löschen',      danger:true, action:()=>delWied('${w.id}')}
+          ]) : `
+            <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
+            <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+            <button class="rca-btn" onclick="delWied('${w.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+          `}
         </div>
       </div>
     </div>`;
