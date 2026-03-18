@@ -158,7 +158,8 @@ function showCtxMenu(e, items) {
 // Usage: _moreBtn('sectionId', itemsArrayAsJSONSafeString)
 // Because this runs inside template literals, we pass items via a global registry keyed by unique id
 function _moreBtn(items) {
-  const id = '_ctx_' + (++(_moreBtn._n = (_moreBtn._n||0)+1));
+  _moreBtn._n = (_moreBtn._n || 0) + 1;
+  const id = '_ctx_' + _moreBtn._n;
   window._ctxReg = window._ctxReg || {};
   window._ctxReg[id] = items;
   return `<button class="mob-more-btn" title="Mehr"
