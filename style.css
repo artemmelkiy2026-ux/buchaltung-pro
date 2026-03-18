@@ -2092,7 +2092,7 @@ input, select, textarea {
   #ang-search,
   #rech-search { width: 100% !important; margin-left: 0 !important; }
   .rech-card { flex-wrap: wrap; }
-  .rech-card-right { width: 100%; justify-content: space-between; margin-top: 8px; }
+  .rech-card-right { width: 100%; justify-content: end; margin-top: 8px; }
 }
 @media(max-width: 480px) {
   .rech-card-actions { flex-wrap: wrap; gap: 4px; }
