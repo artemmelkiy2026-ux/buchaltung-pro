@@ -57,7 +57,7 @@ function renderWied(){
     const _wMultiplier = {woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
     const _wJahres = w.betrag * (_wMultiplier[w.intervall]||1);
     return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'}">
-      <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;width:100%">
         ${_wSelMode ? `<div style="padding-right:2px;flex-shrink:0">${_selCb('wiederkehrend', w.id)}</div>` : ''}
         <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
           <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
@@ -79,8 +79,8 @@ function renderWied(){
               <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste: <strong>${fdm(w.naechste)}</strong>
               ${w.enddatum?`<span style="margin-left:4px;opacity:.7">· bis ${fdm(w.enddatum)}</span>`:''}
             </span>
-            ${_wBookedCount>0?`<span style="font-size:11px;color:var(--sub)"><i class="fas fa-history" style="font-size:10px;margin-right:2px"></i>${_wBookedCount}× gebucht</span>`:''}
-            <span style="font-size:11px;color:var(--sub)"><i class="fas fa-calendar-check" style="font-size:10px;margin-right:2px"></i>≈ ${fmt(_wJahres)}/Jahr</span>
+            ${_wBookedCount>0?`<span class="wied-stat-extra" style="font-size:11px;color:var(--sub)"><i class="fas fa-history" style="font-size:10px;margin-right:2px"></i>${_wBookedCount}× gebucht</span>`:''}
+            <span class="wied-stat-extra" style="font-size:11px;color:var(--sub)"><i class="fas fa-calendar-check" style="font-size:10px;margin-right:2px"></i>≈ ${fmt(_wJahres)}/Jahr</span>
           </div>
         </div>
       </div>
