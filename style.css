@@ -376,6 +376,18 @@ tr:hover .del-btn, div:hover > div > .del-btn, div:hover .del-btn{opacity:1}
 .zk-sub{font-size:11px;color:var(--sub);padding-top:7px;border-top:1px solid var(--border)}
 .zk-name{display:none}.zk-name-sub{display:none}.zk-icon-wrap{display:none}
 
+@media(max-width:600px){
+  .zk{ padding:12px 14px; }
+  .zk-header{ margin-bottom:6px; }
+  .zk-lbl{ font-size:9px; }
+  .zk-icon{ width:28px; height:28px; font-size:12px; }
+  .zk-val{ font-size:16px; margin-bottom:6px; }
+  .zk-row{ gap:6px; margin-bottom:5px; }
+  .zk-pill{ font-size:10px; }
+  .zk-sub{ font-size:10px; padding-top:5px; }
+  .zk-prog{ margin-bottom:6px; }
+}
+
 /* ── TOAST ── */
 /* ── Toast / Snackbar (Google Material style) ── */
 .toast{
@@ -537,7 +549,13 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 
 @media(max-width:768px){
   .rech-card{ flex-wrap:wrap; }
-  .rech-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:end; }
+  .rech-card-right{
+    flex-direction:row; align-items:center; width:100%; justify-content:end; gap:10px;
+    margin-top:8px; padding-top:10px;
+    border-top:1px solid var(--border);
+    margin-left:12px; margin-right:12px;
+    width:calc(100% - 24px);
+  }
   .kunde-card{ flex-wrap:wrap; line-height:1.3; }
   .kunde-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:end; min-width:0; }
 }
@@ -1094,7 +1112,7 @@ th.sort-desc::after {
 @media (max-width: 480px) {
   .stats { grid-template-columns: 1fr; }
   .month-cards { grid-template-columns: 1fr; }
-  .zk-grid { grid-template-columns: 1fr; gap: 8px; }
+  .zk-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   #prog-cards { grid-template-columns: 1fr !important; }
   #st-cards { grid-template-columns: 1fr !important; }
   #rech-cards { grid-template-columns: 1fr !important; }
@@ -2054,7 +2072,7 @@ input, select, textarea {
   /* Produkte header: icon-only + compact search on mobile */
   .prod-hdr-txt { display: none; }
   .prod-hdr-btn { padding: 8px 10px !important; min-width: 36px; justify-content: center; }
-  .prod-search-input { width: 100px !important; font-size: 12px !important; padding: 6px 10px !important; }
+  .prod-search-input { width: 120px !important; font-size: 12px !important; padding: 6px 10px !important; }
 }
 
 /* ════════════════════════════════════════════════════════
@@ -2277,6 +2295,7 @@ input, select, textarea {
   .ang-sticky-header { padding: 10px 12px; }
   .ang-sticky-title { font-size: 17px; }
   .ang-btn-txt { display: none; }
+  .ang-btn-txt-short { display: inline !important; }
   .ang-info-grid { grid-template-columns: 1fr; gap: 12px; }
   .ang-pos-header { display: none; }
   .ang-totals-wrap { justify-content: stretch; }
@@ -2546,6 +2565,9 @@ input, select, textarea {
 
 /* keep right column (used in zahlungsarten breakdown) */
 .ein-row-right{ display:none }
+#z-tbody .ein-row-right{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+#z-tbody .ein-row-body{ flex:1; min-width:0; }
+#z-tbody .ein-row{ display:flex; align-items:center; gap:10px; }
 .ein-row-meta{ display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0; }
 
 /* ── Mobile ── */
@@ -3065,8 +3087,12 @@ input, select, textarea {
 .prod-actions { display: flex; gap: 4px; }
 
 @media(max-width:600px) {
-  .prod-card { flex-wrap: wrap; }
-  .prod-card-right { width: 100%; justify-content: space-between; }
+  .prod-card { gap: 10px; padding: 12px; }
+  .prod-card-left { gap: 10px; }
+  .prod-avatar { width: 36px; height: 36px; font-size: 28px; }
+  .prod-card-right { gap: 8px; }
+  .prod-price-main { font-size: 13px; }
+  .prod-price-sub { font-size: 10px; }
 }
 
 /* ── USt Dropdown с флагом ── */
