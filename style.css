@@ -2503,7 +2503,7 @@ input, select, textarea {
 
 /* Content: 3 rows */
 .ein-row-content{
-  flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;
+  flex:1;min-width:0;display:flex;flex-direction:column;
 }
 
 /* Row 1: desc + amount */
