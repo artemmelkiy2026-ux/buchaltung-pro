@@ -1042,10 +1042,10 @@
     </div>
     <div class="ph-right">
       <input type="text" id="produkte-search" placeholder="Suchen..." oninput="renderProdukte()"
-        style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:13px;outline:none;width:200px">
+        style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:13px;outline:none;width:200px" class="prod-search-input">
       <button class="btn" id="btn-bulk-del-produkte" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('produkte')"></button>
-      <button class="btn" id="btn-select-produkte" onclick="toggleSelectMode('produkte')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
-      <button class="btn primary" onclick="openProduktModal()"><i class="fas fa-plus"></i> Neues Produkt</button>
+      <button class="btn prod-hdr-btn" id="btn-select-produkte" onclick="toggleSelectMode('produkte')"><i class="fas fa-check-square"></i><span class="prod-hdr-txt"> Auswählen</span></button>
+      <button class="btn primary prod-hdr-btn" onclick="openProduktModal()"><i class="fas fa-plus"></i><span class="prod-hdr-txt"> Neues Produkt</span></button>
     </div>
   </div>
 

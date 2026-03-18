@@ -2051,6 +2051,10 @@ input, select, textarea {
   /* Rechnungen header: icon-only on mobile */
   .rech-hdr-txt { display: none; }
   .rech-hdr-btn { padding: 8px 10px !important; min-width: 36px; justify-content: center; }
+  /* Produkte header: icon-only + compact search on mobile */
+  .prod-hdr-txt { display: none; }
+  .prod-hdr-btn { padding: 8px 10px !important; min-width: 36px; justify-content: center; }
+  .prod-search-input { width: 100px !important; font-size: 12px !important; padding: 6px 10px !important; }
 }
 
 /* ════════════════════════════════════════════════════════
