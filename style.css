@@ -4,6 +4,7 @@
      Акцентный зелёный: #5d9d69
   
      Фон:              #f0f4f8
+  
   ──────────────────────────────────────────────────────────── */
 
 /* ── Monatsbericht адаптив ──────────────────────────────────────── */
@@ -1838,14 +1839,14 @@ input, select, textarea {
   transition:box-shadow .15s,border-color .15s;
   position:relative;overflow:hidden;
   display:grid;
-  grid-template-columns:28px 1fr auto;
+  grid-template-columns:44px 1fr auto;
   align-items:center;
   gap:10px;
 }
 .drc:hover{box-shadow:var(--shadow-sm);border-color:var(--border2)}
 .drc-storno{opacity:.4}
 .drc-icon{
-  width:32px;height:32px;border-radius:var(--r);
+  width:44px;height:44px;border-radius:var(--r);
   display:flex;align-items:center;justify-content:center;
   font-size:12px;flex-shrink:0;
 }
@@ -2488,7 +2489,7 @@ input, select, textarea {
 .ein-row-st{ opacity:.45 }
 
 /* Body = full width column */
-.ein-row-body{ flex:1;min-width:0;display:flex;flex-direction:column;gap:5px; }
+.ein-row-body{ flex:1;min-width:0;display:flex;flex-direction: column-reverse;gap:5px; }
 
 /* Row 1: meta badges + amount */
 .ein-row-r1{
@@ -2511,7 +2512,7 @@ input, select, textarea {
   display:flex;align-items:center;gap:8px;margin-top:2px;
 }
 .ein-row-icon{
-  width:28px;height:28px;border-radius:var(--r);flex-shrink:0;
+  width:44px;height:44px;border-radius:var(--r);flex-shrink:0;
   display:flex;align-items:center;justify-content:center;font-size:11px;
 }
 .ein-row-icon-in { background:rgba(58,138,78,.1); color:var(--green) }
