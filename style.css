@@ -1169,7 +1169,7 @@ th.sort-desc::after {
 .km-valid { border-color:var(--green) !important }
 .km-invalid { border-color:var(--red) !important }
 @media(max-width:768px){
-  #kunden-cards { grid-template-columns:1fr }
+  #kunden-cards { grid-template-columns:1fr !important }
 }
 
 /* ── PIN SCREEN ─────────────────────────────────────────────────────────── */
@@ -2110,7 +2110,7 @@ input, select, textarea {
 }
 @media(max-width: 768px) {
   #ang-cards,
-  #rech-cards { grid-template-columns: 1fr; }
+  #rech-cards { grid-template-columns: 1fr !important; }
   #ang-search,
   #rech-search { width: 100% !important; margin-left: 0 !important; }
   .rech-card { flex-wrap: wrap; }
@@ -3090,6 +3090,7 @@ input, select, textarea {
   .prod-card-right { gap: 8px; }
   .prod-price-main { font-size: 13px; }
   .prod-price-sub { font-size: 10px; }
+  #produkte-stats { grid-template-columns: 1fr !important; }
 }
 
 /* ── USt Dropdown с флагом ── */
