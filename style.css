@@ -2548,7 +2548,7 @@ input, select, textarea {
 @media(max-width:600px){
   .ein-row-icon{ width:40px;height:40px; }
   .ein-row-head .amt{ font-size:14px; }
-  .ein-row-desc{ font-size:14px; }
+  .ein-row-desc{ font-size:15px; }
   .ein-row-mid{ flex-wrap:wrap; }
 }
 
