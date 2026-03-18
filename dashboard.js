@@ -827,31 +827,47 @@ function renderEin(){
             {icon:'fa-times',  label:'Stornieren', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
           ])
         : '';
-      // Build ein-row in the style of the screenshot
-      const _topLeft = ''
+      // Layout matching screenshot:
+      // Row1: badges + nr + date  |  amount
+      // Row2: time + category     |  payment + ⋮
+      // Row3: arrow icon + title (description)
+
+      const _row1 = ''
         +(stLbl ? stLbl : '')
         +(e.belegnr ? '<span class="ein-row-nr">Nr.'+e.belegnr+'</span>' : '')
-        +'<span class="ein-row-date">'+fd(e.datum)+'</span>'
-        +(e.created_at ? '<span class="ein-row-sep" style="opacity:.35">·</span><span class="ein-row-time">'+fdt(e.created_at).slice(11)+'</span>' : '');
-      const _botLeft = '<span class="ein-row-kat">'+e.kategorie+'</span>'
-        +(e.notiz ? '<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>' : '')
-        +(mwstBadge ? mwstBadge : '');
+        +'<span class="ein-row-date">'+fd(e.datum)+'</span>';
+
+      const _row2left = ''
+        +(e.created_at ? '<span class="ein-row-time">'+fdt(e.created_at).slice(11)+'</span><span class="ein-row-sep">·</span>' : '')
+        +'<span class="ein-row-kat">'+e.kategorie+'</span>'
+        +(mwstBadge ? '<span class="ein-row-sep">·</span>'+mwstBadge : '')
+        +(e.notiz ? '<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>' : '');
 
       return '<div class="ein-row'+(st?' ein-row-st':'')+(_selMode?' ein-row-selmode':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':_selMode?'default':'pointer')+'">'
-        +(_cb ? '<div style="display:flex;align-items:center;padding-right:4px">'+_cb+'</div>' : '')
-        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'
-        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'
+        // checkbox
+        +(_cb ? '<div style="display:flex;align-items:center;padding-right:6px">'+_cb+'</div>' : '')
+        // main body — full width flex column
         +'<div class="ein-row-body">'
-        +'<div class="ein-row-meta">'+_topLeft+'</div>'
-        +'<div class="ein-row-desc">'+(e.beschreibung||e.kategorie)+'</div>'
-        +'<div class="ein-row-bot">'+_botLeft+'</div>'
-        +'</div>'
-        +'<div class="ein-row-right">'
-        +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
-        +'<div class="ein-row-sub">'
-        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
-        +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>' : _mobBtn)
-        +'</div>'
+          // Row 1: meta + amount on same line
+          +'<div class="ein-row-r1">'
+            +'<div class="ein-row-meta">'+_row1+'</div>'
+            +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+          +'</div>'
+          // Row 2: time/category + payment/⋮
+          +'<div class="ein-row-r2">'
+            +'<div class="ein-row-bot">'+_row2left+'</div>'
+            +'<div class="ein-row-sub" onclick="event.stopPropagation()">'
+              +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
+              +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>' : _mobBtn)
+            +'</div>'
+          +'</div>'
+          // Row 3: icon + description title
+          +'<div class="ein-row-r3">'
+            +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'
+              +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i>'
+            +'</div>'
+            +'<div class="ein-row-desc">'+(e.beschreibung||e.kategorie)+'</div>'
+          +'</div>'
         +'</div>'
         +'</div>';
     }).join('');
