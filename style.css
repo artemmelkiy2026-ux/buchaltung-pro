@@ -537,7 +537,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 
 @media(max-width:768px){
   .rech-card{ flex-wrap:wrap; }
-  .rech-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:space-between; }
+  .rech-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:end; }
   .kunde-card{ flex-wrap:wrap; }
   .kunde-card-right{ flex-direction:row; align-items:center; width:100%; justify-content:space-between; min-width:0; }
 }
