@@ -49,7 +49,11 @@ function renderWied(){
     const isFaellig=w.naechste<=today&&w.status!=='paused';
     const isPaused=w.status==='paused';
     const isEin=w.typ==='Einnahme';
-    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}">
+    const _wSelMode = window._selectMode && window._selectMode['wiederkehrend'];
+    const _wCb = _wSelMode ? _selCb('wiederkehrend', w.id) : '';
+    const _wClick = _wSelMode ? '' : `onclick="editWied('${w.id}')"`;
+    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'}">
+      ${_wCb ? `<div style="display:flex;align-items:center;padding:12px 0 12px 14px">${_wCb}</div>` : ''}
       <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
         <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
       </div>
@@ -70,10 +74,12 @@ function renderWied(){
         <div class="wied-card-betrag" style="color:${isEin?'var(--green)':'var(--red)'}">
           ${isEin?'+':'−'}${fmt(w.betrag)}
         </div>
-        <div class="wied-card-actions">
+        <div class="wied-card-actions" onclick="event.stopPropagation()">
           <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
-          <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-          <button class="rca-btn" onclick="delWied('${w.id}')" title="Vorlage löschen"><i class="fas fa-trash"></i></button>
+          ${isMob() && !window._selectMode['wiederkehrend'] ? _moreBtn([
+            {icon:'fa-edit',  label:'Bearbeiten', action:()=>editWied('${w.id}')},
+            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delWied('${w.id}')}
+          ]) : ''}
         </div>
       </div>
     </div>`;

@@ -817,7 +817,43 @@ function renderEin(){
       }
       const mwstBadge = showMwst&&hasMwst
         ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
-      return '<div class="ein-row'+(st?' ein-row-st':'')+'">'        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'        +'<div class="ein-row-body">'        +'<div class="ein-row-meta">'        +(stLbl?stLbl:'')        +(e.belegnr?'<span class="ein-row-nr" title="Beleg-Nr.">Nr.'+e.belegnr+'</span><span class="ein-row-sep">·</span>':'')+'<span class="ein-row-date">'+fd(e.datum)+'</span>'+(e.created_at?'<span class="ein-row-sep" style="opacity:.4">·</span><span style="font-size:10px;color:var(--sub);font-family:var(--mono)">'+fdt(e.created_at).slice(11)+'</span>':'')        +'<span class="ein-row-sep">·</span>'        +'<span class="ein-row-kat">'+e.kategorie+'</span>'        +'</div>'        +'<div class="ein-row-desc">'        +(e.beschreibung||e.kategorie)        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')        +'</div>'        +(mwstBadge?'<div class="ein-row-mwst">'+mwstBadge+'</div>':'')        +'</div>'        +'<div class="ein-row-right">'        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'        +'<div class="ein-row-sub">'        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'        +(!st          ?'<div style="display:flex;gap:2px">'           +'<button class="del-btn edit-btn" title="Bearbeiten" onclick="event.stopPropagation();editE(event,\''+e.id+'\')"><i class="fas fa-edit"></i></button>'           +'<button class="del-btn" onclick="event.stopPropagation();delE(event,\''+e.id+'\')"><i class="fas fa-times"></i></button></div>'          :'<span style="font-size:10px;color:var(--sub)">GoBD</span>')        +'</div>'        +'</div>'        +'</div>';
+      
+      const _selMode = window._selectMode && window._selectMode['eintraege'];
+      const _cb = _selMode ? _selCb('eintraege', e.id) : '';
+      const _clickAttr = _selMode ? '' : (!st ? `onclick="editE(event,'${e.id}')"` : '');
+      const _mobBtn = !_selMode && isMob() && !st
+        ? _moreBtn([
+            {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
+            {icon:'fa-times',  label:'Stornieren', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
+          ])
+        : '';
+      return '<div class="ein-row'+(st?' ein-row-st':'')+(_selMode?' ein-row-selmode':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':_selMode?'default':'pointer')+'">'
+        +(_cb ? '<div style="display:flex;align-items:center;padding-left:8px">'+_cb+'</div>' : '')
+        +'<div class="ein-row-icon '+(isEin?'ein-row-icon-in':'ein-row-icon-out')+'">'
+        +'<i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></div>'
+        +'<div class="ein-row-body">'
+        +'<div class="ein-row-meta">'
+        +(stLbl?stLbl:'')
+        +(e.belegnr?'<span class="ein-row-nr" title="Beleg-Nr.">Nr.'+e.belegnr+'</span><span class="ein-row-sep">·</span>':'')
+        +'<span class="ein-row-date">'+fd(e.datum)+'</span>'
+        +(e.created_at?'<span class="ein-row-sep" style="opacity:.4">·</span><span style="font-size:10px;color:var(--sub);font-family:var(--mono)">'+fdt(e.created_at).slice(11)+'</span>':'')
+        +'<span class="ein-row-sep">·</span>'
+        +'<span class="ein-row-kat">'+e.kategorie+'</span>'
+        +'</div>'
+        +'<div class="ein-row-desc">'
+        +(e.beschreibung||e.kategorie)
+        +(e.notiz?'<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:5px"></i>':'')
+        +'</div>'
+        +(mwstBadge?'<div class="ein-row-mwst">'+mwstBadge+'</div>':'')
+        +'</div>'
+        +'<div class="ein-row-right">'
+        +'<span class="amt '+(isEin?'ein':'aus')+'" style="font-size:15px;font-weight:700;white-space:nowrap">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+        +'<div class="ein-row-sub">'
+        +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'" style="font-size:10px">'+(e.zahlungsart||'—')+'</span>'
+        +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>' : _mobBtn)
+        +'</div>'
+        +'</div>'
+        +'</div>';
     }).join('');
     
     window._einPagerCb=function(p){einPage=p;renderEin();}

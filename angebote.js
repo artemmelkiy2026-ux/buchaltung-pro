@@ -166,7 +166,11 @@ function renderAngebote() {
     // Netto info if USt
     const hasUst = (a.positionen||[]).some(p => p.mwst > 0);
     const nettoLabel = hasUst ? `<span style="font-size:10px;color:var(--sub);font-family:var(--mono)">brutto</span>` : '';
-    return `<div class="rech-card" onclick="openAngForm('${a.id}')" style="flex-direction:column;align-items:stretch;gap:10px">
+    const _aSelMode = window._selectMode && window._selectMode['angebote'];
+    const _aCb = _aSelMode ? _selCb('angebote', a.id) : '';
+    const _aClick = _aSelMode ? '' : `onclick="openAngForm('${a.id}')"`;
+    return `<div class="rech-card" ${_aClick} style="flex-direction:column;align-items:stretch;gap:10px;cursor:${_aSelMode?'default':'pointer'}">
+      ${_aCb ? `<div style="padding:8px 12px 0">${_aCb}</div>` : ''}
       <div style="display:flex;align-items:center;gap:12px">
         <div class="rech-card-avatar ${st.cls}" style="width:38px;height:38px;border-radius:var(--r);font-size:16px">
           <i class="${st.icon}"></i>
@@ -191,9 +195,12 @@ function renderAngebote() {
         ${posCount ? `<span><i class="fas fa-list" style="width:12px;opacity:.5"></i> ${posCount} Position${posCount!==1?'en':''}</span>` : ''}
         ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}"><i class="fas fa-hourglass-half" style="width:12px;opacity:.5"></i> bis ${fd(a.gueltig)}</span>` : ''}
         <span style="margin-left:auto;display:flex;gap:3px" onclick="event.stopPropagation()">
-          <button class="rca-btn" onclick="angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="fas fa-print" style="font-size:11px"></i></button>
-          <button class="rca-btn rca-green" onclick="angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="fas fa-file-invoice" style="font-size:11px"></i></button>
-          <button class="rca-btn rca-red" onclick="delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><i class="fas fa-trash" style="font-size:11px"></i></button>
+          <button class="rca-btn" onclick="event.stopPropagation();angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="fas fa-print" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-green" onclick="event.stopPropagation();angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="fas fa-file-invoice" style="font-size:11px"></i></button>
+          ${isMob() && !window._selectMode?.['angebote'] ? _moreBtn([
+            {icon:'fa-edit',  label:'Bearbeiten',  action:()=>openAngForm('${a.id}')},
+            {icon:'fa-trash', label:'Löschen',     danger:true, action:()=>delAng('${a.id}')}
+          ]) : `<button class="rca-btn rca-red" onclick="event.stopPropagation();delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><i class="fas fa-trash" style="font-size:11px"></i></button>`}
         </span>
       </div>
       ${expiryHtml}

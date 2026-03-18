@@ -49,7 +49,8 @@ function renderProdukte() {
   const katColor = k => k === 'Artikel' ? 'var(--blue)' : k === 'Dienstleistung' ? 'var(--green)' : 'var(--sub)';
 
   list.innerHTML = items.map(p => `
-    <div class="prod-card" onclick="openProduktModal('${p.id}')">
+    <div class="prod-card" ${window._selectMode?.['produkte'] ? '' : `onclick="openProduktModal('${p.id}')"`} style="cursor:${window._selectMode?.['produkte']?'default':'pointer'}">
+      ${_selCb('produkte', p.id)}
       <div class="prod-card-left">
         <div class="prod-avatar" style="background:${katColor(p.kategorie)}22;color:${katColor(p.kategorie)}">
           <i class="fas ${katIcon(p.kategorie)}"></i>
@@ -70,8 +71,10 @@ function renderProdukte() {
           <div class="prod-price-sub">${fmt(p.vkBrutto || 0)} € Brutto</div>
         </div>
         <div class="prod-actions">
-          <button class="rca-btn" onclick="event.stopPropagation();openProduktModal('${p.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-          <button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+          ${isMob() && !window._selectMode?.['produkte'] ? _moreBtn([
+            {icon:'fa-edit',  label:'Bearbeiten', action:()=>openProduktModal('${p.id}')},
+            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delProdukt('${p.id}')}
+          ]) : `<button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`}
         </div>
       </div>
     </div>`).join('');

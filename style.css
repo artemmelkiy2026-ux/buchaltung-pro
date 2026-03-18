@@ -3328,3 +3328,75 @@ header { background: #fff; }
 #kat-growth-section .kat-stat-sub {
   font-size: 13px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   SELECT MODE + CONTEXT MENU + VORSCHAU
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Auswählen button active state */
+#btn-select-eintraege.active,
+#btn-select-wiederkehrend.active,
+#btn-select-angebote.active,
+#btn-select-rechnungen.active,
+#btn-select-kunden.active,
+#btn-select-produkte.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+/* Row in select mode — no hover glow */
+.ein-row-selmode { cursor: default !important; }
+.ein-row-selmode:hover { background: var(--s1) !important; box-shadow: none !important; }
+
+/* Checkbox in rows */
+.sel-cb-row {
+  transition: transform .1s;
+}
+.sel-cb-row:hover { transform: scale(1.1); }
+
+/* Mobile more button */
+.mob-more-btn {
+  background: none;
+  border: none;
+  color: var(--sub);
+  font-size: 16px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 28px;
+}
+.mob-more-btn:hover { background: var(--s2); color: var(--text); }
+
+/* Context menu */
+.ctx-menu { animation: ctx-in .12s ease; }
+@keyframes ctx-in {
+  from { opacity:0; transform:scale(.95) translateY(-4px); }
+  to   { opacity:1; transform:scale(1)   translateY(0); }
+}
+.ctx-menu-item { transition: background .1s; }
+
+/* Vorschau modal animation */
+#vorschau-modal { animation: none; }
+#vorschau-modal[style*="flex"] { animation: modal-in .2s ease; }
+@keyframes modal-in {
+  from { opacity:0; transform:scale(.97); }
+  to   { opacity:1; transform:scale(1); }
+}
+
+/* Wied card clickable */
+.wied-card { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.wied-card:hover { border-color: var(--border2) !important; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+
+/* ein-row clickable */
+.ein-row { cursor: pointer; }
+.ein-row:hover { background: var(--s2); }
+
+/* Kunde card clickable */
+.kunde-card { cursor: pointer; }
+

@@ -243,7 +243,11 @@ function renderKunden(){
     const rechCount = (data.rechnungen||[]).filter(r=>r.kundeId===k.id).length;
     const initials = (k.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
     const hasContact = k.email || k.tel;
-    return `<div class="kunde-card" onclick="showKundeRechnungen('${k.id}')">
+    const _kSelMode = window._selectMode && window._selectMode['kunden'];
+    const _kCb = _kSelMode ? _selCb('kunden', k.id) : '';
+    const _kClick = _kSelMode ? '' : `onclick="showKundeRechnungen('${k.id}')"`;
+    return `<div class="kunde-card" ${_kClick} style="cursor:${_kSelMode?'default':'pointer'}">
+      ${_kCb ? `<div style="display:flex;align-items:center;padding-left:4px">${_kCb}</div>` : ''}
       <div class="kunde-card-avatar">${initials}</div>
       <div class="kunde-card-body">
         <div class="kunde-card-name">${k.name||'—'}</div>
@@ -257,9 +261,11 @@ function renderKunden(){
       <div class="kunde-card-right">
         ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div><div class="kunde-rech-cnt">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:'<div class="kunde-rech-cnt" style="color:var(--muted)">Keine Rechnungen</div>'}
         <div class="kunde-card-actions" onclick="event.stopPropagation()">
-          <button class="rca-btn" onclick="editKunde('${k.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-          <button class="rca-btn" onclick="neueRechnungFuerKunde('${k.id}')" title="Rechnungen"><i class="fas fa-file-invoice"></i></button>
-          <button class="rca-btn rca-red" onclick="delKunde('${k.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+          <button class="rca-btn" onclick="neueRechnungFuerKunde('${k.id}')" title="Neue Rechnung"><i class="fas fa-file-invoice"></i></button>
+          ${isMob() && !window._selectMode?.['kunden'] ? _moreBtn([
+            {icon:'fa-edit',  label:'Bearbeiten', action:()=>editKunde('${k.id}')},
+            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delKunde('${k.id}')}
+          ]) : ''}
         </div>
       </div>
     </div>`;

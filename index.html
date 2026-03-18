@@ -332,6 +332,8 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Einträge</div><div class="ph-sub">Alle Buchungen · Einnahmen & Ausgaben</div></div>
     <div class="ph-right">
+      <button class="btn" id="btn-bulk-del-eintraege" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('eintraege')"></button>
+      <button class="btn" id="btn-select-eintraege" onclick="toggleSelectMode('eintraege')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn primary" onclick="openNeuEintrag()"><i class="fas fa-plus"></i> Neuer Eintrag</button>
     </div>
   </div>
@@ -839,6 +841,8 @@
       <div class="ph-sub">Kundenverwaltung · Umsatz · Rechnungen</div>
     </div>
     <div class="ph-right">
+      <button class="btn" id="btn-bulk-del-kunden" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('kunden')"></button>
+      <button class="btn" id="btn-select-kunden" onclick="toggleSelectMode('kunden')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn primary" onclick="openKundeModal()"><i class="fas fa-plus"></i> Neuer Kunde</button>
     </div>
   </div>
@@ -864,6 +868,8 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Angebote</div><div class="ph-sub">Kostenvoranschläge erstellen und verwalten</div></div>
     <div class="ph-right">
+      <button class="btn" id="btn-bulk-del-angebote" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('angebote')"></button>
+      <button class="btn" id="btn-select-angebote" onclick="toggleSelectMode('angebote')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn primary" onclick="openAngForm(null)"><i class="fas fa-plus"></i> Angebot erstellen</button>
     </div>
   </div>
@@ -898,6 +904,7 @@
       <div id="ang-form-sub" style="font-size:12px;color:var(--muted);margin-top:2px">Angebot erstellen und an Kunden senden</div>
     </div>
     <div class="ang-sticky-right">
+      <button class="btn" onclick="openVorschau('angebot')"><i class="fas fa-eye"></i><span class="ang-btn-txt"> Vorschau</span></button>
       <button class="btn" onclick="angDruck(null)"><i class="fas fa-print"></i><span class="ang-btn-txt"> Drucken</span></button>
       <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
       <button class="btn ang-back-btn" onclick="closeAngForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
@@ -1036,6 +1043,8 @@
     <div class="ph-right">
       <input type="text" id="produkte-search" placeholder="Suchen..." oninput="renderProdukte()"
         style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:13px;outline:none;width:200px">
+      <button class="btn" id="btn-bulk-del-produkte" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('produkte')"></button>
+      <button class="btn" id="btn-select-produkte" onclick="toggleSelectMode('produkte')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn primary" onclick="openProduktModal()"><i class="fas fa-plus"></i> Neues Produkt</button>
     </div>
   </div>
@@ -1101,6 +1110,8 @@
       <div class="ph-sub">Automatisch je Monat / Quartal / Jahr</div>
     </div>
     <div class="ph-right">
+      <button class="btn" id="btn-bulk-del-wiederkehrend" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('wiederkehrend')"></button>
+      <button class="btn" id="btn-select-wiederkehrend" onclick="toggleSelectMode('wiederkehrend')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn success" onclick="wBuchenAlle()"><i class="fas fa-bolt"></i> Alle fälligen buchen</button>
       <button class="btn primary" onclick="openWiedModal()"><i class="fas fa-plus"></i> Neue Vorlage</button>
     </div>
@@ -1753,6 +1764,7 @@
       <div id="rn-form-sub" style="font-size:12px;color:var(--muted);margin-top:2px">Rechnung erstellen und versenden</div>
     </div>
     <div class="ang-sticky-right">
+      <button class="btn" onclick="openVorschau('rechnung')"><i class="fas fa-eye"></i><span class="ang-btn-txt"> Vorschau</span></button>
       <button class="btn" onclick="druckRechnung()"><i class="fas fa-print"></i><span class="ang-btn-txt"> Drucken</span></button>
       <button class="btn" onclick="emailRechnung()" title="Per E-Mail senden"><i class="fas fa-envelope"></i><span class="ang-btn-txt"> E-Mail</span></button>
       <button class="btn primary" onclick="saveRechnung()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
@@ -2091,5 +2103,28 @@
 <script src="journal.js"></script>
 <script src="umsatzsteuer.js"></script>
 <script src="custom-ui.js"></script>
+
+<!-- ══ VORSCHAU MODAL ══ -->
+<div id="vorschau-modal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--s1);border-radius:12px;width:100%;max-width:860px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.4)">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div style="font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px">
+        <i class="fas fa-eye" style="color:var(--blue)"></i> Vorschau
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="vorschauPrint()"><i class="fas fa-print"></i><span class="ang-btn-txt"> Drucken / PDF</span></button>
+        <button class="btn" onclick="closeVorschau()" style="padding:8px 12px"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <!-- iframe -->
+    <div style="flex:1;overflow:auto;background:#e5e7eb;padding:16px">
+      <iframe id="vorschau-frame" style="width:100%;min-height:600px;border:none;border-radius:6px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.15)" sandbox="allow-same-origin allow-scripts"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="select_mode.js"></script>
+<script src="vorschau.js"></script>
 </body>
 </html>
