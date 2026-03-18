@@ -127,9 +127,6 @@ function renderRech(){
         <div class="rech-card-row2">
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
           <div class="rech-card-end" onclick="event.stopPropagation()">
-            <div class="rech-card-status ${st.cls}-pill">
-              <i class="${st.icon}" style="font-size:9px"></i> ${st.label}
-            </div>
             ${isMob() ? _moreBtn([
               ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt('${r.id}')}] : []),
               {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId('${r.id}')},
