@@ -1242,18 +1242,16 @@
     <!-- Block 4: Status (nur im Edit-Modus) -->
     <div id="wied-status-block" class="form-panel" style="margin-bottom:14px;display:none">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Status</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn" id="wied-status-active" onclick="setWiedStatus('active')" style="flex:1;padding:10px;text-align:center">
-          <span style="font-size:16px;display:block;margin-bottom:2px">●</span>
-          <span style="font-size:11px">Aktiv</span>
+      <div style="display:inline-flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;width:100%">
+        <button class="wied-status-btn" id="wied-status-active" onclick="setWiedStatus('active')">
+          <i class="fas fa-circle" style="font-size:9px"></i> Aktiv
         </button>
-        <button class="btn" id="wied-status-paused" onclick="setWiedStatus('paused')" style="flex:1;padding:10px;text-align:center">
-          <span style="font-size:16px;display:block;margin-bottom:2px">⏸</span>
-          <span style="font-size:11px">Pausiert</span>
+        <button class="wied-status-btn" id="wied-status-paused" onclick="setWiedStatus('paused')">
+          <i class="fas fa-pause"></i> Pausiert
         </button>
       </div>
       <div id="wied-pause-info" style="display:none;margin-top:10px;padding:10px 12px;background:var(--ydim);border-radius:var(--r);font-size:12px;color:var(--yellow)">
-        Pausierte Vorlagen werden bei fälligen Buchungen übersprungen.
+        <i class="fas fa-info-circle" style="margin-right:4px"></i>Pausierte Vorlagen werden bei fälligen Buchungen übersprungen.
       </div>
     </div>
 

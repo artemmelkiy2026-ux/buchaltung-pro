@@ -263,9 +263,9 @@ function setWiedStatus(status){
   const ab=document.getElementById('wied-status-active');
   const pb=document.getElementById('wied-status-paused');
   const pi=document.getElementById('wied-pause-info');
-  if(ab){ab.style.background=status==='active'?'var(--gdim)':'';ab.style.borderColor=status==='active'?'var(--green)':'';ab.style.color=status==='active'?'var(--green)':'';}
-  if(pb){pb.style.background=status==='paused'?'var(--ydim)':'';pb.style.borderColor=status==='paused'?'var(--yellow)':'';pb.style.color=status==='paused'?'var(--yellow)':'';}
-  if(pi)pi.style.display=status==='paused'?'':'none';
+  if(ab){ ab.classList.toggle('wied-status-active-sel', status==='active'); ab.style.background=''; ab.style.borderColor=''; ab.style.color=''; }
+  if(pb){ pb.classList.toggle('wied-status-paused-sel', status==='paused'); pb.style.background=''; pb.style.borderColor=''; pb.style.color=''; }
+  if(pi) pi.style.display=status==='paused'?'':'none';
   if(editWiedId){
     const w=(data.wiederkehrend||[]).find(x=>x.id===editWiedId);
     if(w){w.status=status;sbSaveWied(w);}

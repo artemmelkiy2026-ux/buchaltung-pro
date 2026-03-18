@@ -3392,3 +3392,35 @@ header { background: #fff; }
 .ein-row { cursor: pointer; }
 .ein-row:hover { background: var(--s2); }
 .kunde-card { cursor: pointer; }
+
+
+/* ── Wied Status Segmented Control ── */
+.wied-status-btn {
+  flex: 1;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--sans);
+  background: var(--s1);
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--sub);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.wied-status-btn:last-child { border-right: none; }
+.wied-status-btn:hover { background: var(--s2); color: var(--text); }
+
+#wied-status-active.wied-status-active-sel {
+  background: var(--gdim);
+  color: var(--green);
+}
+#wied-status-paused.wied-status-paused-sel {
+  background: var(--ydim);
+  color: var(--yellow);
+}
