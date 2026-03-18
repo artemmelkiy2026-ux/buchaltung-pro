@@ -3390,10 +3390,10 @@ header { background: #fff; }
 /* Mobile ⋮ button */
 .mob-more-btn {
   background: none; border: none; color: var(--sub);
-  font-size: 17px; padding: 6px 10px; cursor: pointer;
+  font-size: 17px; padding:0px; cursor: pointer;
   border-radius: 6px; flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 36px; height: 36px; -webkit-tap-highlight-color: transparent;
+ -webkit-tap-highlight-color: transparent;
 }
 .mob-more-btn:active { background: var(--s2); }
 
