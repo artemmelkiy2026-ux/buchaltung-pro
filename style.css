@@ -2047,6 +2047,9 @@ input, select, textarea {
   /* Wiederkehrend header: icon-only on mobile */
   .wied-hdr-txt { display: none; }
   .wied-hdr-btn { padding: 8px 10px !important; min-width: 36px; justify-content: center; }
+  /* Rechnungen header: icon-only on mobile */
+  .rech-hdr-txt { display: none; }
+  .rech-hdr-btn { padding: 8px 10px !important; min-width: 36px; justify-content: center; }
 }
 
 /* ════════════════════════════════════════════════════════
