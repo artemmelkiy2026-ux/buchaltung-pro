@@ -873,6 +873,13 @@
     <button class="btn sort-btn" onclick="sortKunden('umsatz')">Umsatz<span class="sort-arrow">&nbsp;</span></button>
   </div>
   <!-- Kunden Karten -->
+  <div class="list-thead" id="kunden-thead">
+    <span class="lt-c" style="width:40px"></span>
+    <span class="lt-c" style="flex:1">Name</span>
+    <span class="lt-c" style="width:250px">Kontakt</span>
+    <span class="lt-c" style="width:110px;text-align:right">Umsatz</span>
+    <span class="lt-c" style="width:90px"></span>
+  </div>
   <div id="kunden-list" class="kunden-list"></div>
   <div id="kunden-pagination"></div>
   <div id="kunden-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-users"></i></div><p>Keine Kunden vorhanden</p></div>
@@ -905,6 +912,14 @@
     <button class="btn sort-btn" onclick="sortAng('datum')">Datum<span class="sort-arrow">&nbsp;</span></button>
     <button class="btn sort-btn" onclick="sortAng('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
     <button class="btn sort-btn" onclick="sortAng('kunde')">Kunde<span class="sort-arrow">&nbsp;</span></button>
+  </div>
+  <div class="list-thead" id="ang-thead">
+    <span class="lt-c" style="width:40px">Status</span>
+    <span class="lt-c" style="width:80px">Nr.</span>
+    <span class="lt-c" style="flex:1">Kunde</span>
+    <span class="lt-c" style="width:200px">Details</span>
+    <span class="lt-c" style="width:110px;text-align:right">Betrag</span>
+    <span class="lt-c" style="width:90px"></span>
   </div>
   <div id="ang-list"></div>
   <div id="ang-pagination"></div>
@@ -1077,6 +1092,14 @@
     <button class="ftab" onclick="setProdFilter('Sonstiges',this)"><i class="fas fa-ellipsis-h"></i> Sonstiges</button>
   </div>
 
+  <div class="list-thead" id="prod-thead">
+    <span class="lt-c" style="width:40px"></span>
+    <span class="lt-c" style="flex:1">Produkt</span>
+    <span class="lt-c" style="width:200px">Details</span>
+    <span class="lt-c" style="width:110px;text-align:right">Netto</span>
+    <span class="lt-c" style="width:110px;text-align:right">Brutto</span>
+    <span class="lt-c" style="width:50px"></span>
+  </div>
   <!-- Список -->
   <div id="produkte-list"></div>
   <div id="produkte-empty" class="empty-state" style="display:none">
@@ -1153,6 +1176,14 @@
     <button class="btn sort-btn" onclick="sortWied('bezeichnung')">Bezeichnung<span class="sort-arrow">&nbsp;</span></button>
     <button class="btn sort-btn" onclick="sortWied('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
     <button class="btn sort-btn" onclick="sortWied('intervall')">Intervall<span class="sort-arrow">&nbsp;</span></button>
+  </div>
+  <div class="list-thead" id="wied-thead">
+    <span class="lt-c" style="width:40px"></span>
+    <span class="lt-c" style="flex:1">Bezeichnung</span>
+    <span class="lt-c" style="width:200px">Intervall / Kategorie</span>
+    <span class="lt-c" style="width:170px">Nächste</span>
+    <span class="lt-c" style="width:110px;text-align:right">Betrag</span>
+    <span class="lt-c" style="width:130px"></span>
   </div>
   <div id="wied-list" style="display:flex;flex-direction:column;gap:10px"></div>
   <div id="wied-pagination"></div>

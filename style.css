@@ -463,6 +463,13 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 
 /* ── RECHNUNGEN KARTEN ── */
 #rech-list, #ang-list{ display:flex; flex-direction:column; gap:12px; }
+.ang-card{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);
+  padding:14px 16px;cursor:pointer;
+  transition:border-color .15s, box-shadow .15s;
+}
+.ang-card:hover{ border-color:var(--border2); box-shadow:var(--shadow-hover); }
 .rech-card{
   display:flex; align-items:flex-start; gap:12px;
   background:var(--s1); border:1px solid var(--border); border-radius:var(--r2);
@@ -3578,4 +3585,86 @@ header { background: #fff; }
   #e-tbody .ein-row-pay{ grid-column:5;grid-row:1; }
   #e-tbody .sel-cb-row{ grid-column:1/-1;grid-row:2; }
   #e-tbody .ein-row:hover{ background:#fafafa;border-color:var(--border); box-shadow:none; }
+
+  /* ── ANGEBOTE table ── */
+  .ang-card{
+    display:grid !important;
+    grid-template-columns:40px 80px 1fr 200px 110px 90px;
+    align-items:center;gap:0 12px;
+    border-radius:0;border-left:none;border-right:none;border-top:none;
+    margin:0;padding:10px 18px;
+  }
+  #ang-list{ gap:0 !important; }
+  #ang-list .ang-card:last-child{ border-radius:0 0 var(--r) var(--r); }
+  .ang-card-avatar{ grid-column:1;grid-row:1; }
+  .ang-card-nr{ grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:2px; }
+  .ang-card-kunde{ grid-column:3;grid-row:1; }
+  .ang-card-meta{ grid-column:4;grid-row:1; }
+  .ang-card-betrag{ grid-column:5;grid-row:1; }
+  .ang-card-actions{ grid-column:6;grid-row:1; }
+  .ang-card .sel-cb-row{ grid-column:1/-1;grid-row:2; }
+  .ang-card:hover{ background:var(--s2); box-shadow:none; }
+
+  /* ── KUNDEN table ── */
+  #kunden-list{ gap:0 !important; }
+  #kunden-list .kunde-card{
+    display:grid !important;
+    grid-template-columns:40px 1fr 250px 110px 90px;
+    align-items:center;gap:0 12px;
+    border-radius:0;border-left:none;border-right:none;border-top:none;
+    margin:0;padding:10px 18px;
+  }
+  #kunden-list .kunde-card:last-child{ border-radius:0 0 var(--r) var(--r); }
+  .kunde-card-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:12px !important; }
+  .kunde-card-body{ grid-column:2;grid-row:1;min-width:0; }
+  .kunde-card-body .kunde-card-name{ font-size:13px; }
+  .kunde-card-body .kunde-card-role{ display:none; }
+  .kunde-card-meta{ grid-column:3;grid-row:1; }
+  .kunde-card-right{ grid-column:4/6;grid-row:1;flex-direction:row !important;align-items:center !important;gap:12px;min-width:0 !important; }
+  .kunde-umsatz{ font-size:14px; }
+  .kunde-card-body .sel-cb-row{ display:none; }
+  .kunde-card .sel-cb-row:last-child{ grid-column:1/-1;grid-row:2;display:flex; }
+  #kunden-list .kunde-card:hover{ background:var(--s2); box-shadow:none; }
+
+  /* ── PRODUKTE table ── */
+  #produkte-list{ gap:0 !important; }
+  #produkte-list .prod-card{
+    display:grid !important;
+    grid-template-columns:40px 1fr 200px 110px 110px 50px;
+    align-items:center;gap:0 12px;
+    border-radius:0;border-left:none;border-right:none;border-top:none;
+    margin:0;padding:10px 18px;
+  }
+  #produkte-list .prod-card:last-child{ border-radius:0 0 var(--r) var(--r); }
+  .prod-card-left{ display:contents !important; }
+  .prod-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:22px !important; }
+  .prod-info{ grid-column:2;grid-row:1; }
+  .prod-name{ font-size:13px !important; }
+  .prod-meta{ grid-column:3;grid-row:1; }
+  .prod-card-right{ display:contents !important; }
+  .prod-prices{ display:contents !important; }
+  .prod-price-main{ grid-column:4;grid-row:1;text-align:right; }
+  .prod-price-sub{ grid-column:5;grid-row:1;text-align:right;margin:0 !important; }
+  .prod-actions{ grid-column:6;grid-row:1;justify-content:flex-end; }
+  .prod-info .sel-cb-row{ display:none; }
+  #produkte-list .prod-card:hover{ background:var(--s2); box-shadow:none; }
+
+  /* ── WIEDERKEHREND table ── */
+  #wied-list{ gap:0 !important; }
+  #wied-list .wied-card{
+    display:grid !important;
+    grid-template-columns:40px 1fr auto;
+    align-items:center;gap:0 12px;
+    border-radius:0;border-left:none;border-right:none;border-top:none;
+    margin:0;padding:10px 18px;
+  }
+  #wied-list .wied-card:last-child{ border-radius:0 0 var(--r) var(--r); }
+  #wied-list .wied-card > div:first-child{ display:contents; }
+  .wied-card-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:14px !important; }
+  .wied-card-body{ grid-column:2;grid-row:1;min-width:0; }
+  .wied-card-body .wied-card-name{ font-size:13px; }
+  .wied-card-right{ grid-column:3;grid-row:1;flex-direction:row !important;align-items:center !important;gap:8px; }
+  .wied-card-betrag{ font-size:14px !important; }
+  .wied-card-body .sel-cb-row{ display:none; }
+  #wied-list .wied-card:hover{ background:var(--s2); box-shadow:none; border-color:var(--border); }
 }

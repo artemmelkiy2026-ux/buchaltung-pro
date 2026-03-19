@@ -168,47 +168,36 @@ function renderAngebote() {
     const nettoLabel = hasUst ? `<span style="font-size:10px;color:var(--sub);font-family:var(--mono)">brutto</span>` : '';
     const _aSelMode = window._selectMode && window._selectMode['angebote'];
     const _aClick = _aSelMode ? '' : `onclick="openAngForm('${a.id}')"`;
-    return `<div class="rech-card" ${_aClick} style="flex-direction:row;align-items:center;gap:0;cursor:${_aSelMode?'default':'pointer'}">
-      <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="rech-card-avatar ${st.cls}" style="width:38px;height:38px;border-radius:var(--r);font-size:16px">
-          <i class="${st.icon}"></i>
-        </div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-            <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--sub)">${a.nr||'—'}</span>
-            <span class="rech-card-status ${st.pill}" style="font-size:10px;padding:2px 6px">
-              ${st.label}
-            </span>
-          </div>
-          <div style="font-size:15px;color:var(--text);overflow:hidden;text-overflow:ellipsis">${a.kunde||'Kein Kunde'}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)">${fmt(a.betrag)}</div>
-          ${nettoLabel}
-        </div>
+    return `<div class="ang-card" ${_aClick} style="cursor:${_aSelMode?'default':'pointer'}">
+      <div class="ang-card-avatar ${st.cls}" style="width:32px;height:32px;border-radius:var(--r);font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="${st.icon}"></i>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub);padding-top:8px;border-top:1px solid var(--border); margin-top:10px">
+      <div class="ang-card-nr">
+        <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--sub)">${a.nr||'—'}</span>
+        <span class="rech-card-status ${st.pill}" style="font-size:10px;padding:2px 6px">${st.label}</span>
+      </div>
+      <div class="ang-card-kunde" style="font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.kunde||'Kein Kunde'}</div>
+      <div class="ang-card-meta" style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--sub)">
         <span><i class="fas fa-calendar" style="width:12px;opacity:.5"></i> ${fd(a.datum)}</span>
-        <span><i class="fas fa-clock" style="width:12px;opacity:.5"></i> ${ageLabel}</span>
-        ${posCount ? `<span><i class="fas fa-list" style="width:12px;opacity:.5"></i> ${posCount} Position${posCount!==1?'en':''}</span>` : ''}
-        ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}"><i class="fas fa-hourglass-half" style="width:12px;opacity:.5"></i> bis ${fd(a.gueltig)}</span>` : ''}
-        <span style="margin-left:auto;display:flex;gap:3px" onclick="event.stopPropagation()">
-          ${isMob() ? _moreBtn([
-            {icon:'fa-print',       label:'Drucken',      action:()=>angDruck('${a.id}')},
-            {icon:'fa-file-invoice',label:'→ Rechnung',   action:()=>angZuRechnung('${a.id}')},
-            {icon:'fa-edit',        label:'Bearbeiten',   action:()=>openAngForm('${a.id}')},
-            {icon:'fa-trash',       label:'Löschen',      danger:true, action:()=>delAng('${a.id}')}
-          ]) : `
-            <button class="rca-btn" onclick="event.stopPropagation();angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="fas fa-print" style="font-size:11px"></i></button>
-            <button class="rca-btn rca-green" onclick="event.stopPropagation();angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="fas fa-file-invoice" style="font-size:11px"></i></button>
-            <button class="rca-btn rca-red" onclick="event.stopPropagation();delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><i class="fas fa-trash" style="font-size:11px"></i></button>
-          `}
-        </span>
+        <span>${ageLabel}</span>
+        ${posCount ? `<span>${posCount} Pos.</span>` : ''}
+        ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}">bis ${fd(a.gueltig)}</span>` : ''}
+      </div>
+      <div class="ang-card-betrag" style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);text-align:right;white-space:nowrap">${fmt(a.betrag)}${nettoLabel}</div>
+      <div class="ang-card-actions" style="display:flex;gap:3px;justify-content:flex-end" onclick="event.stopPropagation()">
+        ${isMob() ? _moreBtn([
+          {icon:'fa-print',       label:'Drucken',      action:()=>angDruck('${a.id}')},
+          {icon:'fa-file-invoice',label:'→ Rechnung',   action:()=>angZuRechnung('${a.id}')},
+          {icon:'fa-edit',        label:'Bearbeiten',   action:()=>openAngForm('${a.id}')},
+          {icon:'fa-trash',       label:'Löschen',      danger:true, action:()=>delAng('${a.id}')}
+        ]) : `
+          <button class="rca-btn" onclick="event.stopPropagation();angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="fas fa-print" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-green" onclick="event.stopPropagation();angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="fas fa-file-invoice" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-red" onclick="event.stopPropagation();delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><i class="fas fa-trash" style="font-size:11px"></i></button>
+        `}
       </div>
       ${expiryHtml}
       <div class="sel-cb-row">${_selCb('angebote', a.id)}</div>
-      </div>
     </div>`;
   }).join('');
 
