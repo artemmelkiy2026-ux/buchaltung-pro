@@ -169,7 +169,6 @@ function renderAngebote() {
     const _aSelMode = window._selectMode && window._selectMode['angebote'];
     const _aClick = _aSelMode ? '' : `onclick="openAngForm('${a.id}')"`;
     return `<div class="rech-card" ${_aClick} style="flex-direction:row;align-items:center;gap:0;cursor:${_aSelMode?'default':'pointer'}">
-      ${_aSelMode ? `<div style="padding:0 10px 0 14px;display:flex;align-items:center;flex-shrink:0">${_selCb('angebote', a.id)}</div>` : ''}
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
       <div style="display:flex;align-items:center;gap:12px">
         <div class="rech-card-avatar ${st.cls}" style="width:38px;height:38px;border-radius:var(--r);font-size:16px">
@@ -184,9 +183,12 @@ function renderAngebote() {
           </div>
           <div style="font-size:15px;color:var(--text);overflow:hidden;text-overflow:ellipsis">${a.kunde||'Kein Kunde'}</div>
         </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)">${fmt(a.betrag)}</div>
-          ${nettoLabel}
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          ${_aSelMode ? _selCb('angebote', a.id) : ''}
+          <div style="text-align:right">
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)">${fmt(a.betrag)}</div>
+            ${nettoLabel}
+          </div>
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub);padding-top:8px;border-top:1px solid var(--border); margin-top:10px">

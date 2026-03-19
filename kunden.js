@@ -58,7 +58,6 @@ function renderWied(){
     const _wJahres = w.betrag * (_wMultiplier[w.intervall]||1);
     return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'}">
       <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
-        ${_wSelMode ? `<div style="padding-right:2px;flex-shrink:0">${_selCb('wiederkehrend', w.id)}</div>` : ''}
         <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
           <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
         </div>
@@ -85,8 +84,11 @@ function renderWied(){
         </div>
       </div>
       <div class="wied-card-right">
-        <div class="wied-card-betrag" style="color:${isEin?'var(--green)':'var(--red)'}">
-          ${isEin?'+':'−'}${fmt(w.betrag)}
+        <div style="display:flex;align-items:center;gap:6px">
+          ${_wSelMode ? _selCb('wiederkehrend', w.id) : ''}
+          <div class="wied-card-betrag" style="color:${isEin?'var(--green)':'var(--red)'}">
+            ${isEin?'+':'−'}${fmt(w.betrag)}
+          </div>
         </div>
         <div class="wied-card-actions" onclick="event.stopPropagation()">
           ${isMob() ? _moreBtn([

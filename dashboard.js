@@ -872,12 +872,13 @@ function renderEin(){
         +'<span class="ein-row-date">'+fd(e.datum)+'</span>';
 
       return '<div class="ein-row'+(st?' ein-row-st':'')+(_selMode?' ein-row-selmode':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':_selMode?'default':'pointer')+'">'
-        +(_cb ? '<div style="display:flex;align-items:center;padding-right:6px">'+_cb+'</div>' : '')
         +'<div class="ein-row-body">'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
               +'<div class="ein-row-desc">'+(e.beschreibung||e.kategorie)+'</div>'
+              +(_cb ? '<div style="display:flex;align-items:center;gap:6px">'+_cb : '')
               +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+              +(_cb ? '</div>' : '')
             +'</div>'
             +'<div class="ein-row-mid">'
               +'<div class="ein-row-cat">'+_catLine+'</div>'

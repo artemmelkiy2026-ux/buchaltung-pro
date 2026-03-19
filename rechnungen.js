@@ -115,14 +115,16 @@ function renderRech(){
     const _rDaysSince = r.datum ? Math.floor((Date.now()-new Date(r.datum))/(864e5)) : null;
     const _rAgeLabel = _rDaysSince===0?'Heute':_rDaysSince===1?'Gestern':_rDaysSince!==null?`vor ${_rDaysSince} Tagen`:'';
     return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" ${_rClick} style="cursor:${_rSelMode?'default':'pointer'}">
-      ${_rSelMode ? `<div class="rech-card-cb">${_selCb('rechnungen', r.id)}</div>` : ''}
       <div class="rech-card-avatar ${st.cls}">
         <i class="${st.icon}"></i>
       </div>
       <div class="rech-card-content">
         <div class="rech-card-row1">
           <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
-          <div class="rech-card-betrag">${fmt(r.betrag)}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            ${_rSelMode ? _selCb('rechnungen', r.id) : ''}
+            <div class="rech-card-betrag">${fmt(r.betrag)}</div>
+          </div>
         </div>
         <div class="rech-card-row2">
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
