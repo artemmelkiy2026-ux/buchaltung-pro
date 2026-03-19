@@ -1149,8 +1149,14 @@ const MAHN_DEFAULTS = [
 
 function isMahnungEnabled() {
   try {
-    const v = localStorage.getItem('bp_mahnung_enabled');
-    if (v === null) return true; // enabled by default
+    var v = localStorage.getItem('bp_mahnung_enabled');
+    // v14 migration: old code stored "false" as default on all devices
+    if (v === 'false' && !localStorage.getItem('bp_mahnung_v14')) {
+      localStorage.removeItem('bp_mahnung_enabled');
+      localStorage.setItem('bp_mahnung_v14', '1');
+      return true;
+    }
+    if (v === null) return true;
     return JSON.parse(v);
   }
   catch(e) { return true; }
@@ -1183,6 +1189,7 @@ function resetMahnTemplates() {
 function toggleMahnSection() {
   const on = document.getElementById('mahnung-enabled')?.checked;
   localStorage.setItem('bp_mahnung_enabled', JSON.stringify(!!on));
+  localStorage.setItem('bp_mahnung_v14', '1');
   const sec = document.getElementById('mahnung-settings');
   if (sec) sec.style.display = on ? '' : 'none';
 }
