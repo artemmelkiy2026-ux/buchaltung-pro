@@ -3618,7 +3618,7 @@ header { background: #fff; }
   .ang-card-meta{ grid-column:4;grid-row:1; }
   .ang-card-betrag{ grid-column:5;grid-row:1;font-size: 14px !important;}
   .ang-card-actions{ grid-column:6;grid-row:1; }
-  .ang-card:hover{ background:var(--s2); box-shadow:none; }
+  .ang-card:hover{ background:#fafafa; box-shadow:none; }
 
   /* ── KUNDEN table ── */
   #kunden-list{ gap:0 !important; }
