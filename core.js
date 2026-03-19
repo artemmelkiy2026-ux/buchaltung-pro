@@ -214,6 +214,8 @@ function appInit(){
     // Zahlungserinnerungen prüfen
     if(typeof checkMahnungen==='function') checkMahnungen();
   },800);
+  // Erneut nach 3s prüfen (langsame Verbindungen)
+  setTimeout(()=>{ if(typeof checkMahnungen==='function') try{checkMahnungen();}catch(e){} },3000);
 }
 
 function buildYearFilters(){
@@ -295,7 +297,7 @@ function nav(id, el){
   if(footer) footer.style.display = FORM_PAGES.includes(id) ? 'none' : '';
   if(id==='bericht') renderRep();
   if(id==='zahlungen') renderZ();
-  if(id==='dashboard') renderDash();
+  if(id==='dashboard') { renderDash(); if(typeof checkMahnungen==='function') try{checkMahnungen();}catch(e){} }
   if(id==='journal') renderJournal();
   if(id==='prognose') renderProg();
   if(id==='kategorien') renderKat();

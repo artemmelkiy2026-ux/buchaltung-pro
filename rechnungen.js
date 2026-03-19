@@ -1563,29 +1563,41 @@ function _mahnFaellig(r) {
 }
 
 function checkMahnungen() {
-  const banner = document.getElementById('dash-mahnung-banner');
-  if (!isMahnungEnabled()) {
-    if (banner) banner.style.display = 'none';
-    return;
-  }
-  const today = new Date().toISOString().split('T')[0];
-  // Überfällig-Status aktualisieren
-  (data.rechnungen || []).forEach(r => {
-    if (r.status === 'offen' && r.faellig && r.faellig < today) r.status = 'ueberfaellig';
-  });
-  const faellige = (data.rechnungen || []).filter(r => _mahnFaellig(r));
-  // Banner auf Dashboard
-  if (!faellige.length) {
-    if (banner) banner.style.display = 'none';
-    return;
-  }
-  if (banner) {
-    const titleEl = document.getElementById('dash-mahnung-title');
-    const subEl = document.getElementById('dash-mahnung-sub');
-    const total = faellige.reduce((s, r) => s + r.betrag, 0);
-    if (titleEl) titleEl.textContent = `${faellige.length} Zahlungserinnerung${faellige.length > 1 ? 'en' : ''} fällig`;
-    if (subEl) subEl.textContent = `Offene Forderungen: ${fmt(total)} — Jetzt Mahnungen versenden`;
+  try {
+    const banner = document.getElementById('dash-mahnung-banner');
+    if (!banner) return;
+    if (!isMahnungEnabled()) {
+      banner.style.display = 'none';
+      return;
+    }
+    if (!data || !data.rechnungen || !data.rechnungen.length) {
+      banner.style.display = 'none';
+      return;
+    }
+    const today = new Date().toISOString().split('T')[0];
+    // Überfällig-Status aktualisieren
+    data.rechnungen.forEach(function(r) {
+      if (r.status === 'offen' && r.faellig && r.faellig < today) r.status = 'ueberfaellig';
+    });
+    var faellige = [];
+    for (var i = 0; i < data.rechnungen.length; i++) {
+      try { if (_mahnFaellig(data.rechnungen[i])) faellige.push(data.rechnungen[i]); }
+      catch(err) { console.warn('[Mahnung] skip', data.rechnungen[i].nr, err); }
+    }
+    // Banner auf Dashboard
+    if (!faellige.length) {
+      banner.style.display = 'none';
+      return;
+    }
+    var titleEl = document.getElementById('dash-mahnung-title');
+    var subEl = document.getElementById('dash-mahnung-sub');
+    var total = 0;
+    for (var j = 0; j < faellige.length; j++) total += (faellige[j].betrag || 0);
+    if (titleEl) titleEl.textContent = faellige.length + ' Zahlungserinnerung' + (faellige.length > 1 ? 'en' : '') + ' fällig';
+    if (subEl) subEl.textContent = 'Offene Forderungen: ' + fmt(total) + ' — Jetzt Mahnungen versenden';
     banner.style.display = 'flex';
+  } catch(e) {
+    console.error('[checkMahnungen]', e);
   }
 }
 
