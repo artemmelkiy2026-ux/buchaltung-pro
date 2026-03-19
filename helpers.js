@@ -243,7 +243,7 @@ function renderKunden(){
     const hasContact = k.email || k.tel;
     const _kSelMode = window._selectMode && window._selectMode['kunden'];
     const _kCb = _kSelMode ? _selCb('kunden', k.id) : '';
-    const _kClick = _kSelMode ? '' : `onclick="showKundeRechnungen('${k.id}')"`;
+    const _kClick = _kSelMode ? '' : `onclick="editKunde('${k.id}')"`;
     return `<div class="kunde-card" ${_kClick} style="cursor:${_kSelMode?'default':'pointer'}">
       <div class="kunde-card-avatar">${initials}</div>
       <div class="kunde-card-body">
