@@ -211,6 +211,8 @@ function appInit(){
     } else if(banner){
       banner.style.display = 'none';
     }
+    // Zahlungserinnerungen prüfen
+    if(typeof checkMahnungen==='function') checkMahnungen();
   },800);
 }
 

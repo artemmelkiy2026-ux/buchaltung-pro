@@ -138,7 +138,7 @@ function dbToRechnung(r, allPos) {
   const _posBrutto = r2(pos.reduce((s,p)=>s+(p.menge||1)*p.brutto,0));
   const _posMwst   = r2(_posBrutto - _posNetto);
   const _posRate   = pos.length>0?(pos.find(p=>p.rate>0)?.rate||0):0;
-  return { id:r.id, nr:r.nr||'', datum:r.datum||'', created_at:r.created_at||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', tel:r.tel||'', betrag:parseFloat(r.betrag)||0, netto:_posNetto||parseFloat(r.betrag)||0, mwstBetrag:_posMwst, mwstRate:_posRate, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', beschreibung:_extra.beschreibung||'', kategorie:_extra.kategorie||'', zahlungsart:_extra.zahlungsart||'', positionen:pos };
+  return { id:r.id, nr:r.nr||'', datum:r.datum||'', created_at:r.created_at||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', tel:r.tel||'', betrag:parseFloat(r.betrag)||0, netto:_posNetto||parseFloat(r.betrag)||0, mwstBetrag:_posMwst, mwstRate:_posRate, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', beschreibung:_extra.beschreibung||'', kategorie:_extra.kategorie||'', zahlungsart:_extra.zahlungsart||'', mahnung_history:_extra.mahnung_history||[], positionen:pos };
 }
 function dbToWied(r) {
   // Unpack extended meta from beschreibung if present
@@ -174,7 +174,7 @@ function kundeToDb(k) {
   return { id:k.id, user_id:currentUser.id, name:k.name||'', ansprechpartner:k.ansprechpartner||null, email:k.email||null, tel:k.tel||null, strasse:k.strasse||null, plz:k.plz||null, ort:k.ort||null, iban:k.iban||null, ustid:k.ustid||null, notiz:k.notiz||null };
 }
 function rechnungToDb(r) {
-  const _wa = JSON.stringify({beschreibung:r.beschreibung||'',kategorie:r.kategorie||'',zahlungsart:r.zahlungsart||''});
+  const _wa = JSON.stringify({beschreibung:r.beschreibung||'',kategorie:r.kategorie||'',zahlungsart:r.zahlungsart||'',mahnung_history:r.mahnung_history||[]});
   return { id:r.id, user_id:currentUser.id, nr:r.nr||null, datum:r.datum||null, faellig:r.faellig||null, kunde:r.kunde||null, kunde_id:r.kundeId||null, adresse:r.adresse||null, email:r.email||null, tel:r.tel||null, betrag:r.betrag||0, status:r.status||'offen', mwst_mode:r.mwstMode||'§19', notiz:r.notiz||null, wa:_wa };
 }
 function posToDb(pos, rechnungId) {

@@ -146,6 +146,7 @@ function renderRech(){
           ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}"><i class="fas fa-hourglass-half" style="opacity:.5;width:10px"></i>Fällig ${fd(r.faellig)}</span>` : ''}
           ${overdueTxt}
           ${_rPosCount?`<span style="color:var(--sub)">·</span><span style="font-size:10px;color:var(--sub)"><i class="fas fa-list" style="opacity:.5;width:10px"></i>${_rPosCount} Pos.</span>`:''}
+          ${(r.mahnung_history||[]).length?`<span style="color:var(--sub)">·</span><span style="font-size:10px;font-weight:600;color:var(--yellow)"><i class="fas fa-bell" style="opacity:.7;width:10px"></i>${r.mahnung_history.length}× gemahnt</span>`:''}
         </div>
         <div class="sel-cb-row">${_selCb('rechnungen', r.id)}</div>
       </div>
@@ -381,7 +382,7 @@ function saveRechnung(){
     sbSaveRechnung(newR);
     sbLogRechnung(newR, 'erstellt', null, {nr:newR.nr, betrag:newR.betrag, kunde:newR.kunde, status:newR.status});
   }
-  renderRech(); closeRechForm(); toast('✓ Rechnung gespeichert!','ok');
+  renderRech(); closeRechForm(); toast('✓ Rechnung gespeichert!','ok'); checkMahnungen();
 }
 async function rechBezahlt(id){
   const r=data.rechnungen.find(x=>x.id===id);if(!r)return;
@@ -403,6 +404,7 @@ async function rechBezahlt(id){
     renderRech();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
+  checkMahnungen();
 }
 function _rechDuplizieren(id){
   const orig = data.rechnungen.find(r=>r.id===id); if(!orig) return;
@@ -413,6 +415,7 @@ function _rechDuplizieren(id){
   newR.datum = new Date().toISOString().split('T')[0];
   newR.status = 'offen';
   newR.created_at = new Date().toISOString();
+  newR.mahnung_history = [];
   delete newR.bezahlt_am;
   data.rechnungen.unshift(newR);
   if(typeof sbSaveRechnung==='function') sbSaveRechnung(newR);
@@ -1425,4 +1428,218 @@ function setRechUstRate(el, rate) {
   wrap.querySelector('.ust-flag-label').textContent = rate + '%';
   wrap.querySelector('.ust-flag-panel').style.display = 'none';
   posRateChanged(hidden);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ZAHLUNGSERINNERUNG (Mahnung) — автоматические напоминания об оплате
+// ══════════════════════════════════════════════════════════════════════════
+
+function _getMahnEmail(r) {
+  // Email из Rechnung или из Kunden-DB
+  if (r.email) return r.email;
+  if (r.kundeId) {
+    const k = (data.kunden || []).find(x => x.id === r.kundeId);
+    if (k && k.email) return k.email;
+  }
+  return '';
+}
+
+function _getMahnStufe(r) {
+  const hist = r.mahnung_history || [];
+  return hist.length; // 0 = erste Mahnung, 1 = zweite, etc.
+}
+
+function _mahnFaellig(r) {
+  // Rechnung muss überfällig sein + Email vorhanden
+  if (r.status !== 'ueberfaellig') return false;
+  if (!_getMahnEmail(r)) return false;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const hist = r.mahnung_history || [];
+  if (!hist.length) {
+    // Noch nie gemahnt — fällig wenn überfällig
+    return true;
+  }
+  // Letzte Mahnung vor 7+ Tagen?
+  const last = new Date(hist[hist.length - 1]);
+  last.setHours(0,0,0,0);
+  const diff = Math.floor((today - last) / 864e5);
+  return diff >= 7;
+}
+
+function checkMahnungen() {
+  const today = new Date().toISOString().split('T')[0];
+  // Überfällig-Status aktualisieren
+  (data.rechnungen || []).forEach(r => {
+    if (r.status === 'offen' && r.faellig && r.faellig < today) r.status = 'ueberfaellig';
+  });
+  const faellige = (data.rechnungen || []).filter(r => _mahnFaellig(r));
+  // Banner auf Dashboard
+  const banner = document.getElementById('dash-mahnung-banner');
+  if (!faellige.length) {
+    if (banner) banner.style.display = 'none';
+    return;
+  }
+  if (banner) {
+    const titleEl = document.getElementById('dash-mahnung-title');
+    const subEl = document.getElementById('dash-mahnung-sub');
+    const total = faellige.reduce((s, r) => s + r.betrag, 0);
+    if (titleEl) titleEl.textContent = `${faellige.length} Zahlungserinnerung${faellige.length > 1 ? 'en' : ''} fällig`;
+    if (subEl) subEl.textContent = `Offene Forderungen: ${fmt(total)} — Jetzt Mahnungen versenden`;
+    banner.style.display = 'flex';
+  }
+}
+
+function openMahnModal() {
+  const today = new Date().toISOString().split('T')[0];
+  (data.rechnungen || []).forEach(r => {
+    if (r.status === 'offen' && r.faellig && r.faellig < today) r.status = 'ueberfaellig';
+  });
+  const faellige = (data.rechnungen || []).filter(r => _mahnFaellig(r));
+  if (!faellige.length) {
+    toast('Keine Mahnungen fällig', 'ok');
+    return;
+  }
+
+  document.getElementById('mahnung-overlay')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'mahnung-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:#00000066;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--s1);border-radius:var(--r2);padding:0;width:520px;max-width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px #0004;overflow:hidden';
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0';
+  hdr.innerHTML = `<div>
+    <div style="font-size:16px;font-weight:700;color:var(--text)"><i class="fas fa-bell" style="color:var(--yellow);margin-right:6px"></i>Zahlungserinnerungen</div>
+    <div style="font-size:12px;color:var(--sub);margin-top:2px">${faellige.length} überfällige Rechnung${faellige.length !== 1 ? 'en' : ''} mit E-Mail</div>
+  </div>`;
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '✕';
+  closeBtn.style.cssText = 'background:none;border:none;font-size:18px;cursor:pointer;color:var(--sub);padding:4px';
+  closeBtn.onclick = function() { overlay.remove(); };
+  hdr.appendChild(closeBtn);
+  box.appendChild(hdr);
+
+  // Alle senden Button
+  const allBar = document.createElement('div');
+  allBar.style.cssText = 'padding:12px 20px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'btn primary';
+  allBtn.style.cssText = 'font-size:13px;height:32px;padding:0 14px';
+  allBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Alle senden';
+  allBtn.onclick = function() {
+    faellige.forEach(r => _sendMahnung(r));
+    overlay.remove();
+    toast(`${faellige.length} Mahnung${faellige.length > 1 ? 'en' : ''} vorbereitet`, 'ok');
+    checkMahnungen();
+  };
+  allBar.innerHTML = `<span style="font-size:12px;color:var(--sub)">${faellige.length} E-Mails werden vorbereitet</span>`;
+  allBar.appendChild(allBtn);
+  box.appendChild(allBar);
+
+  // List
+  const list = document.createElement('div');
+  list.style.cssText = 'overflow-y:auto;flex:1;padding:8px 12px';
+
+  faellige.forEach(r => {
+    const email = _getMahnEmail(r);
+    const stufe = _getMahnStufe(r);
+    const stufeLbl = stufe === 0 ? '1. Mahnung' : stufe === 1 ? '2. Mahnung' : `${stufe + 1}. Mahnung`;
+    const overdueDays = Math.floor((new Date() - new Date(r.faellig)) / 864e5);
+    const lastMahn = (r.mahnung_history || []).length
+      ? fd((r.mahnung_history || [])[(r.mahnung_history || []).length - 1])
+      : '—';
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;background:var(--s1)';
+    row.innerHTML = `
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px">
+          <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--sub)">${r.nr}</span>
+          <span style="font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.kunde || '—'}</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--sub)">
+          <span style="color:var(--red);font-weight:600">+${overdueDays} Tage überfällig</span>
+          <span>·</span>
+          <span style="font-family:var(--mono)">${fmt(r.betrag)}</span>
+          <span>·</span>
+          <span>${stufeLbl}</span>
+          <span>·</span>
+          <span>Letzte: ${lastMahn}</span>
+        </div>
+        <div style="font-size:10px;color:var(--sub);margin-top:2px;opacity:.7">→ ${email}</div>
+      </div>
+    `;
+    const sendBtn = document.createElement('button');
+    sendBtn.className = 'btn';
+    sendBtn.style.cssText = 'font-size:12px;height:30px;padding:0 12px;flex-shrink:0;color:var(--blue);border-color:var(--blue)';
+    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    sendBtn.title = 'Mahnung senden';
+    sendBtn.onclick = function(e) {
+      e.stopPropagation();
+      _sendMahnung(r);
+      row.style.opacity = '0.4';
+      row.style.pointerEvents = 'none';
+      sendBtn.innerHTML = '<i class="fas fa-check" style="color:var(--green)"></i>';
+    };
+    row.appendChild(sendBtn);
+    list.appendChild(row);
+  });
+
+  box.appendChild(list);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+function _sendMahnung(r) {
+  const firma = getFirmaData();
+  const email = _getMahnEmail(r);
+  if (!email) return;
+
+  const stufe = _getMahnStufe(r);
+  const overdueDays = Math.floor((new Date() - new Date(r.faellig)) / 864e5);
+
+  // Mahnung-Text je nach Stufe
+  let betreff, text;
+  if (stufe === 0) {
+    betreff = `Zahlungserinnerung — Rechnung ${r.nr}`;
+    text = `Sehr geehrte Damen und Herren,\n\n` +
+      `hiermit möchten wir Sie freundlich daran erinnern, dass die Rechnung Nr. ${r.nr} ` +
+      `über ${fmt(r.betrag)} seit dem ${fd(r.faellig)} fällig ist.\n\n` +
+      `Bitte überweisen Sie den offenen Betrag innerhalb der nächsten 7 Tage.\n\n` +
+      `Sollte sich Ihre Zahlung mit diesem Schreiben gekreuzt haben, betrachten Sie diese Erinnerung bitte als gegenstandslos.\n\n` +
+      `Mit freundlichen Grüßen\n${firma.name || ''}`;
+  } else if (stufe === 1) {
+    betreff = `2. Mahnung — Rechnung ${r.nr}`;
+    text = `Sehr geehrte Damen und Herren,\n\n` +
+      `trotz unserer ersten Erinnerung ist die Rechnung Nr. ${r.nr} ` +
+      `über ${fmt(r.betrag)} weiterhin offen (fällig seit ${fd(r.faellig)}, ${overdueDays} Tage überfällig).\n\n` +
+      `Wir bitten Sie dringend, den Betrag umgehend zu begleichen.\n\n` +
+      `Mit freundlichen Grüßen\n${firma.name || ''}`;
+  } else {
+    betreff = `${stufe + 1}. Mahnung — Rechnung ${r.nr}`;
+    text = `Sehr geehrte Damen und Herren,\n\n` +
+      `die Rechnung Nr. ${r.nr} über ${fmt(r.betrag)} ist seit ${overdueDays} Tagen überfällig ` +
+      `(Fälligkeitsdatum: ${fd(r.faellig)}).\n\n` +
+      `Dies ist unsere ${stufe + 1}. Mahnung. Wir fordern Sie letztmalig auf, ` +
+      `den offenen Betrag innerhalb von 5 Werktagen zu überweisen.\n\n` +
+      `Andernfalls behalten wir uns weitere rechtliche Schritte vor.\n\n` +
+      `Mit freundlichen Grüßen\n${firma.name || ''}`;
+  }
+
+  // Mahnung-Historie aktualisieren
+  if (!r.mahnung_history) r.mahnung_history = [];
+  r.mahnung_history.push(new Date().toISOString().split('T')[0]);
+  if (typeof sbSaveRechnung === 'function') sbSaveRechnung(r);
+
+  // Email öffnen
+  const mailto = 'mailto:' + encodeURIComponent(email)
+    + '?subject=' + encodeURIComponent(betreff)
+    + '&body=' + encodeURIComponent(text);
+  window.open(mailto, '_blank');
 }
