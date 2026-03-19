@@ -25,8 +25,8 @@
          content: "";
         position: absolute;
         bottom: 0px;
-        left: 15px;
-        right: 16px;
+        left: 20px;
+        right: 25px;
         border-bottom: 1px solid var(--border);
 }
 .flag-circle .band {
