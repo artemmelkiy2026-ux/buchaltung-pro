@@ -1140,8 +1140,12 @@ const MAHN_DEFAULTS = [
 ];
 
 function isMahnungEnabled() {
-  try { return JSON.parse(localStorage.getItem('bp_mahnung_enabled') || 'false'); }
-  catch(e) { return false; }
+  try {
+    const v = localStorage.getItem('bp_mahnung_enabled');
+    if (v === null) return true; // enabled by default
+    return JSON.parse(v);
+  }
+  catch(e) { return true; }
 }
 
 function getMahnTemplates() {
