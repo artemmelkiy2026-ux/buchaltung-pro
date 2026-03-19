@@ -76,7 +76,7 @@
     <span class="tab-ic mob-plus-ic"><i class="fa-solid fa-plus"></i></span><span class="tab-lbl">Neu</span>
   </button>
   <button class="mob-tab" id="mobt-rechnungen" onclick="mobNav('rechnungen',this)">
-    <span class="tab-ic"><i class="fas fa-file-invoice"></i></span><span class="tab-lbl">Rechnungen</span>
+    <span class="tab-ic"><i class="fas fa-regular fa-file"></i></span><span class="tab-lbl">Rechnungen</span>
   </button>
   <button class="mob-tab more-tab" onclick="openMobDrawer()">
     <span class="tab-ic"><i class="fas fa-bars"></i></span><span class="tab-lbl">Mehr</span>
@@ -104,7 +104,7 @@
   <!-- Aufträge -->
   <div class="mob-drawer-group">
     <div class="mob-drawer-group-header" onclick="toggleMobGroup(this)">
-      <span class="mob-drawer-group-icon"><i class="fas fa-file-invoice"></i></span>
+      <span class="mob-drawer-group-icon"><i class="fas fa-regular fa-file"></i></span>
       <span>Aufträge</span>
       <i class="fas fa-chevron-right mob-drawer-arrow"></i>
     </div>
@@ -202,7 +202,7 @@
 
   <!-- Aufträge — раскрывающаяся группа -->
   <div class="nav-group-header" id="auftraege-header" onclick="toggleNavGroup('auftraege-group','auftraege-header')">
-    <span class="nav-group-icon"><i class="fas fa-file-invoice"></i></span>
+    <span class="nav-group-icon"><i class="fas fa-regular fa-file"></i></span>
     <span class="nav-group-label">Aufträge</span>
     <i class="fas fa-chevron-right nav-group-arrow"></i>
   </div>
@@ -456,7 +456,7 @@
     </button>
     <button id="jtab-rechnungen" onclick="setJournalTab('rechnungen')"
       style="padding:7px 14px;border-radius:var(--r);font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:;color:;transition:all .12s;font-family:inherit">
-      <i class="fas fa-file-invoice"></i> Rechnungen-Log
+      <i class="fas fa-regular fa-file"></i> Rechnungen-Log
     </button>
   </div>
   <div id="journal-eintraege-controls">
@@ -1051,7 +1051,7 @@
     <!-- Кнопки внизу -->
     <div class="ang-bottom-actions">
       <button class="btn primary" onclick="saveAng()"><i class="fas fa-save"></i> Speichern</button>
-      <button class="btn" onclick="angZuRechnung(editAngId||'')"><i class="fas fa-file-invoice"></i> Als Rechnung</button>
+      <button class="btn" onclick="angZuRechnung(editAngId||'')"><i class="fas fa-regular fa-file"></i> Als Rechnung</button>
       <button class="btn" onclick="closeAngForm()"><i class="fas fa-times"></i> Abbrechen</button>
     </div>
 
@@ -1140,7 +1140,7 @@
   </div>
   <div id="rech-list"></div>
   <div id="rech-pagination"></div>
-  <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungen</p></div>
+  <div id="rech-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-regular fa-file"></i></div><p>Keine Rechnungen</p></div>
 </div>
 </div>
 
@@ -2119,7 +2119,7 @@
   <div class="modal" style="max-width:580px;width:100%">
     <div class="modal-hdr">
       <div>
-        <h2><i class="fas fa-file-invoice"></i> Rechnungen</h2>
+        <h2><i class="fas fa-regular fa-file"></i> Rechnungen</h2>
         <p id="kunde-rech-name" style="font-size:12px;color:var(--sub);margin-top:2px"></p>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
