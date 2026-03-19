@@ -970,7 +970,11 @@ function openFirmaModal() {
   if (bodEl) bodEl.value = tmpl.body;
   // Mahnung editor
   _populateMahnEditor();
-  openModal('firma-modal');
+  nav('firma', null);
+}
+
+function closeFirmaForm() {
+  nav('rechnungen', document.querySelector('.nav-item[onclick*="rechnungen"]:not([onclick*="form"])') || null);
 }
 
 // Сжимаем изображение до maxW×maxH и maxKB — возвращает base64 или null
@@ -1089,7 +1093,7 @@ async function saveFirmaData() {
   // Mahnung Vorlagen speichern
   saveMahnTemplates();
   toast('✓ Firmendaten gespeichert!', 'ok');
-  closeModal('firma-modal');
+  closeFirmaForm();
 }
 
 function getEmailTemplate() {
