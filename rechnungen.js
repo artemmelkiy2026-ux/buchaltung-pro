@@ -122,7 +122,6 @@ function renderRech(){
         <div class="rech-card-row1">
           <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
           <div class="rech-card-betrag">${fmt(r.betrag)}</div>
-          ${_selCb('rechnungen', r.id)}
         </div>
         <div class="rech-card-row2">
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
@@ -150,6 +149,7 @@ function renderRech(){
           ${(r.mahnung_history||[]).length?`<span style="color:var(--sub)">·</span><span style="font-size:10px;font-weight:600;color:var(--yellow)"><i class="fas fa-bell" style="opacity:.7;width:10px"></i>${r.mahnung_history.length}× gemahnt</span>`:''}
         </div>
       </div>
+      <div class="sel-cb-abs">${_selCb('rechnungen', r.id)}</div>
     </div>`;
   }).join('');
 

@@ -96,8 +96,8 @@ function renderWied(){
             <button class="rca-btn rca-red" onclick="delWied('${w.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
           `}
         </div>
-        ${_selCb('wiederkehrend', w.id)}
       </div>
+      <div class="sel-cb-abs">${_selCb('wiederkehrend', w.id)}</div>
     </div>`;
   }).join('');
 

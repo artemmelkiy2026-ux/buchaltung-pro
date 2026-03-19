@@ -266,8 +266,8 @@ function renderKunden(){
             {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delKunde('${k.id}')}
           ]) : ''}
         </div>
-        ${_selCb('kunden', k.id)}
       </div>
+      <div class="sel-cb-abs">${_selCb('kunden', k.id)}</div>
     </div>`;
   }).join('');
 

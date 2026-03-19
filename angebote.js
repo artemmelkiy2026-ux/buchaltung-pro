@@ -183,7 +183,7 @@ function renderAngebote() {
         ${posCount ? `<span>${posCount} Pos.</span>` : ''}
         ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}">bis ${fd(a.gueltig)}</span>` : ''}
       </div>
-      <div class="ang-card-betrag">${fmt(a.betrag)}${nettoLabel} ${_selCb('angebote', a.id)}</div>
+      <div class="ang-card-betrag">${fmt(a.betrag)}${nettoLabel}</div>
       <div class="ang-card-actions" onclick="event.stopPropagation()">
         ${isMob() ? _moreBtn([
           {icon:'fa-print',       label:'Drucken',      action:()=>angDruck('${a.id}')},
@@ -197,6 +197,7 @@ function renderAngebote() {
         `}
       </div>
       ${expiryHtml}
+      <div class="sel-cb-abs">${_selCb('angebote', a.id)}</div>
     </div>`;
   }).join('');
 

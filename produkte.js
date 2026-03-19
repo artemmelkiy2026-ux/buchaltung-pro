@@ -75,8 +75,8 @@ function renderProdukte() {
             {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delProdukt('${p.id}')}
           ]) : `<button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`}
         </div>
-        ${_selCb('produkte', p.id)}
       </div>
+      <div class="sel-cb-abs">${_selCb('produkte', p.id)}</div>
     </div>`).join('');
 }
 
