@@ -1980,9 +1980,6 @@
   </div>
 </div>
 
-</div><!-- /app-wrapper -->
-
-<!-- ── FIRMA EINSTELLUNGEN MODAL ── -->
 <!-- ── FIRMENPROFIL (full page) ── -->
 <div class="page" id="p-firma">
   <div class="ang-sticky-header">
@@ -1996,8 +1993,6 @@
     </div>
   </div>
   <div class="ang-form-body">
-
-    <!-- Logo Upload -->
     <div class="ang-block">
       <div class="ang-block-label"><i class="fas fa-image"></i> Firmenlogo</div>
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
@@ -2017,8 +2012,6 @@
         <div style="font-size:11px;color:var(--sub);line-height:1.5">Max. 5 MB · PNG, JPG, SVG</div>
       </div>
     </div>
-
-    <!-- Firma-Daten -->
     <div class="ang-block">
       <div class="ang-block-label">Firmendaten</div>
       <div class="fg"><label>Firmenname *</label><input type="text" id="firma-name" placeholder="z.B. Autowäsche Berg GmbH"></div>
@@ -2034,8 +2027,6 @@
         <div class="fg"><label>E-Mail</label><input type="email" id="firma-email" placeholder="info@firma.de"></div>
       </div>
     </div>
-
-    <!-- Bankverbindung -->
     <div class="ang-block">
       <div class="ang-block-label">Bankverbindung</div>
       <div class="fgrow c2">
@@ -2043,8 +2034,6 @@
         <div class="fg"><label>BIC</label><input type="text" id="firma-bic" placeholder="SSKMDEMMXXX"></div>
       </div>
     </div>
-
-    <!-- Steuerdaten -->
     <div class="ang-block">
       <div class="ang-block-label">Steuerdaten</div>
       <div class="fgrow c2">
@@ -2052,16 +2041,12 @@
         <div class="fg"><label>USt-ID (optional)</label><input type="text" id="firma-ustid" placeholder="DE123456789"></div>
       </div>
     </div>
-
-    <!-- Footer-Text -->
     <div class="ang-block">
       <div class="ang-block-label">Zusatztext (Fußzeile Rechnung)</div>
       <div class="fg" style="margin:0"><label>Rechtliche Hinweise / Weitere Infos</label>
         <textarea id="firma-footer" rows="3" placeholder="z.B.: Kleinunternehmer gem. §19 UStG · Handelsregister HRB 12345 · Amtsgericht Worms"></textarea>
       </div>
     </div>
-
-    <!-- E-Mail Vorlage -->
     <div class="ang-block">
       <div class="ang-block-label"><i class="fas fa-envelope"></i> E-Mail Vorlage</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
@@ -2071,8 +2056,6 @@
       <div class="fg"><label>Betreff</label><input type="text" id="email-tmpl-subject" placeholder="Rechnung Nr. {{NR}} — {{FIRMA}}"></div>
       <div class="fg" style="margin:0"><label>E-Mail Text</label><textarea id="email-tmpl-body" rows="7" style="font-family:monospace;font-size:12px" placeholder="Sehr geehrte Damen und Herren..."></textarea></div>
     </div>
-
-    <!-- Zahlungserinnerungen -->
     <div class="ang-block">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div class="ang-block-label" style="margin:0"><i class="fas fa-bell"></i> Zahlungserinnerungen</div>
@@ -2103,9 +2086,10 @@
         <div style="text-align:right"><button onclick="resetMahnTemplates()" style="background:none;border:none;font-size:11px;color:var(--sub);cursor:pointer;text-decoration:underline">Vorlagen zurücksetzen</button></div>
       </div>
     </div>
-
   </div>
 </div>
+
+</div><!-- /app-wrapper -->
 
 
 <!-- ── KUNDE RECHNUNGEN MODAL ── -->
