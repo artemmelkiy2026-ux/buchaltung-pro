@@ -50,6 +50,7 @@ function renderProdukte() {
 
   list.innerHTML = items.map(p => `
     <div class="prod-card" ${window._selectMode?.['produkte'] ? '' : `onclick="openProduktModal('${p.id}')"`} style="cursor:${window._selectMode?.['produkte']?'default':'pointer'}">
+      ${_selCb('produkte', p.id)}
       <div class="prod-card-left">
         <div class="prod-avatar" style="background:${katColor(p.kategorie)}22;color:${katColor(p.kategorie)}">
           <i class="fas ${katIcon(p.kategorie)}"></i>
@@ -65,12 +66,9 @@ function renderProdukte() {
         </div>
       </div>
       <div class="prod-card-right">
-        <div style="position:relative">
-          ${_selCb('produkte', p.id)}
-          <div class="prod-prices">
-            <div class="prod-price-main">${fmt(p.vkNetto || 0)} €<span style="font-size:10px;color:var(--sub);font-weight:400"> Netto</span></div>
-            <div class="prod-price-sub">${fmt(p.vkBrutto || 0)} € Brutto</div>
-          </div>
+        <div class="prod-prices">
+          <div class="prod-price-main">${fmt(p.vkNetto || 0)} €<span style="font-size:10px;color:var(--sub);font-weight:400"> Netto</span></div>
+          <div class="prod-price-sub">${fmt(p.vkBrutto || 0)} € Brutto</div>
         </div>
         <div class="prod-actions">
           ${isMob() && !window._selectMode?.['produkte'] ? _moreBtn([

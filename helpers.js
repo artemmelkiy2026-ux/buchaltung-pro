@@ -247,6 +247,7 @@ function renderKunden(){
     const _kCb = _kSelMode ? _selCb('kunden', k.id) : '';
     const _kClick = _kSelMode ? '' : `onclick="showKundeRechnungen('${k.id}')"`;
     return `<div class="kunde-card" ${_kClick} style="cursor:${_kSelMode?'default':'pointer'}">
+      <div style="display:flex;align-items:center;padding-left:4px">${_selCb('kunden', k.id)}</div>
       <div class="kunde-card-avatar">${initials}</div>
       <div class="kunde-card-body">
         <div class="kunde-card-name">${k.name||'—'}</div>
@@ -258,11 +259,7 @@ function renderKunden(){
         </div>
       </div>
       <div class="kunde-card-right">
-        <div style="position:relative">
-          ${_kCb}
-          ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div>`:''}
-        </div>
-        ${umsatz>0?`<div class="kunde-rech-cnt">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:'<div class="kunde-rech-cnt" style="color:var(--muted)">Keine Rechnungen</div>'}
+        ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div><div class="kunde-rech-cnt">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:'<div class="kunde-rech-cnt" style="color:var(--muted)">Keine Rechnungen</div>'}
         <div class="kunde-card-actions" onclick="event.stopPropagation()">
           <button class="rca-btn" onclick="neueRechnungFuerKunde('${k.id}')" title="Neue Rechnung"><i class="fas fa-file-invoice"></i></button>
           ${isMob() && !window._selectMode?.['kunden'] ? _moreBtn([

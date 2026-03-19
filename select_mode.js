@@ -87,11 +87,12 @@ function _rerender(section) {
 
 // ── Checkbox HTML ──────────────────────────────────────────────────
 function _selCb(section, id) {
-  if (!window._selectMode || !window._selectMode[section]) return '';
-  const checked = window._selected[section].has(id) ? 'checked' : '';
+  const active = window._selectMode && window._selectMode[section];
+  const checked = active && window._selected[section].has(id) ? 'checked' : '';
+  // Всегда резервируем место 15px, но чекбокс видим только в selectMode
   return `<input type="checkbox" class="sel-cb" data-section="${section}" data-id="${id}"
     ${checked} onclick="event.stopPropagation();toggleSelectItem('${section}','${id}',this)"
-    style="width:15px;height:15px;flex-shrink:0;accent-color:var(--blue);cursor:pointer;position:absolute;right:calc(100% + 4px);top:50%;transform:translateY(-50%)">`;
+    style="width:15px;height:15px;flex-shrink:0;accent-color:var(--blue);cursor:pointer;${active?'':'opacity:0;pointer-events:none'}">`;
 }
 
 // ── Context menu ───────────────────────────────────────────────────
