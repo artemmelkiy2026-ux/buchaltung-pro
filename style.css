@@ -3657,7 +3657,15 @@ header { background: #fff; }
     white-space:nowrap;font-size:11px;opacity:.75;
   }
   .kunde-card-body .kunde-card-meta a:hover{ opacity:1; }
-  .kunde-card-body .sel-cb-row{ width:100%; }
+  .kunde-card-body .sel-cb-row{
+    position:absolute;bottom:0;left:18px;right:18px;
+    border-top:1px solid transparent;
+  }
+  .kunde-card-body .sel-cb-row:has(.sel-cb-on){
+    border-color:var(--border);padding-top:6px;padding-bottom:4px;
+  }
+  #kunden-list .kunde-card{ position:relative;padding-bottom:12px; }
+  #kunden-list .kunde-card:has(.sel-cb-on){ padding-bottom:32px; }
   .kunde-card-right{
     grid-column:3;grid-row:1;
     display:flex !important;flex-direction:row !important;align-items:center !important;gap:10px;flex-shrink:0;
@@ -3688,7 +3696,15 @@ header { background: #fff; }
   .prod-price-main{ grid-column:4;grid-row:1;text-align:right; }
   .prod-price-sub{ grid-column:5;grid-row:1;text-align:right;margin:0 !important; }
   .prod-actions{ grid-column:6;grid-row:1;justify-content:flex-end; }
-  .prod-info .sel-cb-row{ width:100%; }
+  .prod-info .sel-cb-row{
+    position:absolute;bottom:0;left:18px;right:18px;
+    border-top:1px solid transparent;
+  }
+  .prod-info .sel-cb-row:has(.sel-cb-on){
+    border-color:var(--border);padding-top:6px;padding-bottom:4px;
+  }
+  #produkte-list .prod-card{ position:relative;padding-bottom:10px; }
+  #produkte-list .prod-card:has(.sel-cb-on){ padding-bottom:32px; }
   #produkte-list .prod-card:hover{ background:var(--s2); box-shadow:none; }
 
   /* ── WIEDERKEHREND table ── */
