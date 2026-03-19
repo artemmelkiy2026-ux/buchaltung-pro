@@ -2333,16 +2333,25 @@ input, select, textarea {
   .ang-form-body { padding: 12px; }
   .ang-block { padding: 14px; }
   .ang-sticky-header {
-    padding: 12px 12px 12px;
-    margin: 0 0 12px;
+    padding: 12px;
+    margin: 0;
     border-bottom: none;
     position: relative;
+    gap: 8px;
+    align-items: flex-start;
+    padding-bottom: 14px;
+    margin-bottom: 14px;
   }
   .ang-sticky-header::after {
     content:'';position:absolute;bottom:0;left:12px;right:12px;
     border-bottom:1px solid var(--border);
   }
+  .ang-sticky-left { width: 100%; }
   .ang-sticky-title { font-size: 17px; }
+  .ang-sticky-right {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
   .ang-btn-txt { display: none; }
   .ang-btn-txt-short { display: inline !important; }
   .ang-info-grid { grid-template-columns: 1fr; gap: 12px; }
