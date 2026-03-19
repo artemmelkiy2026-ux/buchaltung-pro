@@ -21,7 +21,14 @@
   vertical-align: middle; /* Выравнивание по центру строки */
   margin-right: 5px;   /* Небольшой отступ от текста */
 }
-
+.ang-sticky-header::after {
+         content: "";
+        position: absolute;
+        bottom: 0px;
+        left: 15px;
+        right: 16px;
+        border-bottom: 1px solid var(--border);
+}
 .flag-circle .band {
   flex: 1;             /* Равномерно распределяет 3 полосы */
   width: 100%;
@@ -2166,8 +2173,8 @@ input, select, textarea {
   justify-content: space-between;
   gap: 16px;
   padding: 20px 20px 14px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 20px;
+  
+  
   flex-shrink: 0;
   flex-wrap: wrap;
   background: var(--bg);
