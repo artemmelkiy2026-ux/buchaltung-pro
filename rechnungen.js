@@ -1570,55 +1570,22 @@ function _mahnFaellig(r) {
 }
 
 function checkMahnungen() {
-  var dbg = document.getElementById('mahnung-debug');
-  var log = [];
   try {
     var banner = document.getElementById('dash-mahnung-banner');
-    if (!banner) { log.push('ERROR: banner element not found'); _showDbg(dbg,log); return; }
-
-    var enabled = isMahnungEnabled();
-    var rechCount = (data && data.rechnungen) ? data.rechnungen.length : 0;
-    log.push('enabled=' + enabled + ' | rechnungen=' + rechCount);
-
-    if (!enabled) {
-      banner.style.display = 'none';
-      log.push('STOPPED: disabled');
-      _showDbg(dbg,log); return;
-    }
-    if (!rechCount) {
-      banner.style.display = 'none';
-      log.push('STOPPED: no rechnungen');
-      _showDbg(dbg,log); return;
-    }
+    if (!banner) return;
+    if (!isMahnungEnabled()) { banner.style.display = 'none'; return; }
+    if (!data || !data.rechnungen || !data.rechnungen.length) { banner.style.display = 'none'; return; }
     var today = new Date().toISOString().split('T')[0];
-    log.push('today=' + today);
-
-    var uebCount = 0;
     for (var i = 0; i < data.rechnungen.length; i++) {
       var r = data.rechnungen[i];
-      if (r.status === 'offen' && r.faellig && r.faellig < today) { r.status = 'ueberfaellig'; uebCount++; }
+      if (r.status === 'offen' && r.faellig && r.faellig < today) r.status = 'ueberfaellig';
     }
-    var allUeb = data.rechnungen.filter(function(x){return x.status==='ueberfaellig'});
-    log.push('überfällig: ' + allUeb.length + ' (neu: ' + uebCount + ')');
-
-    for (var k = 0; k < allUeb.length; k++) {
-      var ru = allUeb[k];
-      var em = _getMahnEmail(ru);
-      log.push('  → ' + ru.nr + ' fällig=' + ru.faellig + ' email=' + (em||'NONE') + ' kundeId=' + (ru.kundeId||'none'));
-    }
-
     var faellige = [];
     for (var i = 0; i < data.rechnungen.length; i++) {
-      try {
-        if (_mahnFaellig(data.rechnungen[i])) faellige.push(data.rechnungen[i]);
-      } catch(err) { log.push('SKIP ERROR: ' + err.message); }
+      try { if (_mahnFaellig(data.rechnungen[i])) faellige.push(data.rechnungen[i]); }
+      catch(err) {}
     }
-    log.push('mahnFällig: ' + faellige.length);
-
-    if (!faellige.length) {
-      banner.style.display = 'none';
-      _showDbg(dbg,log); return;
-    }
+    if (!faellige.length) { banner.style.display = 'none'; return; }
     var titleEl = document.getElementById('dash-mahnung-title');
     var subEl = document.getElementById('dash-mahnung-sub');
     var total = 0;
@@ -1626,18 +1593,9 @@ function checkMahnungen() {
     if (titleEl) titleEl.textContent = faellige.length + ' Zahlungserinnerung' + (faellige.length > 1 ? 'en' : '') + ' fällig';
     if (subEl) subEl.textContent = 'Offene Forderungen: ' + fmt(total) + ' — Jetzt Mahnungen versenden';
     banner.style.display = 'flex';
-    log.push('✅ BANNER SHOWN');
-    _showDbg(dbg,log);
-  } catch(e) {
-    log.push('FATAL: ' + e.message);
-    _showDbg(dbg,log);
-  }
+  } catch(e) { console.error('[checkMahnungen]', e); }
 }
-function _showDbg(el,lines){
-  if(!el) return;
-  el.style.display='block';
-  el.textContent='[Mahnung Debug] ' + new Date().toLocaleTimeString() + '\n' + lines.join('\n');
-}
+
 
 function openMahnModal() {
   const today = new Date().toISOString().split('T')[0];
