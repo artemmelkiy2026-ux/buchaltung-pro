@@ -3504,3 +3504,72 @@ header { background: #fff; }
   background: var(--ydim);
   color: var(--yellow);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DESKTOP TABLE VIEW — cards look like table rows on wide screens
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Header row */
+.list-thead{
+  display:none; /* hidden on mobile */
+}
+
+@media(min-width:901px){
+  .list-thead{
+    display:flex;align-items:center;gap:12px;
+    padding:9px 18px;
+    font-size:11px;font-weight:600;color:var(--sub);
+    text-transform:uppercase;letter-spacing:.05em;
+    border-bottom:2px solid var(--border);
+    background:var(--s2);
+    border-radius:var(--r) var(--r) 0 0;
+  }
+  .lt-c{ flex-shrink:0; }
+
+  /* ── RECHNUNGEN table ── */
+  #rech-list{ gap:0 !important; }
+  #rech-list .rech-card{
+    display:grid;
+    grid-template-columns:40px 90px 1fr 220px 110px 110px;
+    align-items:center;
+    gap:0 12px;
+    border-radius:0;border-left:none;border-right:none;border-top:none;
+    margin:0;padding:10px 18px;
+  }
+  #rech-list .rech-card:last-child{ border-radius:0 0 var(--r) var(--r); }
+  #rech-list .rech-card-content{ display:contents; }
+  #rech-list .rech-card-row1{ display:contents; }
+  #rech-list .rech-card-row2{ display:contents; }
+  #rech-list .rech-card-avatar{ grid-column:1;grid-row:1;width:32px;height:32px;font-size:14px;margin:0; }
+  #rech-list .rech-card-nr{ grid-column:2;grid-row:1;margin:0;font-size:12px; }
+  #rech-list .rech-card-kunde{ grid-column:3;grid-row:1;font-size:13px;font-weight:500; }
+  #rech-list .rech-card-meta{ grid-column:4;grid-row:1;margin:0;gap:6px;font-size:11px; }
+  #rech-list .rech-card-betrag{ grid-column:5;grid-row:1;text-align:right;font-size:14px; }
+  #rech-list .rech-card-end{ grid-column:6;grid-row:1;justify-content:flex-end; }
+  #rech-list .sel-cb-row{ grid-column:1/-1;grid-row:2; }
+  #rech-list .rech-card:hover{ background:var(--s2);border-color:var(--border); box-shadow:none; }
+  #rech-list .rech-overdue{ font-size:10px;padding:1px 5px; }
+
+  /* ── EINTRÄGE table ── */
+  #e-tbody{ gap:0 !important; }
+  #e-tbody .ein-row{
+    display:grid;
+    grid-template-columns:1fr 220px 200px 110px 120px;
+    align-items:center;
+    gap:0 12px;
+    border-radius:0;border-left:none;border-right:none;border-top:none;
+    margin:0;padding:10px 18px;
+  }
+  #e-tbody .ein-row:last-child{ border-radius:0 0 var(--r) var(--r); }
+  #e-tbody .ein-row-body{ display:contents; }
+  #e-tbody .ein-row-content{ display:contents; }
+  #e-tbody .ein-row-head{ display:contents; }
+  #e-tbody .ein-row-mid{ display:contents; }
+  #e-tbody .ein-row-desc{ grid-column:1;grid-row:1;font-size:13px; }
+  #e-tbody .ein-row-cat{ grid-column:2;grid-row:1; }
+  #e-tbody .ein-row-tags{ grid-column:3;grid-row:1; }
+  #e-tbody .amt{ grid-column:4;grid-row:1;text-align:right;font-size:14px; }
+  #e-tbody .ein-row-pay{ grid-column:5;grid-row:1; }
+  #e-tbody .sel-cb-row{ grid-column:1/-1;grid-row:2; }
+  #e-tbody .ein-row:hover{ background:var(--s2);border-color:var(--border); box-shadow:none; }
+}

@@ -406,6 +406,13 @@
     <span id="th-mwst" style="display:none"></span>
     <span id="th-bet" style="display:none"></span>
   </div>
+  <div class="list-thead" id="ein-thead">
+    <span class="lt-c" style="flex:1">Beschreibung</span>
+    <span class="lt-c" style="width:220px">Info</span>
+    <span class="lt-c" style="width:200px">Tags</span>
+    <span class="lt-c" style="width:110px;text-align:right">Betrag</span>
+    <span class="lt-c" style="width:120px">Zahlung</span>
+  </div>
   <div id="e-tbody"></div>
   <div id="e-pagination" style="margin-top:8px"></div>
   <div id="e-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-inbox"></i></div><p>Keine Einträge gefunden</p></div>
@@ -1106,6 +1113,14 @@
     <button class="btn sort-btn" onclick="sortRech('faellig')">Fällig<span class="sort-arrow">&nbsp;</span></button>
     <button class="btn sort-btn" onclick="sortRech('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
     <button class="btn sort-btn" onclick="sortRech('kunde')">Kunde<span class="sort-arrow">&nbsp;</span></button>
+  </div>
+  <div class="list-thead" id="rech-thead">
+    <span class="lt-c" style="width:40px">Status</span>
+    <span class="lt-c" style="width:90px">Nr.</span>
+    <span class="lt-c" style="flex:1">Kunde</span>
+    <span class="lt-c" style="width:220px">Datum / Fällig</span>
+    <span class="lt-c" style="width:110px;text-align:right">Betrag</span>
+    <span class="lt-c" style="width:110px"></span>
   </div>
   <div id="rech-list"></div>
   <div id="rech-pagination"></div>
