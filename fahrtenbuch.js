@@ -84,7 +84,7 @@ async function deleteAuto(id) {
   const ok = await appConfirm('Fahrzeug löschen?', { title: 'Fahrzeug löschen', icon: '🚗', okLabel: 'Löschen', danger: true });
   if (!ok) return;
   data.fbAutos = getFbAutos().filter(a => a.id !== id);
-  saveFbAutos(data.fbAutos);
+  if (typeof sbDeleteFbAuto === 'function') sbDeleteFbAuto(id);
   renderFbAutoList();
   renderFbAutoSelect('fb-auto-filter', true);
   renderFbAutoSelect('fb-form-auto', false);

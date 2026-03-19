@@ -79,6 +79,10 @@ async function sbLoadAll() {
   var fb = { data: null, error: null };
   try { fb = await sb.from('fahrtenbuch').select('*').eq('user_id', uid).order('datum', { ascending: false }); }
   catch(e) { console.warn('[Fahrtenbuch] table not found or error:', e); }
+  // fb_autos — separate query
+  var fbAutos = { data: null, error: null };
+  try { fbAutos = await sb.from('fb_autos').select('*').eq('user_id', uid).order('kennzeichen'); }
+  catch(e) { console.warn('[fb_autos] table not found:', e); }
   const eintraege     = (ein.data  || []).map(dbToEintrag);
   // GoBD: восстанавливаем _storniert для оригиналов после перезагрузки
   const stornoOfIds = new Set(eintraege.filter(e => e.is_storno && e.storno_of).map(e => e.storno_of));
@@ -95,7 +99,8 @@ async function sbLoadAll() {
   const angebote = (ang && !ang.error && ang.data) ? ang.data.map(dbToAngebot) : [];
   const produkte = (prod && !prod.error && prod.data) ? prod.data.map(dbToProdukt) : [];
   const fahrtenbuch = (fb && !fb.error && fb.data) ? fb.data.map(dbToFahrt) : [];
-  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog, produkte, fahrtenbuch };
+  const fbAutosArr  = (fbAutos && !fbAutos.error && fbAutos.data) ? fbAutos.data.map(dbToAuto) : [];
+  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog, produkte, fahrtenbuch, fbAutos: fbAutosArr };
   } catch(err) {
     console.error('[sbLoadAll error]', err);
     return { eintraege:[], kunden:[], rechnungen:[], angebote:[], wiederkehrend:[], ustModeByYear:{}, ustEintraege:[], rechnungenLog:[], produkte:[], fahrtenbuch:[] };
@@ -374,6 +379,7 @@ function fahrtToDb(f) {
     datum: f.datum||null, abfahrt: f.abfahrt||null, ziel: f.ziel||null,
     zweck: f.zweck||null, typ: f.typ||'Geschäftlich', kennzeichen: f.kennzeichen||null,
     km_start: f.km_start||0, km_end: f.km_end||0, km: f.km||0,
+    auto_id: f.autoId||null,
   };
 }
 function dbToFahrt(r) {
@@ -381,6 +387,7 @@ function dbToFahrt(r) {
     id: r.id, datum: r.datum||'', abfahrt: r.abfahrt||'', ziel: r.ziel||'',
     zweck: r.zweck||'', typ: r.typ||'Geschäftlich', kennzeichen: r.kennzeichen||'',
     km_start: parseFloat(r.km_start)||0, km_end: parseFloat(r.km_end)||0, km: parseFloat(r.km)||0,
+    autoId: r.auto_id||'',
   };
 }
 async function sbSaveFahrt(f) {
@@ -395,6 +402,36 @@ async function sbDeleteFahrt(id) {
   try {
     await sb.from('fahrtenbuch').delete().eq('id', id).eq('user_id', currentUser.id);
   } catch(e) { console.warn('[sbDeleteFahrt]', e); }
+}
+function autoToDb(a) {
+  return {
+    id: a.id, user_id: currentUser.id,
+    kennzeichen: a.kennzeichen||'', name: a.name||null,
+    vin: a.vin||null, marke: a.marke||null,
+    km_initial: a.kmInitial||0,
+  };
+}
+function dbToAuto(r) {
+  return {
+    id: r.id, kennzeichen: r.kennzeichen||'', name: r.name||'',
+    vin: r.vin||'', marke: r.marke||'', kmInitial: parseFloat(r.km_initial)||0,
+  };
+}
+async function sbSaveFbAutos(autos) {
+  if (!currentUser) return;
+  try {
+    const rows = autos.map(a => autoToDb(a));
+    if (rows.length) {
+      const {error} = await sb.from('fb_autos').upsert(rows, {onConflict:'id'});
+      if (error) console.warn('Save fb_autos:', error.message);
+    }
+  } catch(e) { console.warn('[sbSaveFbAutos]', e); }
+}
+async function sbDeleteFbAuto(id) {
+  if (!currentUser) return;
+  try {
+    await sb.from('fb_autos').delete().eq('id', id).eq('user_id', currentUser.id);
+  } catch(e) { console.warn('[sbDeleteFbAuto]', e); }
 }
 // ── RECHNUNGEN-LOG (GoBD Variant B) ──────────────────────────────────────
 // Записывает каждое изменение рекоманды в отдельную таблицу rechnungen_log
