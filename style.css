@@ -2330,7 +2330,7 @@ input, select, textarea {
   #p-kunden-form,
   #p-produkte-form,
   #p-firma { height: auto; overflow: visible; }
-  .ang-form-body { padding: 12px; }
+  .ang-form-body { padding: 15px; }
   
   .ang-sticky-header {
     padding: 12px;
