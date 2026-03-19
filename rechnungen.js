@@ -968,6 +968,8 @@ function openFirmaModal() {
   const bodEl = document.getElementById('email-tmpl-body');
   if (subEl) subEl.value = tmpl.subject;
   if (bodEl) bodEl.value = tmpl.body;
+  // Mahnung editor
+  _populateMahnEditor();
   openModal('firma-modal');
 }
 
@@ -1084,6 +1086,8 @@ async function saveFirmaData() {
     };
     localStorage.setItem('bp_email_template', JSON.stringify(tmpl));
   }
+  // Mahnung Vorlagen speichern
+  saveMahnTemplates();
   toast('✓ Firmendaten gespeichert!', 'ok');
   closeModal('firma-modal');
 }
@@ -1114,6 +1118,83 @@ function resetEmailTemplate() {
   if (subEl) subEl.value = tmpl.subject;
   if (bodEl) bodEl.value = tmpl.body;
   toast('✓ E-Mail Vorlage zurückgesetzt', 'ok');
+}
+
+// ── MAHNUNG TEMPLATES ────────────────────────────────────────────────────
+
+const MAHN_DEFAULTS = [
+  {
+    subject: 'Zahlungserinnerung — Rechnung {{NR}}',
+    body: 'Sehr geehrte Damen und Herren,\n\nhiermit möchten wir Sie freundlich daran erinnern, dass die Rechnung Nr. {{NR}} über {{BETRAG}} seit dem {{FAELLIG}} fällig ist.\n\nBitte überweisen Sie den offenen Betrag innerhalb der nächsten 7 Tage.\n\nSollte sich Ihre Zahlung mit diesem Schreiben gekreuzt haben, betrachten Sie diese Erinnerung bitte als gegenstandslos.\n\nMit freundlichen Grüßen\n{{FIRMA}}'
+  },
+  {
+    subject: '2. Mahnung — Rechnung {{NR}}',
+    body: 'Sehr geehrte Damen und Herren,\n\ntrotz unserer ersten Erinnerung ist die Rechnung Nr. {{NR}} über {{BETRAG}} weiterhin offen (fällig seit {{FAELLIG}}, {{TAGE}} Tage überfällig).\n\nWir bitten Sie dringend, den Betrag umgehend zu begleichen.\n\nMit freundlichen Grüßen\n{{FIRMA}}'
+  },
+  {
+    subject: '{{STUFE}}. Mahnung — Rechnung {{NR}}',
+    body: 'Sehr geehrte Damen und Herren,\n\ndie Rechnung Nr. {{NR}} über {{BETRAG}} ist seit {{TAGE}} Tagen überfällig (Fälligkeitsdatum: {{FAELLIG}}).\n\nDies ist unsere {{STUFE}}. Mahnung. Wir fordern Sie letztmalig auf, den offenen Betrag innerhalb von 5 Werktagen zu überweisen.\n\nAndernfalls behalten wir uns weitere rechtliche Schritte vor.\n\nMit freundlichen Grüßen\n{{FIRMA}}'
+  }
+];
+
+function isMahnungEnabled() {
+  try { return JSON.parse(localStorage.getItem('bp_mahnung_enabled') || 'false'); }
+  catch(e) { return false; }
+}
+
+function getMahnTemplates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('bp_mahnung_templates') || '[]');
+    return [0,1,2].map(i => ({
+      subject: (saved[i] && saved[i].subject) || MAHN_DEFAULTS[i].subject,
+      body:    (saved[i] && saved[i].body)    || MAHN_DEFAULTS[i].body,
+    }));
+  } catch(e) { return MAHN_DEFAULTS.map(d => ({...d})); }
+}
+
+function saveMahnTemplates() {
+  const tmpls = [1,2,3].map(i => ({
+    subject: (document.getElementById('mahn-subject-'+i)||{}).value || '',
+    body:    (document.getElementById('mahn-body-'+i)||{}).value    || '',
+  }));
+  localStorage.setItem('bp_mahnung_templates', JSON.stringify(tmpls));
+}
+
+function resetMahnTemplates() {
+  localStorage.removeItem('bp_mahnung_templates');
+  _populateMahnEditor();
+  toast('✓ Mahnung-Vorlagen zurückgesetzt', 'ok');
+}
+
+function toggleMahnSection() {
+  const on = document.getElementById('mahnung-enabled')?.checked;
+  localStorage.setItem('bp_mahnung_enabled', JSON.stringify(!!on));
+  const sec = document.getElementById('mahnung-settings');
+  if (sec) sec.style.display = on ? '' : 'none';
+}
+
+function setMahnTab(n) {
+  [1,2,3].forEach(i => {
+    const tab = document.getElementById('mahn-tab-'+i);
+    const panel = document.getElementById('mahn-panel-'+i);
+    if (tab) tab.classList.toggle('active', i === n);
+    if (panel) panel.style.display = i === n ? '' : 'none';
+  });
+}
+
+function _populateMahnEditor() {
+  const tmpls = getMahnTemplates();
+  [1,2,3].forEach(i => {
+    const subEl = document.getElementById('mahn-subject-'+i);
+    const bodEl = document.getElementById('mahn-body-'+i);
+    if (subEl) subEl.value = tmpls[i-1].subject;
+    if (bodEl) bodEl.value = tmpls[i-1].body;
+  });
+  const enEl = document.getElementById('mahnung-enabled');
+  if (enEl) enEl.checked = isMahnungEnabled();
+  const sec = document.getElementById('mahnung-settings');
+  if (sec) sec.style.display = isMahnungEnabled() ? '' : 'none';
+  setMahnTab(1);
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1468,6 +1549,11 @@ function _mahnFaellig(r) {
 }
 
 function checkMahnungen() {
+  const banner = document.getElementById('dash-mahnung-banner');
+  if (!isMahnungEnabled()) {
+    if (banner) banner.style.display = 'none';
+    return;
+  }
   const today = new Date().toISOString().split('T')[0];
   // Überfällig-Status aktualisieren
   (data.rechnungen || []).forEach(r => {
@@ -1475,7 +1561,6 @@ function checkMahnungen() {
   });
   const faellige = (data.rechnungen || []).filter(r => _mahnFaellig(r));
   // Banner auf Dashboard
-  const banner = document.getElementById('dash-mahnung-banner');
   if (!faellige.length) {
     if (banner) banner.style.display = 'none';
     return;
@@ -1603,34 +1688,22 @@ function _sendMahnung(r) {
 
   const stufe = _getMahnStufe(r);
   const overdueDays = Math.floor((new Date() - new Date(r.faellig)) / 864e5);
+  const tmpls = getMahnTemplates();
+  const idx = Math.min(stufe, 2); // 0, 1, or 2
 
-  // Mahnung-Text je nach Stufe
-  let betreff, text;
-  if (stufe === 0) {
-    betreff = `Zahlungserinnerung — Rechnung ${r.nr}`;
-    text = `Sehr geehrte Damen und Herren,\n\n` +
-      `hiermit möchten wir Sie freundlich daran erinnern, dass die Rechnung Nr. ${r.nr} ` +
-      `über ${fmt(r.betrag)} seit dem ${fd(r.faellig)} fällig ist.\n\n` +
-      `Bitte überweisen Sie den offenen Betrag innerhalb der nächsten 7 Tage.\n\n` +
-      `Sollte sich Ihre Zahlung mit diesem Schreiben gekreuzt haben, betrachten Sie diese Erinnerung bitte als gegenstandslos.\n\n` +
-      `Mit freundlichen Grüßen\n${firma.name || ''}`;
-  } else if (stufe === 1) {
-    betreff = `2. Mahnung — Rechnung ${r.nr}`;
-    text = `Sehr geehrte Damen und Herren,\n\n` +
-      `trotz unserer ersten Erinnerung ist die Rechnung Nr. ${r.nr} ` +
-      `über ${fmt(r.betrag)} weiterhin offen (fällig seit ${fd(r.faellig)}, ${overdueDays} Tage überfällig).\n\n` +
-      `Wir bitten Sie dringend, den Betrag umgehend zu begleichen.\n\n` +
-      `Mit freundlichen Grüßen\n${firma.name || ''}`;
-  } else {
-    betreff = `${stufe + 1}. Mahnung — Rechnung ${r.nr}`;
-    text = `Sehr geehrte Damen und Herren,\n\n` +
-      `die Rechnung Nr. ${r.nr} über ${fmt(r.betrag)} ist seit ${overdueDays} Tagen überfällig ` +
-      `(Fälligkeitsdatum: ${fd(r.faellig)}).\n\n` +
-      `Dies ist unsere ${stufe + 1}. Mahnung. Wir fordern Sie letztmalig auf, ` +
-      `den offenen Betrag innerhalb von 5 Werktagen zu überweisen.\n\n` +
-      `Andernfalls behalten wir uns weitere rechtliche Schritte vor.\n\n` +
-      `Mit freundlichen Grüßen\n${firma.name || ''}`;
+  function fillVars(tpl) {
+    return tpl
+      .replace(/\{\{NR\}\}/g,      r.nr||'')
+      .replace(/\{\{KUNDE\}\}/g,   r.kunde||'')
+      .replace(/\{\{BETRAG\}\}/g,  fmt(r.betrag))
+      .replace(/\{\{FAELLIG\}\}/g, r.faellig ? fd(r.faellig) : '')
+      .replace(/\{\{FIRMA\}\}/g,   firma.name||'')
+      .replace(/\{\{TAGE\}\}/g,    String(overdueDays))
+      .replace(/\{\{STUFE\}\}/g,   String(stufe + 1));
   }
+
+  const betreff = fillVars(tmpls[idx].subject);
+  const text    = fillVars(tmpls[idx].body);
 
   // Mahnung-Historie aktualisieren
   if (!r.mahnung_history) r.mahnung_history = [];

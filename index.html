@@ -2058,6 +2058,43 @@
       <label>E-Mail Text</label>
       <textarea id="email-tmpl-body" rows="7" style="font-family:monospace;font-size:12px" placeholder="Sehr geehrte Damen und Herren..."></textarea>
     </div>
+    <!-- Zahlungserinnerungen (Mahnung) -->
+    <div style="border-top:1px solid var(--border);margin:14px 0 10px;padding-top:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.5px"><i class="fas fa-bell"></i> Zahlungserinnerungen</span>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--sub)">
+          <input type="checkbox" id="mahnung-enabled" onchange="toggleMahnSection()" style="width:15px;height:15px;accent-color:var(--blue)"> Aktiviert
+        </label>
+      </div>
+      <p style="font-size:11px;color:var(--sub);margin:6px 0 0">Automatische Erinnerungen bei überfälligen Rechnungen (alle 7 Tage)</p>
+    </div>
+    <div id="mahnung-settings" style="display:none">
+      <p style="font-size:11px;color:var(--sub);margin:8px 0 10px">Variablen: <code>{{NR}}</code> <code>{{KUNDE}}</code> <code>{{BETRAG}}</code> <code>{{FAELLIG}}</code> <code>{{FIRMA}}</code> <code>{{TAGE}}</code> <code>{{STUFE}}</code></p>
+      <!-- Tabs -->
+      <div style="display:flex;gap:4px;margin-bottom:12px">
+        <button class="btn sort-btn active" id="mahn-tab-1" onclick="setMahnTab(1)" style="flex:1;justify-content:center">1. Mahnung</button>
+        <button class="btn sort-btn" id="mahn-tab-2" onclick="setMahnTab(2)" style="flex:1;justify-content:center">2. Mahnung</button>
+        <button class="btn sort-btn" id="mahn-tab-3" onclick="setMahnTab(3)" style="flex:1;justify-content:center">3. Mahnung</button>
+      </div>
+      <!-- Stufe 1 -->
+      <div id="mahn-panel-1">
+        <div class="fg"><label>Betreff</label><input type="text" id="mahn-subject-1" placeholder="Zahlungserinnerung — Rechnung {{NR}}"></div>
+        <div class="fg"><label>Text</label><textarea id="mahn-body-1" rows="6" style="font-family:monospace;font-size:12px" placeholder="Freundliche Erinnerung..."></textarea></div>
+      </div>
+      <!-- Stufe 2 -->
+      <div id="mahn-panel-2" style="display:none">
+        <div class="fg"><label>Betreff</label><input type="text" id="mahn-subject-2" placeholder="2. Mahnung — Rechnung {{NR}}"></div>
+        <div class="fg"><label>Text</label><textarea id="mahn-body-2" rows="6" style="font-family:monospace;font-size:12px" placeholder="Dringende Zahlungsaufforderung..."></textarea></div>
+      </div>
+      <!-- Stufe 3 -->
+      <div id="mahn-panel-3" style="display:none">
+        <div class="fg"><label>Betreff</label><input type="text" id="mahn-subject-3" placeholder="Letzte Mahnung — Rechnung {{NR}}"></div>
+        <div class="fg"><label>Text</label><textarea id="mahn-body-3" rows="6" style="font-family:monospace;font-size:12px" placeholder="Letztmalige Zahlungsaufforderung..."></textarea></div>
+      </div>
+      <div style="text-align:right;margin-bottom:4px">
+        <button onclick="resetMahnTemplates()" style="background:none;border:none;font-size:11px;color:var(--sub);cursor:pointer;text-decoration:underline">Vorlagen zurücksetzen</button>
+      </div>
+    </div>
     <!-- Buttons -->
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn primary" style="flex:1;padding:11px" onclick="saveFirmaData()"><i class="fas fa-save"></i> Speichern</button>
