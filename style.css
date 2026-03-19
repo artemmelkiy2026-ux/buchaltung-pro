@@ -3786,7 +3786,7 @@ header { background: #fff; }
 }
 .fb-row-meta{
   grid-column:2;grid-row:2;
-  display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--sub);
+  display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--sub);line-height: 1.1;
 }
 .fb-row-meta span{ display:flex;align-items:center;gap:3px;white-space:nowrap; }
 
