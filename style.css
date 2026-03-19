@@ -3527,7 +3527,7 @@ header { background: #fff; }
     font-size:11px;font-weight:600;color:var(--sub);
     text-transform:uppercase;letter-spacing:.05em;
    
-    background:var(--s2);
+    background:#fafafa;
     border-radius:var(--r) var(--r) 0 0;
   }
   .lt-c{ flex-shrink:0; }
@@ -3577,5 +3577,5 @@ header { background: #fff; }
   #e-tbody .amt{ grid-column:4;grid-row:1;text-align:right;font-size:14px; }
   #e-tbody .ein-row-pay{ grid-column:5;grid-row:1; }
   #e-tbody .sel-cb-row{ grid-column:1/-1;grid-row:2; }
-  #e-tbody .ein-row:hover{ background:var(--s2);border-color:var(--border); box-shadow:none; }
+  #e-tbody .ein-row:hover{ background:#fafafa;border-color:var(--border); box-shadow:none; }
 }
