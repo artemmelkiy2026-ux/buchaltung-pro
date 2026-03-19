@@ -1847,7 +1847,7 @@
       <div class="ph-sub">Geschäftliche &amp; private Fahrten · §6 EStG</div>
     </div>
     <div class="ph-right">
-      <select id="fb-yr" onchange="renderFahrtenbuch()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:13px"><option value="Alle">Alle Jahre</option></select>
+      <select id="fb-yr" onchange="renderFahrtenbuch()"><option value="Alle">Alle Jahre</option></select>
       <button class="btn" onclick="openModal('auto-modal-list')"><i class="fas fa-car"></i><span class="ang-btn-txt"> Fahrzeuge</span></button>
       <button class="btn primary" onclick="openFahrtForm()"><i class="fas fa-plus"></i><span class="ang-btn-txt"> Neue Fahrt</span></button>
     </div>
@@ -1856,7 +1856,7 @@
   <!-- Fahrzeug-Filter -->
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
     <i class="fas fa-car" style="color:var(--sub);font-size:12px;flex-shrink:0"></i>
-    <select id="fb-auto-filter" onchange="renderFahrtenbuch()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:13px;max-width:240px">
+    <select id="fb-auto-filter" onchange="renderFahrtenbuch()">
       <option value="">Alle Fahrzeuge</option>
     </select>
   </div>
@@ -1906,7 +1906,7 @@
     <div class="ang-block">
       <div class="ang-block-label">Fahrzeug</div>
       <div style="display:flex;align-items:center;gap:8px;max-width:480px">
-        <select id="fb-form-auto" onchange="_onFbAutoChange()" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:9px 12px;font-size:13px">
+        <select id="fb-form-auto" onchange="_onFbAutoChange()">
           <option value="">— Fahrzeug wählen —</option>
         </select>
         <button class="btn" onclick="openAutoModal(null)" style="white-space:nowrap;flex-shrink:0"><i class="fas fa-plus"></i> Neu</button>
