@@ -50,7 +50,6 @@ function renderProdukte() {
 
   list.innerHTML = items.map(p => `
     <div class="prod-card" ${window._selectMode?.['produkte'] ? '' : `onclick="openProduktModal('${p.id}')"`} style="cursor:${window._selectMode?.['produkte']?'default':'pointer'}">
-      ${_selCb('produkte', p.id)}
       <div class="prod-card-left">
         <div class="prod-avatar" style="background:${katColor(p.kategorie)}22;color:${katColor(p.kategorie)}">
           <i class="fas ${katIcon(p.kategorie)}"></i>
@@ -63,6 +62,7 @@ function renderProdukte() {
             <span>${p.ust ?? 19}% USt.</span>
             ${p.beschreibung ? `<span style="color:var(--sub);font-style:italic">${p.beschreibung.slice(0,40)}${p.beschreibung.length>40?'…':''}</span>` : ''}
           </div>
+          <div class="sel-cb-row">${_selCb('produkte', p.id)}</div>
         </div>
       </div>
       <div class="prod-card-right">

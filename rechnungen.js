@@ -115,7 +115,6 @@ function renderRech(){
     const _rDaysSince = r.datum ? Math.floor((Date.now()-new Date(r.datum))/(864e5)) : null;
     const _rAgeLabel = _rDaysSince===0?'Heute':_rDaysSince===1?'Gestern':_rDaysSince!==null?`vor ${_rDaysSince} Tagen`:'';
     return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" ${_rClick} style="cursor:${_rSelMode?'default':'pointer'}">
-      <div class="rech-card-cb">${_selCb('rechnungen', r.id)}</div>
       <div class="rech-card-avatar ${st.cls}">
         <i class="${st.icon}"></i>
       </div>
@@ -148,6 +147,7 @@ function renderRech(){
           ${overdueTxt}
           ${_rPosCount?`<span style="color:var(--sub)">·</span><span style="font-size:10px;color:var(--sub)"><i class="fas fa-list" style="opacity:.5;width:10px"></i>${_rPosCount} Pos.</span>`:''}
         </div>
+        <div class="sel-cb-row">${_selCb('rechnungen', r.id)}</div>
       </div>
     </div>`;
   }).join('');

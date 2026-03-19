@@ -89,8 +89,7 @@ function _rerender(section) {
 function _selCb(section, id) {
   const active = window._selectMode && window._selectMode[section];
   const checked = active && window._selected[section].has(id) ? 'checked' : '';
-  // Всегда резервируем место 15px, но чекбокс видим только в selectMode
-  return `<input type="checkbox" class="sel-cb" data-section="${section}" data-id="${id}"
+  return `<input type="checkbox" class="sel-cb${active?' sel-cb-on':''}" data-section="${section}" data-id="${id}"
     ${checked} onclick="event.stopPropagation();toggleSelectItem('${section}','${id}',this)"
     style="width:15px;height:15px;flex-shrink:0;accent-color:var(--blue);cursor:pointer;${active?'':'opacity:0;pointer-events:none'}">`;
 }

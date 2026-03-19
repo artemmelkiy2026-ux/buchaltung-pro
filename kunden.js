@@ -56,7 +56,6 @@ function renderWied(){
     const _wJahres = w.betrag * (_wMultiplier[w.intervall]||1);
     return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'}">
       <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
-        <div style="flex-shrink:0">${_selCb('wiederkehrend', w.id)}</div>
         <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
           <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
         </div>
@@ -80,6 +79,7 @@ function renderWied(){
             ${_wBookedCount>0?`<span style="font-size:11px;color:var(--sub)"><i class="fas fa-history" style="font-size:10px;margin-right:2px"></i>${_wBookedCount}× gebucht</span>`:''}
             <span style="font-size:11px;color:var(--sub)"><i class="fas fa-calendar-check" style="font-size:10px;margin-right:2px"></i>≈ ${fmt(_wJahres)}/Jahr</span>
           </div>
+          <div class="sel-cb-row">${_selCb('wiederkehrend', w.id)}</div>
         </div>
       </div>
       <div class="wied-card-right">

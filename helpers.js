@@ -245,7 +245,6 @@ function renderKunden(){
     const _kCb = _kSelMode ? _selCb('kunden', k.id) : '';
     const _kClick = _kSelMode ? '' : `onclick="showKundeRechnungen('${k.id}')"`;
     return `<div class="kunde-card" ${_kClick} style="cursor:${_kSelMode?'default':'pointer'}">
-      <div style="display:flex;align-items:center;padding-left:4px">${_selCb('kunden', k.id)}</div>
       <div class="kunde-card-avatar">${initials}</div>
       <div class="kunde-card-body">
         <div class="kunde-card-name">${k.name||'—'}</div>
@@ -255,6 +254,7 @@ function renderKunden(){
           ${k.tel?`<span class="kunde-meta-item"><i class="fas fa-phone"></i> ${k.tel}</span>`:''}
           ${k.ort?`<span class="kunde-meta-item"><i class="fas fa-map-marker-alt"></i> ${k.plz?k.plz+' ':''}${k.ort}</span>`:''}
         </div>
+        <div class="sel-cb-row">${_selCb('kunden', k.id)}</div>
       </div>
       <div class="kunde-card-right">
         ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div><div class="kunde-rech-cnt">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:'<div class="kunde-rech-cnt" style="color:var(--muted)">Keine Rechnungen</div>'}
