@@ -98,6 +98,7 @@
     <div class="mob-drawer-group-body">
       <div class="mob-drawer-child" onclick="mobNavDrawer('eintraege')">Einträge</div>
       <div class="mob-drawer-child" onclick="mobNavDrawer('wiederkehrend')">Wiederkehrend</div>
+      <div class="mob-drawer-child" onclick="mobNavDrawer('fahrtenbuch')">Fahrtenbuch</div>
     </div>
   </div>
 
@@ -198,6 +199,7 @@
   <div class="nav-group-children" id="buchen-group">
     <div class="nav-item nav-child" onclick="nav('eintraege',this)">Einträge</div>
     <div class="nav-item nav-child" onclick="nav('wiederkehrend',this)">Wiederkehrend</div>
+    <div class="nav-item nav-child" onclick="nav('fahrtenbuch',this)">Fahrtenbuch</div>
   </div>
 
   <!-- Aufträge — раскрывающаяся группа -->
@@ -1835,6 +1837,92 @@
     </div>
   </div>
 </div>
+<!-- ── FAHRTENBUCH ── -->
+<div class="page" id="p-fahrtenbuch">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Fahrtenbuch</div>
+      <div class="ph-sub">Geschäftliche &amp; private Fahrten · §6 EStG</div>
+    </div>
+    <div class="ph-right">
+      <select id="fb-yr" onchange="renderFahrtenbuch()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:13px"><option>Alle Jahre</option></select>
+      <button class="btn primary" onclick="openFahrtForm()"><i class="fas fa-plus"></i><span class="ang-btn-txt"> Neue Fahrt</span></button>
+    </div>
+  </div>
+  <div class="stats" id="fb-stats" style="grid-template-columns:repeat(4,1fr)"></div>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
+    <button class="btn sort-btn" onclick="sortFb('datum')">Datum<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortFb('km')">Kilometer<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortFb('typ')">Typ<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortFb('ziel')">Ziel<span class="sort-arrow">&nbsp;</span></button>
+  </div>
+  <div class="list-thead" id="fb-thead">
+    <span class="lt-c" style="width:36px"></span>
+    <span class="lt-c" style="flex:1">Strecke</span>
+    <span class="lt-c" style="width:220px">Details</span>
+    <span class="lt-c" style="width:100px;text-align:right">Kilometer</span>
+    <span class="lt-c" style="width:50px"></span>
+  </div>
+  <div id="fb-list"></div>
+  <div id="fb-pagination"></div>
+  <div id="fb-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-car"></i></div><p>Keine Fahrten eingetragen</p><p style="font-size:12px;color:var(--sub)">Erste Fahrt erfassen →</p></div>
+</div>
+</div>
+
+<!-- ── FAHRTENBUCH FORM ── -->
+<div class="page" id="p-fahrtenbuch-form">
+  <div class="ang-sticky-header">
+    <div class="ang-sticky-left">
+      <div id="fb-form-title" class="ang-sticky-title">Neue Fahrt</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Fahrt im Fahrtenbuch erfassen</div>
+    </div>
+    <div class="ang-sticky-right">
+      <button class="btn primary" onclick="saveFahrt()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
+      <button class="btn ang-back-btn" onclick="closeFahrtForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
+    </div>
+  </div>
+  <div class="ang-form-body">
+    <div class="ang-block">
+      <div class="ang-block-label">Fahrtdaten</div>
+      <div class="fgrow c2">
+        <div class="fg"><label>Datum *</label><input type="date" id="fb-datum"></div>
+        <div class="fg"><label>Fahrttyp *</label>
+          <select id="fb-typ" style="width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:9px 12px;font-size:13px">
+            <option value="Geschäftlich">🔵 Geschäftlich</option>
+            <option value="Privat">⚫ Privat</option>
+            <option value="Arbeitsweg">🟡 Arbeitsweg</option>
+          </select>
+        </div>
+      </div>
+      <div class="fgrow c2">
+        <div class="fg"><label>Abfahrtsort *</label><input type="text" id="fb-abfahrt" placeholder="z.B. Worms, Büro"></div>
+        <div class="fg"><label>Zielort *</label><input type="text" id="fb-ziel" placeholder="z.B. Mannheim, Kunde XY"></div>
+      </div>
+      <div class="fg"><label>Zweck der Fahrt</label><input type="text" id="fb-zweck" placeholder="z.B. Kundentermin, Materialtransport"></div>
+    </div>
+    <div class="ang-block">
+      <div class="ang-block-label">Kilometerstand</div>
+      <div class="fgrow c2">
+        <div class="fg"><label>km-Stand Abfahrt *</label><input type="number" id="fb-km-start" step="0.1" placeholder="z.B. 45230" oninput="_calcFbKm()"></div>
+        <div class="fg"><label>km-Stand Ankunft *</label><input type="number" id="fb-km-end" step="0.1" placeholder="z.B. 45278" oninput="_calcFbKm()"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--s2);border-radius:var(--r);margin-top:8px">
+        <i class="fas fa-route" style="font-size:18px;color:var(--blue)"></i>
+        <div>
+          <div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Gefahrene Strecke</div>
+          <div id="fb-km" style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text)">0,0 km</div>
+        </div>
+      </div>
+    </div>
+    <div class="ang-block">
+      <div class="ang-block-label">Fahrzeug</div>
+      <div class="fg" style="margin:0"><label>Kennzeichen</label><input type="text" id="fb-kennzeichen" placeholder="z.B. WO-AB 123" style="text-transform:uppercase"></div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /main -->
 <!-- ── MONATSDETAIL MODAL ── -->
 <div class="modal-bg" id="mon-modal">
@@ -2157,6 +2245,7 @@
 <script src="angebote.js"></script>
 <script src="produkte.js"></script>
 <script src="kunden.js"></script>
+<script src="fahrtenbuch.js"></script>
 <script src="journal.js"></script>
 <script src="umsatzsteuer.js"></script>
 <script src="custom-ui.js"></script>

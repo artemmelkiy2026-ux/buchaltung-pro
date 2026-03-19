@@ -2130,6 +2130,7 @@ input, select, textarea {
 #p-rechnungen-form,
 #p-kunden-form,
 #p-produkte-form,
+#p-fahrtenbuch-form,
 #p-firma {
   display: none;
   flex-direction: column;
@@ -2142,6 +2143,7 @@ input, select, textarea {
 #p-rechnungen-form.active,
 #p-kunden-form.active,
 #p-produkte-form.active,
+#p-fahrtenbuch-form.active,
 #p-firma.active { display: flex; }
 
 /* Иконки статусов в карточках — 18px */
@@ -2336,6 +2338,7 @@ input, select, textarea {
   #p-rechnungen-form,
   #p-kunden-form,
   #p-produkte-form,
+  #p-fahrtenbuch-form,
   #p-firma { height: auto; overflow: visible; }
   .ang-form-body { padding: 15px; }
   
@@ -3742,10 +3745,82 @@ header { background: #fff; }
 #ang-pagination,
 #kunden-pagination,
 #wied-pagination,
-#produkte-pagination{
+#produkte-pagination,
+#fb-pagination{
   position:sticky;bottom:0;z-index:10;
   background:var(--bg);
   padding:10px 0 4px;
   margin-top:8px;
   border-top:1px solid var(--border);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FAHRTENBUCH
+   ══════════════════════════════════════════════════════════════════════════ */
+.fb-row{
+  display:flex;align-items:center;gap:14px;
+  background:var(--s1);border:1px solid var(--border);border-bottom:none;
+  padding:14px 18px;transition:background .12s;
+}
+.fb-row:first-child{ border-radius:var(--r) var(--r) 0 0; }
+.fb-row:last-of-type{ border-bottom:1px solid var(--border); }
+.fb-row:hover{ background:var(--s2); }
+
+.fb-row-left{
+  flex:1;min-width:0;
+  display:grid;grid-template-columns:36px 1fr;gap:3px 12px;
+}
+.fb-row-icon{
+  grid-column:1;grid-row:1/3;align-self:center;
+  width:32px;height:32px;border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.fb-row-name{
+  grid-column:2;grid-row:1;
+  font-size:14px;font-weight:600;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.fb-row-typ{
+  font-size:10px;font-weight:600;flex-shrink:0;
+}
+.fb-row-meta{
+  grid-column:2;grid-row:2;
+  display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--sub);
+}
+.fb-row-meta span{ display:flex;align-items:center;gap:3px;white-space:nowrap; }
+
+.fb-row-right{
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;
+}
+.fb-row-km{
+  font-family:var(--mono);font-size:15px;font-weight:700;white-space:nowrap;
+}
+.fb-row-actions{ display:flex;gap:3px; }
+
+/* Desktop table view */
+@media(min-width:901px){
+  #fb-list .fb-row{
+    display:grid !important;
+    grid-template-columns:36px 1fr 220px 100px 50px;
+    align-items:center;gap:0 12px;
+    border-radius:0;border-left:none;border-right:none;border-top:none;
+    margin:0;padding:10px 18px;
+  }
+  #fb-list .fb-row:last-of-type{ border-radius:0 0 var(--r) var(--r);border-bottom:none; }
+  .fb-row-left{ display:contents !important; }
+  .fb-row-right{ display:contents !important; }
+  .fb-row-icon{ grid-column:1;grid-row:1; }
+  .fb-row-name{ grid-column:2;grid-row:1;font-size:13px; }
+  .fb-row-meta{ grid-column:3;grid-row:1; }
+  .fb-row-km{ grid-column:4;grid-row:1;text-align:right;font-size:14px; }
+  .fb-row-actions{ grid-column:5;grid-row:1;justify-content:flex-end; }
+}
+
+/* Mobile adjustments */
+@media(max-width:600px){
+  .fb-row{ padding:12px 14px;gap:10px; }
+  .fb-row-name{ font-size:13px; }
+  .fb-row-km{ font-size:14px; }
+  #fb-stats{ grid-template-columns:repeat(2,1fr) !important; }
 }

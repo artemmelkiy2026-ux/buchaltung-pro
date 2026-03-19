@@ -90,6 +90,7 @@ window.addEventListener('supabase-ready', () => {
   if (!data.ustModeByYear) data.ustModeByYear = {};
   if (!data.wiederkehrend) data.wiederkehrend = [];
   if (!data.rechnungenLog) data.rechnungenLog = [];
+  if (!data.fahrtenbuch) data.fahrtenbuch = [];
   // Migrate old ustMode
   if (data.ustMode) {
     const oldMode = data.ustMode;
@@ -138,6 +139,8 @@ function openNavGroupIfNeeded(id) {
     'neu':           'buchen-group',
     'eintraege':     'buchen-group',
     'wiederkehrend': 'buchen-group',
+    'fahrtenbuch':   'buchen-group',
+    'fahrtenbuch-form':'buchen-group',
     'angebote':      'auftraege-group',
     'angebote-form': 'auftraege-group',
     'rechnungen':    'auftraege-group',
@@ -283,7 +286,7 @@ function activeEintraegeMitRech(yr) {
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────
-const FORM_PAGES = ['angebote-form','rechnungen-form','kunden-form','produkte-form','neu','wiedform','firma'];
+const FORM_PAGES = ['angebote-form','rechnungen-form','kunden-form','produkte-form','neu','wiedform','firma','fahrtenbuch-form'];
 function nav(id, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   openNavGroupIfNeeded(id);
@@ -311,6 +314,7 @@ function nav(id, el){
   if(id==='produkte-form') { /* форма готова */ }
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
+  if(id==='fahrtenbuch') renderFahrtenbuch();
   if(id==='eintraege') renderEin();
   if(id==='neu') updateNeuToolbar(false);
 }
