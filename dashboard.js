@@ -848,20 +848,13 @@ function renderEin(){
           : '<span style="font-size:10px;color:var(--blue);font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' VSt ('+mwstRate+'%)</span>')
         : '';
       
-      const _selMode = window._selectMode && window._selectMode['eintraege'];
-      const _cb = _selMode ? _selCb('eintraege', e.id) : '';
-      const _clickAttr = _selMode ? '' : (!st ? `onclick="editE(event,'${e.id}')"` : '');
-      const _mobBtn = !_selMode && isMob() && !st
+      const _clickAttr = !st ? `onclick="editE(event,'${e.id}')"` : '';
+      const _mobBtn = isMob() && !st
         ? _moreBtn([
             {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
             {icon:'fa-times',  label:'Stornieren', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
           ])
         : '';
-      // Layout:
-      // Desktop: [icon] [desc] [time·kat·mwst] [badges·nr·date] →→ [amount] [payment] [⋮]
-      // Mobile:  [icon]  desc .......................... amount
-      //                  time · kat · mwst        payment  ⋮
-      //                  [●badge] [Nr.XX] date
 
       const _catLine = ''
         +(e.created_at ? '<span class="ein-row-time">'+fdt(e.created_at).slice(11)+'</span><span class="ein-row-sep">·</span>' : '')
@@ -874,7 +867,7 @@ function renderEin(){
         +(e.belegnr ? '<span class="ein-row-nr">Nr.'+e.belegnr+'</span>' : '')
         +'<span class="ein-row-date">'+fd(e.datum)+'</span>';
 
-      return '<div class="ein-row'+(st?' ein-row-st':'')+(_selMode?' ein-row-selmode':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':_selMode?'default':'pointer')+'">'
+      return '<div class="ein-row'+(st?' ein-row-st':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':'pointer')+'">'
         +'<div class="ein-row-body">'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
@@ -891,7 +884,6 @@ function renderEin(){
             +'<div class="ein-row-tags">'+_tagLine+'</div>'
           +'</div>'
         +'</div>'
-        +'<div class="sel-cb-abs">'+_selCb('eintraege', e.id)+'</div>'
         +'</div>';
     }).join('');
     

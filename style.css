@@ -170,19 +170,14 @@ header{display:none}
 .sort-btn.active{border-color:var(--blue) !important;color:var(--blue) !important;background:transparent !important;font-weight:600}
 .sort-arrow{display:inline-block;width:12px;text-align:center;font-size:10px}
 /* ── Selection checkbox row (bottom of card) ── */
-/* Inline checkbox (Auswählen) — unified left-side positioning */
+/* Inline checkbox (Auswählen) — only Kunden & Produkte */
 .sel-cb-abs{
   position:absolute;left:6px;top:50%;transform:translateY(-50%);
   z-index:5;display:flex;align-items:center;
 }
-.ein-row, .rech-card, .ang-card, .wied-card, .kunde-card, .prod-card{
+.kunde-card, .prod-card{
   position:relative;
 }
-/* When select mode active, shift content right */
-.ein-row:has(.sel-cb-on),
-.rech-card:has(.sel-cb-on),
-.ang-card:has(.sel-cb-on),
-.wied-card:has(.sel-cb-on),
 .kunde-card:has(.sel-cb-on),
 .prod-card:has(.sel-cb-on){
   padding-left:36px !important;
@@ -3463,8 +3458,7 @@ header { background: #fff; }
 .sel-cb:hover { transform: scale(1.1); }
 
 /* Row in select mode */
-.ein-row-selmode { cursor: default !important; }
-.ein-row-selmode:hover { background: var(--s1) !important; box-shadow: none !important; }
+
 
 /* Mobile ⋮ button */
 .mob-more-btn {

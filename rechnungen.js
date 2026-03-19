@@ -107,14 +107,13 @@ function renderRech(){
     );
     const stornoBadge = _rechStorno.length > 0
       ? `<span class="badge-storno" style="font-size:10px;padding:2px 6px;border-radius:4px">↩ Storniert</span>` : '';
-    const _rSelMode = window._selectMode && window._selectMode['rechnungen'];
-    const _rClick = _rSelMode ? '' : `onclick="editRech('${r.id}')"`;
+    const _rClick = `onclick="editRech('${r.id}')"`;
     // Anzahl Positionen
     const _rPosCount = (r.positionen||[]).length;
     // Wie alt ist die Rechnung?
     const _rDaysSince = r.datum ? Math.floor((Date.now()-new Date(r.datum))/(864e5)) : null;
     const _rAgeLabel = _rDaysSince===0?'Heute':_rDaysSince===1?'Gestern':_rDaysSince!==null?`vor ${_rDaysSince} Tagen`:'';
-    return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" ${_rClick} style="cursor:${_rSelMode?'default':'pointer'}">
+    return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" ${_rClick} style="cursor:pointer">
       <div class="rech-card-avatar ${st.cls}">
         <i class="${st.icon}"></i>
       </div>
@@ -149,7 +148,6 @@ function renderRech(){
           ${(r.mahnung_history||[]).length?`<span style="color:var(--sub)">·</span><span style="font-size:10px;font-weight:600;color:var(--yellow)"><i class="fas fa-bell" style="opacity:.7;width:10px"></i>${r.mahnung_history.length}× gemahnt</span>`:''}
         </div>
       </div>
-      <div class="sel-cb-abs">${_selCb('rechnungen', r.id)}</div>
     </div>`;
   }).join('');
 

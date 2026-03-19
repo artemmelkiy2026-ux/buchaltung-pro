@@ -289,7 +289,7 @@
   </div>
 
   <!-- Mahnung Banner -->
-  <div id="dash-mahnung-banner" style="display:none;margin-bottom:14px;background:#fff;border:1.5px solid var(--red);border-radius:var(--r);padding:14px 16px;cursor:pointer;align-items:center;gap:12px;user-select:none" onclick="openMahnModal()">
+  <div id="dash-mahnung-banner" style="display:none;margin-bottom:14px;background:#3a1a1a;border:1.5px solid var(--red);border-radius:var(--r);padding:14px 16px;cursor:pointer;align-items:center;gap:12px;user-select:none" onclick="openMahnModal()">
     <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;font-size:15px;flex-shrink:0"><i class="fas fa-bell"></i></span>
     <div style="flex:1">
       <div id="dash-mahnung-title" style="font-weight:700;font-size:14px;color:var(--red)"></div>
@@ -342,8 +342,6 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Einträge</div><div class="ph-sub">Alle Buchungen · Einnahmen & Ausgaben</div></div>
     <div class="ph-right">
-      <button class="btn" id="btn-bulk-del-eintraege" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('eintraege')"></button>
-      <button class="btn" id="btn-select-eintraege" onclick="toggleSelectMode('eintraege')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn primary" onclick="openNeuEintrag()"><i class="fas fa-plus"></i> Neuer Eintrag</button>
     </div>
   </div>
@@ -890,8 +888,6 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Angebote</div><div class="ph-sub">Kostenvoranschläge erstellen und verwalten</div></div>
     <div class="ph-right">
-      <button class="btn" id="btn-bulk-del-angebote" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('angebote')"></button>
-      <button class="btn" id="btn-select-angebote" onclick="toggleSelectMode('angebote')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn primary" onclick="openAngForm(null)"><i class="fas fa-plus"></i> Angebot erstellen</button>
     </div>
   </div>
@@ -1115,8 +1111,6 @@
     <div class="ph-left"><div class="ph-title">Rechnungen</div><div class="ph-sub">Rechnungen erstellen · Zahlungsstatus verfolgen</div></div>
     <div class="ph-right">
       <button class="btn rech-hdr-btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i><span class="rech-hdr-txt"> Firmenprofil</span></button>
-      <button class="btn" id="btn-bulk-del-rechnungen" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('rechnungen')"></button>
-      <button class="btn rech-hdr-btn" id="btn-select-rechnungen" onclick="toggleSelectMode('rechnungen')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn primary rech-hdr-btn" onclick="openRechModal()"><i class="fas fa-plus"></i><span class="rech-hdr-txt"> Rechnung erstellen</span></button>
     </div>
   </div>
@@ -1158,8 +1152,6 @@
       <div class="ph-sub">Automatisch je Monat / Quartal / Jahr</div>
     </div>
     <div class="ph-right">
-      <button class="btn" id="btn-bulk-del-wiederkehrend" style="display:none;background:var(--red);color:#fff;border-color:var(--red)" onclick="bulkDelete('wiederkehrend')"></button>
-      <button class="btn" id="btn-select-wiederkehrend" onclick="toggleSelectMode('wiederkehrend')"><i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span></button>
       <button class="btn success wied-hdr-btn" onclick="wBuchenAlle()" title="Alle fälligen buchen"><i class="fas fa-bolt"></i><span class="wied-hdr-txt"> Alle fälligen buchen</span></button>
       <button class="btn primary wied-hdr-btn" onclick="openWiedModal()" title="Neue Vorlage"><i class="fas fa-plus"></i><span class="wied-hdr-txt"> Neue Vorlage</span></button>
     </div>

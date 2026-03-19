@@ -47,14 +47,12 @@ function renderWied(){
     const isFaellig=w.naechste<=today&&w.status!=='paused';
     const isPaused=w.status==='paused';
     const isEin=w.typ==='Einnahme';
-    const _wSelMode = window._selectMode && window._selectMode['wiederkehrend'];
-    const _wClick = _wSelMode ? '' : `onclick="editWied('${w.id}')"`;
     // Нет ещё записей истории — кол-во раз забуканных
     const _wBookedCount = (data.eintraege||[]).filter(e=>e.beschreibung===w.bezeichnung&&e.notiz==='Wiederkehrend').length;
     // Годовой эквивалент
     const _wMultiplier = {woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
     const _wJahres = w.betrag * (_wMultiplier[w.intervall]||1);
-    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'}">
+    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" onclick="editWied('${w.id}')" style="cursor:pointer">
       <div class="wied-card-left">
         <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
           <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
@@ -97,7 +95,6 @@ function renderWied(){
           `}
         </div>
       </div>
-      <div class="sel-cb-abs">${_selCb('wiederkehrend', w.id)}</div>
     </div>`;
   }).join('');
 

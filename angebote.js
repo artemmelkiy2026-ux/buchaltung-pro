@@ -166,9 +166,7 @@ function renderAngebote() {
     // Netto info if USt
     const hasUst = (a.positionen||[]).some(p => p.mwst > 0);
     const nettoLabel = hasUst ? `<span style="font-size:10px;color:var(--sub);font-family:var(--mono)">brutto</span>` : '';
-    const _aSelMode = window._selectMode && window._selectMode['angebote'];
-    const _aClick = _aSelMode ? '' : `onclick="openAngForm('${a.id}')"`;
-    return `<div class="ang-card" ${_aClick} style="cursor:${_aSelMode?'default':'pointer'}">
+    return `<div class="ang-card" onclick="openAngForm('${a.id}')" style="cursor:pointer">
       <div class="ang-card-avatar ${st.cls}" style="width:32px;height:32px;border-radius:var(--r);font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
         <i class="${st.icon}"></i>
       </div>
@@ -197,7 +195,6 @@ function renderAngebote() {
         `}
       </div>
       ${expiryHtml}
-      <div class="sel-cb-abs">${_selCb('angebote', a.id)}</div>
     </div>`;
   }).join('');
 

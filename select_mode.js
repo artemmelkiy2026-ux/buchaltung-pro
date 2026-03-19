@@ -5,7 +5,7 @@
 window._selectMode = window._selectMode || {};
 window._selected   = window._selected   || {};
 
-const SELECT_SECTIONS = ['eintraege','wiederkehrend','angebote','rechnungen','kunden','produkte'];
+const SELECT_SECTIONS = ['kunden','produkte'];
 SELECT_SECTIONS.forEach(s => {
   if (!(s in window._selectMode)) window._selectMode[s] = false;
   if (!(s in window._selected))   window._selected[s]   = new Set();
@@ -48,24 +48,7 @@ async function bulkDelete(section) {
     { title: 'Mehrere löschen', icon: '🗑️', okLabel: 'Löschen', danger: true });
   if (!ok) return;
 
-  if (section === 'eintraege') {
-    let done = 0;
-    for (const id of ids) {
-      const storno = await sbStornoEintrag(id);
-      if (storno) { data.eintraege.push(storno); done++; }
-    }
-    renderAll();
-    toast(`${done} Einträge storniert`, 'ok');
-  } else if (section === 'wiederkehrend') {
-    ids.forEach(id => { data.wiederkehrend = (data.wiederkehrend||[]).filter(w=>w.id!==id); sbDeleteWied(id); });
-    toast(`${ids.length} Vorlagen gelöscht`, 'err'); renderWied();
-  } else if (section === 'angebote') {
-    ids.forEach(id => { data.angebote = (data.angebote||[]).filter(a=>a.id!==id); if(typeof sbDeleteAngebot==='function') sbDeleteAngebot(id); });
-    toast(`${ids.length} Angebote gelöscht`, 'err'); renderAngebote();
-  } else if (section === 'rechnungen') {
-    ids.forEach(id => { data.rechnungen = (data.rechnungen||[]).filter(r=>r.id!==id); sbDeleteRechnung(id); });
-    toast(`${ids.length} Rechnungen gelöscht`, 'err'); renderRech();
-  } else if (section === 'kunden') {
+  if (section === 'kunden') {
     ids.forEach(id => { data.kunden = (data.kunden||[]).filter(k=>k.id!==id); sbDeleteKunde(id); });
     toast(`${ids.length} Kunden gelöscht`, 'err'); renderKunden();
   } else if (section === 'produkte') {
@@ -76,7 +59,6 @@ async function bulkDelete(section) {
   window._selected[section].clear();
   window._selectMode[section] = false;
   _refreshSelectUI(section);
-  if (section === 'eintraege') renderEin();
 }
 
 function _rerender(section) {
