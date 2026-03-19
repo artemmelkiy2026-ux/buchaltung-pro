@@ -843,7 +843,10 @@ function renderEin(){
         stLbl='<span class="badge-korrektur">● Korrektur</span>';
       }
       const mwstBadge = showMwst&&hasMwst
-        ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' ('+mwstRate+'%)</span>' : '';
+        ? (isEin
+          ? '<span style="font-size:10px;color:#f97316;font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' USt ('+mwstRate+'%)</span>'
+          : '<span style="font-size:10px;color:var(--blue);font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' VSt ('+mwstRate+'%)</span>')
+        : '';
       
       const _selMode = window._selectMode && window._selectMode['eintraege'];
       const _cb = _selMode ? _selCb('eintraege', e.id) : '';
