@@ -275,7 +275,7 @@
       <div class="ph-sub">Übersicht — <span id="dash-yr-lbl"></span></div>
     </div>
     <div class="ph-right">
-      <select id="dash-yr" onchange="renderDash()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--sans)">
+      <select id="dash-yr" onchange="renderDash()" class="sel-yr">
         <option>Alle</option>
       </select>
     </div>
@@ -356,11 +356,11 @@
     </div>
     <div class="toolbar-group">
       <label>Jahr</label>
-      <select id="f-jahr" onchange="renderEin()"><option value="Alle">Alle</option></select>
+      <select id="f-jahr" onchange="renderEin()" class="sel-filter"><option value="Alle">Alle</option></select>
     </div>
     <div class="toolbar-group">
       <label>Monat</label>
-      <select id="f-mon" onchange="renderEin()">
+      <select id="f-mon" onchange="renderEin()" class="sel-filter">
         <option value="Alle">Alle</option>
         <option value="01">Januar</option><option value="02">Februar</option><option value="03">März</option>
         <option value="04">April</option><option value="05">Mai</option><option value="06">Juni</option>
@@ -370,11 +370,11 @@
     </div>
     <div class="toolbar-group">
       <label>Kategorie</label>
-      <select id="f-kat" onchange="renderEin()"><option value="Alle">Alle</option></select>
+      <select id="f-kat" onchange="renderEin()" class="sel-filter"><option value="Alle">Alle</option></select>
     </div>
     <div class="toolbar-group">
       <label><span class="mob-hide">Zahlung</span><span class="mob-show">Zahl</span></label>
-      <select id="f-zahl" onchange="renderEin()">
+      <select id="f-zahl" onchange="renderEin()" class="sel-filter">
         <option value="Alle">Alle</option>
         <option>Überweisung</option><option>Barzahlung</option><option>PayPal</option>
         <option>EC-Karte</option><option>Lastschrift</option><option>Sonstiges</option>
@@ -579,9 +579,9 @@
       <div class="fg"><label>Betrag (€) <span id="nf-betrag-info" style="font-size:10px;color:#f97316;font-weight:700"></span></label><input type="number" id="nf-bet" placeholder="0,00" step="0.01" min="0.01" oninput="calcNfVorsteuer();calcNfMwst()"></div>
     </div>
     <div class="fgrow c2">
-      <div class="fg"><label>Kategorie</label><select id="nf-kat"></select></div>
+      <div class="fg"><label>Kategorie</label><select id="nf-kat" class="sel-form"></select></div>
       <div class="fg"><label>Zahlungsart</label>
-        <select id="nf-zahl">
+        <select id="nf-zahl" class="sel-form">
           <option value="Überweisung">Überweisung</option><option value="Barzahlung">Barzahlung</option><option value="PayPal">PayPal</option>
           <option value="EC-Karte">EC-Karte</option><option value="Lastschrift">Lastschrift</option><option value="Sonstiges">Sonstiges</option>
         </select>
@@ -714,7 +714,7 @@
   <div class="ph">
     <div class="ph-left"><div class="ph-title">Monatsbericht</div><div class="ph-sub">Monatsübersicht · Jahresvergleich</div></div>
     <div class="ph-right">
-      <select id="rep-yr" onchange="renderRep()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--mono)"></select>
+      <select id="rep-yr" onchange="renderRep()" class="sel-yr"></select>
       <button class="csv" onclick="exportRepCSV()"><span class="mob-hide">Jahresbericht </span>CSV <i class="fa-solid fa-download"></i></button>
     </div>
   </div>
@@ -750,7 +750,7 @@
       <div class="ph-sub">Analyse nach Zahlungsart</div>
     </div>
     <div class="ph-right">
-      <select id="z-yr" onchange="renderZ()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--sans)">
+      <select id="z-yr" onchange="renderZ()" class="sel-yr">
         <option>Alle</option>
       </select>
     </div>
@@ -777,7 +777,7 @@
       <div class="ph-sub">Hochrechnung auf Basis der laufenden Monate</div>
     </div>
     <div class="ph-right">
-      <select id="prog-yr" onchange="renderProg()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--sans)"></select>
+      <select id="prog-yr" onchange="renderProg()" class="sel-yr"></select>
     </div>
   </div>
 
@@ -807,7 +807,7 @@
       <div class="ph-sub">Ausgaben & Einnahmen nach Kategorien</div>
     </div>
     <div class="ph-right">
-      <select id="kat-yr" onchange="renderKat()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;outline:none;font-family:var(--sans)"></select>
+      <select id="kat-yr" onchange="renderKat()" class="sel-yr"></select>
       <button class="ftab active" id="kat-tab-aus" onclick="setKatTab('Ausgabe',this)">Ausgaben</button>
       <button class="ftab" id="kat-tab-ein" onclick="setKatTab('Einnahme',this)">Einnahmen</button>
     </div>
@@ -1214,7 +1214,7 @@
       <div class="fgrow c2">
         <div class="fg"><label>Betrag (€)</label><input type="number" id="wied-bet" step="0.01" min="0.01" placeholder="0,00" oninput="updateWiedSidebar()"></div>
         <div class="fg"><label>Intervall</label>
-          <select id="wied-int" onchange="updateWiedSidebar()">
+          <select id="wied-int" onchange="updateWiedSidebar()" class="sel-form">
             <option value="woechentlich">Wöchentlich</option>
             <option value="monatlich" selected>Monatlich</option>
             <option value="quartalsweise">Quartalsweise</option>
@@ -1224,9 +1224,9 @@
         </div>
       </div>
       <div class="fgrow c2">
-        <div class="fg"><label>Kategorie</label><select id="wied-kat"></select></div>
+        <div class="fg"><label>Kategorie</label><select id="wied-kat" class="sel-form"></select></div>
         <div class="fg"><label>Zahlungsart</label>
-          <select id="wied-zahl">
+          <select id="wied-zahl" class="sel-form">
             <option value="Überweisung">Überweisung</option><option value="Barzahlung">Barzahlung</option><option value="PayPal">PayPal</option>
             <option value="EC-Karte">EC-Karte</option><option value="Lastschrift">Lastschrift</option><option value="Sonstiges">Sonstiges</option>
           </select>
@@ -1243,7 +1243,7 @@
       </div>
       <div class="fgrow c2">
         <div class="fg"><label>Erinnerung (Tage vorher)</label>
-          <select id="wied-remind">
+          <select id="wied-remind" class="sel-form">
             <option value="0">Keine Erinnerung</option>
             <option value="1">1 Tag vorher</option>
             <option value="3" selected>3 Tage vorher</option>
@@ -1252,7 +1252,7 @@
           </select>
         </div>
         <div class="fg"><label>Auto-Buchung</label>
-          <select id="wied-auto">
+          <select id="wied-auto" class="sel-form">
             <option value="manual">Manuell bestätigen</option>
             <option value="auto">Automatisch buchen</option>
           </select>
@@ -1273,7 +1273,7 @@
         </div>
         <div class="fgrow c2">
           <div class="fg"><label>Kündigungsfrist</label>
-            <select id="wied-kuendigung">
+            <select id="wied-kuendigung" class="sel-form">
               <option value="">Nicht angegeben</option>
               <option value="1m">1 Monat</option>
               <option value="3m">3 Monate</option>
@@ -1355,7 +1355,7 @@
       <div class="ph-sub">USt-Modus je Jahr · Zahllast · Voranmeldung</div>
     </div>
     <div class="ph-right">
-      <select id="ust-yr" onchange="ustPage=1;ustQuartalFilter=0;renderUst()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:14px;font-weight:600;outline:none;cursor:pointer"></select>
+      <select id="ust-yr" onchange="ustPage=1;ustQuartalFilter=0;renderUst()" class="sel-yr"></select>
     </div>
   </div>
 
@@ -1548,7 +1548,7 @@
       </div>
       <div class="fgrow c2" style="margin-bottom:10px">
         <div class="fg" style="margin:0"><label>Typ</label>
-          <select id="ust-new-typ" style="width:100%">
+          <select id="ust-new-typ" class="sel-form">
             <option value="ust">Ausgangs-USt (Einnahme)</option>
             <option value="vorsteuer">Vorsteuer (Ausgabe)</option>
           </select>
@@ -1647,12 +1647,12 @@
           <div class="ang-fields-2col">
             <div class="fg" style="margin:0"><label>Art.-Nr.</label><input type="text" id="ap-artnr" placeholder="1000"></div>
             <div class="fg" style="margin:0"><label>Kategorie</label>
-              <select id="ap-kategorie"><option>Artikel</option><option>Dienstleistung</option><option>Sonstiges</option></select>
+              <select id="ap-kategorie" class="sel-form"><option>Artikel</option><option>Dienstleistung</option><option>Sonstiges</option></select>
             </div>
           </div>
           <div class="ang-fields-2col">
             <div class="fg" style="margin:0"><label>Standardeinheit</label>
-              <select id="ap-einheit"><option>Stk</option><option>h</option><option>kg</option><option>m</option><option>m²</option><option>l</option><option>Pauschal</option></select>
+              <select id="ap-einheit" class="sel-form"><option>Stk</option><option>h</option><option>kg</option><option>m</option><option>m²</option><option>l</option><option>Pauschal</option></select>
             </div>
             <div class="fg" style="margin:0"><label>Umsatzsteuer in %</label>
               <input type="hidden" id="ap-ust" value="19">
@@ -1715,7 +1715,7 @@
         <div class="ang-prod-grid" style="margin-top:16px">
           <div class="fg" style="margin:0"><label>Schwellenwert für Benachrichtigung</label><input type="number" id="ap-schwellenwert" placeholder="0,00" value="0" min="0" step="0.01"></div>
           <div class="fg" style="margin:0"><label>Erinnere mich</label>
-            <select id="ap-erinnere"><option>Täglich</option><option>2 Tage</option><option>3 Tage</option><option>4 Tage</option><option>5 Tage</option><option>6 Tage</option><option>7 Tage</option></select>
+            <select id="ap-erinnere" class="sel-form"><option>Täglich</option><option>2 Tage</option><option>3 Tage</option><option>4 Tage</option><option>5 Tage</option><option>6 Tage</option><option>7 Tage</option></select>
           </div>
         </div>
       </div>
@@ -1901,7 +1901,7 @@
     <div class="ang-block">
       <div class="ang-block-label">Fahrzeug</div>
       <div style="display:flex;align-items:center;gap:8px;max-width:480px">
-        <select id="fb-form-auto" onchange="_onFbAutoChange()">
+        <select id="fb-form-auto" onchange="_onFbAutoChange()" class="sel-form">
           <option value="">— Fahrzeug wählen —</option>
         </select>
         <button class="btn" onclick="openAutoModal(null)" style="white-space:nowrap;flex-shrink:0"><i class="fas fa-plus"></i> Neu</button>
@@ -1914,7 +1914,7 @@
       <div class="fgrow c2">
         <div class="fg"><label>Datum *</label><input type="date" id="fb-datum"></div>
         <div class="fg"><label>Fahrttyp *</label>
-          <select id="fb-typ" style="width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:9px 12px;font-size:13px">
+          <select id="fb-typ" class="sel-form">
             <option value="Geschäftlich">Geschäftlich</option>
             <option value="Privat">Privat</option>
             <option value="Arbeitsweg">Arbeitsweg</option>
@@ -2059,9 +2059,9 @@
       <div class="fg"><label>Betrag (€)</label><input type="number" id="edit-bet" step="0.01" min="0.01"></div>
     </div>
     <div class="fgrow c2">
-      <div class="fg"><label>Kategorie</label><select id="edit-kat"></select></div>
+      <div class="fg"><label>Kategorie</label><select id="edit-kat" class="sel-form"></select></div>
       <div class="fg"><label>Zahlungsart</label>
-        <select id="edit-zahl">
+        <select id="edit-zahl" class="sel-form">
           <option value="Überweisung">Überweisung</option><option value="Barzahlung">Barzahlung</option><option value="PayPal">PayPal</option>
           <option value="EC-Karte">EC-Karte</option><option value="Lastschrift">Lastschrift</option><option value="Sonstiges">Sonstiges</option>
         </select>

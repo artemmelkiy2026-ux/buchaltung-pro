@@ -3854,35 +3854,77 @@ header { background: #fff; }
 .fb-route-btn:hover{ border-color:var(--blue); }
 #fb-km-start[readonly]{ background:var(--s2); }
 
-/* ── FAHRTENBUCH SELECTS ─────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   SELECT / DROPDOWN — единые стили для всех выпадающих списков
+   Меняй здесь — применится везде в приложении
+   ══════════════════════════════════════════════════════════════════════════
+
+   .sel-yr      — годовые фильтры в шапках разделов (Alle Jahre)
+   .sel-filter  — строчные фильтры списков (Einträge: год, месяц, категория)
+   .sel-form    — поля внутри форм создания/редактирования
+   .fb-filter-sel — компактные фильтры Fahrtenbuch в шапке
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Базовый стиль — наследуется всеми группами */
+.sel-yr,
+.sel-filter,
+.sel-form,
 .fb-filter-sel {
-  background: var(--s2);
-  border: 1px solid var(--border);
+  background:   var(--s2);
+  border:       1px solid var(--border);
   border-radius: var(--r);
-  color: var(--text);
-  padding: 7px 12px;
+  color:        var(--text);
+  font-family:  inherit;
+  outline:      none;
+  cursor:       pointer;
+  transition:   border-color .15s;
+}
+.sel-yr:hover,
+.sel-filter:hover,
+.sel-form:hover,
+.fb-filter-sel:hover    { border-color: var(--border2); }
+.sel-yr:focus,
+.sel-filter:focus,
+.sel-form:focus,
+.fb-filter-sel:focus    { border-color: var(--blue); }
+
+/* Годовые фильтры в шапках разделов */
+.sel-yr {
+  padding:   7px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  width: auto;
+}
+
+/* Строчные фильтры списков */
+.sel-filter {
+  padding:   6px 10px;
   font-size: 13px;
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
+  width: auto;
+}
+
+/* Поля внутри форм */
+.sel-form {
+  padding:   9px 12px;
+  font-size: 13px;
+  width: 100%;
+}
+
+/* Компактные фильтры Fahrtenbuch в шапке */
+.fb-filter-sel {
+  padding:   7px 12px;
+  font-size: 13px;
   width: auto;
   max-width: 180px;
 }
 
+/* Fahrtenbuch форма — автомобиль */
 #fb-form-auto {
   flex: 1;
   min-width: 0;
-  background: var(--s2);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  color: var(--text);
-  padding: 9px 12px;
-  font-size: 13px;
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
 }
 
-@media(max-width:768px) {
+@media(max-width: 768px) {
   .fb-filter-sel { max-width: 140px; font-size: 12px; padding: 6px 8px; }
+  .sel-yr        { font-size: 13px; }
 }
