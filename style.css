@@ -3855,7 +3855,7 @@ header { background: #fff; }
 #fb-km-start[readonly]{ background:var(--s2); }
 
 /* ── FAHRTENBUCH SELECTS ─────────────────────────────────────────────── */
-#fb-yr {
+.fb-filter-sel {
   background: var(--s2);
   border: 1px solid var(--border);
   border-radius: var(--r);
@@ -3865,20 +3865,8 @@ header { background: #fff; }
   font-family: inherit;
   outline: none;
   cursor: pointer;
-}
-
-#fb-auto-filter {
-  background: var(--s2);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  color: var(--text);
-  padding: 6px 10px;
-  font-size: 13px;
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
-  max-width: 240px;
-  width: 100%;
+  width: auto;
+  max-width: 180px;
 }
 
 #fb-form-auto {
@@ -3893,4 +3881,8 @@ header { background: #fff; }
   font-family: inherit;
   outline: none;
   cursor: pointer;
+}
+
+@media(max-width:768px) {
+  .fb-filter-sel { max-width: 140px; font-size: 12px; padding: 6px 8px; }
 }

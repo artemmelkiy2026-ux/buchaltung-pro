@@ -1847,18 +1847,13 @@
       <div class="ph-sub">Geschäftliche &amp; private Fahrten · §6 EStG</div>
     </div>
     <div class="ph-right">
-      <select id="fb-yr" onchange="renderFahrtenbuch()"><option value="Alle">Alle Jahre</option></select>
+      <select id="fb-auto-filter" onchange="renderFahrtenbuch()" class="fb-filter-sel">
+        <option value="">Alle Fahrzeuge</option>
+      </select>
+      <select id="fb-yr" onchange="renderFahrtenbuch()" class="fb-filter-sel"><option value="Alle">Alle Jahre</option></select>
       <button class="btn" onclick="openModal('auto-modal-list')"><i class="fas fa-car"></i><span class="ang-btn-txt"> Fahrzeuge</span></button>
       <button class="btn primary" onclick="openFahrtForm()"><i class="fas fa-plus"></i><span class="ang-btn-txt"> Neue Fahrt</span></button>
     </div>
-  </div>
-
-  <!-- Fahrzeug-Filter -->
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-   
-    <select id="fb-auto-filter" onchange="renderFahrtenbuch()">
-      <option value="">Alle Fahrzeuge</option>
-    </select>
   </div>
 
   <div class="stats" id="fb-stats" style="grid-template-columns:repeat(4,1fr)"></div>
