@@ -2597,7 +2597,7 @@ input, select, textarea {
   display:flex;align-items:center;gap:4px;flex-shrink:0;
 }
 .ein-row-badge{
-  font-size:10px;font-weight:500;flex-shrink:0;margin-left:auto;
+  font-size:10px;font-weight:500;flex-shrink:0;
 }
 
 /* Row 3: badges + nr + date */
