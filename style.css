@@ -2350,7 +2350,7 @@ input, select, textarea {
    
   }
   .ang-sticky-header::after {
-    content:'';position:absolute;bottom:0;left:15px;right:16px;
+    content:'';position:absolute;bottom:0;left:15px !important;right:16px !important;
     border-bottom:1px solid var(--border);
   }
   .ang-sticky-left { width: 100%; }
