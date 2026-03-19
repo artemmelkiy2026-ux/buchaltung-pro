@@ -64,7 +64,7 @@ async function sbLoadAll() {
   if (!currentUser) return null;
   const uid = currentUser.id;
   try {
-  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang, prod] = await Promise.all([
+  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang, prod, fb] = await Promise.all([
     sb.from('eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('kunden').select('*').eq('user_id', uid).order('name'),
     sb.from('rechnungen').select('*').eq('user_id', uid).order('datum', { ascending: false }),
@@ -74,6 +74,7 @@ async function sbLoadAll() {
     sb.from('ust_eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('angebote').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('produkte').select('*').eq('user_id', uid).order('name'),
+    sb.from('fahrtenbuch').select('*').eq('user_id', uid).order('datum', { ascending: false }),
   ]);
   const eintraege     = (ein.data  || []).map(dbToEintrag);
   // GoBD: восстанавливаем _storniert для оригиналов после перезагрузки
@@ -90,11 +91,11 @@ async function sbLoadAll() {
   const rechnungenLog = (rechLog.data || []);  // error игнорируем — таблица может не существовать
   const angebote = (ang && !ang.error && ang.data) ? ang.data.map(dbToAngebot) : [];
   const produkte = (prod && !prod.error && prod.data) ? prod.data.map(dbToProdukt) : [];
-  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog, produkte };
+  const fahrtenbuch = (fb && !fb.error && fb.data) ? fb.data.map(dbToFahrt) : [];
+  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog, produkte, fahrtenbuch };
   } catch(err) {
     console.error('[sbLoadAll error]', err);
-    // Возвращаем пустые данные — не теряем приложение
-    return { eintraege:[], kunden:[], rechnungen:[], angebote:[], wiederkehrend:[], ustModeByYear:{}, ustEintraege:[], rechnungenLog:[], produkte:[] };
+    return { eintraege:[], kunden:[], rechnungen:[], angebote:[], wiederkehrend:[], ustModeByYear:{}, ustEintraege:[], rechnungenLog:[], produkte:[], fahrtenbuch:[] };
   }
 }
 
@@ -362,6 +363,31 @@ async function sbSaveProdukt(p) {
 async function sbDeleteProdukt(id) {
   if (!currentUser) return;
   await sb.from('produkte').delete().eq('id', id).eq('user_id', currentUser.id);
+}
+// ── FAHRTENBUCH ──────────────────────────────────────────────────────────
+function fahrtToDb(f) {
+  return {
+    id: f.id, user_id: currentUser.id,
+    datum: f.datum||null, abfahrt: f.abfahrt||null, ziel: f.ziel||null,
+    zweck: f.zweck||null, typ: f.typ||'Geschäftlich', kennzeichen: f.kennzeichen||null,
+    km_start: f.km_start||0, km_end: f.km_end||0, km: f.km||0,
+  };
+}
+function dbToFahrt(r) {
+  return {
+    id: r.id, datum: r.datum||'', abfahrt: r.abfahrt||'', ziel: r.ziel||'',
+    zweck: r.zweck||'', typ: r.typ||'Geschäftlich', kennzeichen: r.kennzeichen||'',
+    km_start: parseFloat(r.km_start)||0, km_end: parseFloat(r.km_end)||0, km: parseFloat(r.km)||0,
+  };
+}
+async function sbSaveFahrt(f) {
+  if (!currentUser) return;
+  const {error} = await sb.from('fahrtenbuch').upsert(fahrtToDb(f), {onConflict:'id'});
+  if (error) console.error('Save fahrt:', error);
+}
+async function sbDeleteFahrt(id) {
+  if (!currentUser) return;
+  await sb.from('fahrtenbuch').delete().eq('id', id).eq('user_id', currentUser.id);
 }
 // ── RECHNUNGEN-LOG (GoBD Variant B) ──────────────────────────────────────
 // Записывает каждое изменение рекоманды в отдельную таблицу rechnungen_log
