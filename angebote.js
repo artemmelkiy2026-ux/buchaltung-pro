@@ -174,10 +174,10 @@ function renderAngebote() {
       </div>
       <div class="ang-card-nr">
         <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--sub)">${a.nr||'—'}</span>
-        <span class="rech-card-status ${st.pill}" style="font-size:10px;padding:2px 6px">${st.label}</span>
       </div>
       <div class="ang-card-kunde">${a.kunde||'Kein Kunde'}</div>
       <div class="ang-card-meta">
+        <span class="rech-card-status ${st.pill}" style="font-size:10px;padding:2px 6px">${st.label}</span>
         <span><i class="fas fa-calendar" style="width:12px;opacity:.5"></i> ${fd(a.datum)}</span>
         <span>${ageLabel}</span>
         ${posCount ? `<span>${posCount} Pos.</span>` : ''}
