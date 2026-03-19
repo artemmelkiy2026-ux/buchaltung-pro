@@ -64,7 +64,7 @@ async function sbLoadAll() {
   if (!currentUser) return null;
   const uid = currentUser.id;
   try {
-  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang, prod, fb] = await Promise.all([
+  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang, prod] = await Promise.all([
     sb.from('eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('kunden').select('*').eq('user_id', uid).order('name'),
     sb.from('rechnungen').select('*').eq('user_id', uid).order('datum', { ascending: false }),
@@ -74,8 +74,11 @@ async function sbLoadAll() {
     sb.from('ust_eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('angebote').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('produkte').select('*').eq('user_id', uid).order('name'),
-    sb.from('fahrtenbuch').select('*').eq('user_id', uid).order('datum', { ascending: false }),
   ]);
+  // Fahrtenbuch — separate query, table may not exist yet
+  var fb = { data: null, error: null };
+  try { fb = await sb.from('fahrtenbuch').select('*').eq('user_id', uid).order('datum', { ascending: false }); }
+  catch(e) { console.warn('[Fahrtenbuch] table not found or error:', e); }
   const eintraege     = (ein.data  || []).map(dbToEintrag);
   // GoBD: восстанавливаем _storniert для оригиналов после перезагрузки
   const stornoOfIds = new Set(eintraege.filter(e => e.is_storno && e.storno_of).map(e => e.storno_of));
@@ -382,12 +385,16 @@ function dbToFahrt(r) {
 }
 async function sbSaveFahrt(f) {
   if (!currentUser) return;
-  const {error} = await sb.from('fahrtenbuch').upsert(fahrtToDb(f), {onConflict:'id'});
-  if (error) console.error('Save fahrt:', error);
+  try {
+    const {error} = await sb.from('fahrtenbuch').upsert(fahrtToDb(f), {onConflict:'id'});
+    if (error) console.warn('Save fahrt:', error.message);
+  } catch(e) { console.warn('[sbSaveFahrt]', e); }
 }
 async function sbDeleteFahrt(id) {
   if (!currentUser) return;
-  await sb.from('fahrtenbuch').delete().eq('id', id).eq('user_id', currentUser.id);
+  try {
+    await sb.from('fahrtenbuch').delete().eq('id', id).eq('user_id', currentUser.id);
+  } catch(e) { console.warn('[sbDeleteFahrt]', e); }
 }
 // ── RECHNUNGEN-LOG (GoBD Variant B) ──────────────────────────────────────
 // Записывает каждое изменение рекоманды в отдельную таблицу rechnungen_log
