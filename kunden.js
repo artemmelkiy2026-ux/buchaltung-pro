@@ -55,31 +55,28 @@ function renderWied(){
     const _wMultiplier = {woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
     const _wJahres = w.betrag * (_wMultiplier[w.intervall]||1);
     return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" ${_wClick} style="cursor:${_wSelMode?'default':'pointer'}">
-      <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+      <div class="wied-card-left">
         <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
           <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
         </div>
-        <div class="wied-card-body">
-          <div class="wied-card-name">
-            ${w.bezeichnung}
-            ${isFaellig?'<span class="wied-faellig-badge">● Fällig</span>':''}
-            ${isPaused?'<span style="font-size:10px;font-weight:600;color:var(--sub);background:var(--s2);padding:1px 6px;border-radius:3px;margin-left:4px">Pausiert</span>':''}
-          </div>
-          <div class="wied-card-meta">
-            <span><i class="fas fa-tag" style="font-size:10px"></i>${w.kategorie}</span>
-            <span><i class="fas fa-sync-alt" style="font-size:10px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
-            <span><i class="fas fa-credit-card" style="font-size:10px"></i>${w.zahlungsart}</span>
-            ${w.anbieter?`<span style="color:var(--blue)"><i class="fas fa-building" style="font-size:10px"></i>${w.anbieter}</span>`:''}
-          </div>
-          <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap">
-            <span class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
-              <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste: <strong>${fdm(w.naechste)}</strong>
-              ${w.enddatum?`<span style="margin-left:4px;opacity:.7">· bis ${fdm(w.enddatum)}</span>`:''}
-            </span>
-            ${_wBookedCount>0?`<span style="font-size:11px;color:var(--sub)"><i class="fas fa-history" style="font-size:10px;margin-right:2px"></i>${_wBookedCount}× gebucht</span>`:''}
-            <span style="font-size:11px;color:var(--sub)"><i class="fas fa-calendar-check" style="font-size:10px;margin-right:2px"></i>≈ ${fmt(_wJahres)}/Jahr</span>
-          </div>
-          <div class="sel-cb-row">${_selCb('wiederkehrend', w.id)}</div>
+        <div class="wied-card-name">
+          ${w.bezeichnung}
+          ${isFaellig?'<span class="wied-faellig-badge">● Fällig</span>':''}
+          ${isPaused?'<span style="font-size:10px;font-weight:600;color:var(--sub);background:var(--s2);padding:1px 6px;border-radius:3px;margin-left:4px">Pausiert</span>':''}
+        </div>
+        <div class="wied-card-meta">
+          <span><i class="fas fa-tag" style="font-size:10px"></i>${w.kategorie}</span>
+          <span><i class="fas fa-sync-alt" style="font-size:10px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
+          <span><i class="fas fa-credit-card" style="font-size:10px"></i>${w.zahlungsart}</span>
+          ${w.anbieter?`<span style="color:var(--blue)"><i class="fas fa-building" style="font-size:10px"></i>${w.anbieter}</span>`:''}
+        </div>
+        <div class="wied-card-schedule">
+          <span class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
+            <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste: <strong>${fdm(w.naechste)}</strong>
+            ${w.enddatum?`<span style="margin-left:4px;opacity:.7">· bis ${fdm(w.enddatum)}</span>`:''}
+          </span>
+          ${_wBookedCount>0?`<span style="font-size:11px;color:var(--sub)"><i class="fas fa-history" style="font-size:10px;margin-right:2px"></i>${_wBookedCount}× gebucht</span>`:''}
+          <span style="font-size:11px;color:var(--sub)"><i class="fas fa-calendar-check" style="font-size:10px;margin-right:2px"></i>≈ ${fmt(_wJahres)}/Jahr</span>
         </div>
       </div>
       <div class="wied-card-right">
@@ -100,6 +97,7 @@ function renderWied(){
           `}
         </div>
       </div>
+      <div class="sel-cb-row">${_selCb('wiederkehrend', w.id)}</div>
     </div>`;
   }).join('');
 
