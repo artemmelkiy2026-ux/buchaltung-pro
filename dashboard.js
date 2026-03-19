@@ -875,7 +875,7 @@ function renderEin(){
         +'<div class="ein-row-body">'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
-              +'<div class="ein-row-desc">'+(e.beschreibung||e.kategorie)+'</div>'
+              +'<div class="ein-row-desc"><span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'+(e.beschreibung||e.kategorie)+'</div>'
               +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
             +'</div>'
             +'<div class="ein-row-mid">'
