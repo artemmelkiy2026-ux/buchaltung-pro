@@ -2331,7 +2331,7 @@ input, select, textarea {
   #p-produkte-form,
   #p-firma { height: auto; overflow: visible; }
   .ang-form-body { padding: 12px; }
-  .ang-block { padding: 14px; }
+  
   .ang-sticky-header {
     padding: 12px;
     margin: 0;
