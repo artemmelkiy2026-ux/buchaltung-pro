@@ -74,6 +74,7 @@ function renderRech(){
   if(!filtered.length){
     if(container) container.innerHTML='';
     em.style.display='block';
+    renderPager('rech-pagination', 1, 1, 0, '_rechPagerCb');
     return;
   }
   em.style.display='none';
@@ -85,13 +86,18 @@ function renderRech(){
     return av<bv ? rechSortDir : av>bv ? -rechSortDir : 0;
   });
 
+  // Пагинация
+  const totalPages = Math.max(1, Math.ceil(filtered.length / RECH_PER_PAGE));
+  if(rechPage > totalPages) rechPage = totalPages;
+  const pageItems = filtered.slice((rechPage-1)*RECH_PER_PAGE, rechPage*RECH_PER_PAGE);
+
   const statusCfg = {
     offen:       {cls:'rech-badge-offen',    icon:'fas fa-clock',              label:'Offen',      color:'var(--yellow)'},
     ueberfaellig:{cls:'rech-badge-ueber',    icon:'fas fa-exclamation-circle', label:'Überfällig', color:'var(--red)'},
     bezahlt:     {cls:'rech-badge-bezahlt',  icon:'fas fa-check-circle',       label:'Bezahlt',    color:'var(--green)'}
   };
 
-  const cards = filtered.map(r=>{
+  const cards = pageItems.map(r=>{
     const st = statusCfg[r.status] || statusCfg.offen;
     let overdueTxt = '';
     if(r.status==='ueberfaellig'&&r.faellig){
@@ -158,6 +164,8 @@ function renderRech(){
   </div>`;
 
   if(container) container.innerHTML = cards + summary;
+  window._rechPagerCb=function(p){rechPage=p;renderRech();};
+  renderPager('rech-pagination', rechPage, totalPages, filtered.length, '_rechPagerCb');
   _updateRechSortBtns();
 }
 function setRechFilter(f,btn){rechFilter=f;rechPage=1;document.querySelectorAll('#p-rechnungen .ftab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderRech();}

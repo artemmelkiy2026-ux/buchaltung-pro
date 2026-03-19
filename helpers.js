@@ -232,11 +232,27 @@ function renderKunden(){
   if(!filtered.length){
     if(container) container.innerHTML='';
     em.style.display='block';
+    window._kundenPagerCb=function(p){kundenPage=p;renderKunden();};
+    renderPager('kunden-pagination', 1, 1, 0, '_kundenPagerCb');
     return;
   }
   em.style.display='none';
 
-  const cards = filtered.map(k=>{
+  // Сортировка
+  const sorted = [...filtered].sort((a,b)=>{
+    let av,bv;
+    if(kundenSort==='umsatz'){ av=getKundeUmsatz(a.id); bv=getKundeUmsatz(b.id); }
+    else { av=(a[kundenSort]||'').toLowerCase(); bv=(b[kundenSort]||'').toLowerCase(); }
+    const dir=kundenSortAsc?1:-1;
+    return av<bv?-dir:av>bv?dir:0;
+  });
+
+  // Пагинация
+  const totalPages = Math.max(1, Math.ceil(sorted.length / KUNDEN_PER_PAGE));
+  if(kundenPage > totalPages) kundenPage = totalPages;
+  const pageItems = sorted.slice((kundenPage-1)*KUNDEN_PER_PAGE, kundenPage*KUNDEN_PER_PAGE);
+
+  const cards = pageItems.map(k=>{
     const umsatz = getKundeUmsatz(k.id);
     const rechCount = (data.rechnungen||[]).filter(r=>r.kundeId===k.id).length;
     const initials = (k.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
@@ -272,6 +288,8 @@ function renderKunden(){
   }).join('');
 
   if(container) container.innerHTML = cards;
+  window._kundenPagerCb=function(p){kundenPage=p;renderKunden();};
+  renderPager('kunden-pagination', kundenPage, totalPages, sorted.length, '_kundenPagerCb');
   _updateKundenSortBtns();
 }
 

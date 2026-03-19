@@ -3713,7 +3713,8 @@ header { background: #fff; }
 #rech-pagination,
 #ang-pagination,
 #kunden-pagination,
-#wied-pagination{
+#wied-pagination,
+#produkte-pagination{
   position:sticky;bottom:0;z-index:10;
   background:var(--bg);
   padding:10px 0 4px;

@@ -2,9 +2,12 @@
 
 let prodFilter = 'alle';
 let editProduktId = null;
+let prodPage = 1;
+const PROD_PER_PAGE = 10;
 
 function setProdFilter(f, btn) {
   prodFilter = f;
+  prodPage = 1;
   document.querySelectorAll('#p-produkte .ftab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderProdukte();
@@ -41,14 +44,21 @@ function renderProdukte() {
   if (!items.length) {
     list.innerHTML = '';
     empty.style.display = 'block';
+    window._prodPagerCb=function(p){prodPage=p;renderProdukte();};
+    renderPager('produkte-pagination', 1, 1, 0, '_prodPagerCb');
     return;
   }
   empty.style.display = 'none';
 
+  // Пагинация
+  const totalPages = Math.max(1, Math.ceil(items.length / PROD_PER_PAGE));
+  if(prodPage > totalPages) prodPage = totalPages;
+  const pageItems = items.slice((prodPage-1)*PROD_PER_PAGE, prodPage*PROD_PER_PAGE);
+
   const katIcon = k => k === 'Artikel' ? 'fa-box' : k === 'Dienstleistung' ? 'fa-tools' : 'fa-ellipsis-h';
   const katColor = k => k === 'Artikel' ? 'var(--blue)' : k === 'Dienstleistung' ? 'var(--green)' : 'var(--sub)';
 
-  list.innerHTML = items.map(p => `
+  list.innerHTML = pageItems.map(p => `
     <div class="prod-card" ${window._selectMode?.['produkte'] ? '' : `onclick="openProduktModal('${p.id}')"`} style="cursor:${window._selectMode?.['produkte']?'default':'pointer'}">
       <div class="prod-card-left">
         <div class="prod-avatar" style="background:${katColor(p.kategorie)}22;color:${katColor(p.kategorie)}">
@@ -78,6 +88,8 @@ function renderProdukte() {
       </div>
       <div class="sel-cb-abs">${_selCb('produkte', p.id)}</div>
     </div>`).join('');
+  window._prodPagerCb=function(p){prodPage=p;renderProdukte();};
+  renderPager('produkte-pagination', prodPage, totalPages, items.length, '_prodPagerCb');
 }
 
 // ── FORM öffnen/schließen ────────────────────────────────────────────────────
