@@ -1905,11 +1905,11 @@
     <!-- Fahrzeug -->
     <div class="ang-block">
       <div class="ang-block-label">Fahrzeug</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <select id="fb-form-auto" onchange="_onFbAutoChange()" style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:9px 12px;font-size:13px">
+      <div style="display:flex;align-items:center;gap:8px;max-width:480px">
+        <select id="fb-form-auto" onchange="_onFbAutoChange()" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:9px 12px;font-size:13px">
           <option value="">— Fahrzeug wählen —</option>
         </select>
-        <button class="btn" onclick="openAutoModal(null)" style="white-space:nowrap"><i class="fas fa-plus"></i> Neu</button>
+        <button class="btn" onclick="openAutoModal(null)" style="white-space:nowrap;flex-shrink:0"><i class="fas fa-plus"></i> Neu</button>
       </div>
     </div>
 
