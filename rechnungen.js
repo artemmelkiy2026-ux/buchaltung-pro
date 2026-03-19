@@ -528,7 +528,7 @@ function addRechPosRow(i,p){
 
   if (mob) {
     // Мобильный layout: Bezeichnung на всю ширину, числа в строку
-    div.style.cssText='background:var(--s2,#f7f8fa);border-radius:4px;padding:10px;margin-bottom:8px;border:1px solid var(--border)';
+    div.style.cssText='margin-bottom:8px;';
     div.innerHTML=`
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Position ${i+1}</span>
