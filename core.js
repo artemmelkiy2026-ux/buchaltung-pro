@@ -281,7 +281,7 @@ function activeEintraegeMitRech(yr) {
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────
-const FORM_PAGES = ['angebote-form','rechnungen-form','kunden-form','produkte-form','neu','wiedform'];
+const FORM_PAGES = ['angebote-form','rechnungen-form','kunden-form','produkte-form','neu','wiedform','firma'];
 function nav(id, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   openNavGroupIfNeeded(id);
