@@ -834,13 +834,13 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     background: var(--blue);
     border-radius: 0 0 2px 2px;
   }
-  .mob-tab .tab-ic { font-size: 30px; line-height: 1; }
+  .mob-tab .tab-ic { font-size: 25px; line-height: 1; }
   .mob-tab .tab-lbl { font-size: 9px; }
 
   /* Кнопка «Neu» — такая же как все */
   #mobt-neu { flex: 0 0 auto; width: 20%; }
   .mob-plus-ic {
-    font-size: 30px !important;
+    font-size: 25px !important;
     color: var(--sub) !important;
     background: none !important;
     width: auto; height: auto;
