@@ -1297,7 +1297,7 @@ input, select, textarea {
 }
 .wied-card-body{flex:1;min-width:0;line-height:1.2;}
 .wied-card-left{
-  display:grid;grid-template-columns:44px 1fr;gap:3px 12px;flex:1;min-width:0;
+  display:grid;grid-template-columns:44px 1fr;flex:1;min-width:0;
 }
 .wied-card-left .wied-card-avatar{ grid-column:1;grid-row:1/4;align-self:start;margin-top:2px; }
 .wied-card-left .wied-card-name{ grid-column:2;grid-row:1; }
