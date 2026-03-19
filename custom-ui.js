@@ -129,7 +129,7 @@ class CustomSelect {
     trigger.type = 'button';
     trigger.className = 'cs-trigger';
     const isCompact = CS_COMPACT.includes(this.id);
-    const minW = this.id === 'fb-auto-filter' ? '160px' : isCompact ? '90px' : '0';
+    const minW = this.id === 'fb-auto-filter' ? '30px' : isCompact ? '50px' : '0';
     trigger.style.cssText = `
       display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
       width:${isCompact ? 'auto' : '100%'};min-width:${minW};padding:7px 12px;
