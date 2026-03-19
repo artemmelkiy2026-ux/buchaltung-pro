@@ -153,13 +153,13 @@ function renderAngebote() {
       const pct = totalMs > 0 ? Math.min(100, Math.round(elapsedMs / totalMs * 100)) : 0;
       const daysLeft = Math.max(0, Math.ceil((new Date(a.gueltig) - new Date()) / (24*60*60*1000)));
       const barColor = pct > 80 ? 'var(--red)' : pct > 50 ? 'var(--yellow)' : 'var(--blue)';
-      expiryHtml = `<div style="margin-top:6px">
+      expiryHtml = `<div class="ang-expiry-bar">
         <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--sub);margin-bottom:3px">
           <span>${daysLeft} ${daysLeft===1?'Tag':'Tage'} verbleibend</span>
           <span>${pct}%</span>
         </div>
         <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden">
-          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px"></div>
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px;transition:width .3s"></div>
         </div>
       </div>`;
     }

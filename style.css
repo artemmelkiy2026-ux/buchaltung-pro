@@ -486,7 +486,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 .ang-card-meta{ grid-column:2;grid-row:3;display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub); }
 .ang-card-betrag{ grid-column:3;grid-row:1;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);text-align:right;white-space:nowrap;align-self:center; }
 .ang-card-actions{ grid-column:3;grid-row:3;display:flex;gap:3px;justify-content:flex-end;align-self:center; }
-.ang-card .ang-expiry-bar{ grid-column:1/-1;grid-row:5; }
+.ang-card .ang-expiry-bar{ grid-column:1/-1;grid-row:5;margin-top:6px; }
 .ang-card:hover{ border-color:var(--border2); box-shadow:var(--shadow-hover); }
 .rech-card{
   display:flex; align-items:flex-start; gap:12px;
