@@ -3609,21 +3609,21 @@ header { background: #fff; }
   #kunden-list{ gap:0 !important; }
   #kunden-list .kunde-card{
     display:grid !important;
-    grid-template-columns:40px 1fr 250px 110px 90px;
-    align-items:center;gap:0 12px;
+    grid-template-columns:40px 1fr auto;
+    align-items:center;gap:0 16px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
-    margin:0;padding:10px 18px;
+    margin:0;padding:12px 18px;
   }
   #kunden-list .kunde-card:last-child{ border-radius:0 0 var(--r) var(--r); }
-  .kunde-card-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:12px !important; }
-  .kunde-card-body{ grid-column:2;grid-row:1;min-width:0; }
-  .kunde-card-body .kunde-card-name{ font-size:13px; }
-  .kunde-card-body .kunde-card-role{ display:none; }
-  .kunde-card-meta{ grid-column:3;grid-row:1; }
-  .kunde-card-right{ grid-column:4/6;grid-row:1;flex-direction:row !important;align-items:center !important;gap:12px;min-width:0 !important; }
-  .kunde-umsatz{ font-size:14px; }
-  .kunde-card-body .sel-cb-row{ display:none; }
-  .kunde-card .sel-cb-row:last-child{ grid-column:1/-1;grid-row:2;display:flex; }
+  .kunde-card-avatar{ grid-column:1;grid-row:1;width:36px !important;height:36px !important;font-size:13px !important; }
+  .kunde-card-body{ grid-column:2;grid-row:1;min-width:0;display:flex !important;align-items:center;gap:16px; }
+  .kunde-card-body .kunde-card-name{ font-size:13px;font-weight:600;white-space:nowrap;flex-shrink:0; }
+  .kunde-card-body .kunde-card-role{ font-size:11px;color:var(--sub);flex-shrink:0; }
+  .kunde-card-body .kunde-card-meta{ display:flex !important;flex:1;min-width:0; }
+  .kunde-card-body .sel-cb-row{ display:none !important; }
+  .kunde-card-right{ grid-column:3;grid-row:1;flex-direction:row !important;align-items:center !important;gap:10px;flex-shrink:0; }
+  .kunde-card-right .kunde-umsatz{ font-size:14px;font-family:var(--mono);white-space:nowrap; }
+  .kunde-card-right .kunde-rech-cnt{ font-size:11px;white-space:nowrap; }
   #kunden-list .kunde-card:hover{ background:var(--s2); box-shadow:none; }
 
   /* ── PRODUKTE table ── */
@@ -3654,17 +3654,22 @@ header { background: #fff; }
   #wied-list .wied-card{
     display:grid !important;
     grid-template-columns:40px 1fr auto;
-    align-items:center;gap:0 12px;
+    align-items:center;gap:0 16px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
-    margin:0;padding:10px 18px;
+    margin:0;padding:12px 18px;
   }
   #wied-list .wied-card:last-child{ border-radius:0 0 var(--r) var(--r); }
   #wied-list .wied-card > div:first-child{ display:contents; }
-  .wied-card-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:14px !important; }
-  .wied-card-body{ grid-column:2;grid-row:1;min-width:0; }
-  .wied-card-body .wied-card-name{ font-size:13px; }
-  .wied-card-right{ grid-column:3;grid-row:1;flex-direction:row !important;align-items:center !important;gap:8px; }
-  .wied-card-betrag{ font-size:14px !important; }
-  .wied-card-body .sel-cb-row{ display:none; }
+  .wied-card-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:14px !important;align-self:start;margin-top:2px; }
+  .wied-card-body{ grid-column:2;grid-row:1;min-width:0;display:flex !important;align-items:center;gap:16px;flex-wrap:nowrap; }
+  .wied-card-body .wied-card-name{ font-size:13px;font-weight:600;white-space:nowrap;flex-shrink:0;max-width:220px;overflow:hidden;text-overflow:ellipsis; }
+  .wied-card-body .wied-card-meta{ flex-shrink:0; }
+  .wied-card-body .wied-card-meta span{ white-space:nowrap; }
+  .wied-card-body > div:nth-child(3){ flex-shrink:0;font-size:11px; }
+  .wied-card-body > div:nth-child(3) span{ white-space:nowrap; }
+  .wied-card-body .sel-cb-row{ display:none !important; }
+  .wied-card-right{ grid-column:3;grid-row:1;flex-direction:row !important;align-items:center !important;gap:6px;flex-shrink:0; }
+  .wied-card-betrag{ font-size:14px !important;font-family:var(--mono);white-space:nowrap; }
+  .wied-card-actions{ flex-shrink:0; }
   #wied-list .wied-card:hover{ background:var(--s2); box-shadow:none; border-color:var(--border); }
 }
