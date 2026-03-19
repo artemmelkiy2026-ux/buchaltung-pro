@@ -2586,15 +2586,18 @@ input, select, textarea {
 .ein-row-arrow-out{ background:rgba(214,51,65,.1);  color:var(--red); }
 .ein-row-head .amt{ font-size:15px;font-weight:700;white-space:nowrap;flex-shrink:0; }
 
-/* Row 2: category info + payment */
+/* Row 2: category info + actions */
 .ein-row-mid{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
 .ein-row-cat{
   display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0;
 }
-.ein-row-pay{
+.ein-row-actions{
   display:flex;align-items:center;gap:4px;flex-shrink:0;
+}
+.ein-row-badge{
+  font-size:10px;font-weight:500;flex-shrink:0;margin-left:auto;
 }
 
 /* Row 3: badges + nr + date */
@@ -3584,7 +3587,7 @@ header { background: #fff; }
   #e-tbody{ gap:0 !important; }
   #e-tbody .ein-row{
     display:grid;
-    grid-template-columns:1fr 220px 200px 110px 120px;
+    grid-template-columns:1fr 220px 200px 110px 50px;
     align-items:center;
     gap:0 12px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
@@ -3599,7 +3602,7 @@ header { background: #fff; }
   #e-tbody .ein-row-cat{ grid-column:2;grid-row:1; }
   #e-tbody .ein-row-tags{ grid-column:3;grid-row:1; }
   #e-tbody .amt{ grid-column:4;grid-row:1;text-align:right;font-size:14px; }
-  #e-tbody .ein-row-pay{ grid-column:5;grid-row:1; }
+  #e-tbody .ein-row-actions{ grid-column:5;grid-row:1;justify-content:flex-end;display:flex; }
   #e-tbody .ein-row:hover{ background:#fafafa;border-color:var(--border); box-shadow:none; }
 
   /* ── ANGEBOTE table ── */

@@ -871,14 +871,15 @@ function renderEin(){
         +'<div class="ein-row-body">'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
-              +'<div class="ein-row-desc"><span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'+(e.beschreibung||e.kategorie)+'</div>'
+              +'<div class="ein-row-desc"><span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'+(e.beschreibung||e.kategorie)+'<span class="badge ein-row-badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span></div>'
               +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
             +'</div>'
             +'<div class="ein-row-mid">'
               +'<div class="ein-row-cat">'+_catLine+'</div>'
-              +'<div class="ein-row-pay" onclick="event.stopPropagation()">'
-                +'<span class="badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
-                +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>' : _mobBtn)
+              +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
+                +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>'
+                  : (isMob() ? _mobBtn
+                    : '<button class="rca-btn rca-red" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren"><i class="fas fa-trash"></i></button>'))
               +'</div>'
             +'</div>'
             +'<div class="ein-row-tags">'+_tagLine+'</div>'
