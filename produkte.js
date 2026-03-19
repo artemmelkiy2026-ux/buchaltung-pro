@@ -62,7 +62,6 @@ function renderProdukte() {
             <span>${p.ust ?? 19}% USt.</span>
             ${p.beschreibung ? `<span style="color:var(--sub);font-style:italic">${p.beschreibung.slice(0,40)}${p.beschreibung.length>40?'…':''}</span>` : ''}
           </div>
-          <div class="sel-cb-row">${_selCb('produkte', p.id)}</div>
         </div>
       </div>
       <div class="prod-card-right">
@@ -76,6 +75,7 @@ function renderProdukte() {
             {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delProdukt('${p.id}')}
           ]) : `<button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`}
         </div>
+        ${_selCb('produkte', p.id)}
       </div>
     </div>`).join('');
 }

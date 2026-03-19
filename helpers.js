@@ -256,7 +256,6 @@ function renderKunden(){
           ${k.tel?`<span class="kunde-meta-item"><i class="fas fa-phone"></i> ${k.tel}</span>`:''}
           ${k.ort?`<span class="kunde-meta-item"><i class="fas fa-map-marker-alt"></i> ${k.plz?k.plz+' ':''}${k.ort}</span>`:''}
         </div>
-        <div class="sel-cb-row">${_selCb('kunden', k.id)}</div>
       </div>
       <div class="kunde-card-right">
         ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div><div class="kunde-rech-cnt">${rechCount} Rechnung${rechCount!==1?'en':''}</div>`:'<div class="kunde-rech-cnt" style="color:var(--muted)">Keine Rechnungen</div>'}
@@ -267,6 +266,7 @@ function renderKunden(){
             {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delKunde('${k.id}')}
           ]) : ''}
         </div>
+        ${_selCb('kunden', k.id)}
       </div>
     </div>`;
   }).join('');

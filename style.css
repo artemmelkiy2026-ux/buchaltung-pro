@@ -170,14 +170,7 @@ header{display:none}
 .sort-btn.active{border-color:var(--blue) !important;color:var(--blue) !important;background:transparent !important;font-weight:600}
 .sort-arrow{display:inline-block;width:12px;text-align:center;font-size:10px}
 /* ── Selection checkbox row (bottom of card) ── */
-.sel-cb-row{
-  display:flex;align-items:center;justify-content:flex-end;
-  height:0;overflow:hidden;
-  margin:0;padding:0;border-top:1px solid transparent;
-}
-.sel-cb-row:has(.sel-cb-on){
-  height:22px;margin-top:6px;padding-top:6px;border-color:var(--border);
-}
+/* Inline checkbox (Auswählen) — hidden when inactive via inline opacity */
 .kg{background:var(--gdim);color:var(--green);font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--green)}
 .edit-btn{color:var(--blue)!important;opacity:0.7!important}
 .edit-btn:hover{opacity:1!important;background:var(--bdim)!important}
@@ -475,7 +468,6 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 .ang-card-meta{ grid-column:2;grid-row:3;display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub); }
 .ang-card-betrag{ grid-column:3;grid-row:1;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);text-align:right;white-space:nowrap;align-self:center; }
 .ang-card-actions{ grid-column:3;grid-row:3;display:flex;gap:3px;justify-content:flex-end;align-self:center; }
-.ang-card .sel-cb-row{ grid-column:1/-1;grid-row:4; }
 .ang-card .ang-expiry-bar{ grid-column:1/-1;grid-row:5; }
 .ang-card:hover{ border-color:var(--border2); box-shadow:var(--shadow-hover); }
 .rech-card{
@@ -3575,7 +3567,6 @@ header { background: #fff; }
   #rech-list .rech-card-meta{ grid-column:4;grid-row:1;margin:0;gap:6px;font-size:11px; }
   #rech-list .rech-card-betrag{ grid-column:5;grid-row:1;text-align:right;font-size:14px; }
   #rech-list .rech-card-end{ grid-column:6;grid-row:1;justify-content:flex-end; }
-  #rech-list .sel-cb-row{ grid-column:1/-1;grid-row:2; }
   #rech-list .rech-card:hover{ background:var(--s2);border-color:var(--border); box-shadow:none; }
   #rech-list .rech-overdue{ font-size:10px;padding:1px 5px; }
 
@@ -3599,7 +3590,6 @@ header { background: #fff; }
   #e-tbody .ein-row-tags{ grid-column:3;grid-row:1; }
   #e-tbody .amt{ grid-column:4;grid-row:1;text-align:right;font-size:14px; }
   #e-tbody .ein-row-pay{ grid-column:5;grid-row:1; }
-  #e-tbody .sel-cb-row{ grid-column:1/-1;grid-row:2; }
   #e-tbody .ein-row:hover{ background:#fafafa;border-color:var(--border); box-shadow:none; }
 
   /* ── ANGEBOTE table ── */
@@ -3618,7 +3608,6 @@ header { background: #fff; }
   .ang-card-meta{ grid-column:4;grid-row:1; }
   .ang-card-betrag{ grid-column:5;grid-row:1;font-size: 14px !important;}
   .ang-card-actions{ grid-column:6;grid-row:1; }
-  .ang-card .sel-cb-row{ grid-column:1/-1;grid-row:2; }
   .ang-card:hover{ background:var(--s2); box-shadow:none; }
 
   /* ── KUNDEN table ── */
@@ -3653,15 +3642,7 @@ header { background: #fff; }
     white-space:nowrap;font-size:11px;opacity:.75;
   }
   .kunde-card-body .kunde-card-meta a:hover{ opacity:1; }
-  .kunde-card-body .sel-cb-row{
-    position:absolute;bottom:0;left:18px;right:18px;
-    border-top:1px solid transparent;
-  }
-  .kunde-card-body .sel-cb-row:has(.sel-cb-on){
-    border-color:var(--border);padding-top:6px;padding-bottom:4px;
-  }
-  #kunden-list .kunde-card{ position:relative;padding-bottom:12px; }
-  #kunden-list .kunde-card:has(.sel-cb-on){ padding-bottom:32px; }
+
   .kunde-card-right{
     grid-column:3;grid-row:1;
     display:flex !important;flex-direction:row !important;align-items:center !important;gap:10px;flex-shrink:0;
@@ -3691,15 +3672,7 @@ header { background: #fff; }
   .prod-price-main{ grid-column:4;grid-row:1;text-align:right; }
   .prod-price-sub{ grid-column:5;grid-row:1;text-align:right;margin:0 !important; }
   .prod-actions{ grid-column:6;grid-row:1;justify-content:flex-end; }
-  .prod-info .sel-cb-row{
-    position:absolute;bottom:0;left:18px;right:18px;
-    border-top:1px solid transparent;
-  }
-  .prod-info .sel-cb-row:has(.sel-cb-on){
-    border-color:var(--border);padding-top:6px;padding-bottom:4px;
-  }
-  #produkte-list .prod-card{ position:relative;padding-bottom:10px; }
-  #produkte-list .prod-card:has(.sel-cb-on){ padding-bottom:32px; }
+
   #produkte-list .prod-card:hover{ background:var(--s2); box-shadow:none; }
 
   /* ── WIEDERKEHREND table ── */
@@ -3722,7 +3695,6 @@ header { background: #fff; }
   .wied-card-schedule span{ white-space:nowrap; }
   .wied-card-betrag{ grid-column:5;grid-row:1;font-size:14px !important;font-family:var(--mono);white-space:nowrap;text-align:right; }
   .wied-card-actions{ grid-column:6;grid-row:1;display:flex;gap:3px;justify-content:flex-end; }
-  .wied-card .sel-cb-row{ grid-column:1/-1;grid-row:2; }
   #wied-list .wied-card:hover{ background:var(--s2); box-shadow:none; border-color:var(--border); }
 }
 

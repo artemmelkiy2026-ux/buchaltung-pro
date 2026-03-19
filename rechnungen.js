@@ -122,6 +122,7 @@ function renderRech(){
         <div class="rech-card-row1">
           <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
           <div class="rech-card-betrag">${fmt(r.betrag)}</div>
+          ${_selCb('rechnungen', r.id)}
         </div>
         <div class="rech-card-row2">
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
@@ -148,7 +149,6 @@ function renderRech(){
           ${_rPosCount?`<span style="color:var(--sub)">·</span><span style="font-size:10px;color:var(--sub)"><i class="fas fa-list" style="opacity:.5;width:10px"></i>${_rPosCount} Pos.</span>`:''}
           ${(r.mahnung_history||[]).length?`<span style="color:var(--sub)">·</span><span style="font-size:10px;font-weight:600;color:var(--yellow)"><i class="fas fa-bell" style="opacity:.7;width:10px"></i>${r.mahnung_history.length}× gemahnt</span>`:''}
         </div>
-        <div class="sel-cb-row">${_selCb('rechnungen', r.id)}</div>
       </div>
     </div>`;
   }).join('');

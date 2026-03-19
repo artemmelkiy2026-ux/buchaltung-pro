@@ -880,6 +880,7 @@ function renderEin(){
             +'<div class="ein-row-head">'
               +'<div class="ein-row-desc"><span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'+(e.beschreibung||e.kategorie)+'</div>'
               +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
+              +_selCb('eintraege', e.id)
             +'</div>'
             +'<div class="ein-row-mid">'
               +'<div class="ein-row-cat">'+_catLine+'</div>'
@@ -889,7 +890,6 @@ function renderEin(){
               +'</div>'
             +'</div>'
             +'<div class="ein-row-tags">'+_tagLine+'</div>'
-            +'<div class="sel-cb-row">'+_selCb('eintraege', e.id)+'</div>'
           +'</div>'
         +'</div>'
         +'</div>';
