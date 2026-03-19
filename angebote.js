@@ -183,7 +183,7 @@ function renderAngebote() {
           </div>
           <div style="font-size:15px;color:var(--text);overflow:hidden;text-overflow:ellipsis">${a.kunde||'Kein Kunde'}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="position:relative;flex-shrink:0">
           ${_aSelMode ? _selCb('angebote', a.id) : ''}
           <div style="text-align:right">
             <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)">${fmt(a.betrag)}</div>

@@ -84,7 +84,7 @@ function renderWied(){
         </div>
       </div>
       <div class="wied-card-right">
-        <div style="display:flex;align-items:center;gap:6px">
+        <div style="position:relative">
           ${_wSelMode ? _selCb('wiederkehrend', w.id) : ''}
           <div class="wied-card-betrag" style="color:${isEin?'var(--green)':'var(--red)'}">
             ${isEin?'+':'−'}${fmt(w.betrag)}

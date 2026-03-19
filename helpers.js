@@ -258,7 +258,7 @@ function renderKunden(){
         </div>
       </div>
       <div class="kunde-card-right">
-        <div style="display:flex;align-items:center;gap:6px">
+        <div style="position:relative">
           ${_kCb}
           ${umsatz>0?`<div class="kunde-umsatz">${fmt(umsatz)}</div>`:''}
         </div>

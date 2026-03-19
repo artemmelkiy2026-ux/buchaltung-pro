@@ -121,7 +121,7 @@ function renderRech(){
       <div class="rech-card-content">
         <div class="rech-card-row1">
           <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
-          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <div style="position:relative;flex-shrink:0">
             ${_rSelMode ? _selCb('rechnungen', r.id) : ''}
             <div class="rech-card-betrag">${fmt(r.betrag)}</div>
           </div>

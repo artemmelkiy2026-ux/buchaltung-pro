@@ -91,7 +91,7 @@ function _selCb(section, id) {
   const checked = window._selected[section].has(id) ? 'checked' : '';
   return `<input type="checkbox" class="sel-cb" data-section="${section}" data-id="${id}"
     ${checked} onclick="event.stopPropagation();toggleSelectItem('${section}','${id}',this)"
-    style="width:18px;height:18px;flex-shrink:0;accent-color:var(--blue);cursor:pointer">`;
+    style="width:15px;height:15px;flex-shrink:0;accent-color:var(--blue);cursor:pointer;position:absolute;right:calc(100% + 4px);top:50%;transform:translateY(-50%)">`;
 }
 
 // ── Context menu ───────────────────────────────────────────────────

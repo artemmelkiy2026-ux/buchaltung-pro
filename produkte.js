@@ -65,7 +65,7 @@ function renderProdukte() {
         </div>
       </div>
       <div class="prod-card-right">
-        <div style="display:flex;align-items:center;gap:6px">
+        <div style="position:relative">
           ${_selCb('produkte', p.id)}
           <div class="prod-prices">
             <div class="prod-price-main">${fmt(p.vkNetto || 0)} €<span style="font-size:10px;color:var(--sub);font-weight:400"> Netto</span></div>
