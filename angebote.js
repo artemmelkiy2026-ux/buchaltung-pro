@@ -176,15 +176,15 @@ function renderAngebote() {
         <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--sub)">${a.nr||'—'}</span>
         <span class="rech-card-status ${st.pill}" style="font-size:10px;padding:2px 6px">${st.label}</span>
       </div>
-      <div class="ang-card-kunde" style="font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.kunde||'Kein Kunde'}</div>
-      <div class="ang-card-meta" style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--sub)">
+      <div class="ang-card-kunde">${a.kunde||'Kein Kunde'}</div>
+      <div class="ang-card-meta">
         <span><i class="fas fa-calendar" style="width:12px;opacity:.5"></i> ${fd(a.datum)}</span>
         <span>${ageLabel}</span>
         ${posCount ? `<span>${posCount} Pos.</span>` : ''}
         ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}">bis ${fd(a.gueltig)}</span>` : ''}
       </div>
-      <div class="ang-card-betrag" style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);text-align:right;white-space:nowrap">${fmt(a.betrag)}${nettoLabel}</div>
-      <div class="ang-card-actions" style="display:flex;gap:3px;justify-content:flex-end" onclick="event.stopPropagation()">
+      <div class="ang-card-betrag">${fmt(a.betrag)}${nettoLabel}</div>
+      <div class="ang-card-actions" onclick="event.stopPropagation()">
         ${isMob() ? _moreBtn([
           {icon:'fa-print',       label:'Drucken',      action:()=>angDruck('${a.id}')},
           {icon:'fa-file-invoice',label:'→ Rechnung',   action:()=>angZuRechnung('${a.id}')},

@@ -464,11 +464,19 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 /* ── RECHNUNGEN KARTEN ── */
 #rech-list, #ang-list{ display:flex; flex-direction:column; gap:12px; }
 .ang-card{
-  display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  display:grid;grid-template-columns:32px 1fr auto;gap:4px 10px;
   background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);
   padding:14px 16px;cursor:pointer;
   transition:border-color .15s, box-shadow .15s;
 }
+.ang-card-avatar{ grid-column:1;grid-row:1;align-self:start;margin-top:2px; }
+.ang-card-nr{ grid-column:2;grid-row:1;display:flex;align-items:center;gap:6px; }
+.ang-card-kunde{ grid-column:2/4;grid-row:2;font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.ang-card-meta{ grid-column:2;grid-row:3;display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--sub); }
+.ang-card-betrag{ grid-column:3;grid-row:1;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);text-align:right;white-space:nowrap;align-self:center; }
+.ang-card-actions{ grid-column:3;grid-row:3;display:flex;gap:3px;justify-content:flex-end;align-self:center; }
+.ang-card .sel-cb-row{ grid-column:1/-1;grid-row:4; }
+.ang-card .ang-expiry-bar{ grid-column:1/-1;grid-row:5; }
 .ang-card:hover{ border-color:var(--border2); box-shadow:var(--shadow-hover); }
 .rech-card{
   display:flex; align-items:flex-start; gap:12px;
@@ -1276,7 +1284,7 @@ input, select, textarea {
   display:flex;align-items:center;gap:14px;
   background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);
   padding:16px 18px;transition:border-color .15s,box-shadow .15s;
-  position:relative;overflow:hidden;
+  position:relative;
 }
 .wied-card:hover{border-color:var(--border2);box-shadow:var(--shadow-hover)}
 .wied-card--faellig{border-color:rgba(224,140,26,.4);background:var(--ydim)}
@@ -3462,7 +3470,7 @@ header { background: #fff; }
 
 /* Context menu */
 .ctx-menu {
-  position: fixed; z-index: 99999;
+  z-index: 99999;
   background: var(--s1); border: 1px solid var(--border2);
   border-radius: 12px; padding: 6px 0;
   box-shadow: 0 8px 32px rgba(0,0,0,.22);
@@ -3645,7 +3653,7 @@ header { background: #fff; }
     white-space:nowrap;font-size:11px;opacity:.75;
   }
   .kunde-card-body .kunde-card-meta a:hover{ opacity:1; }
-  .kunde-card-body .sel-cb-row{ display:none !important; }
+  .kunde-card-body .sel-cb-row{ width:100%; }
   .kunde-card-right{
     grid-column:3;grid-row:1;
     display:flex !important;flex-direction:row !important;align-items:center !important;gap:10px;flex-shrink:0;
@@ -3675,7 +3683,7 @@ header { background: #fff; }
   .prod-price-main{ grid-column:4;grid-row:1;text-align:right; }
   .prod-price-sub{ grid-column:5;grid-row:1;text-align:right;margin:0 !important; }
   .prod-actions{ grid-column:6;grid-row:1;justify-content:flex-end; }
-  .prod-info .sel-cb-row{ display:none; }
+  .prod-info .sel-cb-row{ width:100%; }
   #produkte-list .prod-card:hover{ background:var(--s2); box-shadow:none; }
 
   /* ── WIEDERKEHREND table ── */

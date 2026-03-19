@@ -124,30 +124,49 @@ function showCtxMenu(e, items) {
     menu.appendChild(el);
   });
 
-  document.body.appendChild(menu);
-
-  // Position: try to place near the trigger
+  // Find the nearest card parent to anchor inside
   const trigger = e && (e.currentTarget || e.target);
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const mW = 180, mH = items.length * 46 + 12;
+  const card = trigger && trigger.closest('.ein-row,.rech-card,.ang-card,.wied-card,.kunde-card,.prod-card');
 
-  let top, left;
-  if (trigger) {
-    const r = trigger.getBoundingClientRect();
-    // prefer below-left of button
-    left = Math.max(8, r.right - mW);
-    top  = r.bottom + 6;
-    if (top + mH > vh - 8) top = r.top - mH - 6;
+  if (card) {
+    // Anchor inside card
+    card.style.position = 'relative';
+    menu.style.position = 'absolute';
+    card.appendChild(menu);
+
+    const btnRect = trigger.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const mW = 180;
+    const mH = items.length * 46 + 12;
+
+    let right = cardRect.right - btnRect.right;
+    let top = btnRect.bottom - cardRect.top + 4;
+    // If overflows bottom of viewport, show above
+    if (btnRect.bottom + mH + 4 > window.innerHeight) {
+      top = btnRect.top - cardRect.top - mH - 4;
+    }
+    menu.style.cssText += `;right:${Math.max(0,right)}px;top:${top}px;min-width:${mW}px;left:auto`;
   } else {
-    left = Math.max(8, (e ? e.clientX : vw/2) - mW/2);
-    top  = e ? e.clientY + 6 : vh/2;
+    // Fallback: fixed on body
+    document.body.appendChild(menu);
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const mW = 180, mH = items.length * 46 + 12;
+    let top, left;
+    if (trigger) {
+      const r = trigger.getBoundingClientRect();
+      left = Math.max(8, r.right - mW);
+      top  = r.bottom + 6;
+      if (top + mH > vh - 8) top = r.top - mH - 6;
+    } else {
+      left = Math.max(8, (e ? e.clientX : vw/2) - mW/2);
+      top  = e ? e.clientY + 6 : vh/2;
+    }
+    left = Math.min(left, vw - mW - 8);
+    top  = Math.max(8, top);
+    menu.style.cssText += `;left:${left}px;top:${top}px;min-width:${mW}px`;
   }
-  left = Math.min(left, vw - mW - 8);
-  top  = Math.max(8, top);
 
-  menu.style.cssText += `;left:${left}px;top:${top}px;min-width:${mW}px`;
-
-  // Close on outside click/tap — use capture to beat stopPropagation
+  // Close on outside click/tap
   const close = (ev) => {
     if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', close, true); }
   };
