@@ -247,8 +247,10 @@ function renderKunden(){
     return `<div class="kunde-card" ${_kClick} style="cursor:${_kSelMode?'default':'pointer'}">
       <div class="kunde-card-avatar">${initials}</div>
       <div class="kunde-card-body">
-        <div class="kunde-card-name">${k.name||'—'}</div>
-        ${k.ansprechpartner?`<div class="kunde-card-role">${k.ansprechpartner}</div>`:''}
+        <div class="kunde-card-headline">
+          <span class="kunde-card-name">${k.name||'—'}</span>
+          ${k.ansprechpartner?`<span class="kunde-card-role">${k.ansprechpartner}</span>`:''}
+        </div>
         <div class="kunde-card-meta">
           ${k.email?`<a href="mailto:${k.email}" onclick="event.stopPropagation()" class="kunde-meta-link"><i class="fas fa-envelope"></i> ${k.email}</a>`:''}
           ${k.tel?`<span class="kunde-meta-item"><i class="fas fa-phone"></i> ${k.tel}</span>`:''}

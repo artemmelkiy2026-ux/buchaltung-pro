@@ -561,8 +561,9 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
   font-size:14px; font-weight:700; color:var(--blue); letter-spacing:.05em;
 }
 .kunde-card-body{ flex:1; min-width:0; }
-.kunde-card-name{ font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
-.kunde-card-role{ font-size:11px; color:var(--sub); margin-bottom:4px; }
+.kunde-card-name{ font-size:14px; font-weight:600; color:var(--text); }
+.kunde-card-role{ font-size:11px; color:var(--sub); }
+.kunde-card-headline{ display:flex; align-items:baseline; gap:8px; margin-bottom:3px; }
 .kunde-card-meta{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 .kunde-meta-link{ font-size:11px; color:var(--blue); text-decoration:none; display:flex; align-items:center; gap:3px; }
 .kunde-meta-link:hover{ text-decoration:underline; }
@@ -3623,14 +3624,35 @@ header { background: #fff; }
   }
   #kunden-list .kunde-card:last-child{ border-radius:0 0 var(--r) var(--r); }
   .kunde-card-avatar{ grid-column:1;grid-row:1;width:36px !important;height:36px !important;font-size:13px !important; }
-  .kunde-card-body{ grid-column:2;grid-row:1;min-width:0;display:flex !important;align-items:center;gap:16px; }
-  .kunde-card-body .kunde-card-name{ font-size:13px;font-weight:600;white-space:nowrap;flex-shrink:0; }
-  .kunde-card-body .kunde-card-role{ font-size:11px;color:var(--sub);flex-shrink:0; }
-  .kunde-card-body .kunde-card-meta{ display:flex !important;flex:1;min-width:0; }
+  .kunde-card-body{
+    grid-column:2;grid-row:1;min-width:0;
+    display:flex !important;flex-direction:column !important;gap:1px !important;
+  }
+  .kunde-card-body .kunde-card-headline{
+    display:flex;align-items:baseline;gap:8px;margin:0;
+  }
+  .kunde-card-body .kunde-card-name{
+    font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .kunde-card-body .kunde-card-role{
+    font-size:11px;color:var(--sub);white-space:nowrap;flex-shrink:0;
+  }
+  .kunde-card-body .kunde-card-meta{
+    display:flex !important;flex-wrap:nowrap;gap:12px;flex:none;min-width:0;margin:0;
+  }
+  .kunde-card-body .kunde-card-meta a,
+  .kunde-card-body .kunde-card-meta span{
+    white-space:nowrap;font-size:11px;opacity:.75;
+  }
+  .kunde-card-body .kunde-card-meta a:hover{ opacity:1; }
   .kunde-card-body .sel-cb-row{ display:none !important; }
-  .kunde-card-right{ grid-column:3;grid-row:1;flex-direction:row !important;align-items:center !important;gap:10px;flex-shrink:0; }
+  .kunde-card-right{
+    grid-column:3;grid-row:1;
+    display:flex !important;flex-direction:row !important;align-items:center !important;gap:10px;flex-shrink:0;
+  }
   .kunde-card-right .kunde-umsatz{ font-size:14px;font-family:var(--mono);white-space:nowrap; }
   .kunde-card-right .kunde-rech-cnt{ font-size:11px;white-space:nowrap; }
+  .kunde-card-right .kunde-card-actions{ flex-shrink:0; }
   #kunden-list .kunde-card:hover{ background:var(--s2); box-shadow:none; }
 
   /* ── PRODUKTE table ── */
