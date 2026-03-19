@@ -3556,7 +3556,7 @@ header { background: #fff; }
   .lt-c{ flex-shrink:0; }
 
   /* ── RECHNUNGEN table ── */
-  #rech-list{ gap:0 !important; min-height:570px; }
+  #rech-list{ gap:0 !important; }
   #rech-list .rech-card{
     display:grid;
     grid-template-columns:40px 90px 1fr 220px 110px 110px;
@@ -3564,8 +3564,7 @@ header { background: #fff; }
     gap:0 12px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
     margin:0;padding:10px 18px;
-    min-height:56px;box-sizing:border-box;
-  }
+    }
   #rech-list .rech-card:last-child{ border-radius:0 0 var(--r) var(--r); }
   #rech-list .rech-card-content{ display:contents; }
   #rech-list .rech-card-row1{ display:contents; }
@@ -3581,7 +3580,7 @@ header { background: #fff; }
   #rech-list .rech-overdue{ font-size:10px;padding:1px 5px; }
 
   /* ── EINTRÄGE table ── */
-  #e-tbody{ gap:0 !important; min-height:570px; }
+  #e-tbody{ gap:0 !important; }
   #e-tbody .ein-row{
     display:grid;
     grid-template-columns:1fr 220px 200px 110px 120px;
@@ -3589,8 +3588,7 @@ header { background: #fff; }
     gap:0 12px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
     margin:0;padding:10px 18px;
-    min-height:56px;box-sizing:border-box;
-  }
+    }
   #e-tbody .ein-row:last-child{ border-radius:0 0 var(--r) var(--r); }
   #e-tbody .ein-row-body{ display:contents; }
   #e-tbody .ein-row-content{ display:contents; }
@@ -3611,9 +3609,8 @@ header { background: #fff; }
     align-items:center;gap:0 12px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
     margin:0;padding:10px 18px;
-    min-height:56px;box-sizing:border-box;
-  }
-  #ang-list{ gap:0 !important; min-height:570px; }
+    }
+  #ang-list{ gap:0 !important; }
   #ang-list .ang-card:last-child{ border-radius:0 0 var(--r) var(--r); }
   .ang-card-avatar{ grid-column:1;grid-row:1; }
   .ang-card-nr{ grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:2px; }
@@ -3625,15 +3622,14 @@ header { background: #fff; }
   .ang-card:hover{ background:var(--s2); box-shadow:none; }
 
   /* ── KUNDEN table ── */
-  #kunden-list{ gap:0 !important; min-height:570px; }
+  #kunden-list{ gap:0 !important; }
   #kunden-list .kunde-card{
     display:grid !important;
     grid-template-columns:40px 1fr auto;
     align-items:center;gap:0 16px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
     margin:0;padding:12px 18px;
-    min-height:56px;box-sizing:border-box;
-  }
+    }
   #kunden-list .kunde-card:last-child{ border-radius:0 0 var(--r) var(--r); }
   .kunde-card-avatar{ grid-column:1;grid-row:1;width:36px !important;height:36px !important;font-size:13px !important; }
   .kunde-card-body{
@@ -3676,15 +3672,14 @@ header { background: #fff; }
   #kunden-list .kunde-card:hover{ background:var(--s2); box-shadow:none; }
 
   /* ── PRODUKTE table ── */
-  #produkte-list{ gap:0 !important; min-height:570px; }
+  #produkte-list{ gap:0 !important; }
   #produkte-list .prod-card{
     display:grid !important;
     grid-template-columns:40px 1fr 200px 110px 110px 50px;
     align-items:center;gap:0 12px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
     margin:0;padding:10px 18px;
-    min-height:56px;box-sizing:border-box;
-  }
+    }
   #produkte-list .prod-card:last-child{ border-radius:0 0 var(--r) var(--r); }
   .prod-card-left{ display:contents !important; }
   .prod-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:22px !important; }
@@ -3729,4 +3724,17 @@ header { background: #fff; }
   .wied-card-actions{ grid-column:6;grid-row:1;display:flex;gap:3px;justify-content:flex-end; }
   .wied-card .sel-cb-row{ grid-column:1/-1;grid-row:2; }
   #wied-list .wied-card:hover{ background:var(--s2); box-shadow:none; border-color:var(--border); }
+}
+
+/* ── STICKY PAGINATION ── */
+#e-pagination,
+#rech-pagination,
+#ang-pagination,
+#kunden-pagination,
+#wied-pagination{
+  position:sticky;bottom:0;z-index:10;
+  background:var(--bg);
+  padding:10px 0 4px;
+  margin-top:8px;
+  border-top:1px solid var(--border);
 }
