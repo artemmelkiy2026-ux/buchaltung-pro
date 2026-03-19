@@ -657,10 +657,10 @@ function renderDash(){
   ['datum','betrag','typ'].forEach(col=>{
     const btn=document.getElementById('dsort-'+col);
     if(!btn) return;
-    btn.style.background = dashSortCol===col ? 'var(--blue)' : '';
-    btn.style.color      = dashSortCol===col ? '#fff' : '';
+    const active = dashSortCol===col;
+    btn.classList.toggle('active', active);
     const lbl = col==='datum'?'Datum':col==='betrag'?'Betrag':'Typ';
-    btn.textContent = lbl + (dashSortCol===col ? (dashSortAsc?' ↑':' ↓') : '');
+    btn.innerHTML = lbl + '<span class="sort-arrow">'+(active?(dashSortAsc?' ↑':' ↓'):'&nbsp;')+'</span>';
   });
 
   // Recent 10 — последние по выбранному году
@@ -807,9 +807,9 @@ function renderEin(){
   [['datum','Datum'],['betrag','Betrag'],['kategorie','Kategorie'],['zahlungsart','Zahlung']].forEach(([col,lbl])=>{
     const btn=document.getElementById('esort-'+col);
     if(!btn) return;
-    btn.style.background = sortCol===col ? 'var(--blue)' : '';
-    btn.style.color      = sortCol===col ? '#fff' : '';
-    btn.textContent = lbl + (sortCol===col ? (sortAsc?' ↑':' ↓') : '');
+    const active = sortCol===col;
+    btn.classList.toggle('active', active);
+    btn.innerHTML = lbl + '<span class="sort-arrow">'+(active?(sortAsc?' ↑':' ↓'):'&nbsp;')+'</span>';
   });
 
   if(!entries.length){
@@ -1101,9 +1101,9 @@ function renderZ(){
   [['datum','Datum'],['zahlungsart','Zahlungsart'],['typ','Ein / Aus']].forEach(([col,lbl])=>{
     const btn=document.getElementById('zsort-'+col);
     if(!btn) return;
-    btn.style.background = zSortCol===col ? 'var(--blue)' : '';
-    btn.style.color      = zSortCol===col ? '#fff' : '';
-    btn.textContent = lbl + (zSortCol===col ? (zSortAsc?' ↑':' ↓') : '');
+    const active = zSortCol===col;
+    btn.classList.toggle('active', active);
+    btn.innerHTML = lbl + '<span class="sort-arrow">'+(active?(zSortAsc?' ↑':' ↓'):'&nbsp;')+'</span>';
   });
   const ztb=document.getElementById('z-tbody'),zem=document.getElementById('z-empty');
   const zpag=document.getElementById('z-pagination');

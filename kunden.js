@@ -12,10 +12,8 @@ function _updateWiedSortBtns(){
   [['bezeichnung','Bezeichnung'],['betrag','Betrag'],['naechste','Nächste'],['intervall','Intervall']].forEach(([col,lbl])=>{
     document.querySelectorAll(`#p-wiederkehrend button[onclick*="sortWied('${col}')"]`).forEach(btn=>{
       const active=wiedSort===col;
-      btn.style.background=active?'var(--blue)':'';
-      btn.style.borderColor=active?'var(--blue)':'';
-      btn.style.color=active?'#fff':'';
-      btn.textContent=lbl+(active?(wiedSortAsc?' ↑':' ↓'):'');
+      btn.classList.toggle('active', active);
+      btn.innerHTML=lbl+'<span class="sort-arrow">'+(active?(wiedSortAsc?' ↑':' ↓'):'&nbsp;')+'</span>';
     });
   });
 }

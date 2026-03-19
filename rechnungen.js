@@ -171,10 +171,8 @@ function _updateRechSortBtns(){
   [['datum','Datum'],['faellig','Fällig'],['betrag','Betrag'],['kunde','Kunde']].forEach(([col,lbl])=>{
     document.querySelectorAll(`#p-rechnungen button[onclick*="sortRech('${col}')"]`).forEach(btn=>{
       const active = rechSort===col;
-      btn.style.background = active ? 'var(--blue)' : '';
-      btn.style.borderColor = active ? 'var(--blue)' : '';
-      btn.style.color = active ? '#fff' : '';
-      btn.textContent = lbl + (active ? (rechSortDir===1?' ↑':' ↓') : '');
+      btn.classList.toggle('active', active);
+      btn.innerHTML = lbl + '<span class="sort-arrow">'+(active?(rechSortDir===1?' ↑':' ↓'):'&nbsp;')+'</span>';
     });
   });
 }

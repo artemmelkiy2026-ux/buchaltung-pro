@@ -203,10 +203,8 @@ function _updateKundenSortBtns(){
   [['name','Name'],['ort','Ort'],['umsatz','Umsatz']].forEach(([col,lbl])=>{
     document.querySelectorAll(`#p-kunden button[onclick*="sortKunden('${col}')"]`).forEach(btn=>{
       const active=kundenSort===col;
-      btn.style.background=active?'var(--blue)':'';
-      btn.style.borderColor=active?'var(--blue)':'';
-      btn.style.color=active?'#fff':'';
-      btn.textContent=lbl+(active?(kundenSortAsc?' ↑':' ↓'):'');
+      btn.classList.toggle('active', active);
+      btn.innerHTML=lbl+'<span class="sort-arrow">'+(active?(kundenSortAsc?' ↑':' ↓'):'&nbsp;')+'</span>';
     });
   });
 }

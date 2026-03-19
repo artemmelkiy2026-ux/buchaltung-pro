@@ -164,6 +164,11 @@ header{display:none}
 .btn.primary:hover{opacity:.88}
 .btn.success{background:var(--gdim);border-color:var(--green);color:var(--green)}
 .btn.success:hover{opacity:.8}
+/* ── Sort buttons (unified) ── */
+.sort-btn{padding:4px 10px !important;font-size:11px !important;height:auto !important;background:transparent !important;border:1px solid var(--border);color:var(--sub)}
+.sort-btn:hover{border-color:var(--blue);color:var(--blue)}
+.sort-btn.active{border-color:var(--blue) !important;color:var(--blue) !important;background:transparent !important;font-weight:600}
+.sort-arrow{display:inline-block;width:12px;text-align:center;font-size:10px}
 .kg{background:var(--gdim);color:var(--green);font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--green)}
 .edit-btn{color:var(--blue)!important;opacity:0.7!important}
 .edit-btn:hover{opacity:1!important;background:var(--bdim)!important}

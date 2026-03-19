@@ -315,9 +315,9 @@
       <div style="font-size:13px;font-weight:700;color:var(--text)">Letzte 10 Einträge</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
         <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-        <button class="btn" id="dsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortDash('datum')">Datum</button>
-        <button class="btn" id="dsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortDash('betrag')">Betrag</button>
-        <button class="btn" id="dsort-typ"    style="padding:4px 10px;font-size:11px" onclick="sortDash('typ')">Typ</button>
+        <button class="btn sort-btn" id="dsort-datum" onclick="sortDash('datum')">Datum<span class="sort-arrow">&nbsp;</span></button>
+        <button class="btn sort-btn" id="dsort-betrag" onclick="sortDash('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
+        <button class="btn sort-btn" id="dsort-typ" onclick="sortDash('typ')">Typ<span class="sort-arrow">&nbsp;</span></button>
       </div>
     </div>
     <div id="d-recent"></div>
@@ -381,10 +381,10 @@
   <!-- Sort bar -->
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-    <button class="btn" id="esort-datum"       style="padding:4px 10px;font-size:11px" onclick="sortE('datum')">Datum</button>
-    <button class="btn" id="esort-betrag"      style="padding:4px 10px;font-size:11px" onclick="sortE('betrag')">Betrag</button>
-    <button class="btn" id="esort-kategorie"   style="padding:4px 10px;font-size:11px" onclick="sortE('kategorie')">Kategorie</button>
-    <button class="btn" id="esort-zahlungsart" style="padding:4px 10px;font-size:11px" onclick="sortE('zahlungsart')">Zahlung</button>
+    <button class="btn sort-btn" id="esort-datum" onclick="sortE('datum')">Datum<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" id="esort-betrag" onclick="sortE('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" id="esort-kategorie" onclick="sortE('kategorie')">Kategorie<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" id="esort-zahlungsart" onclick="sortE('zahlungsart')">Zahlung<span class="sort-arrow">&nbsp;</span></button>
     <!-- compat hidden elements for JS refs -->
     <span id="th-datum" style="display:none"></span>
     <span id="th-typ" style="display:none"></span>
@@ -450,8 +450,8 @@
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
       <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-      <button class="btn" id="jsort-datum"  style="padding:4px 10px;font-size:11px" onclick="sortJournal('datum')">Datum</button>
-      <button class="btn" id="jsort-betrag" style="padding:4px 10px;font-size:11px" onclick="sortJournal('betrag')">Betrag</button>
+      <button class="btn sort-btn" id="jsort-datum" onclick="sortJournal('datum')">Datum<span class="sort-arrow">&nbsp;</span></button>
+      <button class="btn sort-btn" id="jsort-betrag" onclick="sortJournal('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
     </div>
   </div>
   <div id="journal-tbody"></div>
@@ -741,9 +741,9 @@
   <div class="zk-grid" id="zk-grid"></div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-    <button class="btn" id="zsort-datum"       style="padding:4px 10px;font-size:11px" onclick="sortZ('datum')">Datum</button>
-    <button class="btn" id="zsort-zahlungsart" style="padding:4px 10px;font-size:11px" onclick="sortZ('zahlungsart')">Zahlungsart</button>
-    <button class="btn" id="zsort-typ"         style="padding:4px 10px;font-size:11px" onclick="sortZ('typ')">Ein / Aus</button>
+    <button class="btn sort-btn" id="zsort-datum" onclick="sortZ('datum')">Datum<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" id="zsort-zahlungsart" onclick="sortZ('zahlungsart')">Zahlungsart<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" id="zsort-typ" onclick="sortZ('typ')">Ein / Aus<span class="sort-arrow">&nbsp;</span></button>
   </div>
   <div id="z-tbody"></div>
   <div id="z-pagination" style="margin-top:8px"></div>
@@ -851,9 +851,9 @@
   <!-- Sort bar -->
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('name')">Name</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('ort')">Ort</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortKunden('umsatz')">Umsatz</button>
+    <button class="btn sort-btn" onclick="sortKunden('name')">Name<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortKunden('ort')">Ort<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortKunden('umsatz')">Umsatz<span class="sort-arrow">&nbsp;</span></button>
   </div>
   <!-- Kunden Karten -->
   <div id="kunden-list" class="kunden-list"></div>
@@ -885,9 +885,9 @@
   </div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortAng('datum')">Datum</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortAng('betrag')">Betrag</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortAng('kunde')">Kunde</button>
+    <button class="btn sort-btn" onclick="sortAng('datum')">Datum<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortAng('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortAng('kunde')">Kunde<span class="sort-arrow">&nbsp;</span></button>
   </div>
   <div id="ang-list"></div>
   <div id="ang-pagination"></div>
@@ -1092,10 +1092,10 @@
   </div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('datum')">Datum</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('faellig')">Fällig</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('betrag')">Betrag</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortRech('kunde')">Kunde</button>
+    <button class="btn sort-btn" onclick="sortRech('datum')">Datum<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortRech('faellig')">Fällig<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortRech('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortRech('kunde')">Kunde<span class="sort-arrow">&nbsp;</span></button>
   </div>
   <div id="rech-list"></div>
   <div id="rech-pagination"></div>
@@ -1124,10 +1124,10 @@
   <!-- Sort bar -->
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('naechste')">Nächste</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('bezeichnung')">Bezeichnung</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('betrag')">Betrag</button>
-    <button class="btn" style="padding:4px 10px;font-size:11px" onclick="sortWied('intervall')">Intervall</button>
+    <button class="btn sort-btn" onclick="sortWied('naechste')">Nächste<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortWied('bezeichnung')">Bezeichnung<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortWied('betrag')">Betrag<span class="sort-arrow">&nbsp;</span></button>
+    <button class="btn sort-btn" onclick="sortWied('intervall')">Intervall<span class="sort-arrow">&nbsp;</span></button>
   </div>
   <div id="wied-list" style="display:flex;flex-direction:column;gap:10px"></div>
   <div id="wied-pagination"></div>

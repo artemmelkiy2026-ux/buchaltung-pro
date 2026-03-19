@@ -47,7 +47,7 @@ function renderJournal() {
     // Сбрасываем кнопки
     ['datum','betrag'].forEach(c => {
       const b = document.getElementById('jsort-'+c);
-      if(b) { b.style.background=''; b.style.color=''; b.textContent = c==='datum'?'Datum':'Betrag'; }
+      if(b) { b.classList.remove('active'); b.innerHTML = (c==='datum'?'Datum':'Betrag')+'<span class="sort-arrow">&nbsp;</span>'; }
     });
     return;
   }
@@ -114,9 +114,9 @@ function renderJournal() {
     const b = document.getElementById('jsort-'+c);
     if (!b) return;
     const lbl = c === 'datum' ? 'Datum' : 'Betrag';
-    b.style.background = journalSortCol === c ? 'var(--blue)' : '';
-    b.style.color      = journalSortCol === c ? '#fff' : '';
-    b.textContent = lbl + (journalSortCol === c ? (journalSortAsc ? ' ↑' : ' ↓') : '');
+    const active = journalSortCol === c;
+    b.classList.toggle('active', active);
+    b.innerHTML = lbl + '<span class="sort-arrow">'+(active?(journalSortAsc?' ↑':' ↓'):'&nbsp;')+'</span>';
   });
 
   let html = '';

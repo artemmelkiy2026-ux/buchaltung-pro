@@ -214,6 +214,15 @@ function renderAngebote() {
 
   window._angPageCb = p => { angPage = p; renderAngebote(); };
   renderPager('ang-pagination', angPage, total, filtered.length, '_angPageCb');
+
+  // Update sort buttons
+  [['datum','Datum'],['betrag','Betrag'],['kunde','Kunde']].forEach(([col,lbl])=>{
+    document.querySelectorAll(`#p-angebote button[onclick*="sortAng('${col}')"]`).forEach(btn=>{
+      const active=angSort===col;
+      btn.classList.toggle('active', active);
+      btn.innerHTML=lbl+'<span class="sort-arrow">'+(active?' ↓':'&nbsp;')+'</span>';
+    });
+  });
 }
 
 // ── FORM ÖFFNEN/SCHLIESSEN ───────────────────────────────────────────────────
@@ -741,8 +750,4 @@ function setAngFilter(filter, el) {
   renderAngebote();
 }
 
-function sortAng(col) {
-  angSort = col;
-  renderAngebote();
-}
 
