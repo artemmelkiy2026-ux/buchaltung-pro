@@ -1838,6 +1838,7 @@
   </div>
 </div>
 <!-- ── FAHRTENBUCH ── -->
+<!-- ── FAHRTENBUCH LISTE ── -->
 <div class="page" id="p-fahrtenbuch">
 <div class="page-inner">
   <div class="ph">
@@ -1847,9 +1848,19 @@
     </div>
     <div class="ph-right">
       <select id="fb-yr" onchange="renderFahrtenbuch()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 12px;font-size:13px"><option value="Alle">Alle Jahre</option></select>
+      <button class="btn" onclick="openModal('auto-modal-list')"><i class="fas fa-car"></i><span class="ang-btn-txt"> Fahrzeuge</span></button>
       <button class="btn primary" onclick="openFahrtForm()"><i class="fas fa-plus"></i><span class="ang-btn-txt"> Neue Fahrt</span></button>
     </div>
   </div>
+
+  <!-- Fahrzeug-Filter -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <i class="fas fa-car" style="color:var(--sub);font-size:12px"></i>
+    <select id="fb-auto-filter" onchange="renderFahrtenbuch()" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 10px;font-size:13px;flex:1;max-width:260px">
+      <option value="">Alle Fahrzeuge</option>
+    </select>
+  </div>
+
   <div class="stats" id="fb-stats" style="grid-template-columns:repeat(4,1fr)"></div>
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
     <span style="font-size:11px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Sortieren:</span>
@@ -1867,7 +1878,11 @@
   </div>
   <div id="fb-list"></div>
   <div id="fb-pagination"></div>
-  <div id="fb-empty" class="empty-state" style="display:none"><div class="ei"><i class="fas fa-car"></i></div><p>Keine Fahrten eingetragen</p><p style="font-size:12px;color:var(--sub)">Erste Fahrt erfassen →</p></div>
+  <div id="fb-empty" class="empty-state" style="display:none">
+    <div class="ei"><i class="fas fa-car"></i></div>
+    <p>Keine Fahrten eingetragen</p>
+    <p style="font-size:12px;color:var(--sub)">Erste Fahrt erfassen →</p>
+  </div>
 </div>
 </div>
 
@@ -1876,14 +1891,29 @@
   <div class="ang-sticky-header">
     <div class="ang-sticky-left">
       <div id="fb-form-title" class="ang-sticky-title">Neue Fahrt</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Fahrt im Fahrtenbuch erfassen</div>
     </div>
     <div class="ang-sticky-right">
+      <button class="btn" id="fb-gmap-toggle" onclick="toggleFbGmap()">
+        <i class="fas fa-map-marked-alt"></i> Maps AUS
+      </button>
       <button class="btn primary" onclick="saveFahrt()"><i class="fas fa-save"></i><span class="ang-btn-txt"> Speichern</span></button>
       <button class="btn ang-back-btn" onclick="closeFahrtForm()" title="Zurück"><i class="fas fa-arrow-left"></i></button>
     </div>
   </div>
   <div class="ang-form-body">
+
+    <!-- Fahrzeug -->
+    <div class="ang-block">
+      <div class="ang-block-label">Fahrzeug</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <select id="fb-form-auto" onchange="_onFbAutoChange()" style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:9px 12px;font-size:13px">
+          <option value="">— Fahrzeug wählen —</option>
+        </select>
+        <button class="btn" onclick="openAutoModal(null)" style="white-space:nowrap"><i class="fas fa-plus"></i> Neu</button>
+      </div>
+    </div>
+
+    <!-- Fahrtdaten -->
     <div class="ang-block">
       <div class="ang-block-label">Fahrtdaten</div>
       <div class="fgrow c2">
@@ -1897,28 +1927,88 @@
         </div>
       </div>
       <div class="fgrow c2">
-        <div class="fg"><label>Abfahrtsort *</label><input type="text" id="fb-abfahrt" placeholder="z.B. Worms, Büro"></div>
-        <div class="fg"><label>Zielort *</label><input type="text" id="fb-ziel" placeholder="z.B. Mannheim, Kunde XY"></div>
+        <div class="fg"><label>Abfahrtsort *</label><input type="text" id="fb-abfahrt" placeholder="z.B. Worms, Büro" oninput="fbAddressChanged()"></div>
+        <div class="fg"><label>Zielort *</label><input type="text" id="fb-ziel" placeholder="z.B. Mannheim, Kunde XY" oninput="fbAddressChanged()"></div>
       </div>
-      <div class="fg"><label>Zweck der Fahrt</label><input type="text" id="fb-zweck" placeholder="z.B. Kundentermin, Materialtransport"></div>
+      <div class="fg" style="margin:0"><label>Zweck der Fahrt</label><input type="text" id="fb-zweck" placeholder="z.B. Kundentermin, Materialtransport"></div>
     </div>
+
+    <!-- Google Maps -->
+    <div id="fb-map-section" style="display:none">
+      <div class="ang-block" style="padding:0;overflow:hidden">
+        <div id="fb-map-canvas" style="width:100%;height:300px;background:var(--s2)"></div>
+        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
+          <div id="fb-route-status" style="font-size:13px;color:var(--sub)"></div>
+          <div id="fb-route-choices" style="display:none;gap:8px;flex-wrap:wrap"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kilometerstand -->
     <div class="ang-block">
       <div class="ang-block-label">Kilometerstand</div>
       <div class="fgrow c2">
-        <div class="fg"><label>km-Stand Abfahrt *</label><input type="number" id="fb-km-start" step="0.1" placeholder="z.B. 45230" oninput="_calcFbKm()"></div>
-        <div class="fg"><label>km-Stand Ankunft *</label><input type="number" id="fb-km-end" step="0.1" placeholder="z.B. 45278" oninput="_calcFbKm()"></div>
+        <div class="fg">
+          <label>km-Stand Abfahrt *</label>
+          <input type="number" id="fb-km-start" step="0.1" placeholder="z.B. 45230" oninput="_calcFbKm()">
+          <div style="font-size:11px;color:var(--sub);margin-top:4px" id="fb-km-start-hint">Fahrzeug wählen oder manuell eingeben</div>
+        </div>
+        <div class="fg">
+          <label>km-Stand Ankunft *</label>
+          <input type="number" id="fb-km-end" step="0.1" placeholder="z.B. 45278" oninput="_calcFbKm()">
+          <div style="font-size:11px;color:var(--sub);margin-top:4px">Oder wird per Maps berechnet</div>
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--s2);border-radius:var(--r);margin-top:8px">
         <i class="fas fa-route" style="font-size:18px;color:var(--blue)"></i>
         <div>
           <div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em">Gefahrene Strecke</div>
-          <div id="fb-km" style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text)">0,0 km</div>
+          <div id="fb-km" style="font-size:22px;font-weight:700;font-family:var(--mono);color:var(--text)">0,0 km</div>
         </div>
       </div>
     </div>
-    <div class="ang-block">
-      <div class="ang-block-label">Fahrzeug</div>
-      <div class="fg" style="margin:0"><label>Kennzeichen</label><input type="text" id="fb-kennzeichen" placeholder="z.B. WO-AB 123" style="text-transform:uppercase"></div>
+
+  </div>
+</div>
+
+<!-- ── FAHRZEUGE LISTE MODAL ── -->
+<div class="modal-bg" id="auto-modal-list">
+  <div class="modal" style="width:560px;max-width:95vw">
+    <div class="modal-hdr">
+      <h2><i class="fas fa-car"></i> Fahrzeuge</h2>
+      <button class="modal-close" onclick="closeModal('auto-modal-list')">✕</button>
+    </div>
+    <div style="margin-bottom:14px">
+      <button class="btn primary" onclick="closeModal('auto-modal-list');openAutoModal(null)"><i class="fas fa-plus"></i> Neues Fahrzeug</button>
+    </div>
+    <div id="fb-auto-list" style="display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- ── FAHRZEUG ANLEGEN / BEARBEITEN MODAL ── -->
+<div class="modal-bg" id="auto-modal">
+  <div class="modal" style="width:480px;max-width:95vw">
+    <div class="modal-hdr">
+      <h2 id="auto-modal-title"><i class="fas fa-car"></i> Neues Fahrzeug</h2>
+      <button class="modal-close" onclick="closeModal('auto-modal')">✕</button>
+    </div>
+    <input type="hidden" id="auto-edit-id">
+    <div class="fgrow c2">
+      <div class="fg"><label>Kennzeichen *</label><input type="text" id="auto-kennzeichen" placeholder="WO-AB 123" style="text-transform:uppercase;font-family:var(--mono);font-weight:700"></div>
+      <div class="fg"><label>Marke / Modell</label><input type="text" id="auto-marke" placeholder="z.B. VW Golf"></div>
+    </div>
+    <div class="fg"><label>Bezeichnung / Fahrer</label><input type="text" id="auto-name" placeholder="z.B. Firmenfahrzeug"></div>
+    <div class="fgrow c2">
+      <div class="fg"><label>VIN / Fahrgestellnummer</label><input type="text" id="auto-vin" placeholder="WVW…" style="font-family:var(--mono);font-size:12px;text-transform:uppercase"></div>
+      <div class="fg"><label>Anfangs-Kilometerstand</label><input type="number" id="auto-km-initial" placeholder="z.B. 45000" step="1"></div>
+    </div>
+    <div style="font-size:12px;color:var(--sub);background:var(--s2);border-radius:var(--r);padding:10px 14px;margin-bottom:16px">
+      <i class="fas fa-info-circle" style="color:var(--blue)"></i>
+      Den <b>Anfangs-Kilometerstand</b> nur einmal eingeben — danach wird er automatisch aus der letzten Fahrt übernommen.
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('auto-modal')">Abbrechen</button>
+      <button class="btn primary" onclick="saveAuto()"><i class="fas fa-save"></i> Speichern</button>
     </div>
   </div>
 </div>

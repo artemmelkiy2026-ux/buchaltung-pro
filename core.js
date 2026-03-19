@@ -314,7 +314,7 @@ function nav(id, el){
   if(id==='produkte-form') { /* форма готова */ }
   if(id==='ust') renderUst();
   if(id==='wiederkehrend') renderWied();
-  if(id==='fahrtenbuch') renderFahrtenbuch();
+  if(id==='fahrtenbuch') initFahrtenbuch();
   if(id==='eintraege') renderEin();
   if(id==='neu') updateNeuToolbar(false);
 }

@@ -3824,3 +3824,32 @@ header { background: #fff; }
   .fb-row-km{ font-size:14px; }
   #fb-stats{ grid-template-columns:repeat(2,1fr) !important; }
 }
+
+/* ── FAHRTENBUCH FAHRZEUGE & MAPS ─────────────────────────────────────── */
+.fb-auto-card{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;border-radius:var(--r);
+  background:var(--s2);border:1px solid var(--border);
+}
+.fb-auto-icon{
+  width:40px;height:40px;border-radius:var(--r);
+  background:var(--bdim);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.fb-auto-info{ flex:1;min-width:0; }
+.fb-auto-kz{ font-size:15px;font-weight:700;color:var(--text);font-family:var(--mono); }
+.fb-auto-stats{ display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;font-size:11px;color:var(--sub); }
+.fb-auto-actions{ display:flex;gap:6px;flex-shrink:0; }
+
+#fb-gmap-toggle.active{ background:var(--blue);color:#fff;border-color:var(--blue); }
+
+.fb-route-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--s2);
+  cursor:pointer;font-family:inherit;font-size:13px;transition:all .15s;
+}
+.fb-route-btn.active{ border-color:var(--blue);background:var(--bdim);color:var(--blue); }
+.fb-route-btn:hover{ border-color:var(--blue); }
+#fb-km-start[readonly]{ background:var(--s2); }
