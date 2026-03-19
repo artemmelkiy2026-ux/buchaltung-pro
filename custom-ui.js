@@ -120,8 +120,6 @@ class CustomSelect {
   _build() {
     const sel       = this.sel;
     const isCompact = CS_COMPACT.includes(this.id);
-    const minW      = this.id === 'fb-auto-filter' ? '160px' : isCompact ? '90px' : '0';
-
     const wrap = document.createElement('div');
     wrap.className = 'cs-wrap';
     wrap.style.cssText = `position:relative;display:${isCompact?'inline-block':'block'};width:${isCompact?'auto':'100%'}`;
@@ -131,7 +129,7 @@ class CustomSelect {
     trigger.className = 'cs-trigger';
     trigger.style.cssText = `
       display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
-      width:${isCompact?'auto':'100%'};min-width:${minW};padding:7px 12px;
+      width:${isCompact?'auto':'100%'};padding:7px 12px;
       background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
       color:var(--text);font-size:13px;font-family:inherit;font-weight:500;
       cursor:pointer;text-align:left;outline:none;
