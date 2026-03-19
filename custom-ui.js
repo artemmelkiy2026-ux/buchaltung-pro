@@ -104,7 +104,7 @@ window.appAlert = function(message, { title='Hinweis', icon='ℹ️' }={}) {
 
 const CS_SKIP = ['nf-mwst-rate']; // уже кастомный — пропускаем
 // Селекты которым нужна фиксированная компактная ширина (год-фильтры)
-const CS_COMPACT = ['rep-yr','dash-yr','z-yr','prog-yr','kat-yr','ust-yr'];
+const CS_COMPACT = ['rep-yr','dash-yr','z-yr','prog-yr','kat-yr','ust-yr','fb-yr','fb-auto-filter'];
 
 class CustomSelect {
   constructor(originalSelect) {
@@ -129,9 +129,10 @@ class CustomSelect {
     trigger.type = 'button';
     trigger.className = 'cs-trigger';
     const isCompact = CS_COMPACT.includes(this.id);
+    const minW = this.id === 'fb-auto-filter' ? '160px' : isCompact ? '90px' : '0';
     trigger.style.cssText = `
       display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
-      width:${isCompact ? 'auto' : '100%'};min-width:${isCompact ? '90px' : '0'};padding:7px 12px;
+      width:${isCompact ? 'auto' : '100%'};min-width:${minW};padding:7px 12px;
       background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
       color:var(--text);font-size:14px;font-family:inherit;font-weight:500;
       cursor:pointer;text-align:left;outline:none;
