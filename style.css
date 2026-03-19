@@ -3718,7 +3718,7 @@ header { background: #fff; }
   #wied-list .wied-card:last-child{ border-radius:0 0 var(--r) var(--r); }
   .wied-card-left{ display:contents !important; }
   .wied-card-right{ display:contents !important; }
-  .wied-card-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:11px }
+  .wied-card-avatar{ grid-column:1;grid-row:1;width:32px !important;height:32px !important;font-size:10px }
   .wied-card-name{ grid-column:2;grid-row:1;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0; }
   .wied-card-meta{ grid-column:3;grid-row:1; }
   .wied-card-meta span{ font-size:11px;white-space:nowrap; }
