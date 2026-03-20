@@ -129,11 +129,11 @@ class CustomSelect {
     trigger.className = 'cs-trigger';
     trigger.style.cssText = `
       display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
-      width:${isCompact?'auto':'100%'};padding:7px 12px;
-      background:var(--s2);border:none;border-radius:var(--r);
+      width:${isCompact?'auto':'100%'};height:38px;padding:0 12px;
+      background:transparent;border:1px solid var(--border);border-radius:6px;
       color:var(--text);font-size:13px;font-family:inherit;font-weight:500;
       cursor:pointer;text-align:left;outline:none;
-      transition:background .15s;`;
+      transition:border-color .15s;`;
     trigger.innerHTML = `
       <span class="cs-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
       <i class="fas fa-chevron-down cs-arrow" style="font-size:10px;color:var(--sub);flex-shrink:0;transition:transform .2s"></i>`;
@@ -210,8 +210,8 @@ class CustomSelect {
     this._ensureOptions(); // строим опции лениво
     this._updateLabel();
 
-    this.trigger.style.background = 'var(--s3, var(--border))';
-    this.arrow.style.transform    = 'rotate(180deg)';
+    this.trigger.style.borderColor = 'var(--blue)';
+    this.arrow.style.transform     = 'rotate(180deg)';
 
     if (window.innerWidth <= 768) {
       this._openMobile();
@@ -277,9 +277,9 @@ class CustomSelect {
   }
 
   _close() {
-    this.panel.style.display    = 'none';
-    this.arrow.style.transform  = '';
-    this.trigger.style.background = 'var(--s2)';
+    this.panel.style.display      = 'none';
+    this.arrow.style.transform    = '';
+    this.trigger.style.borderColor = '';
     document.querySelectorAll('.cs-mob-overlay').forEach(o => o.remove());
   }
 }

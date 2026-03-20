@@ -108,7 +108,7 @@ function showCtxMenu(e, items) {
 
   // Find the nearest card parent to anchor inside
   const trigger = e && (e.currentTarget || e.target);
-  const card = trigger && trigger.closest('.ein-row,.rech-card,.ang-card,.wied-card,.kunde-card,.prod-card');
+  const card = trigger && trigger.closest('.ein-row,.rech-card,.ang-card,.wied-card,.kunde-card,.prod-card,.fb-row');
 
   if (card) {
     // Anchor inside card
