@@ -100,17 +100,19 @@ function showCtxMenu(e, items) {
 
   // Делегирование на menu — один обработчик для всех пунктов
   const handleAction = (ev) => {
+    alert('handleAction fired! type=' + ev.type + ' target=' + ev.target.className);
     const el = ev.target.closest('.ctx-menu-item');
-    if (!el) return;
+    if (!el) { alert('no ctx-menu-item found'); return; }
     ev.stopPropagation();
     ev.preventDefault();
     const idx = parseInt(el.dataset.idx);
     const item = items[idx];
+    alert('item=' + (item ? item.label : 'undefined') + ' action=' + typeof item?.action);
     menu.remove();
     document.removeEventListener('mousedown', outsideClose, true);
     document.removeEventListener('touchstart', outsideClose, true);
     if (item && typeof item.action === 'function') {
-      setTimeout(() => { try { item.action(); } catch(err) { console.error(err); } }, 0);
+      setTimeout(() => { try { item.action(); } catch(err) { alert('action error: ' + err.message); } }, 0);
     }
   };
 
