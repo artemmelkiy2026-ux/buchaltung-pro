@@ -81,6 +81,7 @@ function _selCb(section, id) {
 // Call as: showCtxMenu(event, [{...}])
 function showCtxMenu(e, items) {
   if (e && e.stopPropagation) e.stopPropagation();
+  if (e && e.preventDefault)  e.preventDefault();
 
   document.querySelectorAll('.ctx-menu').forEach(m => m.remove());
   if (!items || !items.length) return;
@@ -88,54 +89,39 @@ function showCtxMenu(e, items) {
   const menu = document.createElement('div');
   menu.className = 'ctx-menu';
 
-  let closeHandler = null;
-  const removeMenu = () => {
-    menu.remove();
-    if (closeHandler) document.removeEventListener('click', closeHandler, true);
-  };
-
   items.forEach(item => {
     const el = document.createElement('div');
     el.className = 'ctx-menu-item';
     el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px"></i><span>${item.label}</span>`;
     if (item.danger) el.style.color = 'var(--red)';
 
-    const execute = (ev) => {
-      ev.stopPropagation();
-      ev.preventDefault();
-      const action = item.action;
-      removeMenu();
-      if (ev.type === 'touchend') {
-        const block = (be) => {
-          if (be.target.closest('#app-confirm-overlay')) return;
-          be.stopPropagation();
-          be.preventDefault();
-          document.removeEventListener('click', block, true);
-        };
-        document.addEventListener('click', block, true);
-        setTimeout(() => document.removeEventListener('click', block, true), 800);
-      }
-      try { 
-        if (!action) { alert('action is undefined!'); return; }
-        action(); 
-      } catch(err) { alert('ERROR: ' + err.message); console.error(err); }
+    // Используем mousedown/touchstart чтобы сработать ДО любого close handler
+    const doAction = () => {
+      menu.remove();
+      document.removeEventListener('mousedown', outsideHandler, true);
+      document.removeEventListener('touchstart', outsideHandler, true);
+      try {
+        if (typeof item.action === 'function') item.action();
+      } catch(err) { console.error('ctx action error:', err); }
     };
 
-    el.addEventListener('touchend', execute, { passive: false });
-    el.addEventListener('click', execute);
+    el.addEventListener('mousedown', (ev) => { ev.stopPropagation(); ev.preventDefault(); doAction(); });
+    el.addEventListener('touchstart', (ev) => { ev.stopPropagation(); ev.preventDefault(); doAction(); }, { passive: false });
     menu.appendChild(el);
   });
 
   document.body.appendChild(menu);
 
+  // Позиционирование
   const trigger = e && (e.currentTarget || e.target);
   const vw = window.innerWidth, vh = window.innerHeight;
-  const mW = 190, mH = items.length * 46 + 12;
+  const mW = 200;
   let top, left;
   if (trigger) {
     const r = trigger.getBoundingClientRect();
     left = Math.max(8, r.right - mW);
     top  = r.bottom + 6;
+    const mH = items.length * 50 + 12;
     if (top + mH > vh - 8) top = Math.max(8, r.top - mH - 6);
   } else {
     left = Math.max(8, (e ? e.clientX : vw/2) - mW/2);
@@ -143,18 +129,21 @@ function showCtxMenu(e, items) {
   }
   left = Math.min(left, vw - mW - 8);
   top  = Math.max(8, top);
-  menu.style.position = 'fixed';
-  menu.style.left     = left + 'px';
-  menu.style.top      = top  + 'px';
-  menu.style.minWidth = mW   + 'px';
-  menu.style.zIndex   = '8000';
+  menu.style.cssText = `position:fixed;left:${left}px;top:${top}px;min-width:${mW}px;z-index:99999`;
 
-  closeHandler = (ev) => {
-    if (ev.target.closest('#app-confirm-overlay')) return;
-    if (!menu.contains(ev.target)) removeMenu();
+  // Закрытие по клику/тапу вне меню
+  const outsideHandler = (ev) => {
+    if (menu.contains(ev.target)) return;
+    menu.remove();
+    document.removeEventListener('mousedown', outsideHandler, true);
+    document.removeEventListener('touchstart', outsideHandler, true);
   };
-  setTimeout(() => document.addEventListener('click', closeHandler, true), 50);
+  setTimeout(() => {
+    document.addEventListener('mousedown', outsideHandler, true);
+    document.addEventListener('touchstart', outsideHandler, true);
+  }, 100);
 }
+
 
 // ── ⋮ button helper ────────────────────────────────────────────────
 // Usage: _moreBtn('sectionId', itemsArrayAsJSONSafeString)
