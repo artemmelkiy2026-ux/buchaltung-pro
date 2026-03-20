@@ -2627,6 +2627,9 @@ input, select, textarea {
 .ein-row-badge{
   font-size:10px;font-weight:500;flex-shrink:0;
 }
+.ein-row-zahl{
+  font-size:10px;font-weight:600;flex-shrink:0;
+}
 
 /* Row 3: badges + nr + date */
 .ein-row-tags{

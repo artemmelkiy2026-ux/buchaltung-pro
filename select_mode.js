@@ -103,14 +103,19 @@ function showCtxMenu(e, items) {
     const execute = (ev) => {
       ev.stopPropagation();
       ev.preventDefault();
+      const action = item.action;
       removeMenu();
-      // После touchend браузер генерирует synthetic click — блокируем его
       if (ev.type === 'touchend') {
-        const block = (e) => { e.stopPropagation(); e.preventDefault(); document.removeEventListener('click', block, true); };
+        const block = (be) => {
+          if (be.target.closest('#app-confirm-overlay')) return;
+          be.stopPropagation();
+          be.preventDefault();
+          document.removeEventListener('click', block, true);
+        };
         document.addEventListener('click', block, true);
-        setTimeout(() => document.removeEventListener('click', block, true), 600);
+        setTimeout(() => document.removeEventListener('click', block, true), 800);
       }
-      try { item.action(); } catch(err) { console.error(err); }
+      try { action(); } catch(err) { console.error(err); }
     };
 
     el.addEventListener('touchend', execute, { passive: false });
