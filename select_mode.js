@@ -88,7 +88,6 @@ function showCtxMenu(e, items) {
   const menu = document.createElement('div');
   menu.className = 'ctx-menu';
 
-  // close определяем ДО использования
   let closeHandler = null;
   const removeMenu = () => {
     menu.remove();
@@ -101,21 +100,21 @@ function showCtxMenu(e, items) {
     el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px"></i><span>${item.label}</span>`;
     if (item.danger) el.style.color = 'var(--red)';
 
-    el.addEventListener('click', (ev) => {
+    const execute = (ev) => {
       ev.stopPropagation();
       ev.preventDefault();
       removeMenu();
+      // После touchend браузер генерирует synthetic click — блокируем его
+      if (ev.type === 'touchend') {
+        const block = (e) => { e.stopPropagation(); e.preventDefault(); document.removeEventListener('click', block, true); };
+        document.addEventListener('click', block, true);
+        setTimeout(() => document.removeEventListener('click', block, true), 600);
+      }
       try { item.action(); } catch(err) { console.error(err); }
-    });
+    };
 
-    // touchend для iOS — preventDefault не даёт сработать onclick на карточке
-    el.addEventListener('touchend', (ev) => {
-      ev.stopPropagation();
-      ev.preventDefault();
-      removeMenu();
-      try { item.action(); } catch(err) { console.error(err); }
-    });
-
+    el.addEventListener('touchend', execute, { passive: false });
+    el.addEventListener('click', execute);
     menu.appendChild(el);
   });
 
