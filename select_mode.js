@@ -148,8 +148,9 @@ function showCtxMenu(e, items) {
     menu.style.cssText += `;left:${left}px;top:${top}px;min-width:${mW}px`;
   }
 
-  // Close on outside click/tap
+  // Close on outside click/tap — но не перехватываем клики по confirm-диалогу
   const close = (ev) => {
+    if (ev.target.closest('#app-confirm-overlay')) return;
     if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', close, true); }
   };
   setTimeout(() => document.addEventListener('click', close, true), 100);
