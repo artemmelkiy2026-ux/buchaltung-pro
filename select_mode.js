@@ -115,7 +115,10 @@ function showCtxMenu(e, items) {
         document.addEventListener('click', block, true);
         setTimeout(() => document.removeEventListener('click', block, true), 800);
       }
-      try { action(); } catch(err) { console.error(err); }
+      try { 
+        if (!action) { alert('action is undefined!'); return; }
+        action(); 
+      } catch(err) { alert('ERROR: ' + err.message); console.error(err); }
     };
 
     el.addEventListener('touchend', execute, { passive: false });
