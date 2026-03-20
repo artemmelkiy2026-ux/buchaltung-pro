@@ -89,26 +89,33 @@ function showCtxMenu(e, items) {
   const menu = document.createElement('div');
   menu.className = 'ctx-menu';
 
-  items.forEach(item => {
+  items.forEach((item, idx) => {
     const el = document.createElement('div');
     el.className = 'ctx-menu-item';
-    el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px"></i><span>${item.label}</span>`;
+    el.dataset.idx = idx;
+    el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px;pointer-events:none"></i><span style="pointer-events:none">${item.label}</span>`;
     if (item.danger) el.style.color = 'var(--red)';
-
-    // Используем mousedown/touchstart чтобы сработать ДО любого close handler
-    const doAction = () => {
-      menu.remove();
-      document.removeEventListener('mousedown', outsideHandler, true);
-      document.removeEventListener('touchstart', outsideHandler, true);
-      try {
-        if (typeof item.action === 'function') item.action();
-      } catch(err) { console.error('ctx action error:', err); }
-    };
-
-    el.addEventListener('mousedown', (ev) => { ev.stopPropagation(); ev.preventDefault(); doAction(); });
-    el.addEventListener('touchstart', (ev) => { ev.stopPropagation(); ev.preventDefault(); doAction(); }, { passive: false });
     menu.appendChild(el);
   });
+
+  // Делегирование на menu — один обработчик для всех пунктов
+  const handleAction = (ev) => {
+    const el = ev.target.closest('.ctx-menu-item');
+    if (!el) return;
+    ev.stopPropagation();
+    ev.preventDefault();
+    const idx = parseInt(el.dataset.idx);
+    const item = items[idx];
+    menu.remove();
+    document.removeEventListener('mousedown', outsideClose, true);
+    document.removeEventListener('touchstart', outsideClose, true);
+    if (item && typeof item.action === 'function') {
+      setTimeout(() => { try { item.action(); } catch(err) { console.error(err); } }, 0);
+    }
+  };
+
+  menu.addEventListener('mousedown', handleAction);
+  menu.addEventListener('touchstart', handleAction, { passive: false });
 
   document.body.appendChild(menu);
 
@@ -131,18 +138,19 @@ function showCtxMenu(e, items) {
   top  = Math.max(8, top);
   menu.style.cssText = `position:fixed;left:${left}px;top:${top}px;min-width:${mW}px;z-index:99999`;
 
-  // Закрытие по клику/тапу вне меню
-  const outsideHandler = (ev) => {
+  // Закрытие по тапу вне меню
+  const outsideClose = (ev) => {
     if (menu.contains(ev.target)) return;
     menu.remove();
-    document.removeEventListener('mousedown', outsideHandler, true);
-    document.removeEventListener('touchstart', outsideHandler, true);
+    document.removeEventListener('mousedown', outsideClose, true);
+    document.removeEventListener('touchstart', outsideClose, true);
   };
   setTimeout(() => {
-    document.addEventListener('mousedown', outsideHandler, true);
-    document.addEventListener('touchstart', outsideHandler, true);
-  }, 100);
+    document.addEventListener('mousedown', outsideClose, true);
+    document.addEventListener('touchstart', outsideClose, true);
+  }, 50);
 }
+
 
 
 // ── ⋮ button helper ────────────────────────────────────────────────
