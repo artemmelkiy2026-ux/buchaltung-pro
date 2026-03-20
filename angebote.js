@@ -184,10 +184,10 @@ function renderAngebote() {
       <div class="ang-card-betrag">${fmt(a.betrag)}${nettoLabel}</div>
       <div class="ang-card-actions" onclick="event.stopPropagation()">
         ${isMob() ? _moreBtn([
-          {icon:'fa-print',       label:'Drucken',      action:()=>angDruck(a.id)},
-          {icon:'fa-file-invoice',label:'→ Rechnung',   action:()=>angZuRechnung(a.id)},
-          {icon:'fa-edit',        label:'Bearbeiten',   action:()=>openAngForm(a.id)},
-          {icon:'fa-trash',       label:'Löschen',      danger:true, action:()=>delAng(a.id)}
+          {icon:'fa-print',       label:'Drucken',      action:()=>angDruck('${a.id}')},
+          {icon:'fa-file-invoice',label:'→ Rechnung',   action:()=>angZuRechnung('${a.id}')},
+          {icon:'fa-edit',        label:'Bearbeiten',   action:()=>openAngForm('${a.id}')},
+          {icon:'fa-trash',       label:'Löschen',      danger:true, action:()=>delAng('${a.id}')}
         ]) : `
           <button class="rca-btn" onclick="event.stopPropagation();angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="fas fa-print" style="font-size:11px"></i></button>
           <button class="rca-btn rca-green" onclick="event.stopPropagation();angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="fas fa-file-invoice" style="font-size:11px"></i></button>
