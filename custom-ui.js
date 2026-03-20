@@ -41,6 +41,7 @@ window._customConfirmResolve = null;
 
 function _showAppDialog({ icon='⚠️', title='', message='', buttons=[] }) {
   return new Promise(resolve => {
+    alert('_showAppDialog called! title=' + title);
     document.getElementById('app-confirm-icon').textContent  = icon;
     document.getElementById('app-confirm-title').textContent = title;
     document.getElementById('app-confirm-msg').innerHTML     = message;
