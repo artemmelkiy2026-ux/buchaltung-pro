@@ -1282,7 +1282,23 @@ async function scanBeleg(base64, mediaType) {
     }
     if (result.zahlungsart) {
       const zahlSel = document.getElementById('nf-zahl');
-      if (zahlSel) zahlSel.value = result.zahlungsart;
+      if (zahlSel) {
+        zahlSel.value = normZahl(result.zahlungsart);
+        requestAnimationFrame(() => { if (typeof updateCS === 'function') updateCS('nf-zahl'); });
+      }
+    }
+    if (result.kategorie) {
+      const katSel = document.getElementById('nf-kat');
+      if (katSel) {
+        const norm = normKat(result.kategorie);
+        const opts = Array.from(katSel.options).map(o => o.value);
+        const match = opts.find(o => o === norm)
+          || opts.find(o => o.toLowerCase().includes((result.kategorie||'').toLowerCase()));
+        if (match) {
+          katSel.value = match;
+          requestAnimationFrame(() => { if (typeof updateCS === 'function') updateCS('nf-kat'); });
+        }
+      }
     }
 
     // Hide progress bar, keep preview visible
@@ -1529,6 +1545,37 @@ function parseBelegText(text) {
   else if (/lastschrift|sepa/i.test(text)) result.zahlungsart = 'Lastschrift';
   else if (hasBar)                       result.zahlungsart = 'Barzahlung';
   else if (/überweisung/i.test(text))    result.zahlungsart = 'Überweisung';
+
+  // ── 9. KATEGORIE ────────────────────────────────────────────────────────
+  const tl = text.toLowerCase();
+  if      (/supermarkt|lebensmittel|rewe|edeka|aldi|lidl|netto|penny|kaufland|bäcker|bakery|backhaus|metzger|fleisch/i.test(text))
+    result.kategorie = 'Lebensmittel';
+  else if (/restaurant|café|cafe|imbiss|pizza|burger|döner|mcdonald|kfc|subway|starbucks|costa|bistro|gaststätte/i.test(text))
+    result.kategorie = 'Bewirtung';
+  else if (/tankstelle|shell|aral|bp|esso|total|jet|agip|westfalen|benzin|diesel|kraftstoff/i.test(text))
+    result.kategorie = 'Fahrtkosten';
+  else if (/amazon|ebay|zalando|otto|mediamarkt|saturn|ikea|bauhaus|obi|hornbach/i.test(text))
+    result.kategorie = 'Büromaterial';
+  else if (/hotel|motel|pension|übernachtung|booking|airbnb/i.test(text))
+    result.kategorie = 'Reisekosten';
+  else if (/bahn|db |bahnhof|flug|lufthansa|ryanair|easyjet|taxi|uber|bolt/i.test(text))
+    result.kategorie = 'Reisekosten';
+  else if (/telekom|vodafone|o2|1&1|telefon|internet|handy|mobilfunk/i.test(text))
+    result.kategorie = 'Telefon & Internet';
+  else if (/apotheke|arzt|doktor|krankenhaus|zahnarzt|medikament|pharma/i.test(text))
+    result.kategorie = 'Sonstiges';
+  else if (/büro|office|staples|papel|drucker|toner|schreibwaren/i.test(text))
+    result.kategorie = 'Büromaterial';
+  else if (/strom|gas|wasser|energie|stadtwerke|eon|rwe|vattenfall/i.test(text))
+    result.kategorie = 'Miete & Nebenkosten';
+  else if (/miete|miet|nebenkosten|hausverwaltung/i.test(text))
+    result.kategorie = 'Miete & Nebenkosten';
+  else if (/werbung|marketing|anzeige|facebook ads|google ads/i.test(text))
+    result.kategorie = 'Werbung & Marketing';
+  else if (/versicherung|allianz|axa|huk|ergo|signal iduna/i.test(text))
+    result.kategorie = 'Versicherungen';
+  else if (/steuerberater|rechtsanwalt|notar|kanzlei|beratung/i.test(text))
+    result.kategorie = 'Beratung & Honorare';
 
   return result;
 }

@@ -299,5 +299,11 @@ window.reinitCustomSelects = function() {
 // Обновить label конкретного select после программного sel.value = '...'
 window.updateCS = function(id) {
   const cs = CS_MAP.get(id);
-  if (cs) { cs._dirty = true; cs._updateLabel(); }
+  if (!cs) return;
+  cs._dirty = true;
+  // setTimeout гарантирует что sel.value уже применён браузером
+  setTimeout(() => {
+    cs._dirty = true;
+    cs._updateLabel();
+  }, 0);
 };
