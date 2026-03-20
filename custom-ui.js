@@ -41,8 +41,9 @@ window._customConfirmResolve = null;
 
 function _showAppDialog({ icon='⚠️', title='', message='', buttons=[] }) {
   return new Promise(resolve => {
-    alert('_showAppDialog called! title=' + title);
-    document.getElementById('app-confirm-icon').textContent  = icon;
+    const overlay = document.getElementById('app-confirm-overlay');
+    if (!overlay) { alert('ERROR: app-confirm-overlay not found in DOM!'); resolve(false); return; }
+    alert('_showAppDialog called! title=' + title + ' overlay found=' + !!overlay);
     document.getElementById('app-confirm-title').textContent = title;
     document.getElementById('app-confirm-msg').innerHTML     = message;
     const btnsEl = document.getElementById('app-confirm-btns');
