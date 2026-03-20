@@ -132,11 +132,11 @@ function renderRech(){
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
           <div class="rech-card-end" onclick="event.stopPropagation()">
             ${isMob() ? _moreBtn([
-              ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
-              {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId(r.id)},
-              {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
-              {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
-              {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
+              ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt('${r.id}')}] : []),
+              {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId('${r.id}')},
+              {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren('${r.id}')},
+              {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech('${r.id}')},
+              {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech('${r.id}')}
             ]) : `<div class="rech-card-actions">
               ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
               <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
@@ -416,7 +416,13 @@ function _rechDuplizieren(id){
   const orig = data.rechnungen.find(r=>r.id===id); if(!orig) return;
   const newR = JSON.parse(JSON.stringify(orig));
   newR.id = 'r-' + Date.now() + '_' + Math.random().toString(36).slice(2,5);
-  // Neue Nr: nächste fortlaufende Nummer
+  // Новые ID для позиций чтобы не было конфликта primary key
+  if (newR.positionen && newR.positionen.length) {
+    newR.positionen = newR.positionen.map(p => ({
+      ...p,
+      id: 'pos-' + Date.now() + '_' + Math.random().toString(36).slice(2,6)
+    }));
+  }
   newR.nr = autoRechNr(new Date().getFullYear());
   newR.datum = new Date().toISOString().split('T')[0];
   newR.status = 'offen';
