@@ -862,29 +862,30 @@ function renderEin(){
         +(mwstBadge ? '<span class="ein-row-sep">·</span>'+mwstBadge : '')
         +(e.notiz ? '<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>' : '');
 
+      const _subLine = '<span class="badge ein-row-badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
+        +'<span class="ein-row-date" style="margin-left:6px">'+fd(e.datum)+'</span>';
+
       const _tagLine = ''
-        +(stLbl ? stLbl : '')
-        +(e.belegnr ? '<span class="ein-row-nr">Nr.'+e.belegnr+'</span>' : '')
-        +'<span class="ein-row-date">'+fd(e.datum)+'</span>';
+        +(stLbl ? stLbl+(st && e.created_at ? '<span class="ein-row-sep">·</span><span class="ein-row-time">'+fdt(e.created_at).slice(0,16).replace('T',' ')+'</span>' : '') : '')
+        +(e.belegnr ? '<span class="ein-row-nr">Nr.'+e.belegnr+'</span>' : '');
 
       return '<div class="ein-row'+(st?' ein-row-st':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':'pointer')+'">'
         +'<div class="ein-row-body">'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
-              +'<div class="ein-row-desc"><span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'+(e.beschreibung||e.kategorie)+'</div>'              +'<div class="ein-row-zahl-line"><span class="badge ein-row-badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span></div>'
+              +'<div class="ein-row-desc"><span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'+(e.beschreibung||e.kategorie)+'</div>'
               +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
             +'</div>'
+            +'<div class="ein-row-sub">'+_subLine+'</div>'
             +'<div class="ein-row-mid">'
-              +'<div class="ein-row-cat">'
-                +_catLine
-              +'</div>'
+              +'<div class="ein-row-cat">'+_catLine+'</div>'
               +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
                 +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>'
                   : (isMob() ? _mobBtn
                     : '<button class="rca-btn rca-red" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren"><i class="fas fa-trash"></i></button>'))
               +'</div>'
             +'</div>'
-            +'<div class="ein-row-tags">'+_tagLine+'</div>'
+            +(_tagLine ? '<div class="ein-row-tags">'+_tagLine+'</div>' : '')
           +'</div>'
         +'</div>'
         +'</div>';
@@ -1286,19 +1287,21 @@ async function scanBeleg(base64, mediaType) {
       const zahlSel = document.getElementById('nf-zahl');
       if (zahlSel) {
         zahlSel.value = normZahl(result.zahlungsart);
-        requestAnimationFrame(() => { if (typeof updateCS === 'function') updateCS('nf-zahl'); });
+        if (typeof updateCS === 'function') updateCS('nf-zahl');
       }
     }
     if (result.kategorie) {
       const katSel = document.getElementById('nf-kat');
       if (katSel) {
         const norm = normKat(result.kategorie);
+        // Точное совпадение или частичное
         const opts = Array.from(katSel.options).map(o => o.value);
         const match = opts.find(o => o === norm)
-          || opts.find(o => o.toLowerCase().includes((result.kategorie||'').toLowerCase()));
+          || opts.find(o => o.toLowerCase() === result.kategorie.toLowerCase())
+          || opts.find(o => o.toLowerCase().includes(result.kategorie.toLowerCase().split(/[\s\/&]+/)[0]));
         if (match) {
           katSel.value = match;
-          requestAnimationFrame(() => { if (typeof updateCS === 'function') updateCS('nf-kat'); });
+          if (typeof updateCS === 'function') updateCS('nf-kat');
         }
       }
     }
@@ -1547,37 +1550,6 @@ function parseBelegText(text) {
   else if (/lastschrift|sepa/i.test(text)) result.zahlungsart = 'Lastschrift';
   else if (hasBar)                       result.zahlungsart = 'Barzahlung';
   else if (/überweisung/i.test(text))    result.zahlungsart = 'Überweisung';
-
-  // ── 9. KATEGORIE ────────────────────────────────────────────────────────
-  const tl = text.toLowerCase();
-  if      (/supermarkt|lebensmittel|rewe|edeka|aldi|lidl|netto|penny|kaufland|bäcker|bakery|backhaus|metzger|fleisch/i.test(text))
-    result.kategorie = 'Lebensmittel';
-  else if (/restaurant|café|cafe|imbiss|pizza|burger|döner|mcdonald|kfc|subway|starbucks|costa|bistro|gaststätte/i.test(text))
-    result.kategorie = 'Bewirtung';
-  else if (/tankstelle|shell|aral|bp|esso|total|jet|agip|westfalen|benzin|diesel|kraftstoff/i.test(text))
-    result.kategorie = 'Fahrtkosten';
-  else if (/amazon|ebay|zalando|otto|mediamarkt|saturn|ikea|bauhaus|obi|hornbach/i.test(text))
-    result.kategorie = 'Büromaterial';
-  else if (/hotel|motel|pension|übernachtung|booking|airbnb/i.test(text))
-    result.kategorie = 'Reisekosten';
-  else if (/bahn|db |bahnhof|flug|lufthansa|ryanair|easyjet|taxi|uber|bolt/i.test(text))
-    result.kategorie = 'Reisekosten';
-  else if (/telekom|vodafone|o2|1&1|telefon|internet|handy|mobilfunk/i.test(text))
-    result.kategorie = 'Telefon & Internet';
-  else if (/apotheke|arzt|doktor|krankenhaus|zahnarzt|medikament|pharma/i.test(text))
-    result.kategorie = 'Sonstiges';
-  else if (/büro|office|staples|papel|drucker|toner|schreibwaren/i.test(text))
-    result.kategorie = 'Büromaterial';
-  else if (/strom|gas|wasser|energie|stadtwerke|eon|rwe|vattenfall/i.test(text))
-    result.kategorie = 'Miete & Nebenkosten';
-  else if (/miete|miet|nebenkosten|hausverwaltung/i.test(text))
-    result.kategorie = 'Miete & Nebenkosten';
-  else if (/werbung|marketing|anzeige|facebook ads|google ads/i.test(text))
-    result.kategorie = 'Werbung & Marketing';
-  else if (/versicherung|allianz|axa|huk|ergo|signal iduna/i.test(text))
-    result.kategorie = 'Versicherungen';
-  else if (/steuerberater|rechtsanwalt|notar|kanzlei|beratung/i.test(text))
-    result.kategorie = 'Beratung & Honorare';
 
   return result;
 }
