@@ -857,7 +857,6 @@ function renderEin(){
         : '';
 
       const _catLine = ''
-        +(e.created_at ? '<span class="ein-row-time">'+fdt(e.created_at).slice(11)+'</span><span class="ein-row-sep">·</span>' : '')
         +'<span class="ein-row-kat">'+e.kategorie+'</span>'
         +(mwstBadge ? '<span class="ein-row-sep">·</span>'+mwstBadge : '')
         +(e.notiz ? '<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>' : '');
@@ -865,8 +864,11 @@ function renderEin(){
       const _subLine = '<span class="badge ein-row-badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
         +'<span class="ein-row-date" style="margin-left:6px">'+fd(e.datum)+'</span>';
 
+      const _korrekturTime = e.korrektur_von && e.created_at
+        ? '<span class="ein-row-sep">·</span><span class="ein-row-time">'+fd(e.datum)+' '+fdt(e.created_at).slice(11,16)+'</span>'
+        : '';
       const _tagLine = ''
-        +(stLbl ? stLbl+(st && e.created_at ? '<span class="ein-row-sep">·</span><span class="ein-row-time">'+fdt(e.created_at).slice(0,16).replace('T',' ')+'</span>' : '') : '')
+        +(stLbl ? stLbl+_korrekturTime : '')
         +(e.belegnr ? '<span class="ein-row-nr">Nr.'+e.belegnr+'</span>' : '');
 
       return '<div class="ein-row'+(st?' ein-row-st':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':'pointer')+'">'
