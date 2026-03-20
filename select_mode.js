@@ -80,84 +80,81 @@ function _selCb(section, id) {
 // items: [{icon, label, action, danger?}]
 // Call as: showCtxMenu(event, [{...}])
 function showCtxMenu(e, items) {
-  if (e && e.stopPropagation) e.stopPropagation();
-  if (e && e.preventDefault)  e.preventDefault();
+  if (e) { e.stopPropagation && e.stopPropagation(); e.preventDefault && e.preventDefault(); }
 
+  // Закрыть все открытые меню
   document.querySelectorAll('.ctx-menu').forEach(m => m.remove());
   if (!items || !items.length) return;
 
   const menu = document.createElement('div');
   menu.className = 'ctx-menu';
 
-  items.forEach((item, idx) => {
+  // Сохраняем items в data-атрибуте через индекс
+  items.forEach((item, i) => {
     const el = document.createElement('div');
     el.className = 'ctx-menu-item';
-    el.dataset.idx = idx;
-    el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px;pointer-events:none"></i><span style="pointer-events:none">${item.label}</span>`;
+    el.dataset.i = i;
+    // pointer-events:none на дочерних — ev.target всегда будет el
+    el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px;pointer-events:none"></i>`
+      + `<span style="pointer-events:none">${item.label}</span>`;
     if (item.danger) el.style.color = 'var(--red)';
     menu.appendChild(el);
   });
 
-  // Делегирование на menu — один обработчик для всех пунктов
-  const handleAction = (ev) => {
-    alert('handleAction fired! type=' + ev.type + ' target=' + ev.target.className);
-    const el = ev.target.closest('.ctx-menu-item');
-    if (!el) { alert('no ctx-menu-item found'); return; }
+  // Один обработчик на menu через делегирование
+  function onAction(ev) {
+    const el = ev.target.closest('[data-i]');
+    if (!el || !menu.contains(el)) return;
     ev.stopPropagation();
     ev.preventDefault();
-    const idx = parseInt(el.dataset.idx);
-    const item = items[idx];
-    alert('item=' + (item ? item.label : 'undefined') + ' action=' + typeof item?.action);
-    menu.remove();
-    document.removeEventListener('mousedown', outsideClose, true);
-    document.removeEventListener('touchstart', outsideClose, true);
+    const item = items[+el.dataset.i];
+    cleanup();
     if (item && typeof item.action === 'function') {
-      setTimeout(() => { try { item.action(); } catch(err) { alert('action error: ' + err.message); } }, 0);
+      // requestAnimationFrame гарантирует что меню закрыто до вызова action
+      requestAnimationFrame(() => {
+        try { item.action(); } catch(err) { console.error('ctx action:', err); }
+      });
     }
-  };
+  }
 
-  menu.addEventListener('mousedown', handleAction);
-  menu.addEventListener('touchstart', handleAction, { passive: false });
+  function cleanup() {
+    menu.remove();
+    document.removeEventListener('mousedown', onAction, true);
+    document.removeEventListener('touchstart', onAction, true);
+    document.removeEventListener('mousedown', onOutside, true);
+    document.removeEventListener('touchstart', onOutside, true);
+  }
+
+  function onOutside(ev) {
+    if (!menu.contains(ev.target)) cleanup();
+  }
+
+  // capture:true — срабатывает раньше любых других обработчиков
+  menu.addEventListener('mousedown', onAction);
+  menu.addEventListener('touchstart', onAction, { passive: false });
 
   document.body.appendChild(menu);
 
   // Позиционирование
   const trigger = e && (e.currentTarget || e.target);
   const vw = window.innerWidth, vh = window.innerHeight;
-  const mW = 200;
-  let top, left;
+  const mW = 200, mH = items.length * 50 + 12;
+  let top = 0, left = 0;
   if (trigger) {
     const r = trigger.getBoundingClientRect();
-    left = Math.max(8, r.right - mW);
+    left = Math.min(Math.max(8, r.right - mW), vw - mW - 8);
     top  = r.bottom + 6;
-    const mH = items.length * 50 + 12;
     if (top + mH > vh - 8) top = Math.max(8, r.top - mH - 6);
-  } else {
-    left = Math.max(8, (e ? e.clientX : vw/2) - mW/2);
-    top  = e ? e.clientY + 6 : vh/2;
   }
-  left = Math.min(left, vw - mW - 8);
-  top  = Math.max(8, top);
   menu.style.cssText = `position:fixed;left:${left}px;top:${top}px;min-width:${mW}px;z-index:99999`;
 
-  // Закрытие по тапу вне меню
-  const outsideClose = (ev) => {
-    if (menu.contains(ev.target)) return;
-    menu.remove();
-    document.removeEventListener('mousedown', outsideClose, true);
-    document.removeEventListener('touchstart', outsideClose, true);
-  };
+  // Закрытие по тапу вне меню — небольшая задержка чтобы не сработало сразу
   setTimeout(() => {
-    document.addEventListener('mousedown', outsideClose, true);
-    document.addEventListener('touchstart', outsideClose, true);
-  }, 50);
+    document.addEventListener('mousedown', onOutside, true);
+    document.addEventListener('touchstart', onOutside, true);
+  }, 80);
 }
 
-
-
-// ── ⋮ button helper ────────────────────────────────────────────────
-// Usage: _moreBtn('sectionId', itemsArrayAsJSONSafeString)
-// Because this runs inside template literals, we pass items via a global registry keyed by unique id
 function _moreBtn(items) {
   _moreBtn._n = (_moreBtn._n || 0) + 1;
   const id = '_ctx_' + _moreBtn._n;

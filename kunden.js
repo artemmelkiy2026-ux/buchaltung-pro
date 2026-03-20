@@ -83,10 +83,10 @@ function renderWied(){
         </div>
         <div class="wied-card-actions" onclick="event.stopPropagation()">
           ${isMob() ? _moreBtn([
-            {icon:'fa-play',         label:'Jetzt buchen',  action:()=>wBuchen('${w.id}')},
-            {icon:'fa-pause',        label:w.status==='paused'?'Fortsetzen':'Pausieren', action:()=>_wTogglePause('${w.id}')},
-            {icon:'fa-edit',         label:'Bearbeiten',    action:()=>editWied('${w.id}')},
-            {icon:'fa-trash',        label:'Löschen',       danger:true, action:()=>delWied('${w.id}')}
+            {icon:'fa-play',         label:'Jetzt buchen',  action:()=>wBuchen(w.id)},
+            {icon:'fa-pause',        label:w.status==='paused'?'Fortsetzen':'Pausieren', action:()=>_wTogglePause(w.id)},
+            {icon:'fa-edit',         label:'Bearbeiten',    action:()=>editWied(w.id)},
+            {icon:'fa-trash',        label:'Löschen',       danger:true, action:()=>delWied(w.id)}
           ]) : `
             <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
             <button class="rca-btn" onclick="_wTogglePause('${w.id}')" title="${isPaused?'Fortsetzen':'Pausieren'}" style="${isPaused?'color:var(--green)':''}"><i class="fas fa-${isPaused?'play-circle':'pause'}"></i></button>

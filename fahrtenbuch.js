@@ -206,8 +206,8 @@ function renderFahrtenbuch() {
         <div class="fb-row-km" style="color:${col}">${fmtKm(km)}</div>
         <div class="fb-row-actions" onclick="event.stopPropagation()">
           ${isMob()?_moreBtn([
-            {icon:'fa-edit',label:'Bearbeiten',action:()=>editFahrt(''+f.id)},
-            {icon:'fa-trash',label:'Löschen',danger:true,action:()=>delFahrt(''+f.id)}
+            {icon:'fa-edit',label:'Bearbeiten',action:()=>editFahrt(f.id)},
+            {icon:'fa-trash',label:'Löschen',danger:true,action:()=>delFahrt(f.id)}
           ]):`<button class="rca-btn rca-red" onclick="event.stopPropagation();delFahrt('${f.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`}
         </div>
       </div>

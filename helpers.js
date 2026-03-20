@@ -278,8 +278,8 @@ function renderKunden(){
         <div class="kunde-card-actions" onclick="event.stopPropagation()">
           <button class="rca-btn" onclick="neueRechnungFuerKunde('${k.id}')" title="Neue Rechnung"><i class="fas fa-file-invoice"></i></button>
           ${isMob() && !window._selectMode?.['kunden'] ? _moreBtn([
-            {icon:'fa-edit',  label:'Bearbeiten', action:()=>editKunde('${k.id}')},
-            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delKunde('${k.id}')}
+            {icon:'fa-edit',  label:'Bearbeiten', action:()=>editKunde(k.id)},
+            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delKunde(k.id)}
           ]) : ''}
         </div>
       </div>

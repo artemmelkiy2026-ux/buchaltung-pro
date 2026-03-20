@@ -81,8 +81,8 @@ function renderProdukte() {
         </div>
         <div class="prod-actions">
           ${isMob() && !window._selectMode?.['produkte'] ? _moreBtn([
-            {icon:'fa-edit',  label:'Bearbeiten', action:()=>openProduktModal('${p.id}')},
-            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delProdukt('${p.id}')}
+            {icon:'fa-edit',  label:'Bearbeiten', action:()=>openProduktModal(p.id)},
+            {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delProdukt(p.id)}
           ]) : `<button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`}
         </div>
       </div>
