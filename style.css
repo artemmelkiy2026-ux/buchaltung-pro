@@ -2624,6 +2624,9 @@ input, select, textarea {
 .ein-row-actions{
   display:flex;align-items:center;gap:4px;flex-shrink:0;
 }
+.ein-row-zahl-line{
+  display:flex;align-items:center;margin-top:3px;
+}
 .ein-row-badge{
   font-size:10px;font-weight:500;flex-shrink:0;
 }
