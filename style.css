@@ -3930,7 +3930,84 @@ header { background: #fff; }
 }
 
 /* ── CUSTOM SELECT (cs-*) ────────────────────────────────────────────────── */
-.cs-trigger:hover { border-color: var(--blue) !important; }
-.cs-wrap { box-sizing: border-box; }
-.cs-panel { border-radius: 6px !important; }
-.cs-item:hover { background: var(--s2) !important; }
+/* ── CUSTOM SELECT ─────────────────────────────────────────────────────── */
+.cs-wrap {
+  box-sizing: border-box;
+  position: relative;
+}
+.cs-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  background: transparent;
+  border: 1px solid #d1d5db; /* фиксированный цвет — iOS видит */
+  border-radius: 6px;
+  color: inherit;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color .15s;
+}
+.cs-trigger--compact {
+  width: auto;
+}
+.cs-trigger:hover,
+.cs-trigger:focus  { border-color: #3b82f6; }
+.cs-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.cs-arrow {
+  font-size: 10px;
+  flex-shrink: 0;
+  opacity: .5;
+  transition: transform .2s;
+}
+.cs-panel {
+  display: none;
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(100% + 4px);
+  background: var(--s1);
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  z-index: 1000;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 4px;
+  min-width: 180px;
+  width: max-content;
+  max-width: min(320px, 90vw);
+  right: 0; left: auto;
+}
+.cs-item {
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.cs-item:hover,
+.cs-item:active { background: var(--s2); }
+
+/* Тёмная тема */
+@media (prefers-color-scheme: dark) {
+  .cs-trigger { border-color: #374151; }
+  .cs-panel    { border-color: #374151; }
+}

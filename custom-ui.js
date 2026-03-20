@@ -126,26 +126,13 @@ class CustomSelect {
 
     const trigger = document.createElement('button');
     trigger.type = 'button';
-    trigger.className = 'cs-trigger';
-    trigger.style.cssText = `
-      display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
-      width:${isCompact?'auto':'100%'};height:38px;padding:0 12px;
-      background:transparent;border:1px solid var(--border);border-radius:6px;
-      color:var(--text);font-size:13px;font-family:inherit;font-weight:500;
-      cursor:pointer;text-align:left;outline:none;
-      transition:border-color .15s;`;
+    trigger.className = `cs-trigger${isCompact?' cs-trigger--compact':''}`;
     trigger.innerHTML = `
-      <span class="cs-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-      <i class="fas fa-chevron-down cs-arrow" style="font-size:10px;color:var(--sub);flex-shrink:0;transition:transform .2s"></i>`;
+      <span class="cs-label"></span>
+      <i class="fas fa-chevron-down cs-arrow"></i>`;
 
     const panel = document.createElement('div');
     panel.className = 'cs-panel';
-    panel.style.cssText = `
-      display:none;position:absolute;left:0;top:calc(100% + 4px);
-      background:var(--s1);border:1px solid var(--border);border-radius:4px;
-      box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:1000;
-      max-height:260px;overflow-y:auto;padding:4px;
-      min-width:180px;width:max-content;max-width:min(320px,90vw);right:0;left:auto;`;
 
     wrap.appendChild(trigger);
     wrap.appendChild(panel);

@@ -82,9 +82,8 @@ function _selCb(section, id) {
 function showCtxMenu(e, items) {
   if (e && e.stopPropagation) e.stopPropagation();
 
-  // Close any existing menus
+  // Закрываем все открытые меню
   document.querySelectorAll('.ctx-menu').forEach(m => m.remove());
-
   if (!items || !items.length) return;
 
   const menu = document.createElement('div');
@@ -95,65 +94,48 @@ function showCtxMenu(e, items) {
     el.className = 'ctx-menu-item';
     el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px"></i><span>${item.label}</span>`;
     if (item.danger) el.style.color = 'var(--red)';
+
+    // pointerdown — срабатывает ДО close listener, надёжно на iOS
     el.addEventListener('pointerdown', (ev) => {
       ev.stopPropagation();
-    });
-    el.addEventListener('click', (ev) => {
-      ev.stopPropagation();
+      ev.preventDefault();
       menu.remove();
+      document.removeEventListener('click', close, true);
       try { item.action(); } catch(err) { console.error(err); }
     });
     menu.appendChild(el);
   });
 
-  // Find the nearest card parent to anchor inside
+  // Всегда вставляем в body — избегаем проблем с overflow:hidden и z-index карточек
+  document.body.appendChild(menu);
+
   const trigger = e && (e.currentTarget || e.target);
-  const card = trigger && trigger.closest('.ein-row,.rech-card,.ang-card,.wied-card,.kunde-card,.prod-card,.fb-row');
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const mW = 190, mH = items.length * 46 + 12;
 
-  if (card) {
-    // Anchor inside card
-    card.style.position = 'relative';
-    menu.style.position = 'absolute';
-    card.appendChild(menu);
-
-    const btnRect = trigger.getBoundingClientRect();
-    const cardRect = card.getBoundingClientRect();
-    const mW = 180;
-    const mH = items.length * 46 + 12;
-
-    let right = cardRect.right - btnRect.right;
-    let top = btnRect.bottom - cardRect.top + 4;
-    // If overflows bottom of viewport, show above
-    if (btnRect.bottom + mH + 4 > window.innerHeight) {
-      top = btnRect.top - cardRect.top - mH - 4;
-    }
-    menu.style.cssText += `;right:${Math.max(0,right)}px;top:${top}px;min-width:${mW}px;left:auto`;
+  let top, left;
+  if (trigger) {
+    const r = trigger.getBoundingClientRect();
+    left = Math.max(8, r.right - mW);
+    top  = r.bottom + 6;
+    if (top + mH > vh - 8) top = Math.max(8, r.top - mH - 6);
   } else {
-    // Fallback: fixed on body
-    document.body.appendChild(menu);
-    const vw = window.innerWidth, vh = window.innerHeight;
-    const mW = 180, mH = items.length * 46 + 12;
-    let top, left;
-    if (trigger) {
-      const r = trigger.getBoundingClientRect();
-      left = Math.max(8, r.right - mW);
-      top  = r.bottom + 6;
-      if (top + mH > vh - 8) top = r.top - mH - 6;
-    } else {
-      left = Math.max(8, (e ? e.clientX : vw/2) - mW/2);
-      top  = e ? e.clientY + 6 : vh/2;
-    }
-    left = Math.min(left, vw - mW - 8);
-    top  = Math.max(8, top);
-    menu.style.cssText += `;left:${left}px;top:${top}px;min-width:${mW}px`;
+    left = Math.max(8, (e ? e.clientX : vw/2) - mW/2);
+    top  = e ? e.clientY + 6 : vh/2;
   }
+  left = Math.min(left, vw - mW - 8);
+  top  = Math.max(8, top);
+  menu.style.cssText += `;position:fixed;left:${left}px;top:${top}px;min-width:${mW}px;z-index:8000`;
 
-  // Close on outside click/tap — но не перехватываем клики по confirm-диалогу
+  // Close on outside click — не трогаем confirm-диалог
   const close = (ev) => {
     if (ev.target.closest('#app-confirm-overlay')) return;
-    if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', close, true); }
+    if (!menu.contains(ev.target)) {
+      menu.remove();
+      document.removeEventListener('click', close, true);
+    }
   };
-  setTimeout(() => document.addEventListener('click', close, true), 100);
+  setTimeout(() => document.addEventListener('click', close, true), 50);
 }
 
 // ── ⋮ button helper ────────────────────────────────────────────────
