@@ -82,12 +82,18 @@ function _selCb(section, id) {
 function showCtxMenu(e, items) {
   if (e && e.stopPropagation) e.stopPropagation();
 
-  // Закрываем все открытые меню
   document.querySelectorAll('.ctx-menu').forEach(m => m.remove());
   if (!items || !items.length) return;
 
   const menu = document.createElement('div');
   menu.className = 'ctx-menu';
+
+  // close определяем ДО использования
+  let closeHandler = null;
+  const removeMenu = () => {
+    menu.remove();
+    if (closeHandler) document.removeEventListener('click', closeHandler, true);
+  };
 
   items.forEach(item => {
     const el = document.createElement('div');
@@ -95,24 +101,29 @@ function showCtxMenu(e, items) {
     el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px"></i><span>${item.label}</span>`;
     if (item.danger) el.style.color = 'var(--red)';
 
-    // pointerdown — срабатывает ДО close listener, надёжно на iOS
-    el.addEventListener('pointerdown', (ev) => {
+    el.addEventListener('click', (ev) => {
       ev.stopPropagation();
       ev.preventDefault();
-      menu.remove();
-      document.removeEventListener('click', close, true);
+      removeMenu();
       try { item.action(); } catch(err) { console.error(err); }
     });
+
+    // touchend для iOS — preventDefault не даёт сработать onclick на карточке
+    el.addEventListener('touchend', (ev) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+      removeMenu();
+      try { item.action(); } catch(err) { console.error(err); }
+    });
+
     menu.appendChild(el);
   });
 
-  // Всегда вставляем в body — избегаем проблем с overflow:hidden и z-index карточек
   document.body.appendChild(menu);
 
   const trigger = e && (e.currentTarget || e.target);
   const vw = window.innerWidth, vh = window.innerHeight;
   const mW = 190, mH = items.length * 46 + 12;
-
   let top, left;
   if (trigger) {
     const r = trigger.getBoundingClientRect();
@@ -125,17 +136,17 @@ function showCtxMenu(e, items) {
   }
   left = Math.min(left, vw - mW - 8);
   top  = Math.max(8, top);
-  menu.style.cssText += `;position:fixed;left:${left}px;top:${top}px;min-width:${mW}px;z-index:8000`;
+  menu.style.position = 'fixed';
+  menu.style.left     = left + 'px';
+  menu.style.top      = top  + 'px';
+  menu.style.minWidth = mW   + 'px';
+  menu.style.zIndex   = '8000';
 
-  // Close on outside click — не трогаем confirm-диалог
-  const close = (ev) => {
+  closeHandler = (ev) => {
     if (ev.target.closest('#app-confirm-overlay')) return;
-    if (!menu.contains(ev.target)) {
-      menu.remove();
-      document.removeEventListener('click', close, true);
-    }
+    if (!menu.contains(ev.target)) removeMenu();
   };
-  setTimeout(() => document.addEventListener('click', close, true), 50);
+  setTimeout(() => document.addEventListener('click', closeHandler, true), 50);
 }
 
 // ── ⋮ button helper ────────────────────────────────────────────────
