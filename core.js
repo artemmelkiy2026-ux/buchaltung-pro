@@ -313,6 +313,7 @@ function nav(id, el){
   if(id==='kunden-form') { /* форма готова */ }
   if(id==='produkte-form') { /* форма готова */ }
   if(id==='ust') renderUst();
+  if(id==='ki-audit') initKiAudit();
   if(id==='wiederkehrend') renderWied();
   if(id==='fahrtenbuch') initFahrtenbuch();
   if(id==='eintraege') renderEin();

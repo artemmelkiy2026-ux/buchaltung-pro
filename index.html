@@ -246,6 +246,7 @@
   <div class="nav-group-children" id="gobd-group">
     <div class="nav-item nav-child" onclick="nav('journal',this)">Journal</div>
     <div class="nav-item nav-child" onclick="nav('ust',this)">Umsatzsteuer</div>
+    <div class="nav-item nav-child" onclick="nav('ki-audit',this)"><i class="fas fa-robot" style="margin-right:6px;color:var(--blue)"></i>KI-Audit</div>
   </div>
 
   <!-- Spacer -->
@@ -2017,6 +2018,79 @@
   </div>
 </div>
 
+<!-- ── KI-AUDIT ── -->
+<div class="page" id="p-ki-audit">
+<div class="page-inner">
+
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title"><i class="fas fa-robot" style="color:var(--blue)"></i> KI-Finanzaudit</div>
+      <div class="ph-sub">KI-gestützte Analyse Ihrer Buchhaltungsdaten</div>
+    </div>
+  </div>
+
+  <!-- Auswahl Bereiche -->
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px 24px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">
+      <i class="fas fa-sliders-h" style="color:var(--blue);margin-right:8px"></i>Analysebereiche auswählen
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="audit-checks">
+      <label class="audit-check-item">
+        <input type="checkbox" id="ac-eintraege" checked>
+        <span><i class="fas fa-list"></i> Einträge & Buchungen</span>
+      </label>
+      <label class="audit-check-item">
+        <input type="checkbox" id="ac-rechnungen" checked>
+        <span><i class="fas fa-file-invoice"></i> Rechnungen</span>
+      </label>
+      <label class="audit-check-item">
+        <input type="checkbox" id="ac-ust" checked>
+        <span><i class="fas fa-percentage"></i> Umsatzsteuer</span>
+      </label>
+      <label class="audit-check-item">
+        <input type="checkbox" id="ac-wiederkehrend">
+        <span><i class="fas fa-sync-alt"></i> Wiederkehrende Zahlungen</span>
+      </label>
+      <label class="audit-check-item">
+        <input type="checkbox" id="ac-kunden">
+        <span><i class="fas fa-users"></i> Kunden (CRM)</span>
+      </label>
+      <label class="audit-check-item">
+        <input type="checkbox" id="ac-fahrtenbuch">
+        <span><i class="fas fa-car"></i> Fahrtenbuch</span>
+      </label>
+    </div>
+
+    <!-- Jahr -->
+    <div style="display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <span style="font-size:13px;font-weight:600;color:var(--text)">Zeitraum:</span>
+      <select id="audit-jahr" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:6px 12px;font-size:13px;outline:none">
+        <option value="alle">Alle Jahre</option>
+      </select>
+      <span style="font-size:12px;color:var(--sub)">Nur Daten aus diesem Jahr werden analysiert</span>
+    </div>
+
+    <button onclick="startKiAudit()" id="audit-start-btn"
+      style="margin-top:16px;width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:var(--r2);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;transition:opacity .15s">
+      <i class="fas fa-robot"></i> KI-Audit starten
+    </button>
+  </div>
+
+  <!-- Progress -->
+  <div id="audit-progress" style="display:none;background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:16px;text-align:center">
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px" id="audit-progress-text">Analyse läuft...</div>
+    <div style="height:4px;background:var(--s2);border-radius:2px;overflow:hidden">
+      <div id="audit-progress-bar" style="height:100%;width:0%;background:var(--blue);border-radius:2px;transition:width .4s ease"></div>
+    </div>
+    <div style="font-size:12px;color:var(--sub);margin-top:8px" id="audit-progress-step"></div>
+  </div>
+
+  <!-- Ergebnis -->
+  <div id="audit-result" style="display:none"></div>
+
+</div>
+</div>
+
 </div><!-- /main -->
 <!-- ── MONATSDETAIL MODAL ── -->
 <div class="modal-bg" id="mon-modal">
@@ -2354,5 +2428,6 @@
 
 <script src="select_mode.js"></script>
 <script src="vorschau.js"></script>
+<script src="ki-audit.js"></script>
 </body>
 </html>
