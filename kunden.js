@@ -17,6 +17,39 @@ function _updateWiedSortBtns(){
     });
   });
 }
+
+function showWiedDetail(id) {
+  const w = (data.wiederkehrend||[]).find(x=>x.id===id);
+  if (!w) return;
+  const isEin = w.typ === 'Einnahme';
+  const isPaused = w.status === 'paused';
+  const intervallLabel = {woechentlich:'Wöchentlich',monatlich:'Monatlich',quartalsweise:'Quartalsweise',halbjaehrlich:'Halbjährlich',jaehrlich:'Jährlich'};
+  const bookedCount = (data.eintraege||[]).filter(e=>e.beschreibung===w.bezeichnung&&e.notiz==='Wiederkehrend').length;
+  const multiplier = {woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
+  const jahres = w.betrag * (multiplier[w.intervall]||1);
+  showDetailSheet({
+    title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
+    rows: [
+      { key: 'Bezeichnung', val: w.bezeichnung || '—' },
+      { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:22px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(w.betrag)}</span>` },
+      { key: 'Intervall',   val: intervallLabel[w.intervall] || w.intervall || '—' },
+      { key: 'Kategorie',   val: w.kategorie || '—' },
+      { key: 'Zahlungsart', val: `<span class="badge ${ZBADGE[w.zahlungsart]||''}">${w.zahlungsart||'—'}</span>` },
+      { key: 'Nächste Buchung', val: fdm(w.naechste) || '—' },
+      { key: 'Pro Jahr (≈)', val: `<span style="font-family:var(--mono)">${fmt(jahres)}</span>` },
+      ...(w.enddatum ? [{ key: 'Enddatum', val: fdm(w.enddatum) }] : []),
+      ...(w.anbieter ? [{ key: 'Anbieter', val: w.anbieter }] : []),
+      ...(bookedCount ? [{ key: 'Gebucht', val: bookedCount + '× bisher' }] : []),
+      { key: 'Status', val: isPaused ? '<span style="color:var(--sub)">Pausiert</span>' : '<span style="color:var(--green)">Aktiv</span>' },
+    ],
+    buttons: [
+      { label: 'Jetzt buchen', icon: 'fa-play', primary: true, action: () => wBuchen(id) },
+      { label: 'Bearbeiten',   icon: 'fa-edit',  action: () => editWied(id) },
+      { label: 'Löschen',      icon: 'fa-trash', danger: true, action: () => delWied(id) },
+    ]
+  });
+}
+
 function renderWied(){
   const wied=data.wiederkehrend||[];
   const container=document.getElementById('wied-list');
@@ -52,7 +85,7 @@ function renderWied(){
     // Годовой эквивалент
     const _wMultiplier = {woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
     const _wJahres = w.betrag * (_wMultiplier[w.intervall]||1);
-    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" onclick="editWied('${w.id}')" style="cursor:pointer">
+    return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" onclick="showWiedDetail('${w.id}')" style="cursor:pointer">
       <div class="wied-card-left">
         <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
           <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>

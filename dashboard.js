@@ -848,13 +848,8 @@ function renderEin(){
           : '<span style="font-size:10px;color:var(--blue);font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' VSt ('+mwstRate+'%)</span>')
         : '';
       
-      const _clickAttr = !st ? `onclick="editE(event,'${e.id}')"` : '';
-      const _mobBtn = isMob() && !st
-        ? _moreBtn([
-            {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
-            {icon:'fa-times',  label:'Stornieren', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
-          ])
-        : '';
+      const _clickAttr = !st ? `onclick="showEintragDetail('${e.id}')"` : '';
+      const _mobBtn = ''; // кнопки теперь внутри detail sheet
 
       const _catLine = ''
         +'<span class="ein-row-kat">'+e.kategorie+'</span>'
