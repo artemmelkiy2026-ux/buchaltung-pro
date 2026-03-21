@@ -26,7 +26,16 @@ function editE(e,id){
     document.getElementById('nf-bet').value=en.betrag;
     document.getElementById('nf-dsc').value=en.beschreibung||'';
     document.getElementById('nf-note').value=en.notiz||'';
-    const _bnEl=document.getElementById('nf-belegnr'); if(_bnEl) _bnEl.value=en.belegnr||'';
+    const _bnEl=document.getElementById('nf-belegnr');
+    if(_bnEl) {
+      // При корректировке Einnahme — следующий номер после максимального по всей базе
+      if(en.typ==='Einnahme') {
+        const _yr = en.datum?.substring(0,4) || new Date().getFullYear().toString();
+        _bnEl.value = autoRechNr(_yr);
+      } else {
+        _bnEl.value = '';
+      }
+    }
     document.getElementById('nf-zahl').value=en.zahlungsart||'Überweisung';
     document.getElementById('nf-kat').value=en.kategorie;
     updateMwstFormVisibility();
@@ -139,4 +148,3 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();persist();toast('✓ Gespeichert!','ok');}
 });
 document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');}));
-
