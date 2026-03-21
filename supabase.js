@@ -380,6 +380,7 @@ function fahrtToDb(f) {
     zweck: f.zweck||null, typ: f.typ||'Geschäftlich', kennzeichen: f.kennzeichen||null,
     km_start: f.km_start||0, km_end: f.km_end||0, km: f.km||0,
     auto_id: f.autoId||null,
+    hin_zurueck: f.hinZurueck||false,
   };
 }
 function dbToFahrt(r) {
@@ -388,6 +389,7 @@ function dbToFahrt(r) {
     zweck: r.zweck||'', typ: r.typ||'Geschäftlich', kennzeichen: r.kennzeichen||'',
     km_start: parseFloat(r.km_start)||0, km_end: parseFloat(r.km_end)||0, km: parseFloat(r.km)||0,
     autoId: r.auto_id||'',
+    hinZurueck: r.hin_zurueck||false,
   };
 }
 async function sbSaveFahrt(f) {
