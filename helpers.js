@@ -1593,7 +1593,7 @@ function showDetailSheet({ title = '', rows = [], buttons = [] }) {
   const rowsHtml = rows.map(r => `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 18px;border-bottom:1px solid var(--border);gap:12px">
       <span style="color:var(--sub);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;flex-shrink:0;padding-top:2px;min-width:110px">${r.key}</span>
-      <span style="color:var(--text);font-size:14px;text-align:right;word-break:break-word;${r.cls==='mdm-amt'?'font-family:var(--mono);font-size:22px;font-weight:800':''}">${r.val}</span>
+      <span style="color:var(--text);font-size:14px;text-align:right;word-break:break-word;${r.cls==='mdm-amt'?'font-family:var(--mono);font-size:16px;font-weight:800':''}">${r.val}</span>
     </div>`).join('');
 
   const btnsHtml = buttons.map((b, i) => `
