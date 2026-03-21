@@ -191,8 +191,8 @@ function renderJournal() {
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
                 ${badge}
-                <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${fd(e.datum)}</span>
-                ${e.created_at ? `<span style="font-size:10px;color:var(--sub);opacity:.6;font-family:var(--mono)">${fdt(e.created_at).slice(11)}</span>` : ''}
+                <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${e.korrektur_von&&e.created_at ? fd(e.created_at.slice(0,10)) : fd(e.datum)}</span>
+                ${e.created_at ? `<span style="font-size:10px;color:var(--sub);opacity:.6;font-family:var(--mono)">${e.created_at.slice(11,16)}</span>` : ''}
               </div>
               <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3${link?';margin-bottom:4px':''}">
                 ${e.belegnr?`<span style="font-size:10px;font-weight:700;font-family:var(--mono);background:var(--blue);color:#fff;padding:1px 5px;border-radius:4px;margin-right:5px">Nr.${e.belegnr}</span>`:''}
@@ -291,7 +291,8 @@ function renderJournal() {
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
                 ${badge}
-                <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${fd(e.datum)}</span>
+                <span style="font-size:11px;color:var(--sub);font-family:var(--mono)">${e.korrektur_von&&e.created_at ? fd(e.created_at.slice(0,10)) : fd(e.datum)}</span>
+                ${e.created_at ? `<span style="font-size:10px;color:var(--sub);opacity:.6;font-family:var(--mono)">${e.created_at.slice(11,16)}</span>` : ''}
               </div>
               <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;line-height:1.3${link?';margin-bottom:4px':''}">
                 ${e.beschreibung||e.kategorie||'—'}
