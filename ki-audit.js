@@ -56,7 +56,6 @@ async function startKiAudit() {
 
   const filterY = arr => jahr==='alle' ? arr : arr.filter(e=>(e.datum||'').startsWith(jahr));
   const realYears = [...new Set((data.eintraege||[]).map(e=>e.datum?.slice(0,4)).filter(Boolean))].sort();
-  auditData._meta = { vorhandeneJahre: realYears, analyseZeitraum: jahr==='alle'?realYears.join(', '):'nur '+jahr };
   const r2 = v => Math.round(v*100)/100;
   const auditData = {};
 
@@ -70,12 +69,11 @@ async function startKiAudit() {
       einnahmen: { count: ein.filter(e=>e.typ==='Einnahme').length, summe: r2(einSum) },
       ausgaben:  { count: ein.filter(e=>e.typ==='Ausgabe').length,  summe: r2(ausSum) },
       gewinn: r2(einSum-ausSum),
-      topKategorien: Object.entries(katMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>({kategorie:k,summe:r2(v)})),
+      topKategorien: Object.entries(katMap).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>({k,v:r2(v)})),
       stornos: ein.filter(e=>e.is_storno).length,
       korrekturen: ein.filter(e=>e.korrektur_von).length,
       ohneBeleg: ein.filter(e=>!e.belegnr).length,
       grosseOhneNotiz: ein.filter(e=>!e.notiz&&!e.beschreibung&&e.betrag>500).length,
-      hinweis: 'Notiz-Feld ist optionales Zusatzfeld; Beschreibung ist Pflicht und immer gefüllt',
     };
   }
 
@@ -183,13 +181,21 @@ async function startKiAudit() {
   if(types.compliance)  aktiveTypen.push('GoBD');
   if(types.benchmark)   aktiveTypen.push('KPIs');
 
-  const prompt = `Steuerberater DE. Analysiere NUR diese Daten (Jahre: \${realYears.join(',')}). Keine Erfindungen.
-Datenhinweise: beschreibung=Pflichtfeld(immer gefüllt), notiz=optional(leer=normal), ohneBeleg=0=gut.
-§19 UStG: bis2024(Vorjahr≤22000,laufend≤50000), ab2025(Vorjahr≤25000,laufend≤100000), Bruttoumsatz, nicht rückwirkend.
-Analyse: \${aktiveTypen.join(',')}
-Daten: \${JSON.stringify(auditData)}
-Antworte NUR JSON:
-{"zusammenfassung":{"bewertung":"gut|warnung|kritisch","text":"2 Sätze mit Zahlen","score":0-100,"highlights":["positiv1"]},"bereiche":[{"name":"Name","icon":"fa-chart-bar","bewertung":"gut|warnung|kritisch","punkte":[{"typ":"ok|warnung|fehler|info","text":"Befund+Zahl"}]}],"empfehlungen":[{"prioritaet":"hoch|mittel|niedrig","text":"Empfehlung"}],"naechste_schritte":["Schritt1","Schritt2"]}`;
+  // Компактная сводка для Gemini
+  const _d = [];
+  if(auditData.eintraege){const e=auditData.eintraege;_d.push("Ein:"+e.einnahmen.count+"x"+e.einnahmen.summe+"€ Aus:"+e.ausgaben.count+"x"+e.ausgaben.summe+"€ Gew:"+e.gewinn+"€ Bel:"+e.ohneBeleg+"f St:"+e.stornos+" Ko:"+e.korrekturen+" Top:"+((e.topKategorien||[]).map(k=>k.k+":"+k.v).join("|")));}
+  if(auditData.rechnungen){const r=auditData.rechnungen;_d.push("Rech:"+r.gesamt+"/"+r.offen+"off/"+r.ueberfaellig+"übf Off:"+r.summeOffen+"€ Übf:"+r.summeUeberfaellig+"€");}
+  if(auditData.ust){const u=auditData.ust;_d.push("MwSt:"+u.mwstGesamt+"€ VSt:"+u.vorsteuerGesamt+"€ ZL:"+u.zahllast+"€ Modi:"+((u.ustModi||[]).map(m=>m.jahr+":"+m.modus).join("|")));}
+  if(auditData.wiederkehrend){const w=auditData.wiederkehrend;_d.push("Wied:"+w.gesamt+"/"+w.faellig+"f JA:"+w.jahresAusgaben+"€");}
+  if(auditData.kunden){const k=auditData.kunden;_d.push("Kund:"+k.gesamt+"/"+k.mitRechnungen+"R/"+k.ohneKontakt+"ok");}
+  if(auditData.fahrtenbuch){const f=auditData.fahrtenbuch;_d.push("Fahr:"+f.fahrten+" km:"+f.kmGeschaeftlich+"gesch Abs:"+f.steuerlichAbsetzbar+"€");}
+
+  const prompt = `Buchhaltungsaudit DE. Jahre:${realYears.join(",")}. Nur vorhandene Daten.
+§19: bis2024(Vj≤22000,lfd≤50000) ab2025(Vj≤25000,lfd≤100000) Brutto.
+Analyse:${aktiveTypen.join(",")}
+${_d.join("\n")}
+Antwort nur JSON:
+{"zusammenfassung":{"bewertung":"gut|warnung|kritisch","text":"2Sätze+€","score":0-100,"highlights":["+"]},"bereiche":[{"name":"x","icon":"fa-chart-bar","bewertung":"g|w|k","punkte":[{"typ":"ok|warnung|fehler|info","text":"Befund+€"}]}],"empfehlungen":[{"prioritaet":"hoch|mittel|niedrig","text":"x"}],"naechste_schritte":["x"]}`;
 
   setP(55,'Google Gemini analysiert Ihre Daten...','KI-Verarbeitung');
 
