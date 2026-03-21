@@ -111,7 +111,7 @@ window.addEventListener('supabase-ready', () => {
   }
   appInit();
 });
-let curTyp='Einnahme', fTyp='Alle', sortCol='datum', sortAsc=false;
+let curTyp='Einnahme', fTyp='Alle', sortCol='created_at', sortAsc=false;
 let fileHandle=null, asOn=false, asTimer=null, curPage='dashboard';
 // <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для сортировки Dashboard "Letzte 10"
 let dashSortCol='datum', dashSortAsc=false;

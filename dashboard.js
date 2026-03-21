@@ -374,7 +374,7 @@ function addEintrag(){
   const mwRate=mwRateRaw===null||mwRateRaw===undefined?19:parseFloat(mwRateRaw);
   const mwBet=r2(parseFloat(document.getElementById('nf-mwst-bet')?.value)||0);
   const netBet=r2(parseFloat(document.getElementById('nf-netto-bet')?.value)||betrag);
-  const entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,belegnr,betrag};
+  const entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,belegnr,betrag,created_at:new Date().toISOString()};
   const entryYrMode=datum.substring(0,4);
   if(!isKleinunternehmer(entryYrMode)&&mwBet>0){
     if(curTyp==='Einnahme'){
@@ -400,7 +400,7 @@ function addEintrag(){
   renderAll(); // включает renderDash внутри
   updateNeuToolbar(true);
   // После сохранения — новая запись всегда сверху
-  einPage=1; sortCol='datum'; sortAsc=false;
+  einPage=1; sortCol='created_at'; sortAsc=false;
   const fj=document.getElementById('f-jahr');
   if(fj){
     const opt=[...fj.options].find(o=>o.value===entryYear);
@@ -790,14 +790,18 @@ function prevTenPages() { einPage = Math.max(1, einPage - 10); renderEin(); }
 
 function renderEin(){
   const entries=getFiltered().sort((a,b)=>{
+    // created_at — по времени добавления/редактирования
+    if(sortCol==='created_at') {
+      const ca = a.created_at||a.id||'', cb = b.created_at||b.id||'';
+      return sortAsc ? ca.localeCompare(cb) : cb.localeCompare(ca);
+    }
     let va=a[sortCol],vb=b[sortCol];
     if(sortCol==='betrag'){va=+va;vb=+vb;}
     if(sortCol==='datum') {
-      // По дате операции — при равных датах новее созданные/изменённые сверху
       const dateCmp = sortAsc ? (va.localeCompare(vb)) : (vb.localeCompare(va));
       if(dateCmp !== 0) return dateCmp;
-      // Вторичная сортировка по created_at (новее сверху)
-      const ca = a.created_at||'', cb = b.created_at||'';
+      // При одинаковой дате — последний изменённый сверху
+      const ca = a.created_at||a.id||'', cb = b.created_at||b.id||'';
       return cb.localeCompare(ca);
     }
     return sortAsc?(va>vb?1:-1):(va<vb?1:-1);
