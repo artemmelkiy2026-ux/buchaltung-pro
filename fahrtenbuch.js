@@ -546,7 +546,7 @@ function showFahrtDetail(id) {
   showDetailSheet({
     title: `<i class="fas fa-car" style="color:var(--blue);margin-right:8px"></i>${f.abfahrt} → ${f.ziel}`,
     rows: [
-      { key: 'Strecke',   val: `<span style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">${fmtKm(f.km)}</span>` },
+      { key: 'Strecke',   val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmtKm(f.km)}</span>` },
       { key: 'Datum',     val: fd(f.datum) },
       { key: 'Typ',       val: f.typ },
       { key: 'Fahrzeug',  val: auto ? auto.kennzeichen : (f.kennzeichen||'—') },
