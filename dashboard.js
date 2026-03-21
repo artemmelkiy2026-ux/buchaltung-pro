@@ -859,7 +859,13 @@ function renderEin(){
       const _typBadge = ''; // стрелка уже есть в ein-row-arrow
 
       // Номер операции рядом с заголовком
-      const _nrBadge = e.belegnr ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;margin-left:6px;vertical-align:middle">Nr.'+e.belegnr+'</span>' : '';
+      // На мобиле — номер ПЕРЕД заголовком, на десктопе — ПОСЛЕ
+      const _nrBefore = e.belegnr && isMob()
+        ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;margin-right:6px;vertical-align:middle;flex-shrink:0">Nr.'+e.belegnr+'</span>'
+        : '';
+      const _nrBadge = e.belegnr && !isMob()
+        ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;margin-left:6px;vertical-align:middle">Nr.'+e.belegnr+'</span>'
+        : '';
 
       // Строка под заголовком: Zahlungsart + Datum
       const _infoLine = '<span class="badge ein-row-badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
@@ -883,6 +889,7 @@ function renderEin(){
               +'<div class="ein-row-desc">'
                 +'<span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'
                 +_typBadge
+                +_nrBefore
                 +(e.beschreibung||e.kategorie)
                 +_nrBadge
               +'</div>'
