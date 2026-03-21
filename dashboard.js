@@ -470,7 +470,126 @@ function sortDash(col){
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────
+
+// ══════════════════════════════════════════════════════════════════
+// БАННЕРЫ СПОКОЙСТВИЯ — Canva-style
+// ══════════════════════════════════════════════════════════════════
+function renderCalmBanners() {
+  const wrap = document.getElementById('calm-banners');
+  if (!wrap) return;
+
+  const yr = document.getElementById('dash-yr')?.value || new Date().getFullYear()+'';
+  const curYr = yr === 'Alle' ? new Date().getFullYear()+'' : yr;
+  const ye = activeEintraegeMitRech(yr === 'Alle' ? null : yr);
+  const ein = sum(ye, 'Einnahme');
+  const isRegel = !isKleinunternehmer(curYr);
+
+  // ── 1. COMPLIANCE ───────────────────────────────────────────────
+  const noDesc  = ye.filter(e => !e.beschreibung || e.beschreibung.trim() === e.kategorie).length;
+  const noZahl  = ye.filter(e => !e.zahlungsart || e.zahlungsart === 'Sonstiges').length;
+  const issues  = noDesc + noZahl;
+  const compPct = ye.length > 0 ? Math.round((1 - issues / (ye.length * 2)) * 100) : 100;
+  const compOk  = compPct >= 90;
+  const compColor = compOk ? '#10b981' : compPct >= 70 ? '#f59e0b' : '#ef4444';
+  const compBg    = compOk ? 'linear-gradient(135deg,#064e3b 0%,#065f46 100%)' 
+                           : compPct >= 70 ? 'linear-gradient(135deg,#451a03 0%,#78350f 100%)'
+                           : 'linear-gradient(135deg,#450a0a 0%,#7f1d1d 100%)';
+  const compIcon  = compOk ? 'fa-shield-alt' : 'fa-exclamation-triangle';
+  const compTitle = compOk ? 'Alles in Ordnung' : 'Prüfung empfohlen';
+  const compSub   = compOk ? `${ye.length} Einträge vollständig` : `${issues} Einträge unvollständig`;
+
+  // ── 2. STEUERRESERVE ────────────────────────────────────────────
+  const mwstTotal  = ye.filter(e=>e.mwstBetrag>0).reduce((s,e)=>s+e.mwstBetrag,0);
+  const vstTotal   = ye.filter(e=>e.vorsteuerBet>0).reduce((s,e)=>s+e.vorsteuerBet,0);
+  const zahllast   = Math.max(0, mwstTotal - vstTotal);
+  const reservePct = zahllast > 0 && ein > 0 ? Math.round(zahllast / ein * 100) : 0;
+  const reserveOk  = zahllast === 0 || !isRegel;
+  const resBg      = reserveOk ? 'linear-gradient(135deg,#1e1b4b 0%,#312e81 100%)'
+                                : 'linear-gradient(135deg,#450a0a 0%,#7f1d1d 100%)';
+  const resColor   = reserveOk ? '#818cf8' : '#fca5a5';
+  const resTitle   = isRegel ? 'Steuerreserve' : 'Kleinunternehmer';
+  const resSub     = isRegel 
+    ? (zahllast > 0 ? `${fmt(zahllast)} reservieren` : 'Kein MwSt-Rückstand')
+    : 'Kein MwSt-Ausweis';
+  const resIcon    = isRegel ? 'fa-piggy-bank' : 'fa-tag';
+  const resVal     = isRegel ? fmt(zahllast) : '§ 19';
+
+  // ── 3. NÄCHSTE FRIST ────────────────────────────────────────────
+  const today = new Date();
+  const mo    = today.getMonth(); // 0-based
+  const yr_n  = today.getFullYear();
+  // USt-VA: fällig am 10. des Folgemonats (bei monatlicher Abgabe)
+  const fristDate = new Date(yr_n, mo + 1, 10); // 10. nächsten Monat
+  const diffDays  = Math.ceil((fristDate - today) / 86400000);
+  const fristOk   = diffDays > 7;
+  const fristBg   = fristOk ? 'linear-gradient(135deg,#0c1445 0%,#1e3a5f 100%)'
+                             : 'linear-gradient(135deg,#450a0a 0%,#7f1d1d 100%)';
+  const fristColor = fristOk ? '#60a5fa' : '#fca5a5';
+  const fristMon  = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const fristLbl  = `USt-VA ${fristMon[mo+1>11?0:mo+1]} bis 10.${String(mo+2>12?1:mo+2).padStart(2,'0')}.${mo+2>12?yr_n+1:yr_n}`;
+
+  // ── RENDER ──────────────────────────────────────────────────────
+  wrap.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px';
+
+  wrap.innerHTML = `
+    <!-- Compliance -->
+    <div style="background:${compBg};border-radius:16px;padding:20px;position:relative;overflow:hidden;min-height:120px;box-shadow:0 4px 24px rgba(0,0,0,.25)">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+      <div style="position:absolute;bottom:-30px;right:20px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:${compColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fas ${compIcon}" style="color:#fff;font-size:16px"></i>
+        </div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5)">Compliance</div>
+      </div>
+      <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:4px">${compPct}%</div>
+      <div style="font-size:13px;font-weight:600;color:${compColor};margin-bottom:2px">${compTitle}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.45)">${compSub}</div>
+      <div style="margin-top:12px;height:3px;border-radius:2px;background:rgba(255,255,255,.1)">
+        <div style="height:100%;width:${compPct}%;border-radius:2px;background:${compColor};transition:width .6s"></div>
+      </div>
+    </div>
+
+    <!-- Steuerreserve -->
+    <div style="background:${resBg};border-radius:16px;padding:20px;position:relative;overflow:hidden;min-height:120px;box-shadow:0 4px 24px rgba(0,0,0,.25)">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+      <div style="position:absolute;bottom:-30px;right:20px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:${resColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fas ${resIcon}" style="color:#fff;font-size:16px"></i>
+        </div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5)">${resTitle}</div>
+      </div>
+      <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:4px">${resVal}</div>
+      <div style="font-size:13px;font-weight:600;color:${resColor};margin-bottom:2px">${isRegel ? (zahllast>0 ? 'Zurückhalten!' : 'Im grünen Bereich') : 'Kein MwSt-Pflicht'}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.45)">${resSub}</div>
+    </div>
+
+    <!-- Nächste Frist -->
+    <div style="background:${fristBg};border-radius:16px;padding:20px;position:relative;overflow:hidden;min-height:120px;box-shadow:0 4px 24px rgba(0,0,0,.25)">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+      <div style="position:absolute;bottom:-30px;right:20px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:${fristColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fas fa-calendar-check" style="color:#fff;font-size:16px"></i>
+        </div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5)">Nächste Frist</div>
+      </div>
+      <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:4px">${diffDays}d</div>
+      <div style="font-size:13px;font-weight:600;color:${fristColor};margin-bottom:2px">${fristOk ? 'Rechtzeitig' : 'Bald fällig!'}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.45)">${fristLbl}</div>
+    </div>`;
+
+  // Mobile: 1 column
+  if (window.innerWidth <= 600) {
+    wrap.style.gridTemplateColumns = '1fr';
+  } else if (window.innerWidth <= 900) {
+    wrap.style.gridTemplateColumns = '1fr 1fr';
+  }
+}
+
 function renderDash(){
+  renderCalmBanners();
   // Обновляем баннер фälligen Wiederkehrenden
   const _banner = document.getElementById('dash-wied-banner');
   const _bannerTitle = document.getElementById('dash-wied-banner-title');
@@ -1327,6 +1446,31 @@ async function scanBeleg(base64, mediaType) {
         if (match) {
           katSel.value = match;
           if (typeof updateCS === 'function') updateCS('nf-kat');
+        }
+      }
+    }
+
+    // ── ДУБЛИРОВАНИЕ: проверка по дате + сумме + описанию ─────────
+    if (result.datum && result.betrag) {
+      const betrag = parseFloat(result.betrag);
+      const datum  = result.datum;
+      const desc   = (result.beschreibung || '').toLowerCase();
+      const duplicate = (data.eintraege || []).find(e =>
+        e.datum === datum &&
+        Math.abs(parseFloat(e.betrag) - betrag) < 0.01 &&
+        !e.is_storno && !e._storniert
+      );
+      if (duplicate) {
+        // Показываем диалог подтверждения
+        const confirmed = await appConfirm(
+          `Ein Eintrag mit dem Betrag <b>${fmt(betrag)}</b> vom <b>${fd(datum)}</b> existiert bereits.<br><br>„${duplicate.beschreibung || duplicate.kategorie}"<br><br>Trotzdem hinzufügen?`,
+          { title: 'Duplikat erkannt', icon: '⚠️', okLabel: 'Ja, hinzufügen', cancelLabel: 'Nein, abbrechen', danger: false }
+        );
+        if (!confirmed) {
+          // Очищаем форму
+          status.style.display = 'none';
+          if (statusInner) statusInner.style.cssText = '';
+          return;
         }
       }
     }
