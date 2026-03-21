@@ -848,7 +848,7 @@ function renderEin(){
           : '<span style="font-size:10px;color:var(--blue);font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' VSt ('+mwstRate+'%)</span>')
         : '';
       
-      const _clickAttr = !st ? `onclick="editE(event,'${e.id}')"` : '';
+      const _clickAttr = !st ? `onclick="showEintragDetail('${e.id}')"` : '';
       const _mobBtn = isMob() && !st
         ? _moreBtn([
             {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
@@ -856,8 +856,7 @@ function renderEin(){
           ])
         : '';
 
-      // Тип-бейдж рядом с заголовком
-      const _typBadge = '<span style="display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-right:6px;vertical-align:middle;'+(isEin?'background:rgba(34,197,94,.12);color:var(--green)':'background:rgba(239,68,68,.12);color:var(--red)')+'">'+(isEin?'↑ Ein':'↓ Aus')+'</span>';
+      const _typBadge = ''; // стрелка уже есть в ein-row-arrow
 
       // Номер операции рядом с заголовком
       const _nrBadge = e.belegnr ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;margin-left:6px;vertical-align:middle">Nr.'+e.belegnr+'</span>' : '';
