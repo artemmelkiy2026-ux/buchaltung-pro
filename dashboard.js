@@ -19,7 +19,7 @@ function onLoad(ev){
       if(e.kategorie)   e.kategorie=normKat(e.kategorie);
     });
     renderAll();
-    toast(`<i class="far fa-check-circle" style="color:var(--green)"></i> Загружено ${data.eintraege.length} записей`,'ok');
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Загружено ${data.eintraege.length} записей`,'ok');
   }catch{
     toast('✗ Неверный файл','err');
   }};
@@ -150,7 +150,7 @@ function renderLetzteEinnahmen(flashId=null) {
   list.innerHTML = recent.map(e => `
     <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:4px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
       <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center">
-        <i class="far fa-arrow-up" style="color:var(--green);font-size:11px"></i>
+        <i class="fas fa-arrow-up" style="color:var(--green);font-size:11px"></i>
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
@@ -183,7 +183,7 @@ function renderLetzteAusgaben(flashId=null) {
   list.innerHTML = recent.map(e => `
     <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:4px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
       <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center">
-        <i class="far fa-arrow-down" style="color:var(--red);font-size:11px"></i>
+        <i class="fas fa-arrow-down" style="color:var(--red);font-size:11px"></i>
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
@@ -461,7 +461,7 @@ function calcNfMwst(){
 
 // ── DASHBOARD SORTING ─────────────────────────────────────────────────────
 function sortDash(col){
-  // <i class="far fa-check-circle" style="color:var(--green)"></i> Для ВСЕХ колонок - можно менять порядок (↑↓)
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Для ВСЕХ колонок - можно менять порядок (↑↓)
   dashSortAsc = dashSortCol === col ? !dashSortAsc : false;
   dashSortCol = col;
   renderDash();
@@ -507,7 +507,7 @@ function renderDash(){
   g('d-aus',fmt(aus));g('d-aus-c',ye.filter(e=>e.typ==='Ausgabe').length+' Einträge');
   g('d-gew',fmt(gew));document.getElementById('d-gew').style.color=gew>=0?'var(--green)':'var(--red)';
   document.getElementById('d-gew').style.setProperty('color',gew>=0?'var(--green)':'var(--red)','important');
-  // <i class="far fa-check-circle" style="color:var(--green)"></i> Меняем класс карточки для изменения цвета верхней полоски
+  // <i class="fas fa-check-circle" style="color:var(--green)"></i> Меняем класс карточки для изменения цвета верхней полоски
   const gewCard = document.getElementById('d-gew').closest('.sc');
   if(gewCard) {
     gewCard.classList.remove('g','r','b','y','p');
@@ -696,7 +696,7 @@ function renderDash(){
     const color=isEin?'var(--green)':'var(--red)';
     return `<div class="drc${st?' drc-storno':''}" onclick="${click}" style="border:1px solid var(--border);background:var(--s1)">
       <div class="drc-icon" style="background:${isEin?'rgba(58,138,78,.1)':'rgba(214,51,65,.1)'};color:${color}">
-        <i class="far fa-arrow-${isEin?'up':'down'}"></i>
+        <i class="fas fa-arrow-${isEin?'up':'down'}"></i>
       </div>      <div class="drc-body">
         <div class="drc-name">${e.beschreibung||e.kategorie}</div>
         <div class="drc-meta">
@@ -790,7 +790,7 @@ function renderEin(){
   const entries=getFiltered().sort((a,b)=>{
     let va=a[sortCol],vb=b[sortCol];
     if(sortCol==='betrag'){va=+va;vb=+vb;}
-    // <i class="far fa-check-circle" style="color:var(--green)"></i> Для дат: sortAsc=false означает новые сверху (убывающий порядок)
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Для дат: sortAsc=false означает новые сверху (убывающий порядок)
     if(sortCol==='datum') {
       return sortAsc ? (va.localeCompare(vb)) : (vb.localeCompare(va)); // DESC по умолчанию
     }
@@ -871,7 +871,7 @@ function renderEin(){
       const _catLine = ''
         +'<span class="ein-row-kat">'+e.kategorie+'</span>'
         +(mwstBadge ? '<span class="ein-row-sep">·</span>'+mwstBadge : '')
-        +(e.notiz ? '<i class="far fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>' : '');
+        +(e.notiz ? '<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>' : '');
 
       // Для Korrektur — дата + время корректуры (created_at этой записи)
       const _korrekturTime = e.korrektur_von && e.created_at
@@ -884,7 +884,7 @@ function renderEin(){
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
               +'<div class="ein-row-desc">'
-                +'<span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="far fa-arrow-'+(isEin?'up':'down')+'"></i></span>'
+                +'<span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'
                 +_typBadge
                 +_nrBefore
                 +(e.beschreibung||e.kategorie)
@@ -898,7 +898,7 @@ function renderEin(){
               +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
                 +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>'
                   : (isMob() ? _mobBtn
-                    : '<button class="rca-btn rca-red" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren"><i class="far fa-trash"></i></button>'))
+                    : '<button class="rca-btn rca-red" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren"><i class="fas fa-trash"></i></button>'))
               +'</div>'
             +'</div>'
             +(_stLblFull ? '<div class="ein-row-tags">'+_stLblFull+'</div>' : '')
@@ -1093,13 +1093,13 @@ function renderZ(){
     return `<div class="zk${isEmpty?' zk-empty':''}">
       <div class="zk-header">
         <div class="zk-lbl">${z}</div>
-        <div class="zk-icon">${ZICONS[z]||'<i class="far fa-euro-sign"></i>'}</div>
+        <div class="zk-icon">${ZICONS[z]||'<i class="fas fa-euro-sign"></i>'}</div>
       </div>
       <div class="zk-val">${isEmpty?'—':fmt(total)}</div>
       ${isEmpty?'<div class="zk-sub">Keine Einträge</div>':`
       <div class="zk-row">
-        <span class="zk-pill zk-ein"><i class="far fa-arrow-up"></i>${fmt(s.ein)}</span>
-        <span class="zk-pill zk-aus"><i class="far fa-arrow-down"></i>${fmt(s.aus)}</span>
+        <span class="zk-pill zk-ein"><i class="fas fa-arrow-up"></i>${fmt(s.ein)}</span>
+        <span class="zk-pill zk-aus"><i class="fas fa-arrow-down"></i>${fmt(s.aus)}</span>
       </div>
       <div class="zk-prog"><div class="zk-prog-fill" style="width:${einPct}%"></div></div>
       <div class="zk-sub">${s.cnt} Eintr. · <span style="color:${gc}">${gew>=0?'+':''}${fmt(gew)}</span></div>`}
@@ -1130,7 +1130,7 @@ function renderZ(){
   } else {
     zem.style.display='none';
     
-    // <i class="far fa-check-circle" style="color:var(--green)"></i> ПАГИНАЦИЯ: показываем только 50 записей на странице
+    // <i class="fas fa-check-circle" style="color:var(--green)"></i> ПАГИНАЦИЯ: показываем только 50 записей на странице
     const totalPages = Math.ceil(sorted.length / zPerPage);
     if(zPage > totalPages) zPage = totalPages;
     
@@ -1575,7 +1575,7 @@ function showEintragDetail(id) {
   if (!e) return;
   const isEin = e.typ==='Einnahme';
   showDetailSheet({
-    title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="far fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="far fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
+    title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
     rows: [
       { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(e.betrag)}</span>` },
       { key: 'Datum',       val: fd(e.datum) },

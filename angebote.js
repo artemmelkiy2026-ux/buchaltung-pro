@@ -176,7 +176,7 @@ function renderAngebote() {
       <div class="ang-card-kunde">${a.kunde||'Kein Kunde'}</div>
       <div class="ang-card-meta">
         <span class="rech-card-status ${st.pill}" style="font-size:10px;padding:2px 6px">${st.label}</span>
-        <span><i class="far fa-calendar" style="width:12px;opacity:.5"></i> ${fd(a.datum)}</span>
+        <span><i class="fas fa-calendar" style="width:12px;opacity:.5"></i> ${fd(a.datum)}</span>
         <span>${ageLabel}</span>
         ${posCount ? `<span>${posCount} Pos.</span>` : ''}
         ${a.gueltig ? `<span style="${isExp?'color:var(--yellow);font-weight:600':''}">bis ${fd(a.gueltig)}</span>` : ''}
@@ -189,9 +189,9 @@ function renderAngebote() {
           {icon:'fa-edit',        label:'Bearbeiten',   action:()=>openAngForm(a.id)},
           {icon:'fa-trash',       label:'Löschen',      danger:true, action:()=>delAng(a.id)}
         ]) : `
-          <button class="rca-btn" onclick="event.stopPropagation();angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="far fa-print" style="font-size:11px"></i></button>
-          <button class="rca-btn rca-green" onclick="event.stopPropagation();angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="far fa-file-invoice" style="font-size:11px"></i></button>
-          <button class="rca-btn rca-red" onclick="event.stopPropagation();delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><i class="far fa-trash" style="font-size:11px"></i></button>
+          <button class="rca-btn" onclick="event.stopPropagation();angDruck('${a.id}')" title="Drucken" style="width:26px;height:26px"><i class="fas fa-print" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-green" onclick="event.stopPropagation();angZuRechnung('${a.id}')" title="→ Rechnung" style="width:26px;height:26px"><i class="fas fa-file-invoice" style="font-size:11px"></i></button>
+          <button class="rca-btn rca-red" onclick="event.stopPropagation();delAng('${a.id}')" title="Löschen" style="width:26px;height:26px"><i class="fas fa-trash" style="font-size:11px"></i></button>
         `}
       </div>
       ${expiryHtml}
@@ -307,7 +307,7 @@ function _angAddPos(p={}) {
           <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
           <span class="ust-flag-label">${rate}%</span>
         </span>
-        <i class="far fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
+        <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
       </button>
       <input type="hidden" class="ust-flag-val" value="${rate}" onchange="recalcAngSumme()">
       <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:120px">
@@ -321,7 +321,7 @@ function _angAddPos(p={}) {
       <button type="button" class="ang-rabatt-suffix" onclick="_angToggleRabatt(this)">${rabattTyp}</button>
     </div>
     <div class="ang-pos-betrag">0,00 €</div>
-    <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px"><i class="far fa-trash"></i></button>`;
+    <button class="del-btn" onclick="this.closest('.ang-pos-row').remove();recalcAngSumme()" style="padding:4px 8px"><i class="fas fa-trash"></i></button>`;
   list.appendChild(row);
   recalcAngSumme();
 }
@@ -447,8 +447,8 @@ function updateAngBanner() {
   el.style.background = isKlein ? 'rgba(251,191,36,.1)' : 'rgba(26,69,120,.08)';
   el.style.color = isKlein ? 'var(--yellow)' : 'var(--blue)';
   el.innerHTML = isKlein
-    ? '<i class="far fa-info-circle"></i> §19 UStG — Kleinunternehmer: keine MwSt.'
-    : '<i class="far fa-info-circle"></i> Regelbesteuerung — MwSt. wird ausgewiesen';
+    ? '<i class="fas fa-info-circle"></i> §19 UStG — Kleinunternehmer: keine MwSt.'
+    : '<i class="fas fa-info-circle"></i> Regelbesteuerung — MwSt. wird ausgewiesen';
 }
 
 // ── SPEICHERN ────────────────────────────────────────────────────────────────
@@ -627,7 +627,7 @@ function angBezSearch(input) {
       ${p.artnr ? `<div style="font-size:11px;color:var(--sub)">Art.-Nr. ${p.artnr}</div>` : ''}
     </div>`).join('') +
     `<div class="ang-bez-suggest-new" id="ang-bez-new-btn">
-      <i class="far fa-plus-circle"></i> Neues Produkt erstellen
+      <i class="fas fa-plus-circle"></i> Neues Produkt erstellen
     </div>`;
 
   // Вешаем клики через JS — без проблем с кавычками
@@ -748,7 +748,7 @@ function showAngDetail(id) {
     abgelaufen: {label:'Abgelaufen', cls:''},
   }[a.status] || {label:a.status, cls:''};
   showDetailSheet({
-    title: `<i class="far fa-file-alt" style="color:var(--blue);margin-right:8px"></i>${a.nr||'Angebot'}`,
+    title: `<i class="fas fa-file-alt" style="color:var(--blue);margin-right:8px"></i>${a.nr||'Angebot'}`,
     rows: [
       { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmt(a.betrag)}</span>` },
       { key: 'Kunde',   val: a.kunde||'—' },

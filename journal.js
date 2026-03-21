@@ -171,7 +171,7 @@ function renderJournal() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              <i class="far fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
+              <i class="fas fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
@@ -256,7 +256,7 @@ function renderJournal() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}opacity:${opacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${iconBg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              <i class="far fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
+              <i class="fas fa-arrow-${isEin?'up':'down'}" style="color:${iconColor};font-size:11px"></i>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
@@ -313,7 +313,7 @@ function renderRechnungenLog() {
   if (!log.length) {
     tb.innerHTML = '';
     em.style.display = 'block';
-    em.innerHTML = '<div class="ei"><i class="far fa-file-invoice"></i></div><p>Keine Rechnungs-Änderungen</p>';
+    em.innerHTML = '<div class="ei"><i class="fas fa-file-invoice"></i></div><p>Keine Rechnungs-Änderungen</p>';
     if(pg) pg.innerHTML = '';
     return;
   }
@@ -385,7 +385,7 @@ function renderRechnungenLog() {
         <div style="display:flex;flex-direction:column;padding:12px 14px;${rowBg}${rowOpacity}">
           <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:${changeHtml?'8':'0'}px">
             <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:${a.bg};display:flex;align-items:center;justify-content:center;margin-top:2px">
-              <i class="far ${a.icon}" style="color:${a.color};font-size:12px"></i>
+              <i class="fas ${a.icon}" style="color:${a.color};font-size:12px"></i>
             </div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">

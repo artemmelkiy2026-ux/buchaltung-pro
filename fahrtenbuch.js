@@ -97,7 +97,7 @@ function renderFbAutoList() {
   const autos = getFbAutos();
   if (!autos.length) {
     el.innerHTML = `<div style="padding:24px;text-align:center;color:var(--sub);font-size:13px">
-      <i class="far fa-car" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>
+      <i class="fas fa-car" style="font-size:28px;opacity:.3;display:block;margin-bottom:8px"></i>
       Noch keine Fahrzeuge angelegt
     </div>`;
     return;
@@ -108,20 +108,20 @@ function renderFbAutoList() {
     const sortedF  = [...fahrten].sort((x,y) => (y.datum||'').localeCompare(x.datum||''));
     const lastKmEnd= sortedF.length ? (sortedF[0].km_end || 0) : (a.kmInitial || 0);
     return `<div class="fb-auto-card">
-      <div class="fb-auto-icon"><i class="far fa-car"></i></div>
+      <div class="fb-auto-icon"><i class="fas fa-car"></i></div>
       <div class="fb-auto-info">
         <div class="fb-auto-kz">${a.kennzeichen}${a.marke ? ` <span style="font-weight:400;color:var(--sub)">· ${a.marke}</span>` : ''}</div>
         ${a.name ? `<div style="font-size:12px;color:var(--sub)">${a.name}</div>` : ''}
         ${a.vin  ? `<div style="font-size:11px;color:var(--sub);font-family:var(--mono)">VIN: ${a.vin}</div>` : ''}
         <div class="fb-auto-stats">
-          <span><i class="far fa-road" style="opacity:.5;font-size:10px"></i> ${fmtKm(totalKm)} gefahren</span>
-          <span><i class="far fa-tachometer-alt" style="opacity:.5;font-size:10px"></i> ~${fmtKm(lastKmEnd)} aktuell</span>
+          <span><i class="fas fa-road" style="opacity:.5;font-size:10px"></i> ${fmtKm(totalKm)} gefahren</span>
+          <span><i class="fas fa-tachometer-alt" style="opacity:.5;font-size:10px"></i> ~${fmtKm(lastKmEnd)} aktuell</span>
           <span>${fahrten.length} Fahrten</span>
         </div>
       </div>
       <div class="fb-auto-actions">
-        <button class="rca-btn" onclick="openAutoModal('${a.id}')" title="Bearbeiten"><i class="far fa-edit"></i></button>
-        <button class="rca-btn rca-red" onclick="deleteAuto('${a.id}')" title="Löschen"><i class="far fa-trash"></i></button>
+        <button class="rca-btn" onclick="openAutoModal('${a.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+        <button class="rca-btn rca-red" onclick="deleteAuto('${a.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
       </div>
     </div>`;
   }).join('');
@@ -190,17 +190,17 @@ function renderFahrtenbuch() {
     const kzLabel = auto ? auto.kennzeichen : (f.kennzeichen||'');
     return `<div class="fb-row" onclick="showFahrtDetail('${f.id}')" style="cursor:pointer">
       <div class="fb-row-left">
-        <div class="fb-row-icon" style="background:${bg};color:${col}"><i class="far ${icon}"></i></div>
+        <div class="fb-row-icon" style="background:${bg};color:${col}"><i class="fas ${icon}"></i></div>
         <div class="fb-row-name">
           ${f.abfahrt||'?'} → ${f.ziel||'?'}
           <span class="fb-row-typ" style="color:${col}">${f.typ}</span>
         </div>
         <div class="fb-row-meta">
-          <span><i class="far fa-calendar" style="font-size:10px;opacity:.5"></i> ${fd(f.datum)}</span>
-          ${f.zweck?`<span><i class="far fa-tag" style="font-size:10px;opacity:.5"></i> ${f.zweck}</span>`:''}
-          ${kzLabel?`<span><i class="far fa-car" style="font-size:10px;opacity:.5"></i> ${kzLabel}</span>`:''}
+          <span><i class="fas fa-calendar" style="font-size:10px;opacity:.5"></i> ${fd(f.datum)}</span>
+          ${f.zweck?`<span><i class="fas fa-tag" style="font-size:10px;opacity:.5"></i> ${f.zweck}</span>`:''}
+          ${kzLabel?`<span><i class="fas fa-car" style="font-size:10px;opacity:.5"></i> ${kzLabel}</span>`:''}
           <span style="font-size:10px;color:var(--sub)">Stand: ${fmtKm(f.km_start||0)} → ${fmtKm(f.km_end||0)}</span>
-          ${f.hinZurueck?`<span style="font-size:10px;font-weight:600;color:var(--blue)"><i class="far fa-exchange-alt" style="font-size:9px;margin-right:2px"></i>Hin & Zurück ×2</span>`:''}
+          ${f.hinZurueck?`<span style="font-size:10px;font-weight:600;color:var(--blue)"><i class="fas fa-exchange-alt" style="font-size:9px;margin-right:2px"></i>Hin & Zurück ×2</span>`:''}
         </div>
       </div>
       <div class="fb-row-right">
@@ -209,7 +209,7 @@ function renderFahrtenbuch() {
           ${isMob()?_moreBtn([
             {icon:'fa-edit',label:'Bearbeiten',action:()=>editFahrt(f.id)},
             {icon:'fa-trash',label:'Löschen',danger:true,action:()=>delFahrt(f.id)}
-          ]):`<button class="rca-btn rca-red" onclick="event.stopPropagation();delFahrt('${f.id}')" title="Löschen"><i class="far fa-trash"></i></button>`}
+          ]):`<button class="rca-btn rca-red" onclick="event.stopPropagation();delFahrt('${f.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`}
         </div>
       </div>
     </div>`;
@@ -387,7 +387,7 @@ async function toggleFbGmap() {
   const btn = document.getElementById('fb-gmap-toggle');
   if (btn) {
     btn.classList.toggle('active', fbGmapEnabled);
-    btn.innerHTML = `<i class="far fa-map-marked-alt"></i> Maps ${fbGmapEnabled?'AN':'AUS'}`;
+    btn.innerHTML = `<i class="fas fa-map-marked-alt"></i> Maps ${fbGmapEnabled?'AN':'AUS'}`;
   }
   const mapSec = document.getElementById('fb-map-section');
   if (mapSec) mapSec.style.display = fbGmapEnabled ? 'block' : 'none';
@@ -464,14 +464,14 @@ function _calcFbRoute() {
   const to   = document.getElementById('fb-ziel')?.value.trim();
   if (!from||!to) return;
   const statusEl = document.getElementById('fb-route-status');
-  if (statusEl) statusEl.innerHTML = '<i class="far fa-spinner fa-spin"></i> Route wird berechnet…';
+  if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Route wird berechnet…';
   fbDirectionsService.route({
     origin:from, destination:to,
     travelMode:google.maps.TravelMode.DRIVING,
     provideRouteAlternatives:true, region:'de'
   }, (result, status) => {
     if (status!=='OK') {
-      if (statusEl) statusEl.innerHTML = '<i class="far fa-exclamation-circle" style="color:var(--red)"></i> Route nicht gefunden';
+      if (statusEl) statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:var(--red)"></i> Route nicht gefunden';
       return;
     }
     fbDirectionsRenderer.setDirections(result);
@@ -489,7 +489,7 @@ function _applyFbRoute(result, idx) {
   _calcFbKm();
   const statusEl = document.getElementById('fb-route-status');
   if (statusEl) statusEl.innerHTML =
-    `<i class="far fa-check-circle" style="color:var(--green)"></i> <b>${leg.distance.text}</b> · ${leg.duration.text}`;
+    `<i class="fas fa-check-circle" style="color:var(--green)"></i> <b>${leg.distance.text}</b> · ${leg.duration.text}`;
 }
 
 function _renderFbRouteChoices(result) {
@@ -498,7 +498,7 @@ function _renderFbRouteChoices(result) {
   el.innerHTML = result.routes.map((r,i) => {
     const leg = r.legs[0];
     return `<button class="fb-route-btn${i===0?' active':''}" onclick="_selectFbRoute(this,${i})">
-      <i class="far fa-route" style="color:var(--blue)"></i>
+      <i class="fas fa-route" style="color:var(--blue)"></i>
       <span><b>${leg.distance.text}</b></span>
       <span style="color:var(--sub);font-size:11px">${leg.duration.text}</span>
     </button>`;
@@ -531,7 +531,7 @@ async function initFahrtenbuch() {
   // Maps standardmäßig immer deaktiviert (AUS)
   fbGmapEnabled = false;
   const _gmapBtn = document.getElementById('fb-gmap-toggle');
-  if (_gmapBtn) { _gmapBtn.classList.remove('active'); _gmapBtn.innerHTML='<i class="far fa-map-marked-alt"></i> Maps AUS'; }
+  if (_gmapBtn) { _gmapBtn.classList.remove('active'); _gmapBtn.innerHTML='<i class="fas fa-map-marked-alt"></i> Maps AUS'; }
   const _mapSec = document.getElementById('fb-map-section');
   if (_mapSec) _mapSec.style.display = 'none';
   renderFbAutoList();
@@ -544,7 +544,7 @@ function showFahrtDetail(id) {
   if (!f) return;
   const auto = (getFbAutos()||[]).find(a=>a.id===f.autoId);
   showDetailSheet({
-    title: `<i class="far fa-car" style="color:var(--blue);margin-right:8px"></i>${f.abfahrt} → ${f.ziel}`,
+    title: `<i class="fas fa-car" style="color:var(--blue);margin-right:8px"></i>${f.abfahrt} → ${f.ziel}`,
     rows: [
       { key: 'Strecke',   val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmtKm(f.km)}</span>` },
       { key: 'Datum',     val: fd(f.datum) },

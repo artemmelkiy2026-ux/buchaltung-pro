@@ -138,20 +138,20 @@ function renderRech(){
               {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
               {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
             ]) : `<div class="rech-card-actions">
-              ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="far fa-check"></i></button>`:''}
-              <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="far fa-print"></i></button>
-              <button class="rca-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="far fa-copy"></i></button>
-              <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="far fa-trash"></i></button>
+              ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
+              <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
+              <button class="rca-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
+              <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
             </div>`}
           </div>
         </div>
         <div class="rech-card-meta">
-          <span><i class="far fa-calendar" style="opacity:.5;width:10px"></i>${fd(r.datum)}</span>
+          <span><i class="fas fa-calendar" style="opacity:.5;width:10px"></i>${fd(r.datum)}</span>
           ${_rAgeLabel?`<span style="opacity:.5">·</span><span style="font-size:10px;color:var(--sub)">${_rAgeLabel}</span>`:''}
-          ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}"><i class="far fa-hourglass-half" style="opacity:.5;width:10px"></i>Fällig ${fd(r.faellig)}</span>` : ''}
+          ${r.faellig ? `<span style="color:var(--sub)">·</span><span style="${dueColor}"><i class="fas fa-hourglass-half" style="opacity:.5;width:10px"></i>Fällig ${fd(r.faellig)}</span>` : ''}
           ${overdueTxt}
-          ${_rPosCount?`<span style="color:var(--sub)">·</span><span style="font-size:10px;color:var(--sub)"><i class="far fa-list" style="opacity:.5;width:10px"></i>${_rPosCount} Pos.</span>`:''}
-          ${(r.mahnung_history||[]).length?`<span style="color:var(--sub)">·</span><span style="font-size:10px;font-weight:600;color:var(--yellow)"><i class="far fa-bell" style="opacity:.7;width:10px"></i>${r.mahnung_history.length}× gemahnt</span>`:''}
+          ${_rPosCount?`<span style="color:var(--sub)">·</span><span style="font-size:10px;color:var(--sub)"><i class="fas fa-list" style="opacity:.5;width:10px"></i>${_rPosCount} Pos.</span>`:''}
+          ${(r.mahnung_history||[]).length?`<span style="color:var(--sub)">·</span><span style="font-size:10px;font-weight:600;color:var(--yellow)"><i class="fas fa-bell" style="opacity:.7;width:10px"></i>${r.mahnung_history.length}× gemahnt</span>`:''}
         </div>
       </div>
     </div>`;
@@ -403,12 +403,12 @@ async function rechBezahlt(id){
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
     renderAll();
-    toast(`<i class="far fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
     renderRech();
-    toast(`<i class="far fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
+    toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
   checkMahnungen();
 }
@@ -559,7 +559,7 @@ function addRechPosRow(i,p){
                 <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
                 <span class="ust-flag-label">${rateVal}%</span>
               </span>
-              <i class="far fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
+              <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
             </button>
             <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
             <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
@@ -588,7 +588,7 @@ function addRechPosRow(i,p){
             <span class="flag-circle" style="width:1.3em;height:1.3em"><span class="band black"></span><span class="band red"></span><span class="band gold"></span></span>
             <span class="ust-flag-label">${rateVal}%</span>
           </span>
-          <i class="far fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
+          <i class="fas fa-chevron-down" style="font-size:9px;color:var(--sub)"></i>
         </button>
         <input type="hidden" class="ust-flag-val rn-ust-hidden" value="${rateVal}" oninput="posRateChanged(this)">
         <div class="ust-flag-panel" style="display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.06);z-index:300;padding:4px;min-width:110px">
@@ -598,7 +598,7 @@ function addRechPosRow(i,p){
         </div>
       </div>
       <input type="number" placeholder="Brutto" value="${bruttoVal!==''?parseFloat(bruttoVal).toFixed(2):''}" min="0" step="0.01" oninput="posBruttoChanged(this)" style="${INP};text-align:right;color:var(--blue)">
-      <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0"><i class="far fa-trash"></i></button>`;
+      <button onclick="this.closest('.rn-pos-row').remove();calcRechTotal()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0"><i class="fas fa-trash"></i></button>`;
   }
   document.getElementById('rn-positionen').appendChild(div);
 }
@@ -794,7 +794,7 @@ function buildRechnungHTML(r){
     .btn-close{padding:10px 20px;background:#e5e7eb;border:none;border-radius:6px;cursor:pointer;font-size:13px}
   </style></head><body>
   <div class="btn-bar">
-    <button class="btn-print" onclick="window.print()"><i class="far fa-print"></i>️ Drucken / Als PDF speichern</button>
+    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i>️ Drucken / Als PDF speichern</button>
     <button class="btn-close" onclick="window.close()">✕ Schließen</button>
   </div>
   <div class="header">
@@ -1031,7 +1031,7 @@ async function onLogoChange(input) {
   // Сохраняем во временный атрибут — применится при Speichern
   input.dataset.b64 = b64;
   const kb = Math.round(b64.length * 0.75 / 1024);
-  toast(`<i class="far fa-check-circle" style="color:var(--green)"></i> Logo geladen (${kb} KB)`, 'ok');
+  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Logo geladen (${kb} KB)`, 'ok');
 }
 
 // Удалить логотип
@@ -1628,7 +1628,7 @@ function openMahnModal() {
   const hdr = document.createElement('div');
   hdr.style.cssText = 'padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0';
   hdr.innerHTML = `<div>
-    <div style="font-size:16px;font-weight:700;color:var(--text)"><i class="far fa-bell" style="color:var(--yellow);margin-right:6px"></i>Zahlungserinnerungen</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text)"><i class="fas fa-bell" style="color:var(--yellow);margin-right:6px"></i>Zahlungserinnerungen</div>
     <div style="font-size:12px;color:var(--sub);margin-top:2px">${faellige.length} überfällige Rechnung${faellige.length !== 1 ? 'en' : ''} mit E-Mail</div>
   </div>`;
   const closeBtn = document.createElement('button');
@@ -1644,7 +1644,7 @@ function openMahnModal() {
   const allBtn = document.createElement('button');
   allBtn.className = 'btn primary';
   allBtn.style.cssText = 'font-size:13px;height:32px;padding:0 14px';
-  allBtn.innerHTML = '<i class="far fa-paper-plane"></i> Alle senden';
+  allBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Alle senden';
   allBtn.onclick = function() {
     faellige.forEach(r => _sendMahnung(r));
     overlay.remove();
@@ -1691,14 +1691,14 @@ function openMahnModal() {
     const sendBtn = document.createElement('button');
     sendBtn.className = 'btn';
     sendBtn.style.cssText = 'font-size:12px;height:30px;padding:0 12px;flex-shrink:0;color:var(--blue);border-color:var(--blue)';
-    sendBtn.innerHTML = '<i class="far fa-paper-plane"></i>';
+    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
     sendBtn.title = 'Mahnung senden';
     sendBtn.onclick = function(e) {
       e.stopPropagation();
       _sendMahnung(r);
       row.style.opacity = '0.4';
       row.style.pointerEvents = 'none';
-      sendBtn.innerHTML = '<i class="far fa-check" style="color:var(--green)"></i>';
+      sendBtn.innerHTML = '<i class="fas fa-check" style="color:var(--green)"></i>';
     };
     row.appendChild(sendBtn);
     list.appendChild(row);
@@ -1750,7 +1750,7 @@ function showRechDetail(id) {
   if (!r) return;
   const statusLabels = {offen:'Offen',bezahlt:'Bezahlt',ueberfaellig:'Überfällig',storniert:'Storniert'};
   showDetailSheet({
-    title: `<i class="far fa-file-invoice" style="color:var(--blue);margin-right:8px"></i>${r.nr||'Rechnung'}`,
+    title: `<i class="fas fa-file-invoice" style="color:var(--blue);margin-right:8px"></i>${r.nr||'Rechnung'}`,
     rows: [
       { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmt(r.betrag)}</span>` },
       { key: 'Kunde',   val: r.kunde||'—' },

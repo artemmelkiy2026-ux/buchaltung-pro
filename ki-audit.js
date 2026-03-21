@@ -42,7 +42,7 @@ async function startKiAudit() {
   const jahr = document.getElementById('audit-jahr')?.value || 'alle';
 
   btn.disabled = true; btn.style.opacity = '.6';
-  btn.innerHTML = '<i class="far fa-spinner fa-spin"></i> Analyse läuft...';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse läuft...';
   progress.style.display = 'block';
   result.style.display = 'none'; result.innerHTML = '';
 
@@ -267,7 +267,7 @@ function _auditErr(msg) {
   const r = document.getElementById('audit-result');
   r.style.display='block';
   r.innerHTML=`<div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r2);padding:20px;color:var(--red)">
-    <i class="far fa-exclamation-triangle"></i> <strong>Fehler:</strong> ${msg}
+    <i class="fas fa-exclamation-triangle"></i> <strong>Fehler:</strong> ${msg}
   </div>`;
 }
 
@@ -290,7 +290,7 @@ function _renderAudit(audit) {
     <div class="audit-section">
       <div class="audit-section-header">
         <div class="audit-section-icon" style="background:${b.bewertung==='gut'?'rgba(34,197,94,.12)':b.bewertung==='warnung'?'rgba(224,140,26,.12)':'rgba(239,68,68,.12)'};color:${b.bewertung==='gut'?'var(--green)':b.bewertung==='warnung'?'var(--yellow)':'var(--red)'}">
-          <i class="far ${b.icon||'fa-chart-bar'}"></i></div>
+          <i class="fas ${b.icon||'fa-chart-bar'}"></i></div>
         <div class="audit-section-title">${b.name}</div>
         <span class="audit-rating ${rCls[b.bewertung]||'audit-rating-ok'}">${rLbl[b.bewertung]||b.bewertung}</span>
       </div>
@@ -303,14 +303,14 @@ function _renderAudit(audit) {
   const empf = (audit.empfehlungen||[]).length ? `
     <div class="audit-section">
       <div class="audit-section-header">
-        <div class="audit-section-icon" style="background:rgba(26,69,120,.1);color:var(--blue)"><i class="far fa-lightbulb"></i></div>
+        <div class="audit-section-icon" style="background:rgba(26,69,120,.1);color:var(--blue)"><i class="fas fa-lightbulb"></i></div>
         <div class="audit-section-title">Handlungsempfehlungen</div>
       </div>
       <div class="audit-section-body">
         ${(audit.empfehlungen||[]).map(e=>{
           const p=typeof e==='object'?e.prioritaet:'mittel', t=typeof e==='object'?e.text:e;
           return `<div class="audit-item">
-            <span class="audit-item-icon" style="color:${pCol[p]||'var(--blue)'}"><i class="far fa-arrow-right" style="font-size:10px"></i></span>
+            <span class="audit-item-icon" style="color:${pCol[p]||'var(--blue)'}"><i class="fas fa-arrow-right" style="font-size:10px"></i></span>
             <span class="audit-item-text"><strong style="color:${pCol[p]||'var(--sub)'}; text-transform:uppercase;font-size:9px;margin-right:5px">${p||''}</strong>${t}</span></div>`;
         }).join('')}
       </div></div>` : '';
@@ -318,7 +318,7 @@ function _renderAudit(audit) {
   const steps = (audit.naechste_schritte||[]).length ? `
     <div class="audit-section">
       <div class="audit-section-header">
-        <div class="audit-section-icon" style="background:rgba(93,157,105,.12);color:var(--green)"><i class="far fa-tasks"></i></div>
+        <div class="audit-section-icon" style="background:rgba(93,157,105,.12);color:var(--green)"><i class="fas fa-tasks"></i></div>
         <div class="audit-section-title">Nächste Schritte</div>
       </div>
       <div class="audit-section-body">
@@ -345,6 +345,6 @@ function _renderAudit(audit) {
     ${bereiche}${empf}${steps}
     <div style="text-align:center;padding:12px;font-size:11px;color:var(--sub)">
       Analyse durch Google Gemini KI ·
-      <i class="far fa-info-circle"></i> Ersetzt keine professionelle Steuerberatung (§ 3 StBerG)
+      <i class="fas fa-info-circle"></i> Ersetzt keine professionelle Steuerberatung (§ 3 StBerG)
     </div>`;
 }
