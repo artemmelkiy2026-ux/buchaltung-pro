@@ -4114,9 +4114,9 @@ header { background: #fff; }
   gap: 12px;
   margin-bottom: 20px;
 }
-@media (max-width: 900px) {
-  #calm-banners { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 600px) {
-  #calm-banners { grid-template-columns: 1fr; }
+@media (max-width: 768px) {
+  #calm-banners {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
 }

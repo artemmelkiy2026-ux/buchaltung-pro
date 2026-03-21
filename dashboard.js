@@ -529,63 +529,54 @@ function renderCalmBanners() {
   const fristLbl  = `USt-VA ${fristMon[mo+1>11?0:mo+1]} bis 10.${String(mo+2>12?1:mo+2).padStart(2,'0')}.${mo+2>12?yr_n+1:yr_n}`;
 
   // ── RENDER ──────────────────────────────────────────────────────
-  wrap.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px';
+  // grid управляется через CSS #calm-banners
+
+  const mob = window.innerWidth <= 768;
+  const cardStyle = `border-radius:16px;padding:${mob?'14px 16px':'20px'};position:relative;overflow:hidden;`;
 
   wrap.innerHTML = `
     <!-- Compliance -->
-    <div style="background:${compBg};border-radius:16px;padding:20px;position:relative;overflow:hidden;min-height:120px;box-shadow:0 4px 24px rgba(0,0,0,.25)">
-      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
-      <div style="position:absolute;bottom:-30px;right:20px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="width:36px;height:36px;border-radius:10px;background:${compColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas ${compIcon}" style="color:#fff;font-size:16px"></i>
+    <div style="${cardStyle}background:${compBg}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:32px;height:32px;border-radius:8px;background:${compColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fas ${compIcon}" style="color:#fff;font-size:14px"></i>
         </div>
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5)">Compliance</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5)">Compliance</div>
       </div>
-      <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:4px">${compPct}%</div>
-      <div style="font-size:13px;font-weight:600;color:${compColor};margin-bottom:2px">${compTitle}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.45)">${compSub}</div>
-      <div style="margin-top:12px;height:3px;border-radius:2px;background:rgba(255,255,255,.1)">
-        <div style="height:100%;width:${compPct}%;border-radius:2px;background:${compColor};transition:width .6s"></div>
+      <div style="font-size:${mob?'24px':'28px'};font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:3px">${compPct}%</div>
+      <div style="font-size:12px;font-weight:600;color:${compColor};margin-bottom:2px">${compTitle}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.3">${compSub}</div>
+      <div style="margin-top:10px;height:3px;border-radius:2px;background:rgba(255,255,255,.1)">
+        <div style="height:100%;width:${compPct}%;border-radius:2px;background:${compColor}"></div>
       </div>
     </div>
 
     <!-- Steuerreserve -->
-    <div style="background:${resBg};border-radius:16px;padding:20px;position:relative;overflow:hidden;min-height:120px;box-shadow:0 4px 24px rgba(0,0,0,.25)">
-      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
-      <div style="position:absolute;bottom:-30px;right:20px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="width:36px;height:36px;border-radius:10px;background:${resColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas ${resIcon}" style="color:#fff;font-size:16px"></i>
+    <div style="${cardStyle}background:${resBg}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:32px;height:32px;border-radius:8px;background:${resColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fas ${resIcon}" style="color:#fff;font-size:14px"></i>
         </div>
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5)">${resTitle}</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5)">${resTitle}</div>
       </div>
-      <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:4px">${resVal}</div>
-      <div style="font-size:13px;font-weight:600;color:${resColor};margin-bottom:2px">${isRegel ? (zahllast>0 ? 'Zurückhalten!' : 'Im grünen Bereich') : 'Kein MwSt-Pflicht'}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.45)">${resSub}</div>
+      <div style="font-size:${mob?'20px':'28px'};font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:3px;word-break:break-all">${resVal}</div>
+      <div style="font-size:12px;font-weight:600;color:${resColor};margin-bottom:2px">${isRegel ? (zahllast>0 ? 'Zurückhalten!' : 'Im grünen Bereich') : 'Kein MwSt-Pflicht'}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.3">${resSub}</div>
     </div>
 
     <!-- Nächste Frist -->
-    <div style="background:${fristBg};border-radius:16px;padding:20px;position:relative;overflow:hidden;min-height:120px;box-shadow:0 4px 24px rgba(0,0,0,.25)">
-      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
-      <div style="position:absolute;bottom:-30px;right:20px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="width:36px;height:36px;border-radius:10px;background:${fristColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas fa-calendar-check" style="color:#fff;font-size:16px"></i>
+    <div style="${cardStyle}background:${fristBg}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:32px;height:32px;border-radius:8px;background:${fristColor};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fas fa-calendar-check" style="color:#fff;font-size:14px"></i>
         </div>
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5)">Nächste Frist</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5)">Nächste Frist</div>
       </div>
-      <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:4px">${diffDays}d</div>
-      <div style="font-size:13px;font-weight:600;color:${fristColor};margin-bottom:2px">${fristOk ? 'Rechtzeitig' : 'Bald fällig!'}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.45)">${fristLbl}</div>
+      <div style="font-size:${mob?'24px':'28px'};font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:3px">${diffDays}d</div>
+      <div style="font-size:12px;font-weight:600;color:${fristColor};margin-bottom:2px">${fristOk ? 'Rechtzeitig' : 'Bald fällig!'}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.3">${fristLbl}</div>
     </div>`;
 
-  // Mobile: 1 column
-  if (window.innerWidth <= 600) {
-    wrap.style.gridTemplateColumns = '1fr';
-  } else if (window.innerWidth <= 900) {
-    wrap.style.gridTemplateColumns = '1fr 1fr';
-  }
 }
 
 function renderDash(){
