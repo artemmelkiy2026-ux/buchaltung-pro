@@ -3619,10 +3619,10 @@ header { background: #fff; }
   #e-tbody .ein-row{
     display:grid;
     grid-template-columns:1fr 220px 200px 110px 50px;
-    align-items:center;
+    align-items:start;
     gap:0 12px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
-    margin:0; min-height: 90px;
+    margin:0; min-height: 90px; padding-top:14px;padding-bottom:14px;
     }
   #e-tbody .ein-row:last-child{ border-radius:0 0 var(--r) var(--r); }
   #e-tbody .ein-row-body{ display:contents; }
@@ -3630,6 +3630,7 @@ header { background: #fff; }
   #e-tbody .ein-row-head{ display:contents; }
   #e-tbody .ein-row-mid{ display:contents; }
   #e-tbody .ein-row-desc{ grid-column:1;grid-row:1;font-size:15px; }
+  #e-tbody .ein-row-sub{ grid-column:1;grid-row:2;padding-top:3px; }
   #e-tbody .ein-row-cat{ grid-column:2;grid-row:1; }
   #e-tbody .ein-row-tags{ grid-column:3;grid-row:1; }
   #e-tbody .amt{ grid-column:4;grid-row:1;text-align:right;font-size:14px; }
