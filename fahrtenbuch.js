@@ -193,11 +193,11 @@ function renderFahrtenbuch() {
         <div class="fb-row-icon" style="background:${bg};color:${col}"><i class="fas ${icon}"></i></div>
         <div class="fb-row-name">
           ${f.abfahrt||'?'} → ${f.ziel||'?'}
-          <span class="fb-row-typ" style="color:${col}">${f.typ}</span>
         </div>
         <div class="fb-row-meta">
-          <span><i class="fas fa-calendar" style="font-size:10px;opacity:.5"></i> ${fd(f.datum)}</span>
+          <span class="fb-row-typ" style="color:${col};font-weight:600"><i class="fas ${icon}" style="font-size:10px;opacity:.7;margin-right:3px"></i>${f.typ}</span>
           ${f.zweck?`<span><i class="fas fa-tag" style="font-size:10px;opacity:.5"></i> ${f.zweck}</span>`:''}
+          <span><i class="fas fa-calendar" style="font-size:10px;opacity:.5"></i> ${fd(f.datum)}</span>
           ${kzLabel?`<span><i class="fas fa-car" style="font-size:10px;opacity:.5"></i> ${kzLabel}</span>`:''}
           <span style="font-size:10px;color:var(--sub)">Stand: ${fmtKm(f.km_start||0)} → ${fmtKm(f.km_end||0)}</span>
         </div>
@@ -394,7 +394,7 @@ function _loadGmapScript(key) {
   if (document.querySelector('script[data-fbgmap]')) return;
   const s = document.createElement('script');
   s.setAttribute('data-fbgmap','1');
-  s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=_fbGmapCallback&language=de&region=DE`;
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=_fbGmapCallback`;
   s.async = true; s.defer = true;
   window._fbGmapCallback = () => { fbGmapLoaded=true; _initFbMap(); };
   document.head.appendChild(s);
@@ -517,10 +517,13 @@ function _clearFbMapState() {
 // ── INIT ──────────────────────────────────────────────────────────────────
 
 async function initFahrtenbuch() {
-  // Maps standardmäßig deaktiviert
-  fbGmapEnabled = false;
-  const _gmapBtn = document.getElementById('fb-gmap-toggle');
-  if (_gmapBtn) { _gmapBtn.classList.remove('active'); _gmapBtn.innerHTML='<i class="fas fa-map-marked-alt"></i> Maps AUS'; }
+  if (localStorage.getItem('fb_gmap_enabled')==='1') {
+    fbGmapEnabled = true;
+    const btn = document.getElementById('fb-gmap-toggle');
+    if (btn) { btn.classList.add('active'); btn.innerHTML='<i class="fas fa-map-marked-alt"></i> Maps AN'; }
+    // Ключ подгрузить заранее (кэшируется в _fbMapsKey)
+    _getFbMapsKey();
+  }
   renderFbAutoList();
   renderFbAutoSelect('fb-auto-filter', true);
   renderFahrtenbuch();
