@@ -485,7 +485,6 @@ function renderCalmBanners() {
   const isRegel = !isKleinunternehmer(curYr);
   const today   = new Date();
 
-  // Корпоративные цвета MelaLogic
   const BLUE  = '#1a4578';
   const GREEN = '#3a8a4e';
   const RED   = '#d63341';
@@ -495,9 +494,7 @@ function renderCalmBanners() {
   const noZahl  = ye.filter(e => !e.zahlungsart || e.zahlungsart === 'Sonstiges').length;
   const issues  = noDesc + noZahl;
   const compPct = ye.length > 0 ? Math.round((1 - issues / (ye.length * 2)) * 100) : 100;
-  const compOk  = compPct >= 90;
-  const compWarn = compPct >= 70;
-  // Зелёный → синий, предупреждение → тёмно-синий + красный, критично → красный
+  const compOk  = compPct >= 90, compWarn = compPct >= 70;
   const compGrad = compOk
     ? `linear-gradient(135deg, ${GREEN} 0%, #2d7a42 60%, #4aab62 100%)`
     : compWarn
@@ -534,7 +531,7 @@ function renderCalmBanners() {
     c2Label = 'KU-Limit 25.000 €';
     c2Val   = limitPct + '%';
     c2Title = limOk ? 'Sicher' : limWarn ? 'Aufpassen!' : 'Kritisch!';
-    c2Sub   = remaining > 0 ? `Noch ${fmt(remaining)} · Prognose ${forecastStr}` : 'Limit überschritten!';
+    c2Sub   = remaining > 0 ? `Noch ${fmt(remaining)} · ${forecastStr}` : 'Limit überschritten!';
     c2Bar   = `<div style="margin-top:14px;height:4px;border-radius:4px;background:rgba(255,255,255,.2)">
       <div style="height:100%;width:${limitPct}%;border-radius:4px;background:rgba(255,255,255,.9)"></div>
     </div>`;
@@ -565,12 +562,33 @@ function renderCalmBanners() {
   const resTitle = isRegel ? (zahllast > 0 ? 'Zurückhalten!' : 'Im grünen Bereich') : 'Kein MwSt-Ausweis';
   const resSub   = isRegel ? (zahllast > 0 ? `${fmt(zahllast)} reservieren` : 'Kein Rückstand') : `${fmt(ein)} von 25.000 €`;
 
+  // ── 4. GEWINN TREND ───────────────────────────────────────────
+  // Сравниваем текущий месяц с предыдущим
+  const curMo  = today.getMonth() + 1;
+  const curYrN = today.getFullYear();
+  const pad    = n => String(n).padStart(2,'0');
+  const curMoStr  = `${curYrN}-${pad(curMo)}`;
+  const prevMoStr = curMo === 1 ? `${curYrN-1}-12` : `${curYrN}-${pad(curMo-1)}`;
+  const eThisMo = ye.filter(e => e.datum && e.datum.startsWith(curMoStr));
+  const ePrevMo = ye.filter(e => e.datum && e.datum.startsWith(prevMoStr));
+  const gewThis = sum(eThisMo,'Einnahme') - sum(eThisMo,'Ausgabe');
+  const gewPrev = sum(ePrevMo,'Einnahme') - sum(ePrevMo,'Ausgabe');
+  const gewDiff = gewPrev !== 0 ? Math.round((gewThis - gewPrev) / Math.abs(gewPrev) * 100) : 0;
+  const trendOk = gewDiff >= 0;
+  const trendGrad = trendOk
+    ? `linear-gradient(135deg, ${GREEN} 0%, #2d7a42 60%, #4aab62 100%)`
+    : `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`;
+  const trendIcon  = trendOk ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down';
+  const trendLabel = 'Gewinn Trend';
+  const trendVal   = (trendOk ? '+' : '') + gewDiff + '%';
+  const trendTitle = trendOk ? 'Wachstum!' : 'Rückgang';
+  const trendSub   = `vs. ${fristMon[curMo>1?curMo-2:11]}: ${fmt(gewThis)} €`;
+
   // ── CARD BUILDER ──────────────────────────────────────────────
   const card = (grad, icon, label, val, title, sub, extra='') => `
-    <div style="background:${grad};border-radius:18px;padding:22px;position:relative;overflow:hidden;min-height:148px">
+    <div style="background:${grad};border-radius:18px;padding:20px;position:relative;overflow:hidden;min-height:148px">
       <div style="position:absolute;top:-28px;right:-28px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
       <div style="position:absolute;bottom:-18px;right:24px;width:65px;height:65px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
-      <div style="position:absolute;top:55%;left:-10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
       <div style="position:relative;z-index:1">
         <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
           <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -578,7 +596,7 @@ function renderCalmBanners() {
           </div>
           <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)">${label}</span>
         </div>
-        <div style="font-size:27px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:5px">${val}</div>
+        <div style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:5px">${val}</div>
         <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:3px">${title}</div>
         <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.4">${sub}</div>
         ${extra}
@@ -591,8 +609,10 @@ function renderCalmBanners() {
         <div style="height:100%;width:${compPct}%;border-radius:4px;background:rgba(255,255,255,.9)"></div>
       </div>`) +
     card(c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Bar) +
-    card(resGrad, resIcon, resLabel, resVal, resTitle, resSub);
+    card(resGrad, resIcon, resLabel, resVal, resTitle, resSub) +
+    card(trendGrad, trendIcon, trendLabel, trendVal, trendTitle, trendSub);
 }
+
 
 
 
