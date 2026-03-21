@@ -202,25 +202,23 @@ async function startKiAudit() {
   };
   const selectedTypes = Object.entries(types).filter(([,v])=>v).map(([k])=>typeMap[k]).join('\n- ');
 
-  const prompt = `Du bist ein erfahrener Wirtschaftsprüfer und Steuerberater in Deutschland mit 20+ Jahren Erfahrung.
+  const prompt = `Steuerberater Deutschland. Analysiere NUR die vorliegenden Daten.
 
-Analysiere diese Buchhaltungsdaten eines deutschen Unternehmers:
+ZEITRAUM: ${realYears.join(', ')}. Keine anderen Jahre erwähnen.
+ANALYSE: ${aktiveTypen.join(', ')}
 
-ZEITRAUM: ${jahr==='alle'?'Alle Jahre':'Jahr '+jahr}
-ANALYSE-SCHWERPUNKTE:
-- ${selectedTypes}
+ZWINGEND BEACHTEN:
+1. Ausgaben haben KEINE Belegnummern - vollkommen normal, kein Fehler, nicht erwähnen!
+2. einnahmenOhneBeleg=${auditData.eintraege?auditData.eintraege.einnahmenOhneBeleg:0} - NUR Einnahmen ohne Beleg sind relevant
+3. ustModus=regel bedeutet der Unternehmer ist BEREITS regelbesteuert - §19 Kleinunternehmer greift NICHT - das ist kein Risiko!
+4. §19 Grenzen (nur relevant wenn modus=§19): bis2024(Vj≤22000,lfd≤50000), ab2025(Vj≤25000,lfd≤100000)
+5. Stornos und Korrekturen sind normale Buchführungsvorgänge - nur bei auffällig vielen als Problem werten
+6. Hoher Gewinn bei IT/Dienstleistungsunternehmen ist normal (niedrige Sachkosten, hohe Margen)
+7. Fahrtkosten 0.30 EUR/km ist der korrekte gesetzliche Satz - nicht als 'niedrig' kritisieren
+8. Keine Daten erfinden, nichts hochrechnen, nur vorhandene Zahlen verwenden
 
-REGELN (ZWINGEND BEACHTEN):
-1. Ausgaben haben KEINE Belegnummern - das ist normal und kein Fehler!
-2. 'einnahmenOhneBeleg'=0 bedeutet alle Einnahmen haben Belegnummern - sehr gut!
-3. Nur Jahre analysieren die in den Daten vorkommen: ${realYears.join(', ')}
-4. §19 UStG: bis 2024 Vorjahr max 22000 EUR laufend max 50000 EUR, ab 2025 Vorjahr max 25000 EUR laufend max 100000 EUR
-5. Keine Daten erfinden oder hochrechnen
-
-BUCHHALTUNGSDATEN:
+DATEN:
 ${_dStr}
-
-Analyse-Schwerpunkte: ${aktiveTypen.join(', ')}
 
 Antworte NUR mit diesem JSON:
 {
@@ -256,7 +254,7 @@ Antworte NUR mit diesem JSON:
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
           contents:[{parts:[{text:prompt}]}],
-          generationConfig:{ temperature:0.2, maxOutputTokens:8192, responseMimeType:'application/json' }
+          generationConfig:{ temperature:0.1, maxOutputTokens:3000 }
         })
       }
     );
