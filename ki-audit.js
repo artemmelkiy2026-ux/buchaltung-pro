@@ -72,7 +72,8 @@ async function startKiAudit() {
       stornos: ein.filter(e=>e.is_storno).length,
       korrekturen: ein.filter(e=>e.korrektur_von).length,
       ohneBeleg: ein.filter(e=>!e.belegnr).length,
-      grosseOhneNotiz: ein.filter(e=>!e.notiz&&e.betrag>500).length,
+      grosseOhneNotiz: ein.filter(e=>!e.notiz&&!e.beschreibung&&e.betrag>500).length,
+      hinweis: 'Notiz-Feld ist optionales Zusatzfeld; Beschreibung ist Pflicht und immer gefüllt',
     };
   }
 
@@ -99,7 +100,7 @@ async function startKiAudit() {
     auditData.ust = {
       mwstBuchungen: mwst.length, mwstGesamt: mwstS,
       vorsteuerGesamt: vostS, zahllast: r2(mwstS-vostS),
-      ustModi: Object.entries(data.ustMode||{}).map(([y,m])=>({jahr:y,modus:m})),
+      ustModi: Object.entries(data.ustModeByYear||data.ustMode||{}).map(([y,m])=>({jahr:y,modus:m})),
     };
   }
 
@@ -179,8 +180,15 @@ ZEITRAUM: ${jahr==='alle'?'Alle Jahre':'Jahr '+jahr}
 ANALYSE-SCHWERPUNKTE:
 - ${selectedTypes}
 
+WICHTIGE HINWEISE ZUR DATENSTRUKTUR:
+- 'notiz' ist ein OPTIONALES Zusatzfeld (kein Pflichtfeld, leer = normal)
+- 'beschreibung' ist das PFLICHTFELD und immer gefüllt — dies ist der Buchungstext
+- 'ohneBeleg' = 0 bedeutet alle Buchungen haben eine Belegnummer (sehr gut)
+- 'grosseOhneNotiz' zählt nur Buchungen >500€ ohne BEIDE Felder (beschreibung UND notiz leer)
+- ustModi zeigt die Steuerregelung je Jahr
+
 BUCHHALTUNGSDATEN:
-${JSON.stringify(auditData, null, 2)}
+\${JSON.stringify(auditData, null, 2)}
 
 Erstelle einen professionellen Audit-Bericht. Prüfe konkret:
 ${types.fehler?'- Fehlende Belegnummern bei Buchungen, Stornos, Inkonsistenzen':''}
