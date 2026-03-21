@@ -55,6 +55,8 @@ async function startKiAudit() {
   setP(10,'Daten werden vorbereitet...','Buchhaltungsdaten laden');
 
   const filterY = arr => jahr==='alle' ? arr : arr.filter(e=>(e.datum||'').startsWith(jahr));
+  const realYears = [...new Set((data.eintraege||[]).map(e=>e.datum?.slice(0,4)).filter(Boolean))].sort();
+  auditData._meta = { vorhandeneJahre: realYears, analyseZeitraum: jahr==='alle'?realYears.join(', '):'nur '+jahr };
   const r2 = v => Math.round(v*100)/100;
   const auditData = {};
 
@@ -176,7 +178,8 @@ async function startKiAudit() {
 
 Analysiere diese Buchhaltungsdaten eines deutschen Unternehmers:
 
-ZEITRAUM: ${jahr==='alle'?'Alle Jahre':'Jahr '+jahr}
+ZEITRAUM: \${jahr==='alle'?'Alle verfügbaren Jahre: '+realYears.join(', '):'Jahr '+jahr}
+STRIKTE ANWEISUNG: Analysiere NUR die Jahre die in _meta.vorhandeneJahre stehen. Erfinde KEINE Daten, Zahlen oder Aussagen über Jahre die NICHT in den Daten vorkommen. Wenn du dir bei etwas nicht sicher bist, schreib "nicht genug Daten" statt etwas zu erfinden.
 ANALYSE-SCHWERPUNKTE:
 - ${selectedTypes}
 
@@ -192,7 +195,12 @@ BUCHHALTUNGSDATEN:
 
 Erstelle einen professionellen Audit-Bericht. Prüfe konkret:
 ${types.fehler?'- Fehlende Belegnummern bei Buchungen, Stornos, Inkonsistenzen':''}
-${types.steuer?'- §19 UStG Kleinunternehmergrenze (22.000€ Vorjahr / 50.000€ laufend), MwSt-Zahllast, Vorsteuer':''}
+${types.steuer?`- §19 UStG Kleinunternehmergrenze — AKTUELLE GESETZLICHE GRENZEN (ZWINGEND BEACHTEN):
+  * bis 2024: Vorjahr-Umsatz ≤ 22.000 EUR, laufendes Jahr ≤ 50.000 EUR
+  * ab 2025: Vorjahr-Umsatz ≤ 25.000 EUR, laufendes Jahr ≤ 100.000 EUR  (EU-Richtlinie 2020/285)
+  * Bezieht sich auf BRUTTOUMSATZ, nicht auf Gewinn
+  * Überschreitung gilt erst AB dem Überschreitungsmonat, NICHT rückwirkend
+  * Prüfe ob Umsatz die jeweilige Jahresgrenze überschreitet und ob Voranmeldungen nötig sind`:''}
 ${types.optimierung?'- Kostentreiber, ineffiziente Kategorien, Einsparpotenziale':''}
 ${types.cashflow?'- Überfällige Rechnungen, Liquiditätsengpässe, Zahlungsmuster':''}
 ${types.compliance?'- GoBD-konforme Buchführung, Belegpflicht, Aufbewahrungsfristen':''}
