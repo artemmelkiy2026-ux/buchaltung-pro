@@ -3781,7 +3781,7 @@ header { background: #fff; }
 }
 .fb-row-name{
   grid-column:2;grid-row:1;
-  font-size:14px;font-weight:600;color:var(--text);
+  font-size:15px;font-weight:600;color:var(--text);
   display:flex;align-items:center;gap:8px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
@@ -3815,7 +3815,7 @@ header { background: #fff; }
   .fb-row-left{ display:contents !important; }
   .fb-row-right{ display:contents !important; }
   .fb-row-icon{ grid-column:1;grid-row:1; }
-  .fb-row-name{ grid-column:2;grid-row:1;font-size:13px; }
+  .fb-row-name{ grid-column:2;grid-row:1;font-size:15px; }
   .fb-row-meta{ grid-column:3;grid-row:1; }
   .fb-row-km{ grid-column:4;grid-row:1;text-align:right;font-size:14px; }
   .fb-row-actions{ grid-column:5;grid-row:1;justify-content:flex-end; }
