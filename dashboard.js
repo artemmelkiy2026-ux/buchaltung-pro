@@ -399,6 +399,8 @@ function addEintrag(){
   sbSaveEintrag(entry);
   renderAll(); // включает renderDash внутри
   updateNeuToolbar(true);
+  // После сохранения — новая запись всегда сверху
+  einPage=1; sortCol='datum'; sortAsc=false;
   const fj=document.getElementById('f-jahr');
   if(fj){
     const opt=[...fj.options].find(o=>o.value===entryYear);
@@ -790,11 +792,14 @@ function renderEin(){
   const entries=getFiltered().sort((a,b)=>{
     let va=a[sortCol],vb=b[sortCol];
     if(sortCol==='betrag'){va=+va;vb=+vb;}
-    // <i class="fas fa-check-circle" style="color:var(--green)"></i> Для дат: sortAsc=false означает новые сверху (убывающий порядок)
     if(sortCol==='datum') {
-      return sortAsc ? (va.localeCompare(vb)) : (vb.localeCompare(va)); // DESC по умолчанию
+      // По дате операции — при равных датах новее созданные/изменённые сверху
+      const dateCmp = sortAsc ? (va.localeCompare(vb)) : (vb.localeCompare(va));
+      if(dateCmp !== 0) return dateCmp;
+      // Вторичная сортировка по created_at (новее сверху)
+      const ca = a.created_at||'', cb = b.created_at||'';
+      return cb.localeCompare(ca);
     }
-    // Для других колонок: стандартная логика
     return sortAsc?(va>vb?1:-1):(va<vb?1:-1);
   });
   const tb=document.getElementById('e-tbody'),em=document.getElementById('e-empty');
