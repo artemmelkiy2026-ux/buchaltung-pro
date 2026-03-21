@@ -59,51 +59,6 @@ function toast(msg,type='ok',onClick=null){
 }
 
 // ── МОБИЛЬНЫЙ DETAIL POPUP ─────────────────────────────────────────────────
-function showMobDetail(entry){
-  const modal=document.getElementById('mob-detail-modal');
-  if(!modal)return;
-  const isEin=entry.typ==='Einnahme';
-  document.getElementById('mdm-title').innerHTML=`<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`;
-  document.getElementById('mdm-body').innerHTML=`
-    <div class="mdm-row">
-      <span class="mdm-key">Betrag</span>
-      <span class="mdm-val mdm-amt" style="color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(entry.betrag)}</span>
-    </div>
-    <div class="mdm-row">
-      <span class="mdm-key">Datum</span>
-      <span class="mdm-val">${fd(entry.datum)}</span>
-    </div>
-    <div class="mdm-row">
-      <span class="mdm-key">Kategorie</span>
-      <span class="mdm-val">${entry.kategorie||'—'}</span>
-    </div>
-    <div class="mdm-row">
-      <span class="mdm-key">Beschreibung</span>
-      <span class="mdm-val">${entry.beschreibung||'—'}</span>
-    </div>
-    <div class="mdm-row">
-      <span class="mdm-key">Zahlungsart</span>
-      <span class="mdm-val"><span class="badge ${ZBADGE[entry.zahlungsart]||''}">${entry.zahlungsart||'—'}</span></span>
-    </div>
-    ${entry.notiz?`<div class="mdm-row"><span class="mdm-key">Notiz</span><span class="mdm-val">${entry.notiz}</span></div>`:''}
-  `;
-  document.getElementById('mdm-btns').innerHTML=`
-    <button class="btn primary" style="flex:1" onclick="closeMobDetail();editE(event,'${entry.id}')"><i class="fas fa-edit"></i> Bearbeiten</button>
-    <button class="btn" style="color:var(--red);border-color:var(--red)" onclick="closeMobDetail();delE(event,'${entry.id}')"> Löschen</button>
-  `;
-  modal.classList.remove('hidden');
-  document.body.style.overflow='hidden';
-}
-function closeMobDetail(){
-  const modal=document.getElementById('mob-detail-modal');
-  if(modal)modal.classList.add('hidden');
-  document.body.style.overflow='';
-}
-// Закрытие по клику на overlay
-document.addEventListener('click',function(e){
-  const modal=document.getElementById('mob-detail-modal');
-  if(modal&&!modal.classList.contains('hidden')&&e.target===modal){closeMobDetail();}
-});
 
 // ── MOBILE BOTTOM NAV ─────────────────────────────────────────
 // Таббары которые соответствуют разделам
@@ -1623,18 +1578,17 @@ function selectKundenPicker(id) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// UNIVERSAL DETAIL SHEET — bottom sheet на мобиле, модал на десктопе
-// Использование: showDetailSheet({ title, rows:[{key,val}], buttons:[{label,icon,primary,danger,action}] })
+// UNIVERSAL DETAIL SHEET
 // ══════════════════════════════════════════════════════════════════════════
 
+// Хранилище кнопок для текущего sheet
+window._detailSheetBtns = [];
+
 function showDetailSheet({ title = '', rows = [], buttons = [] }) {
-  // Удаляем предыдущий если есть
   document.getElementById('u-detail-sheet')?.remove();
+  window._detailSheetBtns = buttons;
 
-  const isMobile = window.innerWidth <= 768;
-
-  const sheet = document.createElement('div');
-  sheet.id = 'u-detail-sheet';
+  const isMob = window.innerWidth <= 768;
 
   const rowsHtml = rows.map(r => `
     <div class="mdm-row">
@@ -1642,22 +1596,27 @@ function showDetailSheet({ title = '', rows = [], buttons = [] }) {
       <span class="mdm-val ${r.cls||''}">${r.val}</span>
     </div>`).join('');
 
-  const btnsHtml = buttons.map(b => `
-    <button class="btn${b.primary?' primary':''}${b.danger?' u-btn-danger':''}"
-      style="flex:1;justify-content:center;padding:12px;font-size:14px;font-weight:600;border-radius:var(--r2)${b.danger?';color:var(--red);border-color:var(--red)':''}"
-      onclick="document.getElementById('u-detail-sheet').remove();document.body.style.overflow='';(${b.action.toString()})()">
+  const btnsHtml = buttons.map((b, i) => `
+    <button class="btn${b.primary?' primary':''}${b.danger?' u-ds-danger':''}" 
+            data-ds-idx="${i}"
+            style="flex:1;justify-content:center;padding:12px;font-size:14px;font-weight:600;border-radius:var(--r2)">
       ${b.icon?`<i class="fas ${b.icon}" style="margin-right:6px"></i>`:''}${b.label}
     </button>`).join('');
 
-  if (isMobile) {
-    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:flex-end;justify-content:center;animation:cs-fade-in .15s ease';
+  const closeBtn = `<button class="mdm-close-btn" data-ds-close="1">✕</button>`;
+
+  const sheet = document.createElement('div');
+  sheet.id = 'u-detail-sheet';
+
+  if (isMob) {
+    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:flex;align-items:flex-end;justify-content:center';
     sheet.innerHTML = `
-      <div class="mdm-box" style="animation:cs-slide-up .22s ease;width:100%">
+      <div class="mdm-box" style="width:100%;animation:cs-slide-up .22s ease">
         <div class="mdm-header">
           <div class="mdm-handle"></div>
           <div class="mdm-title-row">
             <div class="mdm-title">${title}</div>
-            <button class="mdm-close-btn" onclick="document.getElementById('u-detail-sheet').remove();document.body.style.overflow=''">✕</button>
+            ${closeBtn}
           </div>
         </div>
         <div class="mdm-body">${rowsHtml}</div>
@@ -1665,28 +1624,43 @@ function showDetailSheet({ title = '', rows = [], buttons = [] }) {
       </div>`;
     document.body.style.overflow = 'hidden';
   } else {
-    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;animation:cs-fade-in .15s ease';
+    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8000;display:flex;align-items:center;justify-content:center;padding:20px';
     sheet.innerHTML = `
       <div style="background:var(--s1);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);animation:app-confirm-in .18s ease">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)">
           <div style="font-size:16px;font-weight:700;color:var(--text)">${title}</div>
-          <button class="mdm-close-btn" onclick="document.getElementById('u-detail-sheet').remove()">✕</button>
+          ${closeBtn}
         </div>
         <div class="mdm-body">${rowsHtml}</div>
         <div class="mdm-btns">${btnsHtml}</div>
       </div>`;
   }
 
-  // Закрытие по клику на overlay
+  // Единый обработчик кликов
   sheet.addEventListener('click', (e) => {
-    if (e.target === sheet) {
-      sheet.remove();
-      document.body.style.overflow = '';
+    // Закрытие по оверлею
+    if (e.target === sheet) { _closeDetailSheet(); return; }
+    // Кнопка закрытия
+    if (e.target.closest('[data-ds-close]')) { _closeDetailSheet(); return; }
+    // Кнопки действий
+    const btn = e.target.closest('[data-ds-idx]');
+    if (btn) {
+      const idx = +btn.dataset.dsIdx;
+      const action = window._detailSheetBtns[idx]?.action;
+      _closeDetailSheet();
+      if (typeof action === 'function') action();
     }
   });
 
   document.body.appendChild(sheet);
 }
+
+function _closeDetailSheet() {
+  document.getElementById('u-detail-sheet')?.remove();
+  document.body.style.overflow = '';
+  window._detailSheetBtns = [];
+}
+
 
 function showKundeDetail(id) {
   const k = (data.kunden||[]).find(x=>x.id===id);

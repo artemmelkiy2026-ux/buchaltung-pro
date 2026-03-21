@@ -4064,3 +4064,9 @@ header { background: #fff; }
   transition: background .15s;
 }
 .mdm-close-btn:hover { background: var(--rdim); color: var(--red); border-color: var(--red); }
+
+/* ── DETAIL SHEET danger button ─────────────────────────────────────────── */
+.u-ds-danger {
+  color: var(--red) !important;
+  border-color: var(--red) !important;
+}
