@@ -328,7 +328,7 @@ function _renderAudit(audit) {
       </div></div>` : '';
 
   result.innerHTML = `
-    <div class="audit-summary" style="background:${bg};margin-bottom:12px">
+    <div class="audit-summary" style="background:${bg};margin-bottom:12px; margin-top:10px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; margin-top:10px">
         <div style="font-size:16px;font-weight:700;color:#fff">KI-Audit Ergebnis</div>
         <div style="text-align:right">
