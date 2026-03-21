@@ -485,6 +485,11 @@ function renderCalmBanners() {
   const isRegel = !isKleinunternehmer(curYr);
   const today   = new Date();
 
+  // Корпоративные цвета MelaLogic
+  const BLUE  = '#1a4578';
+  const GREEN = '#3a8a4e';
+  const RED   = '#d63341';
+
   // ── 1. COMPLIANCE ─────────────────────────────────────────────
   const noDesc  = ye.filter(e => !e.beschreibung || e.beschreibung.trim() === e.kategorie).length;
   const noZahl  = ye.filter(e => !e.zahlungsart || e.zahlungsart === 'Sonstiges').length;
@@ -492,11 +497,12 @@ function renderCalmBanners() {
   const compPct = ye.length > 0 ? Math.round((1 - issues / (ye.length * 2)) * 100) : 100;
   const compOk  = compPct >= 90;
   const compWarn = compPct >= 70;
+  // Зелёный → синий, предупреждение → тёмно-синий + красный, критично → красный
   const compGrad = compOk
-    ? 'linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%)'
+    ? `linear-gradient(135deg, ${GREEN} 0%, #2d7a42 60%, #4aab62 100%)`
     : compWarn
-      ? 'linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)'
-      : 'linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%)';
+      ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, ${RED} 100%)`
+      : `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`;
   const compIcon  = compOk ? 'fa-shield-alt' : 'fa-exclamation-triangle';
   const compTitle = compOk ? 'Alles in Ordnung' : compWarn ? 'Prüfung empfohlen' : 'Achtung!';
   const compSub   = compOk ? `${ye.length} Einträge vollständig` : `${issues} unvollständig`;
@@ -520,10 +526,10 @@ function renderCalmBanners() {
   if (!isRegel) {
     const limOk = limitPct < 70, limWarn = limitPct < 90;
     c2Grad  = limOk
-      ? 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)'
+      ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, #2a6bbf 100%)`
       : limWarn
-        ? 'linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)'
-        : 'linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%)';
+        ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, ${RED} 100%)`
+        : `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`;
     c2Icon  = 'fa-tachometer-alt';
     c2Label = 'KU-Limit 25.000 €';
     c2Val   = limitPct + '%';
@@ -535,8 +541,8 @@ function renderCalmBanners() {
   } else {
     const fOk = diffDays > 7;
     c2Grad  = fOk
-      ? 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)'
-      : 'linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%)';
+      ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, #2a6bbf 100%)`
+      : `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`;
     c2Icon  = 'fa-calendar-check';
     c2Label = 'Nächste Frist';
     c2Val   = diffDays + 'd';
@@ -549,32 +555,30 @@ function renderCalmBanners() {
   const vstTotal  = ye.filter(e=>e.vorsteuerBet>0).reduce((s,e)=>s+e.vorsteuerBet,0);
   const zahllast  = Math.max(0, mwstTotal - vstTotal);
   const resGrad = !isRegel
-    ? 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #8b5cf6 100%)'
+    ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, #2a6bbf 100%)`
     : zahllast > 0
-      ? 'linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%)'
-      : 'linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%)';
+      ? `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`
+      : `linear-gradient(135deg, ${GREEN} 0%, #2d7a42 60%, #4aab62 100%)`;
   const resIcon  = isRegel ? 'fa-piggy-bank' : 'fa-tag';
   const resLabel = isRegel ? 'MwSt-Reserve' : 'Kleinunternehmer';
   const resVal   = isRegel ? fmt(zahllast) : '§ 19';
   const resTitle = isRegel ? (zahllast > 0 ? 'Zurückhalten!' : 'Im grünen Bereich') : 'Kein MwSt-Ausweis';
-  const resSub   = isRegel ? (zahllast > 0 ? `${fmt(zahllast)} reservieren` : 'Kein Rückstand') : `Umsatz ${fmt(ein)} / 25.000 €`;
+  const resSub   = isRegel ? (zahllast > 0 ? `${fmt(zahllast)} reservieren` : 'Kein Rückstand') : `${fmt(ein)} von 25.000 €`;
 
   // ── CARD BUILDER ──────────────────────────────────────────────
   const card = (grad, icon, label, val, title, sub, extra='') => `
-    <div style="background:${grad};border-radius:20px;padding:22px;position:relative;overflow:hidden;min-height:140px">
-      <!-- Декоративные круги -->
-      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08)"></div>
-      <div style="position:absolute;bottom:-20px;right:30px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
-      <div style="position:absolute;top:50%;right:-10px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
-      <!-- Контент -->
+    <div style="background:${grad};border-radius:18px;padding:22px;position:relative;overflow:hidden;min-height:148px">
+      <div style="position:absolute;top:-28px;right:-28px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
+      <div style="position:absolute;bottom:-18px;right:24px;width:65px;height:65px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+      <div style="position:absolute;top:55%;left:-10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
       <div style="position:relative;z-index:1">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-          <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <i class="fas ${icon}" style="color:#fff;font-size:14px"></i>
           </div>
           <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)">${label}</span>
         </div>
-        <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:6px">${val}</div>
+        <div style="font-size:27px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:5px">${val}</div>
         <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:3px">${title}</div>
         <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.4">${sub}</div>
         ${extra}
@@ -589,6 +593,7 @@ function renderCalmBanners() {
     card(c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Bar) +
     card(resGrad, resIcon, resLabel, resVal, resTitle, resSub);
 }
+
 
 
 
