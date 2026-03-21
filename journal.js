@@ -149,48 +149,29 @@ function renderJournal() {
 
       let link = '';
       if (e.is_storno && e.storno_of) {
-        // GEGENBUCHUNG — показываем что именно отменяем
         const orig = data.eintraege.find(x => x.id === e.storno_of);
         if (orig) {
-          const nrInfo = orig.belegnr ? `<span style="font-weight:700;color:var(--text)">Nr.${orig.belegnr}</span> · ` : '';
-          link = `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
-            <span style="font-size:10px;background:rgba(148,163,184,.1);border:1px solid var(--border);border-radius:3px;padding:2px 7px;color:var(--sub)">
-              ↩ hebt auf: ${nrInfo}${fd(orig.datum)} · ${fmt(orig.betrag)} € · ${orig.kategorie||''}${orig.zahlungsart?' · '+orig.zahlungsart:''}
-            </span>
-          </div>`;
+          const _nr = orig.belegnr ? '<b>Nr.'+orig.belegnr+'</b> · ' : '';
+          link = '<div style="margin-top:4px"><span style="font-size:10px;background:rgba(148,163,184,.1);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--sub)">↩ hebt auf: '+_nr+fd(orig.datum)+' · '+fmt(orig.betrag)+' € · '+(orig.kategorie||'')+(orig.zahlungsart?' · '+orig.zahlungsart:'')+'</span></div>';
         }
       } else if (e.korrektur_von) {
-        // KORREKTUR — показываем что изменилось (старый → новый)
         const orig = data.eintraege.find(x => x.id === e.korrektur_von);
         if (orig) {
-          const nrOld = orig.belegnr || '—';
-          const nrNew = e.belegnr || '—';
-          const nrChanged = nrOld !== nrNew;
-          const betragChanged = orig.betrag !== e.betrag;
-          const katChanged = orig.kategorie !== e.kategorie;
-          const zahlChanged = orig.zahlungsart !== e.zahlungsart;
-          const changes = [];
-          if (nrChanged) changes.push(`Nr: <span style="color:var(--red);text-decoration:line-through">${nrOld}</span> → <span style="color:var(--green);font-weight:700">${nrNew}</span>`);
-          if (betragChanged) changes.push(`Betrag: <span style="color:var(--red);text-decoration:line-through">${fmt(orig.betrag)} €</span> → <span style="color:var(--green);font-weight:700">${fmt(e.betrag)} €</span>`);
-          if (katChanged) changes.push(`Kategorie: <span style="color:var(--red);text-decoration:line-through">${orig.kategorie}</span> → <span style="color:var(--green);font-weight:700">${e.kategorie}</span>`);
-          if (zahlChanged) changes.push(`Zahlung: <span style="color:var(--red);text-decoration:line-through">${orig.zahlungsart}</span> → <span style="color:var(--green);font-weight:700">${e.zahlungsart}</span>`);
-          const changesHtml = changes.length ? changes.join(' &nbsp;|&nbsp; ') : 'Inhalt aktualisiert';
-          link = `<div style="margin-top:5px">
-            <div style="font-size:10px;color:var(--sub);margin-bottom:3px">ersetzt: <span style="font-weight:600;color:var(--text)">Nr.${nrOld}</span> vom ${fd(orig.datum)}</div>
-            <div style="font-size:10px;background:rgba(93,157,105,.07);border:1px solid rgba(93,157,105,.2);border-radius:3px;padding:3px 8px;display:inline-flex;flex-wrap:wrap;gap:4px">${changesHtml}</div>
-          </div>`;
+          const _nrOld = orig.belegnr||'—', _nrNew = e.belegnr||'—';
+          const _ch = [];
+          if (_nrOld !== _nrNew) _ch.push('Nr: <s style="color:var(--red)">'+_nrOld+'</s> → <b style="color:var(--green)">'+_nrNew+'</b>');
+          if (orig.betrag !== e.betrag) _ch.push('Betrag: <s style="color:var(--red)">'+fmt(orig.betrag)+' €</s> → <b style="color:var(--green)">'+fmt(e.betrag)+' €</b>');
+          if (orig.kategorie !== e.kategorie) _ch.push('Kat: <s style="color:var(--red)">'+orig.kategorie+'</s> → <b style="color:var(--green)">'+e.kategorie+'</b>');
+          if (orig.zahlungsart !== e.zahlungsart) _ch.push('Zahlung: <s style="color:var(--red)">'+orig.zahlungsart+'</s> → <b style="color:var(--green)">'+e.zahlungsart+'</b>');
+          const _chHtml = _ch.length ? _ch.join(' &nbsp;|&nbsp; ') : 'Inhalt geändert';
+          link = '<div style="margin-top:5px"><div style="font-size:10px;color:var(--sub);margin-bottom:3px">ersetzt: <b>Nr.'+_nrOld+'</b> vom '+fd(orig.datum)+' · '+fmt(orig.betrag)+' €</div><div style="font-size:10px;background:rgba(93,157,105,.07);border:1px solid rgba(93,157,105,.2);border-radius:3px;padding:3px 8px">'+_chHtml+'</div></div>';
         }
       } else if (involved.has(e.id)) {
-        // STORNIERT — показываем кто сторнировал и новый белег корректуры
         const stornoRec = data.eintraege.find(x => x.storno_of === e.id);
         const korr = data.eintraege.find(x => x.korrektur_von === e.id);
         if (stornoRec) {
-          const korrInfo = korr ? ` &nbsp;→&nbsp; Korrektur <span style="font-weight:700;color:var(--green)">Nr.${korr.belegnr||'—'}</span> ${fmt(korr.betrag)} €` : '';
-          link = `<div style="margin-top:4px">
-            <span style="font-size:10px;background:rgba(224,140,26,.08);border:1px solid rgba(224,140,26,.25);border-radius:3px;padding:2px 8px;color:var(--yellow)">
-              → Storno ${fd(stornoRec.datum)}${korrInfo}
-            </span>
-          </div>`;
+          const _ki = korr ? ' → Korrektur <b style="color:var(--green)">Nr.'+(korr.belegnr||'—')+'</b> '+fmt(korr.betrag)+' €' : '';
+          link = '<div style="margin-top:4px"><span style="font-size:10px;background:rgba(224,140,26,.08);border:1px solid rgba(224,140,26,.25);border-radius:3px;padding:2px 8px;color:var(--yellow)">→ Storno '+fd(stornoRec.datum)+_ki+'</span></div>';
         }
       }
 
@@ -271,14 +252,29 @@ function renderJournal() {
       let link = '';
       if (e.is_storno && e.storno_of) {
         const orig = data.eintraege.find(x => x.id === e.storno_of);
-        if (orig) link = `<span style="font-size:10px;color:var(--sub)">hebt auf: ${fd(orig.datum)} · ${fmt(orig.betrag)}</span>`;
+        if (orig) {
+          const _nr = orig.belegnr ? '<b>Nr.'+orig.belegnr+'</b> · ' : '';
+          link = '<div style="margin-top:4px"><span style="font-size:10px;background:rgba(148,163,184,.1);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--sub)">↩ hebt auf: '+_nr+fd(orig.datum)+' · '+fmt(orig.betrag)+' € · '+(orig.kategorie||'')+(orig.zahlungsart?' · '+orig.zahlungsart:'')+'</span></div>';
+        }
       } else if (e.korrektur_von) {
         const orig = data.eintraege.find(x => x.id === e.korrektur_von);
-        if (orig) link = `<span style="font-size:10px;color:var(--sub)">ersetzt: ${fd(orig.datum)} · ${fmt(orig.betrag)}</span>`;
+        if (orig) {
+          const _nrOld = orig.belegnr||'—', _nrNew = e.belegnr||'—';
+          const _ch = [];
+          if (_nrOld !== _nrNew) _ch.push('Nr: <s style="color:var(--red)">'+_nrOld+'</s> → <b style="color:var(--green)">'+_nrNew+'</b>');
+          if (orig.betrag !== e.betrag) _ch.push('Betrag: <s style="color:var(--red)">'+fmt(orig.betrag)+' €</s> → <b style="color:var(--green)">'+fmt(e.betrag)+' €</b>');
+          if (orig.kategorie !== e.kategorie) _ch.push('Kat: <s style="color:var(--red)">'+orig.kategorie+'</s> → <b style="color:var(--green)">'+e.kategorie+'</b>');
+          if (orig.zahlungsart !== e.zahlungsart) _ch.push('Zahlung: <s style="color:var(--red)">'+orig.zahlungsart+'</s> → <b style="color:var(--green)">'+e.zahlungsart+'</b>');
+          const _chHtml = _ch.length ? _ch.join(' &nbsp;|&nbsp; ') : 'Inhalt geändert';
+          link = '<div style="margin-top:5px"><div style="font-size:10px;color:var(--sub);margin-bottom:3px">ersetzt: <b>Nr.'+_nrOld+'</b> vom '+fd(orig.datum)+' · '+fmt(orig.betrag)+' €</div><div style="font-size:10px;background:rgba(93,157,105,.07);border:1px solid rgba(93,157,105,.2);border-radius:3px;padding:3px 8px">'+_chHtml+'</div></div>';
+        }
       } else if (involved.has(e.id)) {
         const stornoRec = data.eintraege.find(x => x.storno_of === e.id);
         const korr = data.eintraege.find(x => x.korrektur_von === e.id);
-        if (stornoRec) link = `<span class="badge-storno">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
+        if (stornoRec) {
+          const _ki = korr ? ' → Korrektur <b style="color:var(--green)">Nr.'+(korr.belegnr||'—')+'</b> '+fmt(korr.betrag)+' €' : '';
+          link = '<div style="margin-top:4px"><span style="font-size:10px;background:rgba(224,140,26,.08);border:1px solid rgba(224,140,26,.25);border-radius:3px;padding:2px 8px;color:var(--yellow)">→ Storno '+fd(stornoRec.datum)+_ki+'</span></div>';
+        }
       }
       const sep = idx > 0 ? `<div style="height:1px;background:var(--border);margin:0 14px"></div>` : '';
       const isEin = e.typ === 'Einnahme';
