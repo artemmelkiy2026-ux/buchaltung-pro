@@ -130,7 +130,7 @@ class CustomSelect {
     trigger.className = `cs-trigger${isCompact?' cs-trigger--compact':''}`;
     trigger.innerHTML = `
       <span class="cs-label"></span>
-      <i class="fas fa-chevron-down cs-arrow"></i>`;
+      <i class="far fa-chevron-down cs-arrow"></i>`;
 
     const panel = document.createElement('div');
     panel.className = 'cs-panel';
@@ -247,7 +247,7 @@ class CustomSelect {
         display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px;
         background:${active?'var(--bdim)':'transparent'};
         color:${active?'var(--blue)':'var(--text)'};font-weight:${active?'700':'400'}`;
-      item.innerHTML = `<span>${opt.innerHTML||opt.text}</span>${active?'<i class="fas fa-check" style="color:var(--blue);font-size:13px"></i>':''}`;
+      item.innerHTML = `<span>${opt.innerHTML||opt.text}</span>${active?'<i class="far fa-check" style="color:var(--blue);font-size:13px"></i>':''}`;
       item.addEventListener('click', () => {
         this.sel.value = opt.value;
         this._updateLabel();

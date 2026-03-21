@@ -28,7 +28,7 @@ function showWiedDetail(id) {
   const multiplier = {woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
   const jahres = w.betrag * (multiplier[w.intervall]||1);
   showDetailSheet({
-    title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
+    title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="far fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="far fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
     rows: [
       { key: 'Bezeichnung', val: w.bezeichnung || '—' },
       { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(w.betrag)}</span>` },
@@ -88,7 +88,7 @@ function renderWied(){
     return`<div class="wied-card${isFaellig?' wied-card--faellig':''}${isPaused?' wied-card--paused':''}" onclick="showWiedDetail('${w.id}')" style="cursor:pointer">
       <div class="wied-card-left">
         <div class="wied-card-avatar" style="background:${isPaused?'var(--s2)':isEin?'var(--gdim)':'var(--rdim)'};color:${isPaused?'var(--sub)':isEin?'var(--green)':'var(--red)'}">
-          <i class="fas fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
+          <i class="far fa-${isPaused?'pause':isEin?'arrow-up':'arrow-down'}"></i>
         </div>
         <div class="wied-card-name">
           ${w.bezeichnung}
@@ -96,18 +96,18 @@ function renderWied(){
           ${isPaused?'<span style="font-size:10px;font-weight:600;color:var(--sub);background:var(--s2);padding:1px 6px;border-radius:3px;margin-left:4px">Pausiert</span>':''}
         </div>
         <div class="wied-card-meta">
-          <span><i class="fas fa-tag" style="font-size:10px"></i>${w.kategorie}</span>
-          <span><i class="fas fa-sync-alt" style="font-size:10px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
-          <span><i class="fas fa-credit-card" style="font-size:10px"></i>${w.zahlungsart}</span>
-          ${w.anbieter?`<span style="color:var(--blue)"><i class="fas fa-building" style="font-size:10px"></i>${w.anbieter}</span>`:''}
+          <span><i class="far fa-tag" style="font-size:10px"></i>${w.kategorie}</span>
+          <span><i class="far fa-sync-alt" style="font-size:10px"></i>${intervallLabel[w.intervall]||w.intervall}</span>
+          <span><i class="far fa-credit-card" style="font-size:10px"></i>${w.zahlungsart}</span>
+          ${w.anbieter?`<span style="color:var(--blue)"><i class="far fa-building" style="font-size:10px"></i>${w.anbieter}</span>`:''}
         </div>
         <div class="wied-card-schedule">
           <span class="wied-card-next" style="color:${isFaellig?'var(--yellow)':isPaused?'var(--sub)':'var(--sub)'}">
-            <i class="fas fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste: <strong>${fdm(w.naechste)}</strong>
+            <i class="far fa-calendar-alt" style="font-size:10px;margin-right:3px"></i>Nächste: <strong>${fdm(w.naechste)}</strong>
             ${w.enddatum?`<span style="margin-left:4px;opacity:.7">· bis ${fdm(w.enddatum)}</span>`:''}
           </span>
-          ${_wBookedCount>0?`<span style="font-size:11px;color:var(--sub)"><i class="fas fa-history" style="font-size:10px;margin-right:2px"></i>${_wBookedCount}× gebucht</span>`:''}
-          <span style="font-size:11px;color:var(--sub)"><i class="fas fa-calendar-check" style="font-size:10px;margin-right:2px"></i>≈ ${fmt(_wJahres)}/Jahr</span>
+          ${_wBookedCount>0?`<span style="font-size:11px;color:var(--sub)"><i class="far fa-history" style="font-size:10px;margin-right:2px"></i>${_wBookedCount}× gebucht</span>`:''}
+          <span style="font-size:11px;color:var(--sub)"><i class="far fa-calendar-check" style="font-size:10px;margin-right:2px"></i>≈ ${fmt(_wJahres)}/Jahr</span>
         </div>
       </div>
       <div class="wied-card-right">
@@ -121,10 +121,10 @@ function renderWied(){
             {icon:'fa-edit',         label:'Bearbeiten',    action:()=>editWied(w.id)},
             {icon:'fa-trash',        label:'Löschen',       danger:true, action:()=>delWied(w.id)}
           ]) : `
-            <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
-            <button class="rca-btn" onclick="_wTogglePause('${w.id}')" title="${isPaused?'Fortsetzen':'Pausieren'}" style="${isPaused?'color:var(--green)':''}"><i class="fas fa-${isPaused?'play-circle':'pause'}"></i></button>
-            <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-            <button class="rca-btn rca-red" onclick="delWied('${w.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+            <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="far fa-play"></i></button>
+            <button class="rca-btn" onclick="_wTogglePause('${w.id}')" title="${isPaused?'Fortsetzen':'Pausieren'}" style="${isPaused?'color:var(--green)':''}"><i class="far fa-${isPaused?'play-circle':'pause'}"></i></button>
+            <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="far fa-edit"></i></button>
+            <button class="rca-btn rca-red" onclick="delWied('${w.id}')" title="Löschen"><i class="far fa-trash"></i></button>
           `}
         </div>
       </div>
@@ -461,7 +461,7 @@ function wBuchen(id){
   if(!newE) return;
   renderAll(); renderWied();
   const w=data.wiederkehrend.find(x=>x.id===id);
-  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${newE.beschreibung} gebucht!`, 'ok');
+  toast(`<i class="far fa-check-circle" style="color:var(--green)"></i> ${newE.beschreibung} gebucht!`, 'ok');
 }
 
 function wBuchenAlle(){
@@ -472,7 +472,7 @@ function wBuchenAlle(){
   faellig.forEach(w=>wBuchenCore(w.id));
   // Один рендер после всех
   renderAll(); renderWied();
-  toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} Zahlungen gebucht!`, 'ok');
+  toast(`<i class="far fa-check-circle" style="color:var(--green)"></i> ${faellig.length} Zahlungen gebucht!`, 'ok');
 }
 async function delWied(id){const _okW=await appConfirm('Vorlage wirklich löschen?',{title:'Vorlage löschen',icon:'🗑️',okLabel:'Löschen',danger:true}); if(!_okW)return;data.wiederkehrend=(data.wiederkehrend||[]).filter(w=>w.id!==id);sbDeleteWied(id);renderWied();toast('Gelöscht','err');}
 
@@ -760,7 +760,7 @@ function openMonatDetail(yr, mi){
   const monName = MN[parseInt(mi)-1];
   _monLabel = `${monName} ${yr}`;
 
-  document.getElementById('mon-modal-title').innerHTML = `<i class="fas fa-calendar-alt"></i> ${_monLabel}`;
+  document.getElementById('mon-modal-title').innerHTML = `<i class="far fa-calendar-alt"></i> ${_monLabel}`;
 
   const ein=sum(entries,'Einnahme'), aus=sum(entries,'Ausgabe'), gew=ein-aus;
   document.getElementById('mon-modal-stats').innerHTML=`
@@ -785,7 +785,7 @@ function openMonatDetail(yr, mi){
     document.getElementById('mon-modal-tbody').innerHTML=entries.map(e=>`
       <tr style="border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">
         <td style="padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--sub)">${fdm(e.datum)}</td>
-        <td style="padding:8px 12px"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="fas fa-arrow-up" style="color:var(--green)"></i>':'<i class="fas fa-arrow-down" style="color:var(--red)"></i>'}</span></td>
+        <td style="padding:8px 12px"><span class="badge ${e.typ==='Einnahme'?'b-ein':'b-aus'}">${e.typ==='Einnahme'?'<i class="far fa-arrow-up" style="color:var(--green)"></i>':'<i class="far fa-arrow-down" style="color:var(--red)"></i>'}</span></td>
         <td class="mob-hide" style="padding:8px 12px;font-size:12px;color:var(--sub)">${e.kategorie}</td>
         <td class="mob-hide" style="padding:8px 12px;font-size:12px">${e.beschreibung}${e.notiz?` <span title="${e.notiz}" style="color:var(--sub);font-size:10px">[PDF]</span>`:''}</td>
         <td class="mob-hide" style="padding:8px 12px"><span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span></td>
@@ -933,5 +933,5 @@ ${rows}
   a.href=URL.createObjectURL(blob);
   a.download=`buchaltung_${_monLabel.replace(' ','_')}.xls`;
   a.click();
-  toast(`<i class="fas fa-chart-bar"></i> Excel — ${_monLabel} exportiert`,'ok');
+  toast(`<i class="far fa-chart-bar"></i> Excel — ${_monLabel} exportiert`,'ok');
 }

@@ -62,7 +62,7 @@ function renderProdukte() {
     <div class="prod-card" ${window._selectMode?.['produkte'] ? '' : `onclick="showProduktDetail('${p.id}')"`} style="cursor:${window._selectMode?.['produkte']?'default':'pointer'}">
       <div class="prod-card-left">
         <div class="prod-avatar" style="background:${katColor(p.kategorie)}22;color:${katColor(p.kategorie)}">
-          <i class="fas ${katIcon(p.kategorie)}"></i>
+          <i class="far ${katIcon(p.kategorie)}"></i>
         </div>
         <div class="prod-info">
           <div class="prod-name">${p.name}</div>
@@ -83,7 +83,7 @@ function renderProdukte() {
           ${isMob() && !window._selectMode?.['produkte'] ? _moreBtn([
             {icon:'fa-edit',  label:'Bearbeiten', action:()=>openProduktModal(p.id)},
             {icon:'fa-trash', label:'Löschen',    danger:true, action:()=>delProdukt(p.id)}
-          ]) : `<button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><i class="fas fa-trash"></i></button>`}
+          ]) : `<button class="rca-btn" onclick="event.stopPropagation();delProdukt('${p.id}')" title="Löschen"><i class="far fa-trash"></i></button>`}
         </div>
       </div>
       <div class="sel-cb-abs">${_selCb('produkte', p.id)}</div>
@@ -218,7 +218,7 @@ function apAddEinheit() {
     <span class="ap-op">=</span>
     <input type="number" placeholder="Preis (Brutto)" min="0" step="0.01">
     <button class="btn" style="padding:4px 8px;color:var(--blue)" onclick="this.closest('.ap-einheit-row').remove()">
-      <i class="fas fa-trash"></i>
+      <i class="far fa-trash"></i>
     </button>`;
   list.appendChild(row);
 }
@@ -234,7 +234,7 @@ function showProduktDetail(id) {
   const p = (data.produkte||[]).find(x=>x.id===id);
   if (!p) return;
   showDetailSheet({
-    title: `<i class="fas fa-box" style="color:var(--blue);margin-right:8px"></i>${p.name}`,
+    title: `<i class="far fa-box" style="color:var(--blue);margin-right:8px"></i>${p.name}`,
     rows: [
       { key: 'VK-Preis (Brutto)', val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmt(p.vkBrutto||0)}</span>` },
       { key: 'VK-Preis (Netto)', val: fmt(p.vkNetto||0) },

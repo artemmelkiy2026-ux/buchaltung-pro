@@ -3,7 +3,7 @@ const SK='buch_pro_v1';
 const KE=['Dienstleistung','Honorar','Warenverkauf','Miete (Einnahme)','Zinsen/Dividenden','Erstattung','Sonstiges Einnahme'];
 const KA=['Büromaterial','Software / IT','Telefon / Internet','Fahrtkosten','Miete / Büro','Marketing / Werbung','Fortbildung','Versicherung','Bankgebühren','Steuern / Abgaben','Hardware','Fremdleistungen','Bewirtung','Sonstiges Ausgabe'];
 const ZAHL=['Überweisung','Barzahlung','PayPal','EC-Karte','Lastschrift','Sonstiges'];
-const ZICONS={'Überweisung':'<i class="fas fa-university"></i>','Barzahlung':'<i class="fas fa-solid fa-euro-sign"></i>','PayPal':'<i class="fa-brands fa-paypal"></i>','EC-Karte':'<i class="fas fa-credit-card"></i>','Lastschrift':'<i class="fas fa-exchange-alt"></i>','Sonstiges':'<i class="fas fa-solid fa-euro-sign"></i>'};
+const ZICONS={'Überweisung':'<i class="far fa-university"></i>','Barzahlung':'<i class="far fa-solid fa-euro-sign"></i>','PayPal':'<i class="fa-brands fa-paypal"></i>','EC-Karte':'<i class="far fa-credit-card"></i>','Lastschrift':'<i class="far fa-exchange-alt"></i>','Sonstiges':'<i class="far fa-solid fa-euro-sign"></i>'};
 const ZCOLS={'Überweisung':'var(--blue)','Barzahlung':'var(--yellow)','PayPal':'var(--purple)','EC-Karte':'var(--cyan)','Lastschrift':'var(--green)','Sonstiges':'var(--muted)'};
 const ZBADGE={'Überweisung':'b-bar','Barzahlung':'b-cash','PayPal':'b-pp','EC-Karte':'b-trans','Lastschrift':'b-ein','Sonstiges':''};
 // ── НОРМАЛИЗАЦИЯ: русский/украинский → немецкий ключ ────────────
@@ -113,9 +113,9 @@ window.addEventListener('supabase-ready', () => {
 });
 let curTyp='Einnahme', fTyp='Alle', sortCol='datum', sortAsc=false;
 let fileHandle=null, asOn=false, asTimer=null, curPage='dashboard';
-// <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для сортировки Dashboard "Letzte 10"
+// <i class="far fa-check-circle" style="color:var(--green)"></i> Переменные для сортировки Dashboard "Letzte 10"
 let dashSortCol='datum', dashSortAsc=false;
-// <i class="fas fa-check-circle" style="color:var(--green)"></i> Переменные для пагинации Einträge
+// <i class="far fa-check-circle" style="color:var(--green)"></i> Переменные для пагинации Einträge
 let einPage=1, einPerPage=10;
 let zPage=1, zPerPage=10;  // Пагинация für Zahlungsarten
 let zSortCol='datum', zSortAsc=false;  // Сортировка Zahlungsarten
@@ -183,7 +183,7 @@ function openNeuEintrag(editEntryId) {
     if(typeof editId !== 'undefined') editId=null;
     const saveBtn=document.getElementById('btn-add-bezahlt');
     if(saveBtn){
-      saveBtn.innerHTML='<i class="fas fa-check-circle"></i> Speichern &amp; Bezahlt';
+      saveBtn.innerHTML='<i class="far fa-check-circle"></i> Speichern &amp; Bezahlt';
       saveBtn.onclick=function(){ addEintrag(true); };
     }
   }

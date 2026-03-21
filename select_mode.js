@@ -32,12 +32,12 @@ function _refreshSelectUI(section) {
   if (btnSel) {
     btnSel.classList.toggle('active', active);
     btnSel.innerHTML = active
-      ? '<i class="fas fa-times"></i><span class="ang-btn-txt"> Abbrechen</span>'
-      : '<i class="fas fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span>';
+      ? '<i class="far fa-times"></i><span class="ang-btn-txt"> Abbrechen</span>'
+      : '<i class="far fa-check-square"></i><span class="ang-btn-txt"> Auswählen</span>';
   }
   if (btnDel) {
     btnDel.style.display = (active && count > 0) ? '' : 'none';
-    btnDel.innerHTML = `<i class="fas fa-trash"></i><span class="ang-btn-txt"> ${count} löschen</span>`;
+    btnDel.innerHTML = `<i class="far fa-trash"></i><span class="ang-btn-txt"> ${count} löschen</span>`;
   }
 }
 
@@ -90,7 +90,7 @@ function showCtxMenu(e, items) {
   items.forEach((item, i) => {
     const el = document.createElement('div');
     el.className = 'ctx-menu-item';
-    el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px"></i><span>${item.label}</span>`;
+    el.innerHTML = `<i class="far ${item.icon}" style="width:18px;font-size:13px"></i><span>${item.label}</span>`;
     if (item.danger) el.style.color = 'var(--red)';
 
     el.onclick = (ev) => {
@@ -143,5 +143,5 @@ function _moreBtn(items) {
   window._ctxReg[id] = items;
   return `<button class="mob-more-btn" title="Mehr"
     onclick="event.stopPropagation();showCtxMenu(event,window._ctxReg['${id}'])">
-    <i class="fas fa-ellipsis-v"></i></button>`;
+    <i class="far fa-ellipsis-v"></i></button>`;
 }

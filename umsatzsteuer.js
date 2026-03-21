@@ -574,7 +574,7 @@ function stBerechnen() {
   const ustPercent = ein > 0 ? ((ustEingezogen / ein) * 100) : 0;
   if (!isKleinunternehmer && ein < 25000 && ustSaldo > 100) {
     document.getElementById('st-klein-recommendation').textContent = 
-      `<i class="fas fa-check-circle" style="color:var(--green)"></i> EMPFOHLEN: Sie zahlen ${fmt(ustSaldo)} USt. Als Kleinunternehmer sparen Sie diese Summe!`;
+      `<i class="far fa-check-circle" style="color:var(--green)"></i> EMPFOHLEN: Sie zahlen ${fmt(ustSaldo)} USt. Als Kleinunternehmer sparen Sie diese Summe!`;
     document.getElementById('st-klein-recommendation').style.color = 'var(--green)';
   } else if (!isKleinunternehmer && ein >= 25000) {
     document.getElementById('st-klein-recommendation').textContent = 
@@ -582,7 +582,7 @@ function stBerechnen() {
     document.getElementById('st-klein-recommendation').style.color = 'var(--yellow)';
   } else if (isKleinunternehmer) {
     document.getElementById('st-klein-recommendation').textContent = 
-      `<i class="fas fa-check-circle" style="color:var(--green)"></i> Kleinunternehmer aktiv — Sie zahlen KEINE Umsatzsteuer!`;
+      `<i class="far fa-check-circle" style="color:var(--green)"></i> Kleinunternehmer aktiv — Sie zahlen KEINE Umsatzsteuer!`;
     document.getElementById('st-klein-recommendation').style.color = 'var(--cyan)';
   }
 

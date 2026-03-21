@@ -510,7 +510,7 @@ function showDeletionBanner(daysLeft) {
   banner.id = 'deletion-banner';
   banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#e08c1a;color:#fff;border-radius:6px;padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:9998;box-shadow:0 8px 32px rgba(224,140,26,.4);font-family:inherit;max-width:380px;width:calc(100% - 32px)';
   banner.innerHTML = `
-    <i class="fa-solid fa-triangle-exclamation" style="font-size:22px;flex-shrink:0"></i>
+    <i class="far fa-triangle-exclamation" style="font-size:22px;flex-shrink:0"></i>
     <div style="flex:1;font-size:13px">
       <div style="font-weight:600;margin-bottom:2px">Konto wird gelöscht</div>
       <div style="opacity:.9;font-size:12px">Noch ${daysLeft} Tage bis zur Löschung</div>

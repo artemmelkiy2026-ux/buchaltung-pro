@@ -87,7 +87,7 @@ body {
     <button class="pin-btn" onclick="pinPress('8')">8</button>
     <button class="pin-btn" onclick="pinPress('9')">9</button>
     <button class="pin-btn" id="pin-bio-btn" onclick="pinBiometric()" style="font-size:20px;display:none">
-      <i class="fa-solid fa-fingerprint"></i>
+      <i class="far fa-fingerprint"></i>
     </button>
     <button class="pin-btn" onclick="pinPress('0')">0</button>
     <button class="pin-btn" onclick="pinBackspace()" style="font-size:18px"><</button>
@@ -178,7 +178,7 @@ async function pinBiometric() {
   }
 
   if (!window.PublicKeyCredential) {
-    document.getElementById('pin-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie wird von diesem Browser nicht unterstützt';
+    document.getElementById('pin-error').innerHTML = '<i class="far fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie wird von diesem Browser nicht unterstützt';
     setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 2500);
     return;
   }
@@ -220,17 +220,17 @@ async function pinBiometric() {
     if (e.name === 'NotAllowedError') {
       // Пользователь отменил — ничего не показываем
     } else if (e.name === 'SecurityError') {
-      document.getElementById('pin-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie nur über HTTPS verfügbar';
+      document.getElementById('pin-error').innerHTML = '<i class="far fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie nur über HTTPS verfügbar';
       setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
     } else if (e.name === 'InvalidStateError' || e.name === 'NotFoundError') {
       // Ключ не найден — убираем биометрию, просим PIN
       localStorage.removeItem('bp_bio_id');
       localStorage.removeItem('bp_bio_login');
       document.getElementById('pin-bio-btn').style.display = 'none';
-      document.getElementById('pin-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie zurückgesetzt — bitte PIN eingeben';
+      document.getElementById('pin-error').innerHTML = '<i class="far fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie zurückgesetzt — bitte PIN eingeben';
       setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
     } else {
-      document.getElementById('pin-error').innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie fehlgeschlagen — bitte PIN eingeben';
+      document.getElementById('pin-error').innerHTML = '<i class="far fa-exclamation-triangle" style="color:var(--yellow)"></i> Biometrie fehlgeschlagen — bitte PIN eingeben';
       setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 2500);
     }
   }
@@ -269,7 +269,7 @@ async function checkPin() {
     for (let i = 0; i < 4; i++) {
       document.getElementById('pin-dot-' + i).classList.add('error');
     }
-    document.getElementById('pin-error').innerHTML = '<i class="fas fa-times-circle" style="color:var(--red)"></i> Falscher PIN';
+    document.getElementById('pin-error').innerHTML = '<i class="far fa-times-circle" style="color:var(--red)"></i> Falscher PIN';
     setTimeout(() => {
       updateDots();
       document.getElementById('pin-error').textContent = '';
