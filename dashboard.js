@@ -871,8 +871,9 @@ function renderEin(){
         +(mwstBadge ? '<span class="ein-row-sep">·</span>'+mwstBadge : '')
         +(e.notiz ? '<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>' : '');
 
+      // Для Korrektur — дата самой корректуры (created_at этой записи), а не дата оригинала
       const _korrekturTime = e.korrektur_von && e.created_at
-        ? '<span class="ein-row-sep">·</span><span class="ein-row-time">'+fdt(e.created_at).slice(11,16)+'</span>'
+        ? '<span class="ein-row-sep">·</span><span class="ein-row-time">'+fd(e.created_at.slice(0,10))+'</span>'
         : '';
       const _stLblFull = stLbl ? stLbl+_korrekturTime : '';
 
