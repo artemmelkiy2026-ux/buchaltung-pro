@@ -355,6 +355,7 @@ function saveFahrt() {
     data.fahrtenbuch.push(newF);
     if (typeof sbSaveFahrt==='function') sbSaveFahrt(newF);
   }
+  fbPage=1; fbSort='datum'; fbSortAsc=false;
   closeFahrtForm(); renderFahrtenbuch(); toast('✓ Fahrt gespeichert!','ok');
 }
 
