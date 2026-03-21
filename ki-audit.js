@@ -55,7 +55,6 @@ async function startKiAudit() {
   setP(10,'Daten werden vorbereitet...','Buchhaltungsdaten laden');
 
   const filterY = arr => jahr==='alle' ? arr : arr.filter(e=>(e.datum||'').startsWith(jahr));
-  const realYears = [...new Set((data.eintraege||[]).map(e=>e.datum?.slice(0,4)).filter(Boolean))].sort();
   const r2 = v => Math.round(v*100)/100;
   const auditData = {};
 
@@ -69,10 +68,10 @@ async function startKiAudit() {
       einnahmen: { count: ein.filter(e=>e.typ==='Einnahme').length, summe: r2(einSum) },
       ausgaben:  { count: ein.filter(e=>e.typ==='Ausgabe').length,  summe: r2(ausSum) },
       gewinn: r2(einSum-ausSum),
-      topKategorien: Object.entries(katMap).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>({k,v:r2(v)})),
+      topKategorien: Object.entries(katMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>({kategorie:k,summe:r2(v)})),
       stornos: ein.filter(e=>e.is_storno).length,
       korrekturen: ein.filter(e=>e.korrektur_von).length,
-      ohneBeleg: ein.filter(e=>!e.belegnr).length,
+      einnahmenOhneBeleg: ein.filter(e=>e.typ==='Einnahme'&&!e.belegnr).length,
       grosseOhneNotiz: ein.filter(e=>!e.notiz&&!e.beschreibung&&e.betrag>500).length,
     };
   }
@@ -162,7 +161,38 @@ async function startKiAudit() {
     _auditReset(btn); return;
   }
 
+  // Активные типы и читаемые данные
+  const aktiveTypen = Object.entries(types).filter(([,v])=>v).map(([k])=>k);
+  const realYears = [...new Set((data.eintraege||[]).map(e=>e.datum&&e.datum.slice(0,4)).filter(Boolean))].sort();
+  const _d = [];
+  if(auditData.eintraege){const e=auditData.eintraege;
+    _d.push('EINNAHMEN: Summe='+e.einnahmen.summe+'EUR, Anzahl='+e.einnahmen.count);
+    _d.push('AUSGABEN: Summe='+e.ausgaben.summe+'EUR, Anzahl='+e.ausgaben.count);
+    _d.push('GEWINN: '+e.gewinn+'EUR');
+    _d.push('BELEGE: Einnahmen ohne Belegnummer='+e.einnahmenOhneBeleg+' (Ausgaben haben normal keine Belegnummern!)');
+    _d.push('STORNOS='+e.stornos+' KORREKTUREN='+e.korrekturen);
+    _d.push('TOP-KATEGORIEN: '+(e.topKategorien||[]).map(k=>k.kategorie+'='+k.summe+'EUR').join(', '));
+  }
+  if(auditData.rechnungen){const r=auditData.rechnungen;
+    _d.push('RECHNUNGEN: gesamt='+r.gesamt+', offen='+r.offen+' ('+r.summeOffen+'EUR), ueberfaellig='+r.ueberfaellig+' ('+r.summeUeberfaellig+'EUR)');
+  }
+  if(auditData.ust){const u=auditData.ust;
+    _d.push('UMSATZSTEUER: MwSt='+u.mwstGesamt+'EUR, Vorsteuer='+u.vorsteuerGesamt+'EUR, Zahllast='+u.zahllast+'EUR');
+    _d.push('UST-MODUS pro Jahr: '+(u.ustModi||[]).map(m=>m.jahr+'='+m.modus).join(', '));
+  }
+  if(auditData.wiederkehrend){const w=auditData.wiederkehrend;
+    _d.push('WIEDERKEHREND: gesamt='+w.gesamt+', faellig='+w.faellig+', JahresAusgaben='+w.jahresAusgaben+'EUR');
+  }
+  if(auditData.kunden){const k=auditData.kunden;
+    _d.push('KUNDEN: gesamt='+k.gesamt+', mit_Rechnungen='+k.mitRechnungen+', ohne_Kontakt='+k.ohneKontakt);
+  }
+  if(auditData.fahrtenbuch){const f=auditData.fahrtenbuch;
+    _d.push('FAHRTENBUCH: Fahrten='+f.fahrten+', km_geschaeftlich='+f.kmGeschaeftlich+', steuerlich_absetzbar='+f.steuerlichAbsetzbar+'EUR (0.30EUR/km)');
+  }
+  const _dStr = _d.join('\n');
+
   const typeMap = {
+
     fehler:      'Fehlersuche & Inkonsistenzen (fehlende Belege, Datenlücken, Widersprüche)',
     steuer:      'Steuerliche Risiken (§19 UStG Grenzen, MwSt-Pflichten, fehlende Voranmeldungen)',
     optimierung: 'Optimierungspotenziale (Kostenreduzierung, Effizienz, Rentabilität)',
@@ -172,43 +202,49 @@ async function startKiAudit() {
   };
   const selectedTypes = Object.entries(types).filter(([,v])=>v).map(([k])=>typeMap[k]).join('\n- ');
 
-  // Активные типы анализа
-  const aktiveTypen = [];
-  if(types.fehler)      aktiveTypen.push('Fehler');
-  if(types.steuer)      aktiveTypen.push('Steuer');
-  if(types.optimierung) aktiveTypen.push('Optimierung');
-  if(types.cashflow)    aktiveTypen.push('Cashflow');
-  if(types.compliance)  aktiveTypen.push('GoBD');
-  if(types.benchmark)   aktiveTypen.push('KPIs');
+  const prompt = `Du bist ein erfahrener Wirtschaftsprüfer und Steuerberater in Deutschland mit 20+ Jahren Erfahrung.
 
-  // Данные для Gemini в читаемом формате
-  const _d = [];
-  if(auditData.eintraege){var e=auditData.eintraege;
-    _d.push("EINTRAEGE: Einnahmen="+e.einnahmen.summe+"EUR ("+e.einnahmen.count+"), Ausgaben="+e.ausgaben.summe+"EUR ("+e.ausgaben.count+"), Gewinn="+e.gewinn+"EUR, BelegeFehlend="+e.ohneBeleg+", Stornos="+e.stornos+", Korrekturen="+e.korrekturen);
-    _d.push("TopKategorien: "+(e.topKategorien||[]).map(function(k){return k.k+"="+k.v+"EUR";}).join(", "));
-  }
-  if(auditData.rechnungen){var r=auditData.rechnungen;
-    _d.push("RECHNUNGEN: gesamt="+r.gesamt+", offen="+r.offen+" ("+r.summeOffen+"EUR), ueberfaellig="+r.ueberfaellig+" ("+r.summeUeberfaellig+"EUR), Gesamtvolumen="+r.gesamtVolumen+"EUR");
-  }
-  if(auditData.ust){var u=auditData.ust;
-    _d.push("UMSATZSTEUER: MwSt="+u.mwstGesamt+"EUR, Vorsteuer="+u.vorsteuerGesamt+"EUR, Zahllast="+u.zahllast+"EUR, Modi="+(u.ustModi||[]).map(function(m){return m.jahr+":"+m.modus;}).join(", "));
-  }
-  if(auditData.wiederkehrend){var w=auditData.wiederkehrend;
-    _d.push("WIEDERKEHREND: gesamt="+w.gesamt+", faellig="+w.faellig+", JahresAusgaben="+w.jahresAusgaben+"EUR");
-  }
-  if(auditData.kunden){var k=auditData.kunden;
-    _d.push("KUNDEN: gesamt="+k.gesamt+", mitRechnungen="+k.mitRechnungen+", ohneKontakt="+k.ohneKontakt);
-  }
-  if(auditData.fahrtenbuch){var fb=auditData.fahrtenbuch;
-    _d.push("FAHRTENBUCH: Fahrten="+fb.fahrten+", kmGeschaeftlich="+fb.kmGeschaeftlich+", steuerlichAbsetzbar="+fb.steuerlichAbsetzbar+"EUR");
-  }
+Analysiere diese Buchhaltungsdaten eines deutschen Unternehmers:
 
-  const prompt = 'Steuerberater Deutschland. Buchhaltungsaudit fuer Jahre: ' + realYears.join(', ') + '. Nur vorhandene Daten analysieren, nichts erfinden.\n'
-    + 'Paragraph 19 UStG: bis 2024 Vorjahr max 22000 EUR laufend max 50000 EUR, ab 2025 Vorjahr max 25000 EUR laufend max 100000 EUR. Bezug: Bruttoumsatz, nicht rueckwirkend.\n'
-    + 'Gewuenschte Analyse: ' + aktiveTypen.join(', ') + '\n\n'
-    + _d.join('\n') + '\n\n'
-    + 'Antworte ausschliesslich mit folgendem JSON-Format (keine anderen Texte):\n'
-    + '{"zusammenfassung":{"bewertung":"gut|warnung|kritisch","text":"2-3 Saetze mit konkreten Zahlen aus den Daten","score":0-100,"highlights":["positiver Punkt"]},"bereiche":[{"name":"Bereichsname","icon":"fa-chart-bar","bewertung":"gut|warnung|kritisch","punkte":[{"typ":"ok|warnung|fehler|info","text":"konkreter Befund mit echten Zahlen"}]}],"empfehlungen":[{"prioritaet":"hoch|mittel|niedrig","text":"konkrete Empfehlung"}],"naechste_schritte":["Schritt 1","Schritt 2"]}';
+ZEITRAUM: ${jahr==='alle'?'Alle Jahre':'Jahr '+jahr}
+ANALYSE-SCHWERPUNKTE:
+- ${selectedTypes}
+
+REGELN (ZWINGEND BEACHTEN):
+1. Ausgaben haben KEINE Belegnummern - das ist normal und kein Fehler!
+2. 'einnahmenOhneBeleg'=0 bedeutet alle Einnahmen haben Belegnummern - sehr gut!
+3. Nur Jahre analysieren die in den Daten vorkommen: ${realYears.join(', ')}
+4. §19 UStG: bis 2024 Vorjahr max 22000 EUR laufend max 50000 EUR, ab 2025 Vorjahr max 25000 EUR laufend max 100000 EUR
+5. Keine Daten erfinden oder hochrechnen
+
+BUCHHALTUNGSDATEN:
+${_dStr}
+
+Analyse-Schwerpunkte: ${aktiveTypen.join(', ')}
+
+Antworte NUR mit diesem JSON:
+{
+  "zusammenfassung": {
+    "bewertung": "gut|warnung|kritisch",
+    "text": "3-4 Sätze Gesamtbewertung mit konkreten Zahlen",
+    "score": 0-100,
+    "highlights": ["Positiver Aspekt 1", "Positiver Aspekt 2"]
+  },
+  "bereiche": [
+    {
+      "name": "Bereichsname",
+      "icon": "fa-list",
+      "bewertung": "gut|warnung|kritisch",
+      "punkte": [
+        {"typ": "ok|warnung|fehler|info", "text": "Konkreter Befund mit Zahlen und Empfehlung"}
+      ]
+    }
+  ],
+  "empfehlungen": [
+    {"prioritaet": "hoch|mittel|niedrig", "text": "Konkrete Handlungsempfehlung"}
+  ],
+  "naechste_schritte": ["Sofortige Maßnahme", "Kurzfristig", "Mittelfristig"]
+}`;
 
   setP(55,'Google Gemini analysiert Ihre Daten...','KI-Verarbeitung');
 
@@ -220,7 +256,7 @@ async function startKiAudit() {
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
           contents:[{parts:[{text:prompt}]}],
-          generationConfig:{ temperature:0.1, maxOutputTokens:3000 }
+          generationConfig:{ temperature:0.2, maxOutputTokens:8192, responseMimeType:'application/json' }
         })
       }
     );
