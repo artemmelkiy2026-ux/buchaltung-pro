@@ -142,8 +142,18 @@ async function startKiAudit() {
   // Gemini Key laden
   let apiKey = null;
   try {
-    const { data: kd, error } = await sb.functions.invoke('get-gemini-key');
-    if (!error && kd?.key) apiKey = kd.key;
+    const resp = await fetch(SUPA_URL + '/functions/v1/get-gemini-key', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SUPA_KEY
+      },
+      body: '{}'
+    });
+    if (resp.ok) {
+      const kd = await resp.json();
+      if (kd?.key) apiKey = kd.key;
+    }
   } catch(e) {}
 
   if (!apiKey) {
