@@ -31,7 +31,7 @@ function showWiedDetail(id) {
     title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
     rows: [
       { key: 'Bezeichnung', val: w.bezeichnung || '—' },
-      { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:22px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(w.betrag)}</span>` },
+      { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(w.betrag)}</span>` },
       { key: 'Intervall',   val: intervallLabel[w.intervall] || w.intervall || '—' },
       { key: 'Kategorie',   val: w.kategorie || '—' },
       { key: 'Zahlungsart', val: `<span class="badge ${ZBADGE[w.zahlungsart]||''}">${w.zahlungsart||'—'}</span>` },
