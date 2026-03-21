@@ -1577,7 +1577,7 @@ function showEintragDetail(id) {
   showDetailSheet({
     title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
     rows: [
-      { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:22px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(e.betrag)}</span>` },
+      { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(e.betrag)}</span>` },
       { key: 'Datum',       val: fd(e.datum) },
       { key: 'Kategorie',   val: e.kategorie||'—' },
       { key: 'Beschreibung',val: e.beschreibung||'—' },
