@@ -1,7 +1,8 @@
-// ── KI-AUDIT ─────────────────────────────────────────────────────────────
+// ── KI-AUDIT mit Google Gemini API ────────────────────────────────────────
+
+const GEMINI_MODEL = 'gemini-2.0-flash';
 
 function initKiAudit() {
-  // Jahresfilter befüllen
   const sel = document.getElementById('audit-jahr');
   if (!sel) return;
   const years = [...new Set((data.eintraege||[]).map(e=>e.datum?.substring(0,4)).filter(Boolean))].sort().reverse();
@@ -10,14 +11,13 @@ function initKiAudit() {
 }
 
 async function startKiAudit() {
-  const btn = document.getElementById('audit-start-btn');
-  const progress = document.getElementById('audit-progress');
-  const result = document.getElementById('audit-result');
-  const progressBar = document.getElementById('audit-progress-bar');
+  const btn          = document.getElementById('audit-start-btn');
+  const progress     = document.getElementById('audit-progress');
+  const result       = document.getElementById('audit-result');
+  const progressBar  = document.getElementById('audit-progress-bar');
   const progressText = document.getElementById('audit-progress-text');
   const progressStep = document.getElementById('audit-progress-step');
 
-  // Welche Bereiche sind ausgewählt?
   const checks = {
     eintraege:    document.getElementById('ac-eintraege')?.checked,
     rechnungen:   document.getElementById('ac-rechnungen')?.checked,
@@ -27,92 +27,97 @@ async function startKiAudit() {
     fahrtenbuch:  document.getElementById('ac-fahrtenbuch')?.checked,
   };
 
-  if (!Object.values(checks).some(Boolean)) {
-    return toast('Bitte mindestens einen Bereich auswählen!', 'err');
-  }
+  const types = {
+    fehler:      document.getElementById('at-fehler')?.checked,
+    steuer:      document.getElementById('at-steuer')?.checked,
+    optimierung: document.getElementById('at-optimierung')?.checked,
+    cashflow:    document.getElementById('at-cashflow')?.checked,
+    compliance:  document.getElementById('at-compliance')?.checked,
+    benchmark:   document.getElementById('at-benchmark')?.checked,
+  };
+
+  if (!Object.values(checks).some(Boolean)) return toast('Bitte mindestens einen Bereich auswählen!','err');
+  if (!Object.values(types).some(Boolean))  return toast('Bitte mindestens eine Analyse-Art auswählen!','err');
 
   const jahr = document.getElementById('audit-jahr')?.value || 'alle';
 
-  // UI — Start
-  btn.disabled = true;
-  btn.style.opacity = '.6';
+  btn.disabled = true; btn.style.opacity = '.6';
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse läuft...';
   progress.style.display = 'block';
-  result.style.display = 'none';
-  result.innerHTML = '';
+  result.style.display = 'none'; result.innerHTML = '';
 
-  // Daten zusammenstellen
-  const setProgress = (pct, text, step='') => {
-    progressBar.style.width = pct + '%';
+  const setP = (pct, text, step='') => {
+    progressBar.style.width = pct+'%';
     progressText.textContent = text;
     progressStep.textContent = step;
   };
 
-  setProgress(10, 'Daten werden vorbereitet...', 'Buchhaltungsdaten laden');
+  setP(10,'Daten werden vorbereitet...','Buchhaltungsdaten laden');
 
-  const filterByYear = (arr, field='datum') =>
-    jahr === 'alle' ? arr : arr.filter(e => (e[field]||'').startsWith(jahr));
-
+  const filterY = arr => jahr==='alle' ? arr : arr.filter(e=>(e.datum||'').startsWith(jahr));
+  const r2 = v => Math.round(v*100)/100;
   const auditData = {};
 
   if (checks.eintraege) {
-    const ein = filterByYear(data.eintraege||[]);
-    const einnahmen = ein.filter(e=>e.typ==='Einnahme');
-    const ausgaben  = ein.filter(e=>e.typ==='Ausgabe');
+    const ein = filterY(data.eintraege||[]);
+    const einSum = ein.filter(e=>e.typ==='Einnahme').reduce((s,e)=>s+e.betrag,0);
+    const ausSum = ein.filter(e=>e.typ==='Ausgabe').reduce((s,e)=>s+e.betrag,0);
+    const katMap = {}; ein.forEach(e=>{ katMap[e.kategorie]=(katMap[e.kategorie]||0)+e.betrag; });
     auditData.eintraege = {
       gesamt: ein.length,
-      einnahmen: { count: einnahmen.length, summe: einnahmen.reduce((s,e)=>s+e.betrag,0) },
-      ausgaben:  { count: ausgaben.length,  summe: ausgaben.reduce((s,e)=>s+e.betrag,0) },
-      gewinn: einnahmen.reduce((s,e)=>s+e.betrag,0) - ausgaben.reduce((s,e)=>s+e.betrag,0),
-      kategorien: [...new Set(ein.map(e=>e.kategorie))],
-      zahlungsarten: [...new Set(ein.map(e=>e.zahlungsart))],
+      einnahmen: { count: ein.filter(e=>e.typ==='Einnahme').length, summe: r2(einSum) },
+      ausgaben:  { count: ein.filter(e=>e.typ==='Ausgabe').length,  summe: r2(ausSum) },
+      gewinn: r2(einSum-ausSum),
+      topKategorien: Object.entries(katMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>({kategorie:k,summe:r2(v)})),
       stornos: ein.filter(e=>e.is_storno).length,
-      ohneBeleg: ein.filter(e=>!e.belegnr).length,
       korrekturen: ein.filter(e=>e.korrektur_von).length,
+      ohneBeleg: ein.filter(e=>!e.belegnr).length,
+      grosseOhneNotiz: ein.filter(e=>!e.notiz&&e.betrag>500).length,
     };
   }
 
   if (checks.rechnungen) {
-    const rech = filterByYear(data.rechnungen||[]);
+    const rech = filterY(data.rechnungen||[]);
+    const today = new Date().toISOString().split('T')[0];
+    const uebf = rech.filter(r=>r.status==='ueberfaellig'||(r.status==='offen'&&r.faellig&&r.faellig<today));
     auditData.rechnungen = {
       gesamt: rech.length,
-      offen:       rech.filter(r=>r.status==='offen').length,
-      bezahlt:     rech.filter(r=>r.status==='bezahlt').length,
-      ueberfaellig:rech.filter(r=>r.status==='ueberfaellig').length,
-      summeOffen:  rech.filter(r=>r.status==='offen').reduce((s,r)=>s+r.betrag,0),
-      gesamtVolumen: rech.reduce((s,r)=>s+r.betrag,0),
+      offen: rech.filter(r=>r.status==='offen').length,
+      bezahlt: rech.filter(r=>r.status==='bezahlt').length,
+      ueberfaellig: uebf.length,
+      summeOffen: r2(rech.filter(r=>r.status==='offen').reduce((s,r)=>s+r.betrag,0)),
+      summeUeberfaellig: r2(uebf.reduce((s,r)=>s+r.betrag,0)),
+      gesamtVolumen: r2(rech.reduce((s,r)=>s+r.betrag,0)),
     };
   }
 
   if (checks.ust) {
-    const ustE = filterByYear(data.ustEintraege||[]);
     const mwst = (data.eintraege||[]).filter(e=>e.mwstBetrag>0);
     const vost = (data.eintraege||[]).filter(e=>e.vorsteuerBet>0);
+    const mwstS = r2(mwst.reduce((s,e)=>s+(e.mwstBetrag||0),0));
+    const vostS = r2(vost.reduce((s,e)=>s+(e.vorsteuerBet||0),0));
     auditData.ust = {
-      mwstBuchungen: mwst.length,
-      mwstGesamt:    mwst.reduce((s,e)=>s+(e.mwstBetrag||0),0),
-      vorsteuerGesamt: vost.reduce((s,e)=>s+(e.vorsteuerBet||0),0),
-      zahllast: mwst.reduce((s,e)=>s+(e.mwstBetrag||0),0) - vost.reduce((s,e)=>s+(e.vorsteuerBet||0),0),
-      manuelleEintraege: ustE.length,
-      ustJahre: [...new Set(Object.keys(data.ustMode||{}))],
+      mwstBuchungen: mwst.length, mwstGesamt: mwstS,
+      vorsteuerGesamt: vostS, zahllast: r2(mwstS-vostS),
+      ustModi: Object.entries(data.ustMode||{}).map(([y,m])=>({jahr:y,modus:m})),
     };
   }
 
   if (checks.wiederkehrend) {
     const wied = data.wiederkehrend||[];
     const today = new Date().toISOString().split('T')[0];
+    const mult = {woechentlich:52,monatlich:12,quartalsweise:4,halbjaehrlich:2,jaehrlich:1};
     auditData.wiederkehrend = {
       gesamt: wied.length,
       faellig: wied.filter(w=>w.naechste<=today&&w.status!=='paused').length,
       pausiert: wied.filter(w=>w.status==='paused').length,
-      einnahmen: wied.filter(w=>w.typ==='Einnahme').reduce((s,w)=>s+w.betrag,0),
-      ausgaben:  wied.filter(w=>w.typ==='Ausgabe').reduce((s,w)=>s+w.betrag,0),
+      jahresAusgaben: r2(wied.filter(w=>w.typ==='Ausgabe').reduce((s,w)=>s+w.betrag*(mult[w.intervall]||1),0)),
+      jahresEinnahmen: r2(wied.filter(w=>w.typ==='Einnahme').reduce((s,w)=>s+w.betrag*(mult[w.intervall]||1),0)),
     };
   }
 
   if (checks.kunden) {
-    const k = data.kunden||[];
-    const r = data.rechnungen||[];
+    const k = data.kunden||[]; const r = data.rechnungen||[];
     auditData.kunden = {
       gesamt: k.length,
       mitRechnungen: k.filter(c=>r.some(re=>re.kundeId===c.id||re.kunde===c.name)).length,
@@ -121,39 +126,67 @@ async function startKiAudit() {
   }
 
   if (checks.fahrtenbuch) {
-    const fb = filterByYear(data.fahrtenbuch||[]);
+    const fb = filterY(data.fahrtenbuch||[]);
+    const kmGsch = fb.filter(f=>f.typ==='Geschäftlich').reduce((s,f)=>s+(f.km||0),0);
     auditData.fahrtenbuch = {
       fahrten: fb.length,
-      kmGesamt: fb.reduce((s,f)=>s+(f.km||0),0),
-      kmGeschaeftlich: fb.filter(f=>f.typ==='Geschäftlich').reduce((s,f)=>s+(f.km||0),0),
-      fahrzeuge: [...new Set(fb.map(f=>f.autoId).filter(Boolean))].length,
+      kmGesamt: r2(fb.reduce((s,f)=>s+(f.km||0),0)),
+      kmGeschaeftlich: r2(kmGsch),
+      steuerlichAbsetzbar: r2(kmGsch*0.30),
       hinZurueck: fb.filter(f=>f.hinZurueck).length,
     };
   }
 
-  setProgress(30, 'KI-Analyse wird vorbereitet...', 'Daten an KI übermitteln');
+  setP(35,'KI-Verbindung wird aufgebaut...','Google Gemini API');
 
-  // Prompt für Claude
-  const bereicheListe = Object.entries(checks).filter(([,v])=>v).map(([k])=>({
-    eintraege:'Einträge & Buchungen', rechnungen:'Rechnungen',
-    ust:'Umsatzsteuer', wiederkehrend:'Wiederkehrende Zahlungen',
-    kunden:'Kunden (CRM)', fahrtenbuch:'Fahrtenbuch'
-  }[k])).join(', ');
+  // Gemini Key laden
+  let apiKey = null;
+  try {
+    const { data: kd, error } = await sb.functions.invoke('get-gemini-key');
+    if (!error && kd?.key) apiKey = kd.key;
+  } catch(e) {}
 
-  const prompt = `Du bist ein erfahrener Steuerberater und Buchhalter in Deutschland. 
-Analysiere die folgenden Buchhaltungsdaten eines deutschen Kleinunternehmers und erstelle einen detaillierten Audit-Bericht.
-Zeitraum: ${jahr === 'alle' ? 'Alle verfügbaren Jahre' : 'Jahr ' + jahr}
-Analysierte Bereiche: ${bereicheListe}
+  if (!apiKey) {
+    _auditErr('Google Gemini API Key nicht gefunden. Bitte Supabase Edge Function "get-gemini-key" einrichten (return { key: "DEIN_GEMINI_KEY" }).');
+    _auditReset(btn); return;
+  }
+
+  const typeMap = {
+    fehler:      'Fehlersuche & Inkonsistenzen (fehlende Belege, Datenlücken, Widersprüche)',
+    steuer:      'Steuerliche Risiken (§19 UStG Grenzen, MwSt-Pflichten, fehlende Voranmeldungen)',
+    optimierung: 'Optimierungspotenziale (Kostenreduzierung, Effizienz, Rentabilität)',
+    cashflow:    'Cashflow & Liquiditätsanalyse (Zahlungsströme, Forderungen, Engpässe)',
+    compliance:  'GoBD-Compliance (§146/§147 AO, Belegpflicht, Aufbewahrung)',
+    benchmark:   'Branchenvergleich & KPIs (Kennzahlen, Margen, Performance-Indikatoren)',
+  };
+  const selectedTypes = Object.entries(types).filter(([,v])=>v).map(([k])=>typeMap[k]).join('\n- ');
+
+  const prompt = `Du bist ein erfahrener Wirtschaftsprüfer und Steuerberater in Deutschland mit 20+ Jahren Erfahrung.
+
+Analysiere diese Buchhaltungsdaten eines deutschen Unternehmers:
+
+ZEITRAUM: ${jahr==='alle'?'Alle Jahre':'Jahr '+jahr}
+ANALYSE-SCHWERPUNKTE:
+- ${selectedTypes}
 
 BUCHHALTUNGSDATEN:
 ${JSON.stringify(auditData, null, 2)}
 
-Erstelle einen strukturierten Audit-Bericht als JSON mit folgender Struktur:
+Erstelle einen professionellen Audit-Bericht. Prüfe konkret:
+${types.fehler?'- Fehlende Belegnummern bei Buchungen, Stornos, Inkonsistenzen':''}
+${types.steuer?'- §19 UStG Kleinunternehmergrenze (22.000€ Vorjahr / 50.000€ laufend), MwSt-Zahllast, Vorsteuer':''}
+${types.optimierung?'- Kostentreiber, ineffiziente Kategorien, Einsparpotenziale':''}
+${types.cashflow?'- Überfällige Rechnungen, Liquiditätsengpässe, Zahlungsmuster':''}
+${types.compliance?'- GoBD-konforme Buchführung, Belegpflicht, Aufbewahrungsfristen':''}
+${types.benchmark?'- Gewinnmarge, Kostenquote, Forderungsquote, branchenübliche Werte':''}
+
+Antworte NUR mit diesem JSON:
 {
   "zusammenfassung": {
     "bewertung": "gut|warnung|kritisch",
-    "text": "Kurze Gesamtbewertung 2-3 Sätze",
-    "score": 85
+    "text": "3-4 Sätze Gesamtbewertung mit konkreten Zahlen",
+    "score": 0-100,
+    "highlights": ["Positiver Aspekt 1", "Positiver Aspekt 2"]
   },
   "bereiche": [
     {
@@ -161,151 +194,147 @@ Erstelle einen strukturierten Audit-Bericht als JSON mit folgender Struktur:
       "icon": "fa-list",
       "bewertung": "gut|warnung|kritisch",
       "punkte": [
-        {"typ": "ok|warnung|fehler|info", "text": "Befund mit konkreten Zahlen und Empfehlung"}
+        {"typ": "ok|warnung|fehler|info", "text": "Konkreter Befund mit Zahlen und Empfehlung"}
       ]
     }
   ],
-  "empfehlungen": ["Konkrete Handlungsempfehlung 1", "Empfehlung 2"]
-}
+  "empfehlungen": [
+    {"prioritaet": "hoch|mittel|niedrig", "text": "Konkrete Handlungsempfehlung"}
+  ],
+  "naechste_schritte": ["Sofortige Maßnahme", "Kurzfristig", "Mittelfristig"]
+}`;
 
-Wichtig:
-- Bewertung "gut" = alles in Ordnung (grün)
-- Bewertung "warnung" = Verbesserungsbedarf (gelb)  
-- Bewertung "kritisch" = dringender Handlungsbedarf (rot)
-- Gib konkrete Zahlen aus den Daten an
-- Prüfe auf steuerliche Risiken (§19 UStG Grenze 25.000€, fehlende Belegnummern, überfällige Rechnungen etc.)
-- Antworte NUR mit dem JSON-Objekt, kein Text davor oder danach`;
-
-  setProgress(50, 'KI analysiert Ihre Daten...', 'Claude KI wird befragt');
+  setP(55,'Google Gemini analysiert Ihre Daten...','KI-Verarbeitung');
 
   try {
-    // Direkt Anthropic API aufrufen
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
+      {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          contents:[{parts:[{text:prompt}]}],
+          generationConfig:{ temperature:0.2, maxOutputTokens:8192, responseMimeType:'application/json' }
+        })
+      }
+    );
 
-    setProgress(80, 'Ergebnisse werden aufbereitet...', 'Bericht wird erstellt');
+    setP(80,'Ergebnisse werden aufbereitet...','Bericht erstellen');
 
-    if (!response.ok) throw new Error('API Fehler: ' + response.status);
-
-    const apiData = await response.json();
-    const rawText = apiData.content?.[0]?.text || '';
-
-    // JSON parsen
-    let audit;
-    try {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      audit = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
-    } catch(e) {
-      throw new Error('Antwort konnte nicht verarbeitet werden');
+    if (!resp.ok) {
+      const ed = await resp.json().catch(()=>({}));
+      throw new Error(ed?.error?.message || 'Gemini API Fehler '+resp.status);
     }
 
-    setProgress(100, 'Audit abgeschlossen!', '');
+    const apiData = await resp.json();
+    const raw = apiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let audit;
+    try { audit = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] || raw); }
+    catch(e) { throw new Error('JSON-Verarbeitung fehlgeschlagen'); }
 
+    setP(100,'Audit abgeschlossen! ✓','');
     setTimeout(() => {
       progress.style.display = 'none';
-      _renderAuditResult(audit);
+      _renderAudit(audit);
       result.style.display = 'block';
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.innerHTML = '<i class="fas fa-robot"></i> Neuen Audit starten';
-    }, 500);
+      _auditReset(btn);
+    }, 400);
 
   } catch(err) {
     progress.style.display = 'none';
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.innerHTML = '<i class="fas fa-robot"></i> KI-Audit starten';
-    result.style.display = 'block';
-    result.innerHTML = `<div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r2);padding:20px;color:var(--red)">
-      <i class="fas fa-exclamation-triangle"></i> Fehler: ${err.message}
-    </div>`;
-    toast('Audit fehlgeschlagen: ' + err.message, 'err');
+    _auditErr(err.message);
+    _auditReset(btn);
+    toast('Audit fehlgeschlagen: '+err.message,'err');
   }
 }
 
-function _renderAuditResult(audit) {
+function _auditReset(btn) {
+  btn.disabled=false; btn.style.opacity='1';
+  btn.innerHTML='<i class="fas fa-robot"></i> KI-Audit starten';
+}
+
+function _auditErr(msg) {
+  const r = document.getElementById('audit-result');
+  r.style.display='block';
+  r.innerHTML=`<div style="background:var(--rdim);border:1px solid var(--red);border-radius:var(--r2);padding:20px;color:var(--red)">
+    <i class="fas fa-exclamation-triangle"></i> <strong>Fehler:</strong> ${msg}
+  </div>`;
+}
+
+function _renderAudit(audit) {
   const result = document.getElementById('audit-result');
-  const zus = audit.zusammenfassung || {};
-  const score = zus.score || 0;
-  const scoreColor = score >= 80 ? '#22c55e' : score >= 60 ? '#e08c1a' : '#ef4444';
+  const zus = audit.zusammenfassung||{};
+  const score = zus.score||0;
+  const sc = score>=80?'#22c55e':score>=60?'#e08c1a':'#ef4444';
+  const bg = score>=80?'linear-gradient(135deg,#16a34a,#22c55e)':score>=60?'linear-gradient(135deg,#b45309,#e08c1a)':'linear-gradient(135deg,#dc2626,#ef4444)';
 
-  const ratingLabel = { gut:'✓ Gut', warnung:'⚠ Warnung', kritisch:'✗ Kritisch' };
-  const ratingClass = { gut:'audit-rating-ok', warnung:'audit-rating-warn', kritisch:'audit-rating-err' };
-  const itemIcon = { ok:'✓', warnung:'⚠', fehler:'✗', info:'ℹ' };
-  const itemColor = { ok:'var(--green)', warnung:'var(--yellow)', fehler:'var(--red)', info:'var(--blue)' };
+  const rLbl={gut:'✓ Gut',warnung:'⚠ Warnung',kritisch:'✗ Kritisch'};
+  const rCls={gut:'audit-rating-ok',warnung:'audit-rating-warn',kritisch:'audit-rating-err'};
+  const iIco={ok:'✓',warnung:'⚠',fehler:'✗',info:'ℹ'};
+  const iCol={ok:'var(--green)',warnung:'var(--yellow)',fehler:'var(--red)',info:'var(--blue)'};
+  const pCol={hoch:'var(--red)',mittel:'var(--yellow)',niedrig:'var(--green)'};
 
-  const bereicheHtml = (audit.bereiche||[]).map(b => `
+  const highlights = (zus.highlights||[]).map(h=>`<span style="background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px;font-size:12px">${h}</span>`).join('');
+
+  const bereiche = (audit.bereiche||[]).map(b=>`
     <div class="audit-section">
       <div class="audit-section-header">
         <div class="audit-section-icon" style="background:${b.bewertung==='gut'?'rgba(34,197,94,.12)':b.bewertung==='warnung'?'rgba(224,140,26,.12)':'rgba(239,68,68,.12)'};color:${b.bewertung==='gut'?'var(--green)':b.bewertung==='warnung'?'var(--yellow)':'var(--red)'}">
-          <i class="fas ${b.icon||'fa-chart-bar'}"></i>
-        </div>
+          <i class="fas ${b.icon||'fa-chart-bar'}"></i></div>
         <div class="audit-section-title">${b.name}</div>
-        <span class="audit-rating ${ratingClass[b.bewertung]||'audit-rating-ok'}">${ratingLabel[b.bewertung]||b.bewertung}</span>
+        <span class="audit-rating ${rCls[b.bewertung]||'audit-rating-ok'}">${rLbl[b.bewertung]||b.bewertung}</span>
       </div>
       <div class="audit-section-body">
-        ${(b.punkte||[]).map(p=>`
-          <div class="audit-item">
-            <span class="audit-item-icon" style="color:${itemColor[p.typ]||'var(--sub)'}">
-              ${itemIcon[p.typ]||'•'}
-            </span>
-            <span class="audit-item-text">${p.text}</span>
-          </div>`).join('')}
-      </div>
-    </div>`).join('');
+        ${(b.punkte||[]).map(p=>`<div class="audit-item">
+          <span class="audit-item-icon" style="color:${iCol[p.typ]||'var(--sub)'}">${iIco[p.typ]||'•'}</span>
+          <span class="audit-item-text">${p.text}</span></div>`).join('')}
+      </div></div>`).join('');
 
-  const empfehlungenHtml = (audit.empfehlungen||[]).length ? `
+  const empf = (audit.empfehlungen||[]).length ? `
     <div class="audit-section">
       <div class="audit-section-header">
-        <div class="audit-section-icon" style="background:rgba(26,69,120,.1);color:var(--blue)">
-          <i class="fas fa-lightbulb"></i>
-        </div>
-        <div class="audit-section-title">Empfehlungen</div>
+        <div class="audit-section-icon" style="background:rgba(26,69,120,.1);color:var(--blue)"><i class="fas fa-lightbulb"></i></div>
+        <div class="audit-section-title">Handlungsempfehlungen</div>
       </div>
       <div class="audit-section-body">
-        ${(audit.empfehlungen||[]).map((e,i)=>`
-          <div class="audit-item">
-            <span class="audit-item-icon" style="color:var(--blue);font-weight:700">${i+1}.</span>
-            <span class="audit-item-text">${e}</span>
-          </div>`).join('')}
+        ${(audit.empfehlungen||[]).map(e=>{
+          const p=typeof e==='object'?e.prioritaet:'mittel', t=typeof e==='object'?e.text:e;
+          return `<div class="audit-item">
+            <span class="audit-item-icon" style="color:${pCol[p]||'var(--blue)'}"><i class="fas fa-arrow-right" style="font-size:10px"></i></span>
+            <span class="audit-item-text"><strong style="color:${pCol[p]||'var(--sub)'}; text-transform:uppercase;font-size:9px;margin-right:5px">${p||''}</strong>${t}</span></div>`;
+        }).join('')}
+      </div></div>` : '';
+
+  const steps = (audit.naechste_schritte||[]).length ? `
+    <div class="audit-section">
+      <div class="audit-section-header">
+        <div class="audit-section-icon" style="background:rgba(93,157,105,.12);color:var(--green)"><i class="fas fa-tasks"></i></div>
+        <div class="audit-section-title">Nächste Schritte</div>
       </div>
-    </div>` : '';
+      <div class="audit-section-body">
+        ${(audit.naechste_schritte||[]).map((s,i)=>`<div class="audit-item">
+          <span class="audit-item-icon" style="color:var(--blue);font-weight:700">${i+1}.</span>
+          <span class="audit-item-text">${s}</span></div>`).join('')}
+      </div></div>` : '';
 
   result.innerHTML = `
-    <!-- Zusammenfassung -->
-    <div class="audit-summary" style="margin-bottom:12px">
+    <div class="audit-summary" style="background:${bg};margin-bottom:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:700">
-          <i class="fas fa-robot" style="margin-right:8px;opacity:.8"></i>KI-Audit Ergebnis
-        </div>
+        <div style="font-size:16px;font-weight:700;color:#fff"><i class="fas fa-robot" style="margin-right:8px"></i>KI-Audit Ergebnis</div>
         <div style="text-align:right">
-          <div style="font-size:36px;font-weight:800;line-height:1;color:${scoreColor}">${score}</div>
-          <div style="font-size:11px;opacity:.7">von 100 Punkten</div>
+          <div style="font-size:42px;font-weight:800;line-height:1;color:#fff">${score}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.8)">von 100 Punkten</div>
         </div>
       </div>
-      <div style="font-size:14px;line-height:1.6;opacity:.9">${zus.text||''}</div>
-      <div style="margin-top:10px;height:6px;background:rgba(255,255,255,.2);border-radius:3px">
-        <div style="height:100%;width:${score}%;background:${scoreColor};border-radius:3px;transition:width .8s ease"></div>
+      <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.95)">${zus.text||''}</div>
+      <div style="margin-top:12px;height:6px;background:rgba(255,255,255,.2);border-radius:3px">
+        <div style="height:100%;width:${score}%;background:#fff;border-radius:3px;opacity:.9"></div>
       </div>
+      ${highlights?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${highlights}</div>`:''}
     </div>
-
-    ${bereicheHtml}
-    ${empfehlungenHtml}
-
+    ${bereiche}${empf}${steps}
     <div style="text-align:center;padding:12px;font-size:11px;color:var(--sub)">
-      <i class="fas fa-info-circle"></i> Dieser Bericht wurde von einer KI erstellt und ersetzt keine professionelle Steuerberatung (§ 3 StBerG).
+      <i class="fas fa-robot"></i> Analyse durch Google Gemini KI ·
+      <i class="fas fa-info-circle"></i> Ersetzt keine professionelle Steuerberatung (§ 3 StBerG)
     </div>`;
-
-  // Score Animation
-  setTimeout(() => {
-    const bar = result.querySelector('.audit-summary div[style*="width:' + score + '%"]');
-    if (bar) bar.style.width = score + '%';
-  }, 100);
 }

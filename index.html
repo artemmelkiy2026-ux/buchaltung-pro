@@ -2061,6 +2061,39 @@
       </label>
     </div>
 
+    <!-- Audit-Typ -->
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">
+        <i class="fas fa-tasks" style="color:var(--blue);margin-right:8px"></i>Art der Analyse
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="audit-types">
+        <label class="audit-check-item">
+          <input type="checkbox" id="at-fehler" checked>
+          <span><i class="fas fa-bug"></i> Fehlersuche &amp; Inkonsistenzen</span>
+        </label>
+        <label class="audit-check-item">
+          <input type="checkbox" id="at-steuer" checked>
+          <span><i class="fas fa-exclamation-triangle"></i> Steuerliche Risiken</span>
+        </label>
+        <label class="audit-check-item">
+          <input type="checkbox" id="at-optimierung" checked>
+          <span><i class="fas fa-chart-line"></i> Optimierungspotenziale</span>
+        </label>
+        <label class="audit-check-item">
+          <input type="checkbox" id="at-cashflow">
+          <span><i class="fas fa-money-bill-wave"></i> Cashflow &amp; Liquidität</span>
+        </label>
+        <label class="audit-check-item">
+          <input type="checkbox" id="at-compliance">
+          <span><i class="fas fa-shield-alt"></i> GoBD-Compliance</span>
+        </label>
+        <label class="audit-check-item">
+          <input type="checkbox" id="at-benchmark">
+          <span><i class="fas fa-balance-scale"></i> Branchenvergleich &amp; KPIs</span>
+        </label>
+      </div>
+    </div>
+
     <!-- Jahr -->
     <div style="display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
       <span style="font-size:13px;font-weight:600;color:var(--text)">Zeitraum:</span>
