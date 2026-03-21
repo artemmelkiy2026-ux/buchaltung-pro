@@ -236,7 +236,7 @@ function showProduktDetail(id) {
   showDetailSheet({
     title: `<i class="fas fa-box" style="color:var(--blue);margin-right:8px"></i>${p.name}`,
     rows: [
-      { key: 'VK-Preis (Brutto)', val: `<span style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">${fmt(p.vkBrutto||0)}</span>` },
+      { key: 'VK-Preis (Brutto)', val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmt(p.vkBrutto||0)}</span>` },
       { key: 'VK-Preis (Netto)', val: fmt(p.vkNetto||0) },
       ...(p.ekBrutto ? [{ key: 'EK-Preis', val: fmt(p.ekBrutto) }] : []),
       { key: 'Kategorie', val: p.kategorie||'—' },
