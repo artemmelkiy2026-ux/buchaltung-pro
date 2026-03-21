@@ -181,21 +181,34 @@ async function startKiAudit() {
   if(types.compliance)  aktiveTypen.push('GoBD');
   if(types.benchmark)   aktiveTypen.push('KPIs');
 
-  // Компактная сводка для Gemini
+  // Данные для Gemini в читаемом формате
   const _d = [];
-  if(auditData.eintraege){const e=auditData.eintraege;_d.push("Ein:"+e.einnahmen.count+"x"+e.einnahmen.summe+"€ Aus:"+e.ausgaben.count+"x"+e.ausgaben.summe+"€ Gew:"+e.gewinn+"€ Bel:"+e.ohneBeleg+"f St:"+e.stornos+" Ko:"+e.korrekturen+" Top:"+((e.topKategorien||[]).map(k=>k.k+":"+k.v).join("|")));}
-  if(auditData.rechnungen){const r=auditData.rechnungen;_d.push("Rech:"+r.gesamt+"/"+r.offen+"off/"+r.ueberfaellig+"übf Off:"+r.summeOffen+"€ Übf:"+r.summeUeberfaellig+"€");}
-  if(auditData.ust){const u=auditData.ust;_d.push("MwSt:"+u.mwstGesamt+"€ VSt:"+u.vorsteuerGesamt+"€ ZL:"+u.zahllast+"€ Modi:"+((u.ustModi||[]).map(m=>m.jahr+":"+m.modus).join("|")));}
-  if(auditData.wiederkehrend){const w=auditData.wiederkehrend;_d.push("Wied:"+w.gesamt+"/"+w.faellig+"f JA:"+w.jahresAusgaben+"€");}
-  if(auditData.kunden){const k=auditData.kunden;_d.push("Kund:"+k.gesamt+"/"+k.mitRechnungen+"R/"+k.ohneKontakt+"ok");}
-  if(auditData.fahrtenbuch){const f=auditData.fahrtenbuch;_d.push("Fahr:"+f.fahrten+" km:"+f.kmGeschaeftlich+"gesch Abs:"+f.steuerlichAbsetzbar+"€");}
+  if(auditData.eintraege){var e=auditData.eintraege;
+    _d.push("EINTRAEGE: Einnahmen="+e.einnahmen.summe+"EUR ("+e.einnahmen.count+"), Ausgaben="+e.ausgaben.summe+"EUR ("+e.ausgaben.count+"), Gewinn="+e.gewinn+"EUR, BelegeFehlend="+e.ohneBeleg+", Stornos="+e.stornos+", Korrekturen="+e.korrekturen);
+    _d.push("TopKategorien: "+(e.topKategorien||[]).map(function(k){return k.k+"="+k.v+"EUR";}).join(", "));
+  }
+  if(auditData.rechnungen){var r=auditData.rechnungen;
+    _d.push("RECHNUNGEN: gesamt="+r.gesamt+", offen="+r.offen+" ("+r.summeOffen+"EUR), ueberfaellig="+r.ueberfaellig+" ("+r.summeUeberfaellig+"EUR), Gesamtvolumen="+r.gesamtVolumen+"EUR");
+  }
+  if(auditData.ust){var u=auditData.ust;
+    _d.push("UMSATZSTEUER: MwSt="+u.mwstGesamt+"EUR, Vorsteuer="+u.vorsteuerGesamt+"EUR, Zahllast="+u.zahllast+"EUR, Modi="+(u.ustModi||[]).map(function(m){return m.jahr+":"+m.modus;}).join(", "));
+  }
+  if(auditData.wiederkehrend){var w=auditData.wiederkehrend;
+    _d.push("WIEDERKEHREND: gesamt="+w.gesamt+", faellig="+w.faellig+", JahresAusgaben="+w.jahresAusgaben+"EUR");
+  }
+  if(auditData.kunden){var k=auditData.kunden;
+    _d.push("KUNDEN: gesamt="+k.gesamt+", mitRechnungen="+k.mitRechnungen+", ohneKontakt="+k.ohneKontakt);
+  }
+  if(auditData.fahrtenbuch){var fb=auditData.fahrtenbuch;
+    _d.push("FAHRTENBUCH: Fahrten="+fb.fahrten+", kmGeschaeftlich="+fb.kmGeschaeftlich+", steuerlichAbsetzbar="+fb.steuerlichAbsetzbar+"EUR");
+  }
 
-  const prompt = `Buchhaltungsaudit DE. Jahre:${realYears.join(",")}. Nur vorhandene Daten.
-§19: bis2024(Vj≤22000,lfd≤50000) ab2025(Vj≤25000,lfd≤100000) Brutto.
-Analyse:${aktiveTypen.join(",")}
-${_d.join("\n")}
-Antwort nur JSON:
-{"zusammenfassung":{"bewertung":"gut|warnung|kritisch","text":"2Sätze+€","score":0-100,"highlights":["+"]},"bereiche":[{"name":"x","icon":"fa-chart-bar","bewertung":"g|w|k","punkte":[{"typ":"ok|warnung|fehler|info","text":"Befund+€"}]}],"empfehlungen":[{"prioritaet":"hoch|mittel|niedrig","text":"x"}],"naechste_schritte":["x"]}`;
+  const prompt = 'Steuerberater Deutschland. Buchhaltungsaudit fuer Jahre: ' + realYears.join(', ') + '. Nur vorhandene Daten analysieren, nichts erfinden.\n'
+    + 'Paragraph 19 UStG: bis 2024 Vorjahr max 22000 EUR laufend max 50000 EUR, ab 2025 Vorjahr max 25000 EUR laufend max 100000 EUR. Bezug: Bruttoumsatz, nicht rueckwirkend.\n'
+    + 'Gewuenschte Analyse: ' + aktiveTypen.join(', ') + '\n\n'
+    + _d.join('\n') + '\n\n'
+    + 'Antworte ausschliesslich mit folgendem JSON-Format (keine anderen Texte):\n'
+    + '{"zusammenfassung":{"bewertung":"gut|warnung|kritisch","text":"2-3 Saetze mit konkreten Zahlen aus den Daten","score":0-100,"highlights":["positiver Punkt"]},"bereiche":[{"name":"Bereichsname","icon":"fa-chart-bar","bewertung":"gut|warnung|kritisch","punkte":[{"typ":"ok|warnung|fehler|info","text":"konkreter Befund mit echten Zahlen"}]}],"empfehlungen":[{"prioritaet":"hoch|mittel|niedrig","text":"konkrete Empfehlung"}],"naechste_schritte":["Schritt 1","Schritt 2"]}';
 
   setP(55,'Google Gemini analysiert Ihre Daten...','KI-Verarbeitung');
 
