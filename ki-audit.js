@@ -174,61 +174,22 @@ async function startKiAudit() {
   };
   const selectedTypes = Object.entries(types).filter(([,v])=>v).map(([k])=>typeMap[k]).join('\n- ');
 
-  const prompt = `Du bist ein erfahrener Wirtschaftsprüfer und Steuerberater in Deutschland mit 20+ Jahren Erfahrung.
+  // Активные типы анализа
+  const aktiveTypen = [];
+  if(types.fehler)      aktiveTypen.push('Fehler');
+  if(types.steuer)      aktiveTypen.push('Steuer');
+  if(types.optimierung) aktiveTypen.push('Optimierung');
+  if(types.cashflow)    aktiveTypen.push('Cashflow');
+  if(types.compliance)  aktiveTypen.push('GoBD');
+  if(types.benchmark)   aktiveTypen.push('KPIs');
 
-Analysiere diese Buchhaltungsdaten eines deutschen Unternehmers:
-
-ZEITRAUM: \${jahr==='alle'?'Alle verfügbaren Jahre: '+realYears.join(', '):'Jahr '+jahr}
-STRIKTE ANWEISUNG: Analysiere NUR die Jahre die in _meta.vorhandeneJahre stehen. Erfinde KEINE Daten, Zahlen oder Aussagen über Jahre die NICHT in den Daten vorkommen. Wenn du dir bei etwas nicht sicher bist, schreib "nicht genug Daten" statt etwas zu erfinden.
-ANALYSE-SCHWERPUNKTE:
-- ${selectedTypes}
-
-WICHTIGE HINWEISE ZUR DATENSTRUKTUR:
-- 'notiz' ist ein OPTIONALES Zusatzfeld (kein Pflichtfeld, leer = normal)
-- 'beschreibung' ist das PFLICHTFELD und immer gefüllt — dies ist der Buchungstext
-- 'ohneBeleg' = 0 bedeutet alle Buchungen haben eine Belegnummer (sehr gut)
-- 'grosseOhneNotiz' zählt nur Buchungen >500€ ohne BEIDE Felder (beschreibung UND notiz leer)
-- ustModi zeigt die Steuerregelung je Jahr
-
-BUCHHALTUNGSDATEN:
-\${JSON.stringify(auditData, null, 2)}
-
-Erstelle einen professionellen Audit-Bericht. Prüfe konkret:
-${types.fehler?'- Fehlende Belegnummern bei Buchungen, Stornos, Inkonsistenzen':''}
-${types.steuer?`- §19 UStG Kleinunternehmergrenze — AKTUELLE GESETZLICHE GRENZEN (ZWINGEND BEACHTEN):
-  * bis 2024: Vorjahr-Umsatz ≤ 22.000 EUR, laufendes Jahr ≤ 50.000 EUR
-  * ab 2025: Vorjahr-Umsatz ≤ 25.000 EUR, laufendes Jahr ≤ 100.000 EUR  (EU-Richtlinie 2020/285)
-  * Bezieht sich auf BRUTTOUMSATZ, nicht auf Gewinn
-  * Überschreitung gilt erst AB dem Überschreitungsmonat, NICHT rückwirkend
-  * Prüfe ob Umsatz die jeweilige Jahresgrenze überschreitet und ob Voranmeldungen nötig sind`:''}
-${types.optimierung?'- Kostentreiber, ineffiziente Kategorien, Einsparpotenziale':''}
-${types.cashflow?'- Überfällige Rechnungen, Liquiditätsengpässe, Zahlungsmuster':''}
-${types.compliance?'- GoBD-konforme Buchführung, Belegpflicht, Aufbewahrungsfristen':''}
-${types.benchmark?'- Gewinnmarge, Kostenquote, Forderungsquote, branchenübliche Werte':''}
-
-Antworte NUR mit diesem JSON:
-{
-  "zusammenfassung": {
-    "bewertung": "gut|warnung|kritisch",
-    "text": "3-4 Sätze Gesamtbewertung mit konkreten Zahlen",
-    "score": 0-100,
-    "highlights": ["Positiver Aspekt 1", "Positiver Aspekt 2"]
-  },
-  "bereiche": [
-    {
-      "name": "Bereichsname",
-      "icon": "fa-list",
-      "bewertung": "gut|warnung|kritisch",
-      "punkte": [
-        {"typ": "ok|warnung|fehler|info", "text": "Konkreter Befund mit Zahlen und Empfehlung"}
-      ]
-    }
-  ],
-  "empfehlungen": [
-    {"prioritaet": "hoch|mittel|niedrig", "text": "Konkrete Handlungsempfehlung"}
-  ],
-  "naechste_schritte": ["Sofortige Maßnahme", "Kurzfristig", "Mittelfristig"]
-}`;
+  const prompt = `Steuerberater DE. Analysiere NUR diese Daten (Jahre: \${realYears.join(',')}). Keine Erfindungen.
+Datenhinweise: beschreibung=Pflichtfeld(immer gefüllt), notiz=optional(leer=normal), ohneBeleg=0=gut.
+§19 UStG: bis2024(Vorjahr≤22000,laufend≤50000), ab2025(Vorjahr≤25000,laufend≤100000), Bruttoumsatz, nicht rückwirkend.
+Analyse: \${aktiveTypen.join(',')}
+Daten: \${JSON.stringify(auditData)}
+Antworte NUR JSON:
+{"zusammenfassung":{"bewertung":"gut|warnung|kritisch","text":"2 Sätze mit Zahlen","score":0-100,"highlights":["positiv1"]},"bereiche":[{"name":"Name","icon":"fa-chart-bar","bewertung":"gut|warnung|kritisch","punkte":[{"typ":"ok|warnung|fehler|info","text":"Befund+Zahl"}]}],"empfehlungen":[{"prioritaet":"hoch|mittel|niedrig","text":"Empfehlung"}],"naechste_schritte":["Schritt1","Schritt2"]}`;
 
   setP(55,'Google Gemini analysiert Ihre Daten...','KI-Verarbeitung');
 
@@ -240,7 +201,7 @@ Antworte NUR mit diesem JSON:
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
           contents:[{parts:[{text:prompt}]}],
-          generationConfig:{ temperature:0.2, maxOutputTokens:8192, responseMimeType:'application/json' }
+          generationConfig:{ temperature:0.1, maxOutputTokens:3000 }
         })
       }
     );
