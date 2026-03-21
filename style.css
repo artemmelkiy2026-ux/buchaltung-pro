@@ -3824,7 +3824,7 @@ header { background: #fff; }
 /* Mobile adjustments */
 @media(max-width:600px){
   .fb-row{ padding:12px 14px;gap:10px; }
-  .fb-row-name{ font-size:13px; }
+  .fb-row-name{ font-size:15px; }
   .fb-row-km{ font-size:14px; }
   #fb-stats{ grid-template-columns:repeat(2,1fr) !important; }
 }
