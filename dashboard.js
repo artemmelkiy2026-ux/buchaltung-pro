@@ -848,32 +848,47 @@ function renderEin(){
           : '<span style="font-size:10px;color:var(--blue);font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' VSt ('+mwstRate+'%)</span>')
         : '';
       
-      const _clickAttr = !st ? `onclick="showEintragDetail('${e.id}')"` : '';
-      const _mobBtn = ''; // кнопки теперь внутри detail sheet
+      const _clickAttr = !st ? `onclick="editE(event,'${e.id}')"` : '';
+      const _mobBtn = isMob() && !st
+        ? _moreBtn([
+            {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
+            {icon:'fa-times',  label:'Stornieren', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
+          ])
+        : '';
+
+      // Тип-бейдж рядом с заголовком
+      const _typBadge = '<span style="display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;margin-right:6px;vertical-align:middle;'+(isEin?'background:rgba(34,197,94,.12);color:var(--green)':'background:rgba(239,68,68,.12);color:var(--red)')+'">'+(isEin?'↑ Ein':'↓ Aus')+'</span>';
+
+      // Номер операции рядом с заголовком
+      const _nrBadge = e.belegnr ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;margin-left:6px;vertical-align:middle">Nr.'+e.belegnr+'</span>' : '';
+
+      // Строка под заголовком: Zahlungsart + Datum
+      const _infoLine = '<span class="badge ein-row-badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
+        +'<span class="ein-row-date" style="margin-left:6px">'+fd(e.datum)+'</span>';
 
       const _catLine = ''
         +'<span class="ein-row-kat">'+e.kategorie+'</span>'
         +(mwstBadge ? '<span class="ein-row-sep">·</span>'+mwstBadge : '')
         +(e.notiz ? '<i class="fas fa-sticky-note" style="color:var(--sub);font-size:10px;margin-left:4px"></i>' : '');
 
-      const _subLine = '<span class="badge ein-row-badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
-        +'<span class="ein-row-date" style="margin-left:6px">'+fd(e.datum)+'</span>';
-
       const _korrekturTime = e.korrektur_von && e.created_at
-        ? '<span class="ein-row-sep">·</span><span class="ein-row-time">'+fd(e.datum)+' '+fdt(e.created_at).slice(11,16)+'</span>'
+        ? '<span class="ein-row-sep">·</span><span class="ein-row-time">'+fdt(e.created_at).slice(11,16)+'</span>'
         : '';
-      const _tagLine = ''
-        +(stLbl ? stLbl+_korrekturTime : '')
-        +(e.belegnr ? '<span class="ein-row-nr">Nr.'+e.belegnr+'</span>' : '');
+      const _stLblFull = stLbl ? stLbl+_korrekturTime : '';
 
       return '<div class="ein-row'+(st?' ein-row-st':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':'pointer')+'">'
         +'<div class="ein-row-body">'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
-              +'<div class="ein-row-desc"><span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'+(e.beschreibung||e.kategorie)+'</div>'
+              +'<div class="ein-row-desc">'
+                +'<span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'
+                +_typBadge
+                +(e.beschreibung||e.kategorie)
+                +_nrBadge
+              +'</div>'
               +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
             +'</div>'
-            +'<div class="ein-row-sub">'+_subLine+'</div>'
+            +'<div class="ein-row-sub">'+_infoLine+'</div>'
             +'<div class="ein-row-mid">'
               +'<div class="ein-row-cat">'+_catLine+'</div>'
               +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
@@ -882,7 +897,7 @@ function renderEin(){
                     : '<button class="rca-btn rca-red" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren"><i class="fas fa-trash"></i></button>'))
               +'</div>'
             +'</div>'
-            +(_tagLine ? '<div class="ein-row-tags">'+_tagLine+'</div>' : '')
+            +(_stLblFull ? '<div class="ein-row-tags">'+_stLblFull+'</div>' : '')
           +'</div>'
         +'</div>'
         +'</div>';
