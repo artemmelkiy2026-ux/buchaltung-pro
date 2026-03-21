@@ -1591,62 +1591,45 @@ function showDetailSheet({ title = '', rows = [], buttons = [] }) {
   const isMob = window.innerWidth <= 768;
 
   const rowsHtml = rows.map(r => `
-    <div class="mdm-row">
-      <span class="mdm-key">${r.key}</span>
-      <span class="mdm-val ${r.cls||''}">${r.val}</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 18px;border-bottom:1px solid var(--border);gap:12px">
+      <span style="color:var(--sub);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;flex-shrink:0;padding-top:2px;min-width:110px">${r.key}</span>
+      <span style="color:var(--text);font-size:14px;text-align:right;word-break:break-word;${r.cls==='mdm-amt'?'font-family:var(--mono);font-size:22px;font-weight:800':''}">${r.val}</span>
     </div>`).join('');
 
   const btnsHtml = buttons.map((b, i) => `
-    <button class="btn${b.primary?' primary':''}${b.danger?' u-ds-danger':''}" 
-            data-ds-idx="${i}"
-            style="flex:1;justify-content:center;padding:12px;font-size:14px;font-weight:600;border-radius:var(--r2)">
-      ${b.icon?`<i class="fas ${b.icon}" style="margin-right:6px"></i>`:''}${b.label}
+    <button data-ds-idx="${i}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;font-size:14px;font-weight:600;border-radius:var(--r2);cursor:pointer;font-family:inherit;${b.primary?'background:var(--blue);color:#fff;border:none':b.danger?'background:transparent;color:var(--red);border:1px solid var(--red)':'background:var(--s2);color:var(--text);border:1px solid var(--border)'}">
+      ${b.icon?`<i class="fas ${b.icon}"></i>`:''}${b.label}
     </button>`).join('');
-
-  const closeBtn = `<button class="mdm-close-btn" data-ds-close="1">✕</button>`;
 
   const sheet = document.createElement('div');
   sheet.id = 'u-detail-sheet';
+  sheet.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:flex;align-items:${isMob?'flex-end':'center'};justify-content:center;${isMob?'':'padding:20px'}`;
 
-  if (isMob) {
-    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:flex;align-items:flex-end;justify-content:center';
-    sheet.innerHTML = `
-      <div class="mdm-box" style="width:100%;animation:cs-slide-up .22s ease">
-        <div class="mdm-header">
-          <div class="mdm-handle"></div>
-          <div class="mdm-title-row">
-            <div class="mdm-title">${title}</div>
-            ${closeBtn}
-          </div>
-        </div>
-        <div class="mdm-body">${rowsHtml}</div>
-        <div class="mdm-btns">${btnsHtml}</div>
-      </div>`;
-    document.body.style.overflow = 'hidden';
-  } else {
-    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8000;display:flex;align-items:center;justify-content:center;padding:20px';
-    sheet.innerHTML = `
-      <div style="background:var(--s1);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);animation:app-confirm-in .18s ease">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)">
-          <div style="font-size:16px;font-weight:700;color:var(--text)">${title}</div>
-          ${closeBtn}
-        </div>
-        <div class="mdm-body">${rowsHtml}</div>
-        <div class="mdm-btns">${btnsHtml}</div>
-      </div>`;
-  }
+  const boxStyle = isMob
+    ? `background:var(--s1);border-radius:16px 16px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,20px);box-shadow:0 -8px 40px rgba(0,0,0,.2);animation:cs-slide-up .22s ease`
+    : `background:var(--s1);border-radius:var(--r2);width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);animation:app-confirm-in .18s ease`;
 
-  // Единый обработчик кликов
+  sheet.innerHTML = `
+    <div style="${boxStyle}">
+      <div style="padding:10px 18px 14px;border-bottom:1px solid var(--border)">
+        ${isMob?'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>':''}
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${title}</div>
+          <button data-ds-close="1" style="width:32px;height:32px;background:var(--s2);border:1px solid var(--border);border-radius:50%;color:var(--sub);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+        </div>
+      </div>
+      <div>${rowsHtml}</div>
+      <div style="padding:14px 18px;display:flex;gap:10px;border-top:1px solid var(--border)">${btnsHtml}</div>
+    </div>`;
+
+  if (isMob) document.body.style.overflow = 'hidden';
+
   sheet.addEventListener('click', (e) => {
-    // Закрытие по оверлею
     if (e.target === sheet) { _closeDetailSheet(); return; }
-    // Кнопка закрытия
     if (e.target.closest('[data-ds-close]')) { _closeDetailSheet(); return; }
-    // Кнопки действий
     const btn = e.target.closest('[data-ds-idx]');
     if (btn) {
-      const idx = +btn.dataset.dsIdx;
-      const action = window._detailSheetBtns[idx]?.action;
+      const action = window._detailSheetBtns[+btn.dataset.dsIdx]?.action;
       _closeDetailSheet();
       if (typeof action === 'function') action();
     }
