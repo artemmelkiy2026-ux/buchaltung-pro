@@ -860,7 +860,7 @@ function renderEin(){
 
       // Номер операции — ВСЕГДА перед заголовком (и мобиль и десктоп)
       const _nrBefore = e.belegnr
-        ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;margin-right:6px;vertical-align:middle;flex-shrink:0">Nr.'+e.belegnr+'</span>'
+        ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;vertical-align:middle;flex-shrink:0">Nr.'+e.belegnr+'</span>'
         : '';
       const _nrBadge = ''; // больше не нужен
 
