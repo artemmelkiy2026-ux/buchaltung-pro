@@ -200,6 +200,7 @@ function renderFahrtenbuch() {
           ${f.zweck?`<span><i class="fas fa-tag" style="font-size:10px;opacity:.5"></i> ${f.zweck}</span>`:''}
           ${kzLabel?`<span><i class="fas fa-car" style="font-size:10px;opacity:.5"></i> ${kzLabel}</span>`:''}
           <span style="font-size:10px;color:var(--sub)">Stand: ${fmtKm(f.km_start||0)} → ${fmtKm(f.km_end||0)}</span>
+          ${f.hinZurueck?`<span style="font-size:10px;font-weight:600;color:var(--blue)"><i class="fas fa-exchange-alt" style="font-size:9px;margin-right:2px"></i>Hin & Zurück ×2</span>`:''}
         </div>
       </div>
       <div class="fb-row-right">
