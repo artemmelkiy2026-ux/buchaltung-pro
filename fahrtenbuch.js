@@ -267,6 +267,7 @@ function openFahrtForm() {
   if (lastAutoId) { const s=document.getElementById('fb-form-auto'); if(s) s.value=lastAutoId; }
   _onFbAutoChange();
   document.getElementById('fb-km-end').value = '';
+  const _hinCb = document.getElementById('fb-hin-zurueck'); if(_hinCb) _hinCb.checked = false;
   _calcFbKm();
   _clearFbMapState();
   nav('fahrtenbuch-form', null);
@@ -288,6 +289,7 @@ function editFahrt(id) {
   _onFbAutoChange();
   document.getElementById('fb-km-start').value = f.km_start||'';
   document.getElementById('fb-km-end').value   = f.km_end||'';
+  const _hinCbE = document.getElementById('fb-hin-zurueck'); if(_hinCbE) _hinCbE.checked = f.hinZurueck||false;
   _calcFbKm();
   _clearFbMapState();
   nav('fahrtenbuch-form', null);
@@ -331,15 +333,17 @@ function saveFahrt() {
   const autoId  = document.getElementById('fb-form-auto')?.value||'';
   const kmStart = parseFloat(document.getElementById('fb-km-start').value)||0;
   const kmEnd   = parseFloat(document.getElementById('fb-km-end').value)||0;
+  const hinZurueck = document.getElementById('fb-hin-zurueck')?.checked || false;
 
   if (!datum)           return toast('Datum ist Pflichtfeld!','err');
   if (!abfahrt||!ziel)  return toast('Abfahrts- und Zielort eingeben!','err');
   if (kmEnd<=kmStart)   return toast('km-Stand Ende muss größer als Start sein!','err');
 
-  const km = Math.round((kmEnd-kmStart)*10)/10;
+  const kmBase = Math.round((kmEnd-kmStart)*10)/10;
+  const km = hinZurueck ? Math.round(kmBase * 2 * 10) / 10 : kmBase;
   if (autoId) localStorage.setItem('fb_last_auto', autoId);
   if (!data.fahrtenbuch) data.fahrtenbuch=[];
-  const obj = { datum, abfahrt, ziel, zweck, typ, autoId, km_start:kmStart, km_end:kmEnd, km };
+  const obj = { datum, abfahrt, ziel, zweck, typ, autoId, km_start:kmStart, km_end:kmEnd, km, hinZurueck };
 
   if (fbEditId) {
     const f = data.fahrtenbuch.find(x=>x.id===fbEditId);
@@ -364,9 +368,14 @@ async function delFahrt(id) {
 function _calcFbKm() {
   const s = parseFloat(document.getElementById('fb-km-start')?.value)||0;
   const e = parseFloat(document.getElementById('fb-km-end')?.value)||0;
-  const km = Math.max(0, Math.round((e-s)*10)/10);
+  const hinZurueck = document.getElementById('fb-hin-zurueck')?.checked || false;
+  let km = Math.max(0, Math.round((e-s)*10)/10);
+  if (hinZurueck) km = Math.round(km * 2 * 10) / 10;
   const el = document.getElementById('fb-km');
-  if (el) el.textContent = fmtKm(km);
+  if (el) {
+    el.textContent = fmtKm(km);
+    el.style.color = hinZurueck ? 'var(--blue)' : 'var(--text)';
+  }
 }
 
 // ── GOOGLE MAPS ──────────────────────────────────────────────────────────
