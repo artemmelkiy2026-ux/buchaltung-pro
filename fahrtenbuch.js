@@ -394,7 +394,7 @@ function _loadGmapScript(key) {
   if (document.querySelector('script[data-fbgmap]')) return;
   const s = document.createElement('script');
   s.setAttribute('data-fbgmap','1');
-  s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=_fbGmapCallback`;
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=_fbGmapCallback&language=de&region=DE`;
   s.async = true; s.defer = true;
   window._fbGmapCallback = () => { fbGmapLoaded=true; _initFbMap(); };
   document.head.appendChild(s);
@@ -517,7 +517,7 @@ function _clearFbMapState() {
 // ── INIT ──────────────────────────────────────────────────────────────────
 
 async function initFahrtenbuch() {
-  // Maps по умолчанию всегда выключена
+  // Maps standardmäßig deaktiviert
   fbGmapEnabled = false;
   const _gmapBtn = document.getElementById('fb-gmap-toggle');
   if (_gmapBtn) { _gmapBtn.classList.remove('active'); _gmapBtn.innerHTML='<i class="fas fa-map-marked-alt"></i> Maps AUS'; }
