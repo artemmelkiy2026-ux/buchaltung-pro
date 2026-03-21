@@ -750,7 +750,7 @@ function showAngDetail(id) {
   showDetailSheet({
     title: `<i class="fas fa-file-alt" style="color:var(--blue);margin-right:8px"></i>${a.nr||'Angebot'}`,
     rows: [
-      { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">${fmt(a.betrag)}</span>` },
+      { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmt(a.betrag)}</span>` },
       { key: 'Kunde',   val: a.kunde||'—' },
       { key: 'Datum',   val: fd(a.datum) },
       { key: 'Gültig bis', val: a.gueltig ? fd(a.gueltig) : '—' },
