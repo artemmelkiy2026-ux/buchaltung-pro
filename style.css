@@ -4097,3 +4097,12 @@ header { background: #fff; }
 .audit-item-icon { font-size:14px;flex-shrink:0;margin-top:1px; }
 .audit-item-text { font-size:13px;color:var(--text);line-height:1.5;flex:1; }
 .audit-summary { background:linear-gradient(135deg,var(--blue) 0%,#2563eb 100%);border-radius:var(--r2);padding:20px 24px;color:#fff;margin-bottom:12px; }
+
+/* ── KI-Audit mobile responsive ── */
+@media(max-width:600px){
+  .audit-grid  { grid-template-columns: 1fr !important; }
+  .audit-grid2 { grid-template-columns: 1fr !important; }
+}
+@media(max-width:900px){
+  .audit-grid  { grid-template-columns: repeat(2,1fr) !important; }
+}

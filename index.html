@@ -157,7 +157,12 @@
   </div>
 
   <!-- KI-Audit -->
-  <div class="mob-drawer-child" onclick="mobNavDrawer('ki-audit')"><i class="fas fa-robot" style="margin-right:8px"></i>KI-Finanzaudit</div>
+  <div class="mob-drawer-group">
+    <div class="mob-drawer-group-header" onclick="mobNavDrawer('ki-audit')">
+      <span class="mob-drawer-group-icon"><i class="fas fa-robot"></i></span>
+      <span>KI-Finanzaudit</span>
+    </div>
+  </div>
 
   <!-- Divider -->
   <div style="border-top:1px solid var(--border);margin:4px 0"></div>
@@ -2041,7 +2046,7 @@
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">
       <i class="fas fa-sliders-h" style="color:var(--blue);margin-right:8px"></i>Analysebereiche auswählen
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="audit-checks">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="audit-checks" class="audit-grid">
       <label class="audit-check-item">
         <input type="checkbox" id="ac-eintraege" checked>
         <span>Einträge & Buchungen</span>
@@ -2071,7 +2076,7 @@
     <!-- Audit-Typ -->
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">Art der Analyse</div>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="audit-types">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="audit-types" class="audit-grid2">
         <label class="audit-check-item">
           <input type="checkbox" id="at-fehler" checked>
           <span>Fehlersuche &amp; Inkonsistenzen</span>
