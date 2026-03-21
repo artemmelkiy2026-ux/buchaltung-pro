@@ -4014,3 +4014,12 @@ header { background: #fff; }
   .cs-trigger { border-color: #374151; }
   .cs-panel    { border-color: #374151; }
 }
+
+/* Блокировка клика на карточках пока открыто контекстное меню */
+.card-no-click { pointer-events: none !important; }
+.card-no-click .ang-card-actions,
+.card-no-click .rech-card-actions,
+.card-no-click .fb-row-actions,
+.card-no-click .prod-actions,
+.card-no-click .wied-card-actions { pointer-events: all !important; }
+

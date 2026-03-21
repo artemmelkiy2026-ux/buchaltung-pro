@@ -81,57 +81,28 @@ function _selCb(section, id) {
 // Call as: showCtxMenu(event, [{...}])
 function showCtxMenu(e, items) {
   if (e) { e.stopPropagation && e.stopPropagation(); e.preventDefault && e.preventDefault(); }
-
-  // Закрыть все открытые меню
   document.querySelectorAll('.ctx-menu').forEach(m => m.remove());
   if (!items || !items.length) return;
 
   const menu = document.createElement('div');
   menu.className = 'ctx-menu';
 
-  // Сохраняем items в data-атрибуте через индекс
   items.forEach((item, i) => {
     const el = document.createElement('div');
     el.className = 'ctx-menu-item';
-    el.dataset.i = i;
-    // pointer-events:none на дочерних — ev.target всегда будет el
-    el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px;pointer-events:none"></i>`
-      + `<span style="pointer-events:none">${item.label}</span>`;
+    el.innerHTML = `<i class="fas ${item.icon}" style="width:18px;font-size:13px"></i><span>${item.label}</span>`;
     if (item.danger) el.style.color = 'var(--red)';
+
+    el.onclick = (ev) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+      menu.remove();
+      document.querySelectorAll('.card-no-click').forEach(c => c.classList.remove('card-no-click'));
+      if (typeof item.action === 'function') item.action();
+    };
+
     menu.appendChild(el);
   });
-
-  // Один обработчик на menu через делегирование
-  function onAction(ev) {
-    const el = ev.target.closest('[data-i]');
-    if (!el || !menu.contains(el)) return;
-    ev.stopPropagation();
-    ev.preventDefault();
-    const item = items[+el.dataset.i];
-    cleanup();
-    if (item && typeof item.action === 'function') {
-      // requestAnimationFrame гарантирует что меню закрыто до вызова action
-      requestAnimationFrame(() => {
-        try { item.action(); } catch(err) { console.error('ctx action:', err); }
-      });
-    }
-  }
-
-  function cleanup() {
-    menu.remove();
-    document.removeEventListener('mousedown', onAction, true);
-    document.removeEventListener('touchstart', onAction, true);
-    document.removeEventListener('mousedown', onOutside, true);
-    document.removeEventListener('touchstart', onOutside, true);
-  }
-
-  function onOutside(ev) {
-    if (!menu.contains(ev.target)) cleanup();
-  }
-
-  // capture:true — срабатывает раньше любых других обработчиков
-  menu.addEventListener('mousedown', onAction);
-  menu.addEventListener('touchstart', onAction, { passive: false });
 
   document.body.appendChild(menu);
 
@@ -148,12 +119,22 @@ function showCtxMenu(e, items) {
   }
   menu.style.cssText = `position:fixed;left:${left}px;top:${top}px;min-width:${mW}px;z-index:99999`;
 
-  // Закрытие по тапу вне меню — небольшая задержка чтобы не сработало сразу
+  // Блокируем click на всех карточках пока меню открыто
+  document.querySelectorAll('.ang-card,.rech-card,.ein-row,.fb-row,.kunde-card,.prod-card,.wied-card').forEach(c => {
+    c.classList.add('card-no-click');
+  });
+
+  // Закрытие по клику вне меню
   setTimeout(() => {
-    document.addEventListener('mousedown', onOutside, true);
-    document.addEventListener('touchstart', onOutside, true);
-  }, 80);
+    document.addEventListener('click', function closeMenu(ev) {
+      if (menu.contains(ev.target)) return;
+      menu.remove();
+      document.querySelectorAll('.card-no-click').forEach(c => c.classList.remove('card-no-click'));
+      document.removeEventListener('click', closeMenu, true);
+    }, true);
+  }, 50);
 }
+
 
 function _moreBtn(items) {
   _moreBtn._n = (_moreBtn._n || 0) + 1;
