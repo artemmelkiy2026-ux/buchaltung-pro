@@ -1752,7 +1752,7 @@ function showRechDetail(id) {
   showDetailSheet({
     title: `<i class="fas fa-file-invoice" style="color:var(--blue);margin-right:8px"></i>${r.nr||'Rechnung'}`,
     rows: [
-      { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">${fmt(r.betrag)}</span>` },
+      { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmt(r.betrag)}</span>` },
       { key: 'Kunde',   val: r.kunde||'—' },
       { key: 'Datum',   val: fd(r.datum) },
       { key: 'Fällig',  val: r.faellig ? fd(r.faellig) : '—' },
