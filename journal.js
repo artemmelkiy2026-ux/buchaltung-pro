@@ -150,14 +150,14 @@ function renderJournal() {
       let link = '';
       if (e.is_storno && e.storno_of) {
         const orig = data.eintraege.find(x => x.id === e.storno_of);
-        if (orig) link = `<span style="font-size:10px;color:var(--sub)">hebt auf: ${fd(orig.datum)} · ${fmt(orig.betrag)}</span>`;
+        if (orig) link = `<span style="font-size:10px;color:var(--sub)">hebt auf: ${fd(orig.datum)} · ${fmt(orig.betrag)}${orig.belegnr?' · Nr.'+orig.belegnr:''}</span>`;
       } else if (e.korrektur_von) {
         const orig = data.eintraege.find(x => x.id === e.korrektur_von);
-        if (orig) link = `<span style="font-size:10px;color:var(--sub)">ersetzt: ${fd(orig.datum)} · ${fmt(orig.betrag)}</span>`;
+        if (orig) link = `<span style="font-size:10px;color:var(--sub)">ersetzt: ${fd(orig.datum)} · ${fmt(orig.betrag)}${orig.belegnr?' · Nr.'+orig.belegnr:''}</span>`;
       } else if (involved.has(e.id)) {
         const stornoRec = data.eintraege.find(x => x.storno_of === e.id);
         const korr = data.eintraege.find(x => x.korrektur_von === e.id);
-        if (stornoRec) link = `<span class="badge-storno">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}` : ''}</span>`;
+        if (stornoRec) link = `<span class="badge-storno">→ Storno ${fd(stornoRec.datum)}${korr ? ` · Korrektur ${fmt(korr.betrag)}${korr.belegnr?' Nr.'+korr.belegnr:''}` : ''}</span>`;
       }
 
       const sep = idx > 0 ? `<div style="height:1px;background:var(--border);margin:0 14px"></div>` : '';
