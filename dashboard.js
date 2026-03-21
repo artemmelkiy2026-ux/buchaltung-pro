@@ -478,12 +478,12 @@ function renderCalmBanners() {
   const wrap = document.getElementById('calm-banners');
   if (!wrap) return;
 
-  const yr    = document.getElementById('dash-yr')?.value || new Date().getFullYear()+'';
-  const curYr = yr === 'Alle' ? new Date().getFullYear()+'' : yr;
-  const ye    = activeEintraegeMitRech(yr === 'Alle' ? null : yr);
-  const ein   = sum(ye, 'Einnahme');
+  const yr      = document.getElementById('dash-yr')?.value || new Date().getFullYear()+'';
+  const curYr   = yr === 'Alle' ? new Date().getFullYear()+'' : yr;
+  const ye      = activeEintraegeMitRech(yr === 'Alle' ? null : yr);
+  const ein     = sum(ye, 'Einnahme');
   const isRegel = !isKleinunternehmer(curYr);
-  const today = new Date();
+  const today   = new Date();
 
   // ── 1. COMPLIANCE ─────────────────────────────────────────────
   const noDesc  = ye.filter(e => !e.beschreibung || e.beschreibung.trim() === e.kategorie).length;
@@ -491,105 +491,105 @@ function renderCalmBanners() {
   const issues  = noDesc + noZahl;
   const compPct = ye.length > 0 ? Math.round((1 - issues / (ye.length * 2)) * 100) : 100;
   const compOk  = compPct >= 90;
-  const compAccent = compOk ? '#059669' : compPct >= 70 ? '#d97706' : '#dc2626';
-  const compBg     = compOk ? '#f0fdf4' : compPct >= 70 ? '#fffbeb' : '#fef2f2';
-  const compBorder = compOk ? '#bbf7d0' : compPct >= 70 ? '#fde68a' : '#fecaca';
-  const compIcon   = compOk ? 'fa-shield-alt' : 'fa-exclamation-triangle';
-  const compTitle  = compOk ? 'Alles in Ordnung' : 'Prüfung empfohlen';
-  const compSub    = compOk ? `${ye.length} Einträge vollständig` : `${issues} unvollständig`;
+  const compWarn = compPct >= 70;
+  const compGrad = compOk
+    ? 'linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%)'
+    : compWarn
+      ? 'linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)'
+      : 'linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%)';
+  const compIcon  = compOk ? 'fa-shield-alt' : 'fa-exclamation-triangle';
+  const compTitle = compOk ? 'Alles in Ordnung' : compWarn ? 'Prüfung empfohlen' : 'Achtung!';
+  const compSub   = compOk ? `${ye.length} Einträge vollständig` : `${issues} unvollständig`;
 
-  // ── 2. FRIST + LIMIT (smart card) ─────────────────────────────
-  // Для KU: прогноз даты пробития лимита 25.000€
-  // Для Regel: дедлайн USt-VA
-  const mo    = today.getMonth();
-  const yr_n  = today.getFullYear();
+  // ── 2. KU-LIMIT oder USt-VA ───────────────────────────────────
+  const mo = today.getMonth(), yr_n = today.getFullYear();
   const fristDate = new Date(yr_n, mo + 1, 10);
   const diffDays  = Math.ceil((fristDate - today) / 86400000);
   const fristMon  = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-  const fristLbl  = `USt-VA bis 10.${String(mo+2>12?1:mo+2).padStart(2,'0')}.${mo+2>12?yr_n+1:yr_n}`;
-
-  // Прогноз лимита KU
-  const KU_LIMIT = 25000;
-  const limitPct = Math.min(100, Math.round(ein / KU_LIMIT * 100));
-  // Среднемесячная выручка за прошедшие месяцы
-  const monthsElapsed = Math.max(1, today.getMonth() + 1); // месяцев прошло в году
-  const avgMonthly    = ein / monthsElapsed;
-  const remaining     = Math.max(0, KU_LIMIT - ein);
-  const monthsLeft    = avgMonthly > 0 ? remaining / avgMonthly : 99;
-  const forecastDate  = new Date(today.getFullYear(), today.getMonth() + Math.ceil(monthsLeft), 1);
-  const forecastStr   = avgMonthly > 0 && remaining > 0
+  const KU_LIMIT  = 25000;
+  const limitPct  = Math.min(100, Math.round(ein / KU_LIMIT * 100));
+  const avgMonthly   = ein / Math.max(1, today.getMonth() + 1);
+  const remaining    = Math.max(0, KU_LIMIT - ein);
+  const monthsLeft   = avgMonthly > 0 ? remaining / avgMonthly : 99;
+  const forecastDate = new Date(yr_n, today.getMonth() + Math.ceil(monthsLeft), 1);
+  const forecastStr  = avgMonthly > 0 && remaining > 0
     ? `${fristMon[Math.min(11, forecastDate.getMonth())]} ${forecastDate.getFullYear()}`
-    : remaining <= 0 ? 'Bereits überschritten!' : 'Kein Risiko';
+    : remaining <= 0 ? 'Überschritten!' : 'Kein Risiko';
 
-  // Smart card: KU → лимит, Regel → USt-VA
-  let card2Accent, card2Bg, card2Border, card2Icon, card2Label, card2Val, card2Title, card2Sub, card2Bar;
+  let c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Bar = '';
   if (!isRegel) {
-    // KU — показываем лимит
-    const limOk = limitPct < 70;
-    card2Accent = limOk ? '#059669' : limitPct < 90 ? '#d97706' : '#dc2626';
-    card2Bg     = limOk ? '#f0fdf4' : limitPct < 90 ? '#fffbeb' : '#fef2f2';
-    card2Border = limOk ? '#bbf7d0' : limitPct < 90 ? '#fde68a' : '#fecaca';
-    card2Icon   = 'fa-tachometer-alt';
-    card2Label  = 'KU-Limit Watcher';
-    card2Val    = limitPct + '%';
-    card2Title  = limOk ? 'Kein Risiko' : limitPct < 90 ? 'Aufpassen!' : 'Kritisch!';
-    card2Sub    = remaining > 0
-      ? `Noch ${fmt(remaining)} frei · Prognose: ${forecastStr}`
-      : `Limit überschritten! Auf Regelbesteuerung wechseln`;
-    card2Bar    = `<div style="margin-top:10px;height:4px;border-radius:2px;background:rgba(0,0,0,.08)">
-        <div style="height:100%;width:${limitPct}%;border-radius:2px;background:${card2Accent};transition:width .6s"></div>
-      </div>`;
+    const limOk = limitPct < 70, limWarn = limitPct < 90;
+    c2Grad  = limOk
+      ? 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)'
+      : limWarn
+        ? 'linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)'
+        : 'linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%)';
+    c2Icon  = 'fa-tachometer-alt';
+    c2Label = 'KU-Limit 25.000 €';
+    c2Val   = limitPct + '%';
+    c2Title = limOk ? 'Sicher' : limWarn ? 'Aufpassen!' : 'Kritisch!';
+    c2Sub   = remaining > 0 ? `Noch ${fmt(remaining)} · Prognose ${forecastStr}` : 'Limit überschritten!';
+    c2Bar   = `<div style="margin-top:14px;height:4px;border-radius:4px;background:rgba(255,255,255,.2)">
+      <div style="height:100%;width:${limitPct}%;border-radius:4px;background:rgba(255,255,255,.9)"></div>
+    </div>`;
   } else {
-    // Regel — показываем USt-VA дедлайн
-    const fristOk = diffDays > 7;
-    card2Accent = fristOk ? '#2563eb' : '#dc2626';
-    card2Bg     = fristOk ? '#eff6ff' : '#fef2f2';
-    card2Border = fristOk ? '#bfdbfe' : '#fecaca';
-    card2Icon   = 'fa-calendar-check';
-    card2Label  = 'Nächste Frist';
-    card2Val    = diffDays + 'd';
-    card2Title  = fristOk ? 'Rechtzeitig' : 'Bald fällig!';
-    card2Sub    = fristLbl;
-    card2Bar    = '';
+    const fOk = diffDays > 7;
+    c2Grad  = fOk
+      ? 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)'
+      : 'linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%)';
+    c2Icon  = 'fa-calendar-check';
+    c2Label = 'Nächste Frist';
+    c2Val   = diffDays + 'd';
+    c2Title = fOk ? 'Rechtzeitig' : 'Bald fällig!';
+    c2Sub   = `USt-VA bis 10.${String(mo+2>12?1:mo+2).padStart(2,'0')}.${mo+2>12?yr_n+1:yr_n}`;
   }
 
   // ── 3. STEUERRESERVE ──────────────────────────────────────────
   const mwstTotal = ye.filter(e=>e.mwstBetrag>0).reduce((s,e)=>s+e.mwstBetrag,0);
   const vstTotal  = ye.filter(e=>e.vorsteuerBet>0).reduce((s,e)=>s+e.vorsteuerBet,0);
   const zahllast  = Math.max(0, mwstTotal - vstTotal);
-  const resOk     = zahllast === 0 || !isRegel;
-  const resAccent = isRegel ? (zahllast > 0 ? '#dc2626' : '#059669') : '#7c3aed';
-  const resBg     = isRegel ? (zahllast > 0 ? '#fef2f2' : '#f0fdf4') : '#f5f3ff';
-  const resBorder = isRegel ? (zahllast > 0 ? '#fecaca' : '#bbf7d0') : '#ddd6fe';
-  const resIcon   = isRegel ? 'fa-piggy-bank' : 'fa-tag';
-  const resLabel  = isRegel ? 'Steuerreserve' : 'Kleinunternehmer';
-  const resVal    = isRegel ? fmt(zahllast) : '§ 19';
-  const resTitle  = isRegel ? (zahllast > 0 ? 'Zurückhalten!' : 'Im grünen Bereich') : 'Kein MwSt-Ausweis';
-  const resSub    = isRegel ? (zahllast > 0 ? `${fmt(zahllast)} reservieren` : 'Kein Rückstand') : 'Umsatz unter 25.000 €';
+  const resGrad = !isRegel
+    ? 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #8b5cf6 100%)'
+    : zahllast > 0
+      ? 'linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%)'
+      : 'linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%)';
+  const resIcon  = isRegel ? 'fa-piggy-bank' : 'fa-tag';
+  const resLabel = isRegel ? 'MwSt-Reserve' : 'Kleinunternehmer';
+  const resVal   = isRegel ? fmt(zahllast) : '§ 19';
+  const resTitle = isRegel ? (zahllast > 0 ? 'Zurückhalten!' : 'Im grünen Bereich') : 'Kein MwSt-Ausweis';
+  const resSub   = isRegel ? (zahllast > 0 ? `${fmt(zahllast)} reservieren` : 'Kein Rückstand') : `Umsatz ${fmt(ein)} / 25.000 €`;
 
-  // ── CARD TEMPLATE ─────────────────────────────────────────────
-  const card = (bg, border, accent, icon, label, val, title, sub, bar='') => `
-    <div style="background:${bg};border:1.5px solid ${border};border-radius:16px;padding:18px;position:relative;overflow:hidden">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <div style="width:32px;height:32px;border-radius:9px;background:${accent};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <i class="fas ${icon}" style="color:#fff;font-size:13px"></i>
+  // ── CARD BUILDER ──────────────────────────────────────────────
+  const card = (grad, icon, label, val, title, sub, extra='') => `
+    <div style="background:${grad};border-radius:20px;padding:22px;position:relative;overflow:hidden;min-height:140px">
+      <!-- Декоративные круги -->
+      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08)"></div>
+      <div style="position:absolute;bottom:-20px;right:30px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
+      <div style="position:absolute;top:50%;right:-10px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+      <!-- Контент -->
+      <div style="position:relative;z-index:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="fas ${icon}" style="color:#fff;font-size:14px"></i>
+          </div>
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)">${label}</span>
         </div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">${label}</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:6px">${val}</div>
+        <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:3px">${title}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.4">${sub}</div>
+        ${extra}
       </div>
-      <div style="font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-.5px;margin-bottom:3px;line-height:1">${val}</div>
-      <div style="font-size:12px;font-weight:600;color:${accent};margin-bottom:3px">${title}</div>
-      <div style="font-size:11px;color:#64748b;line-height:1.4">${sub}</div>
-      ${bar}
     </div>`;
 
   wrap.innerHTML =
-    card(compBg, compBorder, compAccent, compIcon, 'Compliance', compPct+'%', compTitle, compSub,
-      `<div style="margin-top:10px;height:4px;border-radius:2px;background:rgba(0,0,0,.08)">
-        <div style="height:100%;width:${compPct}%;border-radius:2px;background:${compAccent}"></div>
+    card(compGrad, compIcon, 'Compliance', compPct+'%', compTitle, compSub,
+      `<div style="margin-top:14px;height:4px;border-radius:4px;background:rgba(255,255,255,.2)">
+        <div style="height:100%;width:${compPct}%;border-radius:4px;background:rgba(255,255,255,.9)"></div>
       </div>`) +
-    card(card2Bg, card2Border, card2Accent, card2Icon, card2Label, card2Val, card2Title, card2Sub, card2Bar) +
-    card(resBg, resBorder, resAccent, resIcon, resLabel, resVal, resTitle, resSub);
+    card(c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Bar) +
+    card(resGrad, resIcon, resLabel, resVal, resTitle, resSub);
 }
+
 
 
 function renderDash(){
