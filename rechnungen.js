@@ -137,12 +137,13 @@ function renderRech(){
               {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
               {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
               {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
-            ]) : `<div class="rech-card-actions">
-              ${r.status!=='bezahlt'?`<button class="rca-btn rca-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>`:''}
-              <button class="rca-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
-              <button class="rca-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
-              <button class="rca-btn rca-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
-            </div>`}
+            ]) : _moreBtn([
+              ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
+              {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId(r.id)},
+              {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
+              {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
+              {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
+            ])}
           </div>
         </div>
         <div class="rech-card-meta">
