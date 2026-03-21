@@ -1,6 +1,6 @@
 // ── KI-AUDIT mit Google Gemini API ────────────────────────────────────────
 
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash-lite';
 
 function initKiAudit() {
   const sel = document.getElementById('audit-jahr');
