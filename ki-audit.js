@@ -260,7 +260,7 @@ Antworte NUR mit diesem JSON:
 
 function _auditReset(btn) {
   btn.disabled=false; btn.style.opacity='1';
-  btn.innerHTML='<i class="fas fa-robot"></i> KI-Audit starten';
+  btn.innerHTML=' KI-Audit starten';
 }
 
 function _auditErr(msg) {
@@ -330,7 +330,7 @@ function _renderAudit(audit) {
   result.innerHTML = `
     <div class="audit-summary" style="background:${bg};margin-bottom:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:700;color:#fff"><i class="fas fa-robot" style="margin-right:8px"></i>KI-Audit Ergebnis</div>
+        <div style="font-size:16px;font-weight:700;color:#fff">KI-Audit Ergebnis</div>
         <div style="text-align:right">
           <div style="font-size:42px;font-weight:800;line-height:1;color:#fff">${score}</div>
           <div style="font-size:11px;color:rgba(255,255,255,.8)">von 100 Punkten</div>
@@ -344,7 +344,7 @@ function _renderAudit(audit) {
     </div>
     ${bereiche}${empf}${steps}
     <div style="text-align:center;padding:12px;font-size:11px;color:var(--sub)">
-      <i class="fas fa-robot"></i> Analyse durch Google Gemini KI ·
+      Analyse durch Google Gemini KI ·
       <i class="fas fa-info-circle"></i> Ersetzt keine professionelle Steuerberatung (§ 3 StBerG)
     </div>`;
 }
