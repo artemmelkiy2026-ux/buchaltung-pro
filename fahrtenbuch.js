@@ -192,14 +192,17 @@ function renderFahrtenbuch() {
       <div class="fb-row-left">
         <div class="fb-row-icon" style="background:${bg};color:${col}"><i class="fas ${icon}"></i></div>
         <div class="fb-row-name">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           ${f.abfahrt||'?'} → ${f.ziel||'?'}
+            <span class="fb-row-typ" style="color:${col};font-size:11px;font-weight:600;background:${bg};padding:1px 7px;border-radius:4px;flex-shrink:0">${f.typ}</span>
+          </div>
         </div>
         <div class="fb-row-meta">
-          <span class="fb-row-typ" style="color:${col};font-weight:600"><i class="fas ${icon}" style="font-size:10px;opacity:.7;margin-right:3px"></i>${f.typ}</span>
-          ${f.zweck?`<span><i class="fas fa-tag" style="font-size:10px;opacity:.5"></i> ${f.zweck}</span>`:''}
           <span><i class="fas fa-calendar" style="font-size:10px;opacity:.5"></i> ${fd(f.datum)}</span>
+          ${f.zweck?`<span><i class="fas fa-tag" style="font-size:10px;opacity:.5"></i> ${f.zweck}</span>`:''}
           ${kzLabel?`<span><i class="fas fa-car" style="font-size:10px;opacity:.5"></i> ${kzLabel}</span>`:''}
           <span style="font-size:10px;color:var(--sub)">Stand: ${fmtKm(f.km_start||0)} → ${fmtKm(f.km_end||0)}</span>
+          ${f.hinZurueck?'<span style="color:var(--blue);font-weight:600;font-size:10px"><i class="fas fa-exchange-alt" style="font-size:10px;margin-right:3px"></i>Hin & Zurück ×2</span>':''}
         </div>
       </div>
       <div class="fb-row-right">
