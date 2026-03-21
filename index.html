@@ -156,6 +156,12 @@
     </div>
   </div>
 
+  <!-- KI-Audit -->
+  <div class="mob-drawer-group-header" onclick="mobNavDrawer('ki-audit')" style="background:linear-gradient(135deg,rgba(26,69,120,.08),rgba(59,130,246,.06));border:1px solid rgba(26,69,120,.15);border-radius:var(--r);margin:4px 8px">
+    <span class="mob-drawer-group-icon" style="color:var(--blue)"><i class="fas fa-robot"></i></span>
+    <span style="color:var(--blue);font-weight:700">KI-Finanzaudit</span>
+  </div>
+
   <!-- Divider -->
   <div style="border-top:1px solid var(--border);margin:4px 0"></div>
 
@@ -246,7 +252,12 @@
   <div class="nav-group-children" id="gobd-group">
     <div class="nav-item nav-child" onclick="nav('journal',this)">Journal</div>
     <div class="nav-item nav-child" onclick="nav('ust',this)">Umsatzsteuer</div>
-    <div class="nav-item nav-child" onclick="nav('ki-audit',this)">KI-Audit</div>
+  </div>
+
+  <!-- KI-Audit — отдельный пункт -->
+  <div class="nav-group-header nav-item" id="kiaudit-header" onclick="nav('ki-audit',this)" style="background:linear-gradient(135deg,rgba(26,69,120,.08),rgba(59,130,246,.06));border:1px solid rgba(26,69,120,.15);border-radius:var(--r);margin:4px 8px">
+    <span class="nav-group-icon" style="color:var(--blue)"><i class="fas fa-robot"></i></span>
+    <span class="nav-group-label" style="color:var(--blue);font-weight:700">KI-Finanzaudit</span>
   </div>
 
   <!-- Spacer -->
