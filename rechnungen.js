@@ -113,7 +113,7 @@ function renderRech(){
     );
     const stornoBadge = _rechStorno.length > 0
       ? `<span class="badge-storno" style="font-size:10px;padding:2px 6px;border-radius:4px">↩ Storniert</span>` : '';
-    const _rClick = `onclick="editRech('${r.id}')"`;
+    const _rClick = `onclick="showRechDetail('${r.id}')"`;
     // Anzahl Positionen
     const _rPosCount = (r.positionen||[]).length;
     // Wie alt ist die Rechnung?
@@ -1743,4 +1743,26 @@ function _sendMahnung(r) {
     + '?subject=' + encodeURIComponent(betreff)
     + '&body=' + encodeURIComponent(text);
   window.open(mailto, '_blank');
+}
+
+function showRechDetail(id) {
+  const r = (data.rechnungen||[]).find(x=>x.id===id);
+  if (!r) return;
+  const statusLabels = {offen:'Offen',bezahlt:'Bezahlt',ueberfaellig:'Überfällig',storniert:'Storniert'};
+  showDetailSheet({
+    title: `<i class="fas fa-file-invoice" style="color:var(--blue);margin-right:8px"></i>${r.nr||'Rechnung'}`,
+    rows: [
+      { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">${fmt(r.betrag)}</span>` },
+      { key: 'Kunde',   val: r.kunde||'—' },
+      { key: 'Datum',   val: fd(r.datum) },
+      { key: 'Fällig',  val: r.faellig ? fd(r.faellig) : '—' },
+      { key: 'Status',  val: `<span class="badge">${statusLabels[r.status]||r.status}</span>` },
+      { key: 'Positionen', val: (r.positionen||[]).length + ' Pos.' },
+      ...(r.notiz ? [{ key: 'Notiz', val: r.notiz }] : []),
+    ],
+    buttons: [
+      { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editRech(id) },
+      { label: 'Löschen', icon: 'fa-trash', danger: true, action: () => delRech(id) },
+    ]
+  });
 }

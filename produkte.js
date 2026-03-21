@@ -59,7 +59,7 @@ function renderProdukte() {
   const katColor = k => k === 'Artikel' ? 'var(--blue)' : k === 'Dienstleistung' ? 'var(--green)' : 'var(--sub)';
 
   list.innerHTML = pageItems.map(p => `
-    <div class="prod-card" ${window._selectMode?.['produkte'] ? '' : `onclick="openProduktModal('${p.id}')"`} style="cursor:${window._selectMode?.['produkte']?'default':'pointer'}">
+    <div class="prod-card" ${window._selectMode?.['produkte'] ? '' : `onclick="showProduktDetail('${p.id}')"`} style="cursor:${window._selectMode?.['produkte']?'default':'pointer'}">
       <div class="prod-card-left">
         <div class="prod-avatar" style="background:${katColor(p.kategorie)}22;color:${katColor(p.kategorie)}">
           <i class="fas ${katIcon(p.kategorie)}"></i>
@@ -228,4 +228,26 @@ function apSetTab(tab, btn) {
   document.querySelectorAll('.ap-tab-pane').forEach(p => p.style.display = 'none');
   btn.classList.add('ap-tab-active');
   document.getElementById('ap-pane-' + tab).style.display = 'block';
+}
+
+function showProduktDetail(id) {
+  const p = (data.produkte||[]).find(x=>x.id===id);
+  if (!p) return;
+  showDetailSheet({
+    title: `<i class="fas fa-box" style="color:var(--blue);margin-right:8px"></i>${p.name}`,
+    rows: [
+      { key: 'VK-Preis (Brutto)', val: `<span style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">${fmt(p.vkBrutto||0)}</span>` },
+      { key: 'VK-Preis (Netto)', val: fmt(p.vkNetto||0) },
+      ...(p.ekBrutto ? [{ key: 'EK-Preis', val: fmt(p.ekBrutto) }] : []),
+      { key: 'Kategorie', val: p.kategorie||'—' },
+      { key: 'Einheit',   val: p.einheit||'Stk' },
+      { key: 'USt',       val: (p.ust||19) + '%' },
+      ...(p.artnr ? [{ key: 'Art.-Nr.', val: p.artnr }] : []),
+      ...(p.beschreibung ? [{ key: 'Beschreibung', val: p.beschreibung }] : []),
+    ],
+    buttons: [
+      { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => openProduktModal(id) },
+      { label: 'Löschen', icon: 'fa-trash', danger: true, action: () => delProdukt(id) },
+    ]
+  });
 }

@@ -188,7 +188,7 @@ function renderFahrtenbuch() {
     const bg   = typBg[f.typ]||'var(--s2)';
     const auto = autos.find(a => a.id===f.autoId);
     const kzLabel = auto ? auto.kennzeichen : (f.kennzeichen||'');
-    return `<div class="fb-row" onclick="editFahrt('${f.id}')" style="cursor:pointer">
+    return `<div class="fb-row" onclick="showFahrtDetail('${f.id}')" style="cursor:pointer">
       <div class="fb-row-left">
         <div class="fb-row-icon" style="background:${bg};color:${col}"><i class="fas ${icon}"></i></div>
         <div class="fb-row-name">
@@ -527,4 +527,25 @@ async function initFahrtenbuch() {
   renderFbAutoList();
   renderFbAutoSelect('fb-auto-filter', true);
   renderFahrtenbuch();
+}
+
+function showFahrtDetail(id) {
+  const f = (data.fahrtenbuch||[]).find(x=>x.id===id);
+  if (!f) return;
+  const auto = (getFbAutos()||[]).find(a=>a.id===f.autoId);
+  showDetailSheet({
+    title: `<i class="fas fa-car" style="color:var(--blue);margin-right:8px"></i>${f.abfahrt} → ${f.ziel}`,
+    rows: [
+      { key: 'Strecke',   val: `<span style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">${fmtKm(f.km)}</span>` },
+      { key: 'Datum',     val: fd(f.datum) },
+      { key: 'Typ',       val: f.typ },
+      { key: 'Fahrzeug',  val: auto ? auto.kennzeichen : (f.kennzeichen||'—') },
+      { key: 'km-Stand',  val: fmtKm(f.km_start) + ' → ' + fmtKm(f.km_end) },
+      ...(f.zweck ? [{ key: 'Zweck', val: f.zweck }] : []),
+    ],
+    buttons: [
+      { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editFahrt(id) },
+      { label: 'Löschen', icon: 'fa-trash', danger: true, action: () => delFahrt(id) },
+    ]
+  });
 }

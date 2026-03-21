@@ -4023,3 +4023,44 @@ header { background: #fff; }
 .card-no-click .prod-actions,
 .card-no-click .wied-card-actions { pointer-events: all !important; }
 
+
+/* ── UNIVERSAL DETAIL SHEET — desktop + mobile ─────────────────────────── */
+.mdm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.mdm-row:last-child { border-bottom: none; }
+.mdm-key {
+  color: var(--sub);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 2px;
+  min-width: 110px;
+}
+.mdm-val {
+  color: var(--text);
+  font-size: 14px;
+  text-align: right;
+  word-break: break-word;
+}
+.mdm-close-btn {
+  width: 32px; height: 32px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--sub);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.mdm-close-btn:hover { background: var(--rdim); color: var(--red); border-color: var(--red); }

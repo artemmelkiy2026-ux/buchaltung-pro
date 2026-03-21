@@ -166,7 +166,7 @@ function renderAngebote() {
     // Netto info if USt
     const hasUst = (a.positionen||[]).some(p => p.mwst > 0);
     const nettoLabel = hasUst ? `<span style="font-size:10px;color:var(--sub);font-family:var(--mono)">brutto</span>` : '';
-    return `<div class="ang-card" onclick="openAngForm('${a.id}')" style="cursor:pointer">
+    return `<div class="ang-card" onclick="showAngDetail('${a.id}')" style="cursor:pointer">
       <div class="ang-card-avatar ${st.cls}" style="width:32px;height:32px;border-radius:var(--r);font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
         <i class="${st.icon}"></i>
       </div>
@@ -737,3 +737,30 @@ function setAngFilter(filter, el) {
 }
 
 
+
+function showAngDetail(id) {
+  const a = (data.angebote||[]).find(x=>x.id===id);
+  if (!a) return;
+  const st = {
+    offen:      {label:'Offen',      cls:''},
+    angenommen: {label:'Angenommen', cls:''},
+    abgelehnt:  {label:'Abgelehnt',  cls:''},
+    abgelaufen: {label:'Abgelaufen', cls:''},
+  }[a.status] || {label:a.status, cls:''};
+  showDetailSheet({
+    title: `<i class="fas fa-file-alt" style="color:var(--blue);margin-right:8px"></i>${a.nr||'Angebot'}`,
+    rows: [
+      { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--blue)">${fmt(a.betrag)}</span>` },
+      { key: 'Kunde',   val: a.kunde||'—' },
+      { key: 'Datum',   val: fd(a.datum) },
+      { key: 'Gültig bis', val: a.gueltig ? fd(a.gueltig) : '—' },
+      { key: 'Status',  val: `<span class="badge">${st.label}</span>` },
+      { key: 'Positionen', val: (a.positionen||[]).length + ' Pos.' },
+      ...(a.notiz ? [{ key: 'Notiz', val: a.notiz }] : []),
+    ],
+    buttons: [
+      { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => openAngForm(id) },
+      { label: 'Löschen', icon: 'fa-trash', danger: true, action: () => delAng(id) },
+    ]
+  });
+}

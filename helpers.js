@@ -259,7 +259,7 @@ function renderKunden(){
     const hasContact = k.email || k.tel;
     const _kSelMode = window._selectMode && window._selectMode['kunden'];
     const _kCb = _kSelMode ? _selCb('kunden', k.id) : '';
-    const _kClick = _kSelMode ? '' : `onclick="editKunde('${k.id}')"`;
+    const _kClick = _kSelMode ? '' : `onclick="showKundeDetail('${k.id}')"`;
     return `<div class="kunde-card" ${_kClick} style="cursor:${_kSelMode?'default':'pointer'}">
       <div class="kunde-card-avatar">${initials}</div>
       <div class="kunde-card-body">
@@ -1620,4 +1620,92 @@ function selectKundenPicker(id) {
 
   closeModal('kunden-picker-modal');
   toast('Kunde übernommen: ' + (k.name || ''), 'ok');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// UNIVERSAL DETAIL SHEET — bottom sheet на мобиле, модал на десктопе
+// Использование: showDetailSheet({ title, rows:[{key,val}], buttons:[{label,icon,primary,danger,action}] })
+// ══════════════════════════════════════════════════════════════════════════
+
+function showDetailSheet({ title = '', rows = [], buttons = [] }) {
+  // Удаляем предыдущий если есть
+  document.getElementById('u-detail-sheet')?.remove();
+
+  const isMobile = window.innerWidth <= 768;
+
+  const sheet = document.createElement('div');
+  sheet.id = 'u-detail-sheet';
+
+  const rowsHtml = rows.map(r => `
+    <div class="mdm-row">
+      <span class="mdm-key">${r.key}</span>
+      <span class="mdm-val ${r.cls||''}">${r.val}</span>
+    </div>`).join('');
+
+  const btnsHtml = buttons.map(b => `
+    <button class="btn${b.primary?' primary':''}${b.danger?' u-btn-danger':''}"
+      style="flex:1;justify-content:center;padding:12px;font-size:14px;font-weight:600;border-radius:var(--r2)${b.danger?';color:var(--red);border-color:var(--red)':''}"
+      onclick="document.getElementById('u-detail-sheet').remove();document.body.style.overflow='';(${b.action.toString()})()">
+      ${b.icon?`<i class="fas ${b.icon}" style="margin-right:6px"></i>`:''}${b.label}
+    </button>`).join('');
+
+  if (isMobile) {
+    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:flex-end;justify-content:center;animation:cs-fade-in .15s ease';
+    sheet.innerHTML = `
+      <div class="mdm-box" style="animation:cs-slide-up .22s ease;width:100%">
+        <div class="mdm-header">
+          <div class="mdm-handle"></div>
+          <div class="mdm-title-row">
+            <div class="mdm-title">${title}</div>
+            <button class="mdm-close-btn" onclick="document.getElementById('u-detail-sheet').remove();document.body.style.overflow=''">✕</button>
+          </div>
+        </div>
+        <div class="mdm-body">${rowsHtml}</div>
+        <div class="mdm-btns">${btnsHtml}</div>
+      </div>`;
+    document.body.style.overflow = 'hidden';
+  } else {
+    sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;animation:cs-fade-in .15s ease';
+    sheet.innerHTML = `
+      <div style="background:var(--s1);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);animation:app-confirm-in .18s ease">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)">
+          <div style="font-size:16px;font-weight:700;color:var(--text)">${title}</div>
+          <button class="mdm-close-btn" onclick="document.getElementById('u-detail-sheet').remove()">✕</button>
+        </div>
+        <div class="mdm-body">${rowsHtml}</div>
+        <div class="mdm-btns">${btnsHtml}</div>
+      </div>`;
+  }
+
+  // Закрытие по клику на overlay
+  sheet.addEventListener('click', (e) => {
+    if (e.target === sheet) {
+      sheet.remove();
+      document.body.style.overflow = '';
+    }
+  });
+
+  document.body.appendChild(sheet);
+}
+
+function showKundeDetail(id) {
+  const k = (data.kunden||[]).find(x=>x.id===id);
+  if (!k) return;
+  const rechnungen = (data.rechnungen||[]).filter(r=>r.kunde===k.name);
+  showDetailSheet({
+    title: `<i class="fas fa-user" style="color:var(--blue);margin-right:8px"></i>${k.name}`,
+    rows: [
+      ...(k.email   ? [{ key: 'E-Mail',   val: k.email }] : []),
+      ...(k.tel     ? [{ key: 'Telefon',  val: k.tel }] : []),
+      ...(k.strasse ? [{ key: 'Adresse',  val: [k.strasse, k.plz+' '+k.ort].filter(Boolean).join(', ') }] : []),
+      ...(k.ustid   ? [{ key: 'USt-ID',   val: k.ustid }] : []),
+      ...(k.iban    ? [{ key: 'IBAN',     val: `<span style="font-family:var(--mono);font-size:12px">${k.iban}</span>` }] : []),
+      { key: 'Rechnungen', val: rechnungen.length + ' Stück' },
+      ...(k.notiz   ? [{ key: 'Notiz',    val: k.notiz }] : []),
+    ],
+    buttons: [
+      { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editKunde(id) },
+      { label: 'Löschen', icon: 'fa-trash', danger: true, action: () => delKunde(id) },
+    ]
+  });
 }

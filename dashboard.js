@@ -692,7 +692,7 @@ function renderDash(){
     const isEin=e.typ==='Einnahme';
     const st=e.is_storno||e._storniert;
     const barW=Math.round(e.betrag/maxBet*100);
-    const click=mob?`showMobDetail(${JSON.stringify(e).replace(/"/g,"'")})`:`editE(event,'${e.id}')`;
+    const click=`showEintragDetail('${e.id}')`;
     const color=isEin?'var(--green)':'var(--red)';
     return `<div class="drc${st?' drc-storno':''}" onclick="${click}" style="border:1px solid var(--border);background:var(--s1)">
       <div class="drc-icon" style="background:${isEin?'rgba(58,138,78,.1)':'rgba(214,51,65,.1)'};color:${color}">
@@ -1554,4 +1554,26 @@ function parseBelegText(text) {
   else if (/überweisung/i.test(text))    result.zahlungsart = 'Überweisung';
 
   return result;
+}
+
+function showEintragDetail(id) {
+  const e = (data.eintraege||[]).find(x=>x.id===id);
+  if (!e) return;
+  const isEin = e.typ==='Einnahme';
+  showDetailSheet({
+    title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
+    rows: [
+      { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:22px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(e.betrag)}</span>` },
+      { key: 'Datum',       val: fd(e.datum) },
+      { key: 'Kategorie',   val: e.kategorie||'—' },
+      { key: 'Beschreibung',val: e.beschreibung||'—' },
+      { key: 'Zahlungsart', val: `<span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span>` },
+      ...(e.notiz  ? [{ key: 'Notiz',   val: e.notiz }] : []),
+      ...(e.belegnr? [{ key: 'Beleg-Nr.',val: e.belegnr }] : []),
+    ],
+    buttons: [
+      { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editE(null, id) },
+      { label: 'Stornieren', icon: 'fa-times', danger: true, action: () => delE({stopPropagation:()=>{}}, id) },
+    ]
+  });
 }
