@@ -4113,6 +4113,7 @@ header { background: #fff; }
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin-bottom: 20px;
+  font-family: var(--mono);
 }
 @media (max-width: 768px) {
   #calm-banners {
