@@ -282,17 +282,7 @@
 <!-- ── DASHBOARD ── -->
 <div class="page active" id="p-dashboard">
 <div class="page-inner">
-  <div class="ph">
-    <div class="ph-left">
-      <div class="ph-title">Dashboard</div>
-      <div class="ph-sub">Übersicht — <span id="dash-yr-lbl"></span></div>
-    </div>
-    <div class="ph-right">
-      <select id="dash-yr" onchange="renderDash()" class="sel-yr">
-        <option>Alle</option>
-      </select>
-    </div>
-  </div>
+
 
   <div id="dash-wied-banner" style="display:none;margin-bottom:14px;background:#1a3a1a;border:1.5px solid var(--green);border-radius:var(--r);padding:14px 16px;cursor:pointer;align-items:center;gap:12px;user-select:none" onclick="var _nEl=document.querySelector('.nav-item[onclick*=\'wiederkehrend\']');if(_nEl){nav('wiederkehrend',_nEl);}else{nav('wiederkehrend',null);}" >
     <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--green);color:#fff;font-size:15px;flex-shrink:0"><i class="fas fa-sync-alt"></i></span>
@@ -314,8 +304,20 @@
   </div>
 
   <!-- ══ БАННЕРЫ СПОКОЙСТВИЯ ══ -->
-  <div id="calm-banners" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px; font-family: var(--mono);"></div>
+  <div id="calm-banners" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
 
+
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title">Dashboard</div>
+      <div class="ph-sub">Übersicht — <span id="dash-yr-lbl"></span></div>
+    </div>
+    <div class="ph-right">
+      <select id="dash-yr" onchange="renderDash()" class="sel-yr">
+        <option>Alle</option>
+      </select>
+    </div>
+  </div>
 
   <!-- Chart -->
   <div style="background:var(--s1);border-radius:var(--r2);padding:5px;margin-bottom:16px">
