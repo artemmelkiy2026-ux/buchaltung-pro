@@ -366,13 +366,14 @@ function showSection(id) {
 // ── USERS ─────────────────────────────────────────────────────────────────
 async function loadUsers() {
   document.getElementById('users-count').textContent = 'Wird geladen...';
-  try {
-    const { data, error } = await sb.auth.admin.listUsers();
-    if (error) throw error;
-    allUsers = data.users || [];
-  } catch(e) {
-    // Fallback: читаем из profiles если есть
-    const { data } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
+  // Читаем из profiles таблицы (anon key)
+  const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
+  if (error) {
+    // Если profiles нет — попробуем eintraege для уникальных user_id
+    const { data: d2 } = await sb.from('eintraege').select('user_id').limit(500);
+    const ids = [...new Set((d2||[]).map(r => r.user_id))];
+    allUsers = ids.map(id => ({ id, email: id.substring(0,8)+'…', created_at: null }));
+  } else {
     allUsers = data || [];
   }
 
@@ -476,7 +477,15 @@ async function sendNotification() {
 
   btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Nachricht senden';
 
-  if (error) { showToast('Fehler: ' + error.message, true); return; }
+  if (error) {
+    if (error.code === '42501') {
+      showToast('RLS-Fehler: INSERT Policy fehlt. Siehe Konsole.', true);
+      console.error('Füge diese Policy in Supabase hinzu:\nCREATE POLICY "Admin can insert" ON notifications FOR INSERT WITH CHECK (true);');
+    } else {
+      showToast('Fehler: ' + error.message, true);
+    }
+    return;
+  }
 
   showToast(target === 'all' ? '✓ Nachricht an alle gesendet!' : '✓ Nachricht gesendet!');
   document.getElementById('msg-title').value = '';
