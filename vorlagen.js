@@ -50,15 +50,13 @@ function rechAusVorlage(vorlId) {
   if (!v) return;
 
   const today = new Date().toISOString().split('T')[0];
-  const newNr = autoRechNr(new Date().getFullYear());
-
   const newR = {
     id:          'r-' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
-    nr:          newNr,
+    nr:          '',
     datum:       today,
     faellig:     '',
     leistungsdatum: '',
-    status:      'offen',
+    status:      'entwurf',
     kunde:       v.kunde       || '',
     adresse:     v.adresse     || '',
     email:       v.email       || '',

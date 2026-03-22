@@ -16,6 +16,7 @@ function setRechStatus(val){
   if(txt)  txt.textContent = cfg.label;
   const panel = document.getElementById('rn-status-panel');
   if(panel) panel.style.display = 'none';
+  _updateNrFieldForStatus(val);
 }
 
 function toggleRechStatusDropdown(){
@@ -131,7 +132,7 @@ function renderRech(){
       </div>
       <div class="rech-card-content">
         <div class="rech-card-row1">
-          <div class="rech-card-nr">${r.nr} ${stornoBadge}</div>
+          <div class="rech-card-nr">${r.nr || '<span style="color:var(--sub);font-style:italic;font-size:11px">Entwurf (ohne Nr.)</span>'} ${stornoBadge}</div>
           <div class="rech-card-betrag">${fmt(r.betrag)}</div>
         </div>
         <div class="rech-card-row2">
@@ -249,10 +250,8 @@ async function _rechStornierenGoBD(r) {
 }
 
 function _editRechAsNew(orig) {
-  // Открываем форму с данными старого рехнунга, но новым номером
-  const newNr = autoRechNr(new Date().getFullYear());
-  editRechId = null; // это будет НОВЫЙ рехнунг, не редактирование
-  document.getElementById('rn-nr').value = newNr;
+  editRechId = null;
+  document.getElementById('rn-nr').value = '';
   document.getElementById('rn-dat').value = new Date().toISOString().split('T')[0];
   document.getElementById('rn-faellig').value = orig.faellig || '';
   setRechStatus('entwurf');
@@ -366,6 +365,8 @@ function _openRechForm(r, id, title) {
   setRechPositionen(posData);
   const t = document.getElementById('rn-form-title');
   if (t) t.textContent = title || 'Rechnung bearbeiten';
+  // Обновить состояние поля номера по текущему статусу
+  _updateNrFieldForStatus(r.status || 'offen');
   nav('rechnungen-form', null);
 }
 
@@ -389,11 +390,10 @@ function _stornoUndNeu(r) {
   }
 
   // 2. Новый рехнунг с следующим номером
-  const newNr = autoRechNr(new Date().getFullYear());
   const newR = {
     ...r,
     id: Date.now()+'_'+Math.random().toString(36).slice(2,6),
-    nr: newNr,
+    nr: '',
     datum: new Date().toISOString().split('T')[0],
     status: 'entwurf',
     storno_von: r.nr,
@@ -404,13 +404,12 @@ function _stornoUndNeu(r) {
 
   data.rechnungen.push(newR);
   sbSaveRechnung(newR);
-  sbLogRechnung(newR, 'erstellt', null, {nr:newR.nr, status:'entwurf', storno_von:r.nr});
+  sbLogRechnung(newR, 'erstellt', null, {nr:'(Entwurf)', status:'entwurf', storno_von:r.nr});
 
   renderRech();
-  toast(`✓ ${r.nr} storniert · Neuer Entwurf ${newNr} erstellt`, 'ok');
+  toast(`✓ ${r.nr} storniert · Neuer Entwurf erstellt (Nr. wird beim Ausstellen vergeben)`, 'ok');
 
-  // Открываем форму редактирования нового
-  setTimeout(() => _openRechForm(newR, newR.id, `Entwurf ${newNr} (aus Storno von ${r.nr})`), 300);
+  setTimeout(() => _openRechForm(newR, newR.id, `Entwurf (aus Storno von ${r.nr})`), 300);
 }
 
 // Создаёт Einnahme из Rechnung и сохраняет в БД
@@ -527,7 +526,10 @@ function saveRechnung(){
   const mwst  =r2(brutto-netto);
   const betrag=brutto;
   const dsc=positionen.map(p=>p.bez).join(', ')||document.getElementById('rn-kunde').value.trim();
-  if(!nr||!betrag||!datum)return toast('Rechnungs-Nr., Datum und mind. 1 Position erforderlich!','err');
+  const status = document.getElementById('rn-status').value;
+  if(status !== 'entwurf' && !nr)
+    return toast('Rechnungs-Nr. ist erforderlich (nur Entwürfe können ohne Nr. gespeichert werden)','err');
+  if(!betrag||!datum)return toast('Datum und mind. 1 Position erforderlich!','err');
   if(!data.rechnungen)data.rechnungen=[];
   // Проверка блокировки номера (занят оплаченным документом)
   const lockMsg=isNrLocked(nr, editRechId, null);
@@ -586,10 +588,13 @@ Nach dem Ausstellen gelten GoBD-Regeln — Änderungen nur noch per Storno mögl
     {title:'📄 Rechnung ausstellen', okLabel:'Ja, ausstellen', cancelLabel:'Abbrechen'}
   );
   if (!ok) return;
+  if (!r.nr || r.nr.trim() === '') {
+    r.nr = autoRechNr(new Date().getFullYear());
+  }
   r.status = 'offen';
   if (!r.datum) r.datum = new Date().toISOString().split('T')[0];
   sbSaveRechnung(r);
-  sbLogRechnung(r, 'ausgestellt', {status:'entwurf'}, {status:'offen'});
+  sbLogRechnung(r, 'ausgestellt', {status:'entwurf'}, {status:'offen', nr:r.nr});
   renderRech();
   toast(`✓ Rechnung ${r.nr} ausgestellt`, 'ok');
 }

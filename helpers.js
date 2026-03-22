@@ -848,6 +848,197 @@ function _buildRechnungHTML(r) {
 </html>`;
 }
 
+// ── ANGEBOT HTML (красивый шаблон как у Rechnung) ─────────────────────────
+function _buildAngebotHTML(a) {
+  const f = typeof getFirmaData==='function' ? getFirmaData() : {};
+  const firmaLogo   = f.logo     || null;
+  const firmaName   = f.name     || 'Meine Firma';
+  const firmaStr    = f.strasse  || '';
+  const firmaPlzOrt = [f.plz, f.ort].filter(Boolean).join(' ');
+  const firmaTel    = f.tel      || '';
+  const firmaEmail  = f.email    || '';
+  const firmaIban   = f.iban     || '';
+  const firmaBic    = f.bic      || '';
+  const firmaStNr   = f.steuernummer || f.steuernr || '';
+  const firmaUstId  = f.ust_id   || f.ustid || '';
+  const firmaFooter = f.rechnung_footer || '';
+  const initials    = firmaName.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+  const aJahr  = a.datum ? a.datum.substring(0,4) : new Date().getFullYear()+'';
+  const isKlein = typeof isKleinunternehmer==='function' ? isKleinunternehmer(aJahr) : true;
+
+  const pos = a.positionen && a.positionen.length ? a.positionen : [];
+  const hasRabatt = pos.some(p => parseFloat(p.rabatt) > 0);
+
+  let totNetto=0, totMwst=0;
+  const posRows = pos.map((p,i) => {
+    const netto  = p.netto !== undefined ? p.netto : (p.preis || 0);
+    const savedRate = p.mwstRate !== undefined ? p.mwstRate : (p.rate !== undefined ? p.rate : 19);
+    const rate   = isKlein ? 0 : (savedRate || 19);
+    const lineN  = r2((p.menge||1) * netto);
+    const lineM  = r2(lineN * rate / 100);
+    totNetto += lineN; totMwst += lineM;
+    const rab    = parseFloat(p.rabatt) || 0;
+    const rabStr = rab > 0 ? (p.rabattTyp==='%' ? `−${rab}%` : `−${fmt(rab)}`) : '';
+    return `<tr>
+      <td>${i+1}</td>
+      <td>
+        <strong>${p.bez||p.beschreibung||'—'}</strong>
+        ${p.desc ? `<div class="pos-desc">${p.desc}</div>` : ''}
+      </td>
+      <td class="text-right">${p.menge||1} ${p.einheit||'Stk.'}</td>
+      <td class="text-right">${fmt(netto)}</td>
+      ${hasRabatt ? `<td class="text-right" style="color:#e85d04;font-size:11px">${rabStr}</td>` : ''}
+      <td class="text-right">${fmt(lineN)}</td>
+    </tr>`;
+  }).join('');
+  const totBrutto = r2(totNetto + totMwst);
+
+  // MwSt-Gruppen
+  const groups = {};
+  pos.forEach(p => {
+    const netto = p.netto !== undefined ? p.netto : (p.preis||0);
+    const rate  = isKlein ? 0 : (p.rate||0);
+    const lineN = r2((p.menge||1)*netto);
+    const lineM = r2(lineN*rate/100);
+    if(!groups[rate]) groups[rate]={netto:0,mwst:0};
+    groups[rate].netto = r2(groups[rate].netto+lineN);
+    groups[rate].mwst  = r2(groups[rate].mwst+lineM);
+  });
+  const mwstRows = isKlein ? '' : Object.keys(groups).map(Number).sort((a,b)=>b-a).map(rate => {
+    const g = groups[rate]; if(!g.netto) return '';
+    return `<tr class="sum-row-sub">
+      <td>Netto ${rate}%</td><td class="text-right">${fmt(g.netto)}</td></tr>
+    <tr class="sum-row-sub">
+      <td>USt. ${rate}%</td><td class="text-right">+${fmt(g.mwst)}</td></tr>`;
+  }).join('');
+  const kleinNote = isKlein ? '<p style="font-size:11px;color:#636366;margin-top:8px">Gem. § 19 UStG wird keine Umsatzsteuer berechnet.</p>' : '';
+
+  const addrLines = (a.adresse||'').split(/[\n,]/).map(s=>s.trim()).filter(Boolean);
+
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Angebot ${a.nr||''}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --primary:#0052cc; --text-main:#1c1c1e; --text-sub:#636366; --border:#e5e5ea; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#fff; font-family:'Inter',sans-serif; color:var(--text-main); }
+  .page { width:210mm; min-height:297mm; background:#fff; padding:14mm 14mm 20mm; margin:0 auto; position:relative; }
+  .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10mm; padding-bottom:6mm; border-bottom:2px solid var(--primary); }
+  .logo-area { display:flex; flex-direction:column; gap:6px; }
+  .logo-img { max-height:52px; max-width:160px; object-fit:contain; }
+  .logo-initials { width:52px; height:52px; background:var(--primary); color:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; }
+  .firma-name { font-size:16px; font-weight:700; color:var(--primary); margin-top:6px; }
+  .firma-sub { font-size:10px; color:var(--text-sub); line-height:1.5; margin-top:2px; }
+  .doc-meta { text-align:right; }
+  .doc-type { font-size:28px; font-weight:800; color:var(--primary); letter-spacing:-0.5px; margin-bottom:6px; }
+  .doc-meta-rows { font-size:11px; color:var(--text-sub); line-height:1.7; }
+  .doc-meta-rows strong { color:var(--text-main); }
+  .addr-block { margin-bottom:8mm; }
+  .addr-from { font-size:9px; color:var(--text-sub); border-bottom:1px solid var(--border); padding-bottom:2px; margin-bottom:4px; }
+  .addr-to { font-size:12px; line-height:1.6; }
+  .subject-block { margin-bottom:6mm; }
+  .subject-line { font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:4px; }
+  .head-text { font-size:11px; color:var(--text-sub); line-height:1.6; white-space:pre-wrap; }
+  .pos-table { width:100%; border-collapse:collapse; margin-bottom:6mm; font-size:11.5px; }
+  .pos-table thead tr { background:var(--primary); color:#fff; }
+  .pos-table thead th { padding:8px 10px; font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; }
+  .pos-table tbody tr:nth-child(even) { background:#f7f9fc; }
+  .pos-table tbody td { padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .text-right { text-align:right; }
+  .pos-desc { font-size:10px; color:var(--text-sub); margin-top:2px; }
+  .sum-block { display:flex; justify-content:flex-end; margin-bottom:6mm; }
+  .sum-table { width:240px; font-size:11.5px; border-collapse:collapse; }
+  .sum-row-sub td { padding:3px 10px; color:var(--text-sub); }
+  .sum-row-total td { padding:8px 10px; font-size:14px; font-weight:800; background:#f0f5ff; border-radius:4px; color:var(--primary); }
+  .foot-text { font-size:11px; color:var(--text-sub); line-height:1.6; white-space:pre-wrap; margin-bottom:6mm; }
+  .footer-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding-top:5mm; border-top:1px solid var(--border); font-size:9.5px; color:var(--text-sub); line-height:1.6; }
+  .footer-strip strong { color:var(--text-main); display:block; margin-bottom:2px; }
+  .angebot-badge { display:inline-block; background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:4px; padding:2px 8px; font-size:10px; font-weight:600; margin-left:8px; vertical-align:middle; }
+  @media print { body { background:#fff; } .page { padding:10mm; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="logo-area">
+      ${firmaLogo
+        ? `<img src="${firmaLogo}" class="logo-img" alt="Logo">`
+        : `<div class="logo-initials">${initials}</div>`}
+      <div class="firma-name">${firmaName}</div>
+      <div class="firma-sub">
+        ${firmaStr} ${firmaPlzOrt}<br>
+        ${firmaTel ? 'Tel: '+firmaTel+' · ' : ''}${firmaEmail}
+      </div>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-type">ANGEBOT <span class="angebot-badge">Kostenvoranschlag</span></div>
+      <div class="doc-meta-rows">
+        <div><strong>Nr.:</strong> ${a.nr||'—'}</div>
+        <div><strong>Datum:</strong> ${fd(a.datum)||'—'}</div>
+        ${a.gueltig ? `<div><strong>Gültig bis:</strong> ${fd(a.gueltig)}</div>` : ''}
+        ${firmaStNr ? `<div><strong>St.-Nr.:</strong> ${firmaStNr}</div>` : ''}
+        ${firmaUstId ? `<div><strong>USt-ID:</strong> ${firmaUstId}</div>` : ''}
+      </div>
+    </div>
+  </div>
+
+  <div class="addr-block">
+    <div class="addr-from">${firmaName} · ${firmaStr} · ${firmaPlzOrt}</div>
+    <div class="addr-to">
+      <strong>${a.kunde||''}</strong><br>
+      ${addrLines.map(l=>`${l}`).join('<br>')}
+    </div>
+  </div>
+
+  ${a.betreff ? `<div class="subject-block"><div class="subject-line">Betreff: ${a.betreff}</div></div>` : ''}
+  ${a.kopftext ? `<div class="subject-block"><div class="head-text">${a.kopftext}</div></div>` : ''}
+
+  <table class="pos-table">
+    <thead>
+      <tr>
+        <th style="width:7%">Pos</th>
+        <th style="width:${hasRabatt?'43%':'50%'}">Leistung / Beschreibung</th>
+        <th style="width:10%" class="text-right">Menge</th>
+        <th style="width:13%" class="text-right">Einzel</th>
+        ${hasRabatt ? '<th style="width:10%" class="text-right">Rabatt</th>' : ''}
+        <th style="width:17%" class="text-right">Gesamt</th>
+      </tr>
+    </thead>
+    <tbody>${posRows}</tbody>
+  </table>
+
+  <div class="sum-block">
+    <table class="sum-table">
+      ${mwstRows}
+      ${!isKlein ? `<tr class="sum-row-sub"><td colspan="2" style="padding:4px 10px;border-top:1px solid var(--border)"></td></tr>` : ''}
+      <tr class="sum-row-sub"><td>Nettobetrag</td><td class="text-right">${fmt(totNetto)}</td></tr>
+      ${!isKlein ? `<tr class="sum-row-sub"><td>MwSt. gesamt</td><td class="text-right">+${fmt(totMwst)}</td></tr>` : ''}
+      <tr class="sum-row-total"><td>Gesamtbetrag</td><td class="text-right">${fmt(totBrutto)}</td></tr>
+    </table>
+  </div>
+
+  ${kleinNote}
+
+  ${a.fusstext ? `<div class="foot-text">${a.fusstext}</div>` : ''}
+  ${firmaFooter ? `<div class="foot-text" style="border-top:1px solid var(--border);padding-top:4mm;margin-top:4mm">${firmaFooter}</div>` : ''}
+
+  <div class="footer-strip">
+    <div><strong>${firmaName}</strong>${firmaStr ? '<br>'+firmaStr : ''}${firmaPlzOrt ? '<br>'+firmaPlzOrt : ''}</div>
+    <div><strong>Bankverbindung</strong>${firmaIban ? '<br>IBAN: '+firmaIban : ''}${firmaBic ? '<br>BIC: '+firmaBic : ''}</div>
+    <div><strong>Kontakt</strong>${firmaTel ? '<br>Tel: '+firmaTel : ''}${firmaEmail ? '<br>'+firmaEmail : ''}</div>
+  </div>
+
+</div>
+</body>
+</html>`;
+}
+
+
 async function generateRechnungPDF(r) {
   const {jsPDF} = window.jspdf;
 
