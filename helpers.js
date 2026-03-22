@@ -507,14 +507,22 @@ function _buildRechnungHTML(r) {
     : [{bez:r.beschreibung||'Leistung', menge:1, einheit:'Stk.', preis:r.betrag, netto:r.betrag, mwstRate:0}];
 
   let totNetto=0, totMwst=0;
+  // Проверяем есть ли скидки в позициях
+  const hasRabatt = pos.some(p => p.rabatt && parseFloat(p.rabatt) > 0);
+
   const posRows = pos.map((p,i) => {
     const netto = p.netto!==undefined ? p.netto : (p.preis||0);
-    // Если regel-Besteuerung но rate не сохранён — берём 19% по умолчанию
     const savedRate = p.mwstRate!==undefined ? p.mwstRate : (p.rate!==undefined ? p.rate : 19);
     const rate  = isKlein ? 0 : (savedRate || 19);
     const lineN = r2((p.menge||1)*netto);
     const lineM = r2(lineN*rate/100);
     totNetto += lineN; totMwst += lineM;
+    // Строка скидки
+    const rabatt    = parseFloat(p.rabatt) || 0;
+    const rabattTyp = p.rabattTyp || '%';
+    const rabattStr = rabatt > 0
+      ? (rabattTyp === '%' ? `−${rabatt}%` : `−${fmt(rabatt)}`)
+      : '';
     return `<tr>
       <td>${i+1}</td>
       <td>
@@ -523,6 +531,7 @@ function _buildRechnungHTML(r) {
       </td>
       <td class="text-right">${p.menge||1} ${p.einheit||'Stk.'}</td>
       <td class="text-right">${fmt(netto)}</td>
+      ${hasRabatt ? `<td class="text-right" style="color:#e85d04;font-size:11px">${rabattStr}</td>` : ''}
       <td class="text-right">${fmt(lineN)}</td>
     </tr>`;
   }).join('');
@@ -768,9 +777,10 @@ function _buildRechnungHTML(r) {
     <thead>
       <tr>
         <th style="width: 8%">Pos</th>
-        <th style="width: 50%">Leistung</th>
+        <th style="${hasRabatt?'width:42%':'width:50%'}">Leistung</th>
         <th style="width: 12%" class="text-right">Menge</th>
-        <th style="width: 15%" class="text-right">Einzel</th>
+        <th style="width: 13%" class="text-right">Einzel</th>
+        ${hasRabatt ? '<th style="width:10%" class="text-right">Rabatt</th>' : ''}
         <th style="width: 15%" class="text-right">Gesamt</th>
       </tr>
     </thead>

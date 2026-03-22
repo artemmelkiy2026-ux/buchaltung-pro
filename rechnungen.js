@@ -970,14 +970,18 @@ function buildRechnungHTML(r){
   const totMwst =Object.values(groups).reduce((s,g)=>s+g.mwst,0);
   const totBrutto=r2(totNetto+totMwst);
 
+  const _hasRabatt = pos.some(p => parseFloat(p.rabatt) > 0);
   const posRows = pos.map(p=>{
     const netto=p.netto!==undefined?p.netto:p.preis;
     const rate=isKlein?0:(p.rate||0);
     const lineN=r2((p.menge||1)*netto);
+    const rab    = parseFloat(p.rabatt)||0;
+    const rabStr = rab>0 ? (p.rabattTyp==='%' ? `−${rab}%` : `−${fmt(rab)}`) : '';
     return `<tr>
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">${p.bez}</td>
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center">${p.menge}</td>
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right">${fmt(netto)}</td>
+      ${_hasRabatt ? `<td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;font-size:11px;color:#e85d04">${rabStr}</td>` : ''}
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;font-size:11px;color:#888">${isKlein?'§19':rate+'%'}</td>
       <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:600">${fmt(lineN)}</td>
     </tr>`;
