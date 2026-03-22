@@ -4181,3 +4181,35 @@ header { background: #fff; }
 .ein-row-rech-virt:hover {
   background: var(--bdim) !important;
 }
+
+/* ── EINTRÄGE ACTION BUTTONS ─────────────────────────────────────────────── */
+.rca-btn {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--sub);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.rca-btn:hover { background: var(--s2); color: var(--text); border-color: var(--border); }
+.rca-btn.rca-edit:hover { background: var(--bdim); color: var(--blue); border-color: var(--blue); }
+.rca-btn.rca-storno:hover { background: var(--rdim); color: var(--red); border-color: var(--red); }
+
+/* Storno filter tab */
+.ftab-storno { opacity: .65; }
+.ftab-storno.active { opacity: 1; }
+
+/* Sторнированная строка — потухшая */
+.ein-row-st {
+  opacity: .5;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    rgba(0,0,0,.02) 8px,
+    rgba(0,0,0,.02) 9px
+  ) !important;
+}

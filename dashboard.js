@@ -940,7 +940,7 @@ function getFiltered(){
     });
   }
   return data.eintraege.filter(e=>{
-    if(e.is_storno||e._storniert)return false; // GoBD: скрываем sторно-записи
+    if((e.is_storno||e._storniert) && !window._showStornoEin)return false; // GoBD
     if(fTyp!=='Alle'&&e.typ!==fTyp)return false;
     if(j!=='Alle'&&!e.datum.startsWith(j))return false;
     if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;
@@ -965,6 +965,21 @@ function sortE(col){
 }
 
 function setFTyp(t,btn){fTyp=t;document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderEin();}
+
+function toggleStornoEin(btn) {
+  window._showStornoEin = !window._showStornoEin;
+  const icon = document.getElementById('ftab-storno-icon');
+  if (window._showStornoEin) {
+    btn.classList.add('active');
+    btn.style.background = 'var(--rdim)';
+    if (icon) icon.className = 'fas fa-eye style="font-size:10px;margin-right:4px"';
+  } else {
+    btn.classList.remove('active');
+    btn.style.background = '';
+    if (icon) icon.className = 'fas fa-eye-slash';
+  }
+  renderEin();
+}
 
 // ── PAGINATION HELPERS ────────────────────────────────────────────────────
 function nextTenPages(total) { einPage = Math.min(total, einPage + 10); renderEin(); }
@@ -1103,9 +1118,10 @@ function renderEin(){
               +'<div class="ein-row-cat">'+_catLine+'</div>'
               +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
                 +(_isRechVirt ? '<span style="font-size:11px;color:var(--sub)"><i class="fas fa-lock" style="font-size:9px"></i> Rechnung</span>'
-                  : st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>'
+                  : st ? '<span style="font-size:10px;color:var(--sub);padding:2px 6px;background:var(--rdim);border-radius:4px">Storniert</span>'
                   : (isMob() ? _mobBtn
-                    : '<button class="rca-btn rca-red" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren"><i class="fas fa-trash"></i></button>'))
+                    : '<button class="rca-btn rca-edit" onclick="event.stopPropagation();editE(event,\''+e.id+'\')" title="Bearbeiten / Korrigieren"><i class="fas fa-edit"></i></button>'
+                    +'<button class="rca-btn rca-storno" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren (GoBD)"><i class="fas fa-undo-alt"></i></button>'))
               +'</div>'
             +'</div>'
             +(_stLblFull ? '<div class="ein-row-tags">'+_stLblFull+'</div>' : '')

@@ -450,6 +450,9 @@
       <button class="ftab active" onclick="setFTyp('Alle',this)">Alle</button>
       <button class="ftab" onclick="setFTyp('Einnahme',this)">Einnahmen</button>
       <button class="ftab" onclick="setFTyp('Ausgabe',this)">Ausgaben</button>
+      <button class="ftab ftab-storno" id="ftab-storno-btn" onclick="toggleStornoEin(this)" style="border-color:var(--red);color:var(--red)">
+        <i class="fas fa-eye-slash" id="ftab-storno-icon" style="font-size:10px;margin-right:4px"></i>Storniert
+      </button>
     </div>
     <div class="toolbar-group">
       <label>Jahr</label>
