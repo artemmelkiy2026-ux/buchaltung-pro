@@ -414,19 +414,40 @@ async function loadAll() {
 
 // ── USERS ─────────────────────────────────────────────────────────────────
 async function loadUsers() {
-  const tables = ['eintraege','rechnungen','kunden','angebote','fahrtenbuch'];
-  const results = await Promise.all(tables.map(t =>
-    sb.from(t).select('user_id,created_at').order('created_at',{ascending:true})
-  ));
-  const map = {};
-  results.forEach(({ data }, ti) => {
-    (data||[]).forEach(r => {
-      if (!map[r.user_id]) map[r.user_id] = { id:r.user_id, first:r.created_at, last:r.created_at, counts:{} };
-      map[r.user_id].counts[tables[ti]] = (map[r.user_id].counts[tables[ti]]||0)+1;
-      if (r.created_at > map[r.user_id].last) map[r.user_id].last = r.created_at;
+  // Сначала пробуем user_registry (точные данные о входах)
+  const { data: regData } = await sb
+    .from('user_registry')
+    .select('*')
+    .order('last_seen_at', { ascending: false });
+
+  if (regData?.length) {
+    // Дополнительно считаем записи из eintraege
+    const { data: eData } = await sb.from('eintraege').select('user_id').limit(1000);
+    const entryCount = {};
+    (eData||[]).forEach(r => { entryCount[r.user_id] = (entryCount[r.user_id]||0)+1; });
+
+    allUsers = regData.map(r => ({
+      id: r.user_id,
+      first: r.created_at,
+      last: r.last_seen_at || r.created_at,
+      counts: { eintraege: entryCount[r.user_id]||0 }
+    }));
+  } else {
+    // Fallback: собираем из таблиц
+    const tables = ['eintraege','rechnungen','kunden','angebote','fahrtenbuch'];
+    const results = await Promise.all(tables.map(t =>
+      sb.from(t).select('user_id,created_at').order('created_at',{ascending:true})
+    ));
+    const map = {};
+    results.forEach(({ data }, ti) => {
+      (data||[]).forEach(r => {
+        if (!map[r.user_id]) map[r.user_id] = { id:r.user_id, first:r.created_at, last:r.created_at, counts:{} };
+        map[r.user_id].counts[tables[ti]] = (map[r.user_id].counts[tables[ti]]||0)+1;
+        if (r.created_at > map[r.user_id].last) map[r.user_id].last = r.created_at;
+      });
     });
-  });
-  allUsers = Object.values(map).sort((a,b) => b.last.localeCompare(a.last));
+    allUsers = Object.values(map).sort((a,b) => b.last.localeCompare(a.last));
+  }
 
   // Stats
   const thirtyAgo = new Date(); thirtyAgo.setDate(thirtyAgo.getDate()-30);
@@ -556,7 +577,14 @@ function renderInbox() {
           ${n.expires_at ? `<span>⏱ bis ${new Date(n.expires_at).toLocaleDateString('de-DE')}</span>` : ''}
         </div>
       </div>
-      <button class="btn btn-red" onclick="delNotif('${n.id}')" style="flex-shrink:0;padding:6px 10px"><i class="fas fa-trash"></i></button>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn" onclick="archiveNotif('${n.id}')" style="padding:6px 10px;font-size:11px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;color:#64748b" title="Archivieren">
+          <i class="fas fa-archive"></i>
+        </button>
+        <button class="btn btn-red" onclick="delNotif('${n.id}')" style="flex-shrink:0;padding:6px 10px" title="Löschen">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -570,12 +598,51 @@ function setNotifFilter(f, el) {
 }
 
 async function delNotif(id) {
+  // Сразу убираем из DOM для отзывчивости
+  const el = document.getElementById('nr-'+id);
+  if (el) el.remove();
+
   const { error } = await sb.from('notifications').delete().eq('id',id);
-  if (error) { toast('Fehler: '+error.message, true); return; }
+  if (error) {
+    toast('Fehler: '+error.message, true);
+    renderInbox(); // восстановить если ошибка
+    return;
+  }
   allNotifs = allNotifs.filter(n => n.id !== id);
-  renderInbox(); renderHistory();
-  document.getElementById('s-msgs').textContent = allNotifs.length;
+  renderHistory();
+  const cnt = document.getElementById('s-msgs');
+  if (cnt) cnt.textContent = allNotifs.length;
+  document.getElementById('inbox-footer').textContent = allNotifs.length + ' Nachrichten';
+  if (!allNotifs.length) renderInbox(); // показать empty state
   toast('✓ Gelöscht');
+}
+
+async function archiveNotif(id) {
+  const el = document.getElementById('nr-'+id);
+  if (el) el.style.opacity = '0.4';
+
+  const { error } = await sb.from('notifications')
+    .update({ is_archived: true })
+    .eq('id', id);
+
+  if (error) {
+    toast('Fehler: '+error.message, true);
+    if (el) el.style.opacity = '1';
+    return;
+  }
+  // В архив — убираем из активного списка, но НЕ удаляем из БД
+  const notif = allNotifs.find(n => n.id === id);
+  if (notif) notif.is_archived = true;
+  allNotifs = allNotifs.filter(n => n.id !== id); // убрать из активного inbox
+  archivedNotifs = archivedNotifs || [];
+  if (notif) archivedNotifs.unshift(notif);
+
+  if (el) el.remove();
+  renderHistory();
+  const cnt = document.getElementById('s-msgs');
+  if (cnt) cnt.textContent = allNotifs.length;
+  if (!allNotifs.filter(n=>!n.is_archived).length) renderInbox();
+  toast('✓ Archiviert — Nutzer können diese Nachricht nicht mehr sehen');
 }
 
 async function deleteAllNotifs() {

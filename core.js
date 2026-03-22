@@ -200,6 +200,13 @@ function closeNeuEintrag() {
 function appInit(){
   document.getElementById('nf-dat').value=new Date().toISOString().split('T')[0];
   updateKatSel(); buildYearFilters(); renderAll();
+  // Регистрируем пользователя для admin панели
+  if (typeof sb !== 'undefined' && currentUser) {
+    sb.from('user_registry').upsert({
+      user_id: currentUser.id,
+      last_seen_at: new Date().toISOString()
+    }, { onConflict: 'user_id' }).then(() => {});
+  }
   updateMwstFormVisibility();
   setTyp(curTyp);
   // Группа Aufträge открывается при переходе в неё

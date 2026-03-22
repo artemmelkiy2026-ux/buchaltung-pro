@@ -13,6 +13,7 @@ async function loadNotifications() {
       .from('notifications')
       .select('*')
       .or(`target_user_id.is.null,target_user_id.eq.${currentUser.id}`)
+      .neq('is_archived', true)
       .order('created_at', { ascending: false })
       .limit(50);
     if (error) throw error;
