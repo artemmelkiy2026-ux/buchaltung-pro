@@ -366,16 +366,24 @@ function showSection(id) {
 // ── USERS ─────────────────────────────────────────────────────────────────
 async function loadUsers() {
   document.getElementById('users-count').textContent = 'Wird geladen...';
-  // Читаем из profiles таблицы (anon key)
-  const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
-  if (error) {
-    // Если profiles нет — попробуем eintraege для уникальных user_id
-    const { data: d2 } = await sb.from('eintraege').select('user_id').limit(500);
-    const ids = [...new Set((d2||[]).map(r => r.user_id))];
-    allUsers = ids.map(id => ({ id, email: id.substring(0,8)+'…', created_at: null }));
-  } else {
-    allUsers = data || [];
-  }
+  // Собираем уникальных пользователей из нескольких таблиц
+  const sources = await Promise.all([
+    sb.from('eintraege').select('user_id, created_at').order('created_at', {ascending:true}),
+    sb.from('rechnungen').select('user_id, created_at').order('created_at', {ascending:true}),
+    sb.from('kunden').select('user_id, created_at').order('created_at', {ascending:true}),
+  ]);
+
+  const userMap = {};
+  sources.forEach(({ data }) => {
+    (data || []).forEach(r => {
+      if (!userMap[r.user_id]) userMap[r.user_id] = { id: r.user_id, created_at: r.created_at, entries: 0, last_sign_in_at: r.created_at };
+      userMap[r.user_id].entries = (userMap[r.user_id].entries || 0) + 1;
+      if (r.created_at > userMap[r.user_id].last_sign_in_at) userMap[r.user_id].last_sign_in_at = r.created_at;
+    });
+  });
+
+  // Попробуем также получить email из notifications если есть
+  allUsers = Object.values(userMap).sort((a,b) => (b.last_sign_in_at||'').localeCompare(a.last_sign_in_at||''));
 
   renderUsers(allUsers);
   fillUserSelect(allUsers);
@@ -394,20 +402,27 @@ function renderUsers(users) {
     return;
   }
   tbody.innerHTML = users.map(u => {
-    const email   = u.email || u.email_address || '—';
-    const initials= email.substring(0, 2).toUpperCase();
+    const email   = u.email || '—';
+    const shortId = u.id?.substring(0,8) + '…';
+    const initials= u.id?.substring(0,2).toUpperCase() || 'US';
     const created = u.created_at ? new Date(u.created_at).toLocaleDateString('de-DE') : '—';
     const lastSeen= u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString('de-DE') : '—';
     const isActive= u.last_sign_in_at && (new Date() - new Date(u.last_sign_in_at)) < 30*86400000;
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:10px">
         <div class="user-avatar">${initials}</div>
-        <span style="font-size:12px;color:#64748b">${u.id?.substring(0,8)}…</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#0f172a">${shortId}</div>
+          <div style="font-size:11px;color:#94a3b8">${u.entries||0} Einträge</div>
+        </div>
       </div></td>
-      <td style="font-size:13px">${email}</td>
+      <td style="font-size:12px;color:#64748b;font-family:monospace">${u.id}</td>
       <td style="font-size:12px;color:#64748b">${created}</td>
-      <td><span class="badge ${isActive?'badge-green':'badge-gray'}">${isActive?'Aktiv':'Inaktiv'}</span></td>
-      <td><button class="btn-outline" onclick="quickSend('${u.id}','${email}')" style="font-size:11px;padding:5px 10px">
+      <td>
+        <div style="font-size:11px;color:#64748b">${lastSeen}</div>
+        <span class="badge ${isActive?'badge-green':'badge-gray'}" style="margin-top:3px">${isActive?'Aktiv':'Inaktiv'}</span>
+      </td>
+      <td><button class="btn-outline" onclick="quickSend('${u.id}','${shortId}')" style="font-size:11px;padding:5px 10px">
         <i class="fas fa-paper-plane"></i> Nachricht
       </button></td>
     </tr>`;
