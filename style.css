@@ -4121,3 +4121,13 @@ header { background: #fff; }
     gap: 10px!important;
   }
 }
+
+/* ── NOTIFICATIONS PAGE ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  #p-notifications .page-inner > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+  #p-notifications [style*="position:sticky"] {
+    position: static !important;
+  }
+}

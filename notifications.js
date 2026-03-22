@@ -141,8 +141,8 @@ async function refreshNotifications() {
   const sysNotifs  = getSystemNotifications();
   const dbNotifs   = await loadNotifications();
 
-  // Объединяем: сначала системные, потом из БД
-  _notifData = [
+  // Объединяем и сортируем по убыванию даты
+  const allNotifs = [
     ...sysNotifs,
     ...dbNotifs.map(n => ({
       id: n.id,
@@ -155,6 +155,12 @@ async function refreshNotifications() {
       action: null
     }))
   ];
+
+  // Сортировка по убыванию (последнее сверху)
+  _notifData = allNotifs.sort((a, b) => {
+    const da = a.created_at || '', db = b.created_at || '';
+    return db.localeCompare(da);
+  });
 
   const readIds = _getReadIds();
   _notifUnread = _notifData.filter(n => !readIds.includes(n.id)).length;
@@ -185,12 +191,19 @@ function renderNotificationsPage() {
   _notifUnread = 0;
   _updateBell();
 
+  // Обновляем правую панель
+  _updateStatusPanel();
+
   if (_notifData.length === 0) {
     container.innerHTML = `
       <div style="text-align:center;padding:60px 20px;color:var(--sub)">
         <i class="fas fa-bell-slash" style="font-size:48px;opacity:.2;margin-bottom:16px;display:block"></i>
-        <div style="font-size:15px;font-weight:600">Keine Benachrichtigungen</div>
-        <div style="font-size:13px;margin-top:6px">Alles ist in Ordnung!</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text)">Keine neuen Benachrichtigungen</div>
+        <div style="font-size:13px;margin-top:6px">Alles ist in Ordnung — alle Checks bestanden!</div>
+        <div style="margin-top:16px;font-size:12px;color:var(--sub)">
+          <i class="fas fa-check-circle" style="color:var(--green);margin-right:6px"></i>
+          Zuletzt geprüft: ${new Date().toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'})}
+        </div>
       </div>`;
     return;
   }
@@ -233,4 +246,58 @@ function renderNotificationsPage() {
     const action = window._notifActions?.[+card.dataset.notifIdx];
     if (typeof action === 'function') action();
   };
+}
+
+// ── Кнопка обновления с анимацией ─────────────────────────────────────────
+async function notifRefresh() {
+  const btn  = document.getElementById('notif-refresh-btn');
+  const icon = document.getElementById('notif-refresh-icon');
+  if (btn)  btn.disabled = true;
+  if (icon) icon.style.animation = 'spin 0.6s linear infinite';
+
+  // Добавим CSS для spin если нет
+  if (!document.getElementById('spin-style')) {
+    const s = document.createElement('style');
+    s.id = 'spin-style';
+    s.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+    document.head.appendChild(s);
+  }
+
+  await refreshNotifications();
+
+  if (icon) icon.style.animation = '';
+  if (btn)  btn.disabled = false;
+}
+
+// ── Правая панель — статус и счётчики ─────────────────────────────────────
+function _updateStatusPanel() {
+  const total  = _notifData.length;
+  const urgent = _notifData.filter(n => n.type === 'danger').length;
+  const warn   = _notifData.filter(n => n.type === 'warning').length;
+  const admin  = _notifData.filter(n => n.from_admin).length;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('notif-count-total',  total);
+  set('notif-count-urgent', urgent);
+  set('notif-count-warn',   warn);
+  set('notif-count-admin',  admin);
+  set('notif-last-update',  new Date().toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}));
+
+  // Статус-строки
+  const rows = document.getElementById('notif-status-rows');
+  if (!rows) return;
+  const checks = [
+    { label: 'Rechnungen', ok: _notifData.filter(n=>n.id==='sys-overdue').length===0 },
+    { label: 'KU-Limit',   ok: _notifData.filter(n=>n.id==='sys-ku-limit').length===0 },
+    { label: 'USt-VA',     ok: _notifData.filter(n=>n.id==='sys-ust-va').length===0 },
+    { label: 'Angebote',   ok: _notifData.filter(n=>n.id==='sys-expiring').length===0 },
+  ];
+  rows.innerHTML = checks.map(ch => `
+    <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+      <span style="color:var(--sub)">${ch.label}</span>
+      <span style="display:flex;align-items:center;gap:4px;font-weight:600;color:${ch.ok?'var(--green)':'var(--red)'}">
+        <i class="fas ${ch.ok?'fa-check-circle':'fa-times-circle'}" style="font-size:11px"></i>
+        ${ch.ok ? 'OK' : 'Prüfen'}
+      </span>
+    </div>`).join('');
 }
