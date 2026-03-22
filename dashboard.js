@@ -498,10 +498,6 @@ function renderCalmBanners() {
         from { opacity:0; }
         to   { opacity:1; }
       }
-      @keyframes calm-glow {
-        0%,100% { opacity:.6; }
-        50%      { opacity:1; }
-      }
       @keyframes calm-bar {
         from { width:0 }
       }
@@ -531,7 +527,6 @@ function renderCalmBanners() {
   const compIcon  = compOk ? 'fa-shield-alt' : 'fa-exclamation-triangle';
   const compTitle = compOk ? 'Alles in Ordnung' : compWarn ? 'Prüfung empfohlen' : 'Achtung!';
   const compSub   = compOk ? `${ye.length} Einträge vollständig` : `${issues} unvollständig`;
-  const compPulse = !compOk; // пульс только при проблемах
 
   // ── 2. KU-LIMIT oder USt-VA ───────────────────────────────────
   const mo = today.getMonth(), yr_n = today.getFullYear();
@@ -548,10 +543,9 @@ function renderCalmBanners() {
     ? `${fristMon[Math.min(11, forecastDate.getMonth())]} ${forecastDate.getFullYear()}`
     : remaining <= 0 ? 'Überschritten!' : 'Kein Risiko';
 
-  let c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Bar = '', c2Pulse = false;
+  let c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Bar = '';
   if (!isRegel) {
     const limOk = limitPct < 70, limWarn = limitPct < 90;
-    c2Pulse = !limOk;
     c2Grad  = limOk
       ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, #2a6bbf 100%)`
       : limWarn
@@ -567,7 +561,6 @@ function renderCalmBanners() {
     </div>`;
   } else {
     const fOk = diffDays > 7;
-    c2Pulse = !fOk;
     c2Grad  = fOk
       ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, #2a6bbf 100%)`
       : `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`;
@@ -582,7 +575,6 @@ function renderCalmBanners() {
   const mwstTotal = ye.filter(e=>e.mwstBetrag>0).reduce((s,e)=>s+e.mwstBetrag,0);
   const vstTotal  = ye.filter(e=>e.vorsteuerBet>0).reduce((s,e)=>s+e.vorsteuerBet,0);
   const zahllast  = Math.max(0, mwstTotal - vstTotal);
-  const resPulse  = isRegel && zahllast > 0;
   const resGrad   = !isRegel
     ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, #2a6bbf 100%)`
     : zahllast > 0
@@ -605,7 +597,6 @@ function renderCalmBanners() {
   const gewPrev = sum(ePrevMo,'Einnahme') - sum(ePrevMo,'Ausgabe');
   const gewDiff = gewPrev !== 0 ? Math.round((gewThis - gewPrev) / Math.abs(gewPrev) * 100) : 0;
   const trendOk  = gewDiff >= 0;
-  const trendPulse = false;
   const trendGrad = trendOk
     ? `linear-gradient(135deg, ${GREEN} 0%, #2d7a42 60%, #4aab62 100%)`
     : `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`;
@@ -618,8 +609,8 @@ function renderCalmBanners() {
   // SVG сетка-паттерн как data URI для фонового декора
   const gridPattern = `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0M-5 5L5-5M35 45L45 35' stroke='rgba(255,255,255,0.06)' stroke-width='1' fill='none'/%3E%3C/svg%3E")`;
 
-  const card = (grad, icon, label, val, title, sub, pulse=false, extra='') => `
-    <div class="calm-card" style="background:${grad};border-radius:10px;padding:20px;position:relative;overflow:hidden;min-height:148px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
+  const card = (grad, icon, label, val, title, sub, extra='') => `
+    <div class="calm-card" style="background:${grad};border-radius:10px;padding:20px;position:relative;overflow:hidden;min-height:148px">
       <!-- Фоновый паттерн -->
       <div style="position:absolute;inset:0;background:${gridPattern};opacity:1;pointer-events:none"></div>
       <!-- Декоративные круги -->
@@ -628,7 +619,7 @@ function renderCalmBanners() {
       <!-- Контент -->
       <div style="position:relative;z-index:1">
         <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
-          <div class="calm-icon-wrap" style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0${pulse?';box-shadow:0 0 0 0 rgba(255,255,255,.4)':''}">
+          <div class="calm-icon-wrap" style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <i class="fas ${icon}" style="color:#fff;font-size:14px"></i>
           </div>
           <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)">${label}</span>
@@ -642,13 +633,13 @@ function renderCalmBanners() {
     </div>`;
 
   wrap.innerHTML =
-    card(compGrad, compIcon, 'Compliance', compPct+'%', compTitle, compSub, compPulse,
+    card(compGrad, compIcon, 'Compliance', compPct+'%', compTitle, compSub,
       `<div style="margin-top:14px;height:4px;border-radius:4px;background:rgba(255,255,255,.2)">
         <div style="height:100%;width:${compPct}%;border-radius:4px;background:rgba(255,255,255,.9);animation:calm-bar .8s ease"></div>
       </div>`) +
-    card(c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Pulse, c2Bar) +
-    card(resGrad, resIcon, resLabel, resVal, resTitle, resSub, resPulse) +
-    card(trendGrad, trendIcon, 'Gewinn Trend', trendVal, trendTitle, trendSub, trendPulse);
+    card(c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Bar) +
+    card(resGrad, resIcon, resLabel, resVal, resTitle, resSub) +
+    card(trendGrad, trendIcon, 'Gewinn Trend', trendVal, trendTitle, trendSub);
 
 
 }
