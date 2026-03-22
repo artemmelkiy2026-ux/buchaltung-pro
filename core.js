@@ -251,7 +251,7 @@ function buildYearFilters(){
   fk.innerHTML='<option value="Alle">Alle</option>'+allKats.map(k=>`<option${k===pk?' selected':''}>${k}</option>`).join('');
 }
 
-function renderAll(){ buildYearFilters(); renderDash(); renderEin(); renderZ(); }
+function renderAll(){ buildYearFilters(); renderDash(); renderEin(); renderZ(); if(typeof renderRech==='function') renderRech(); }
 
 // Все записи без сторно — используется во всех расчётах
 function activeEintraege() {

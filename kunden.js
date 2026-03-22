@@ -78,16 +78,32 @@ function showWiedEintragInfo(wiedId) {
           _closeDetailSheet();
           const el = document.querySelector('.nav-item[onclick*="wiederkehrend"]');
           if (el) nav('wiederkehrend', el);
-          // Подсвечиваем нужную карточку
+          // Переключаем страницу если нужно и подсвечиваем
           setTimeout(() => {
-            const card = document.querySelector(`.wied-card[onclick*="${wiedId}"]`);
-            if (card) {
-              card.scrollIntoView({ behavior:'smooth', block:'center' });
-              card.classList.remove('highlight-flash');
-              void card.offsetWidth;
-              card.classList.add('highlight-flash');
-              setTimeout(() => card.classList.remove('highlight-flash'), 1200);
+            const _findWC = () => document.querySelector(`.wied-card[onclick*="${wiedId}"]`);
+            let wcard = _findWC();
+            // Если карточки нет — ищем страницу
+            if (!wcard && typeof data !== 'undefined' && data.wiederkehrend
+                && typeof wiedPage !== 'undefined' && typeof WIED_PER_PAGE !== 'undefined') {
+              const widx = (data.wiederkehrend||[]).findIndex(w => w.id === wiedId);
+              if (widx >= 0) {
+                const tp = Math.floor(widx / WIED_PER_PAGE) + 1;
+                if (tp !== wiedPage) { wiedPage = tp; if(typeof renderWied==='function') renderWied(); }
+              }
             }
+            let wa = 0;
+            const wr = setInterval(() => {
+              wa++;
+              wcard = _findWC();
+              if (wcard) {
+                clearInterval(wr);
+                wcard.scrollIntoView({ behavior:'smooth', block:'center' });
+                wcard.classList.remove('highlight-flash');
+                void wcard.offsetWidth;
+                wcard.classList.add('highlight-flash');
+                setTimeout(() => wcard.classList.remove('highlight-flash'), 1200);
+              } else if (wa > 20) clearInterval(wr);
+            }, 100);
           }, 400);
         }
       },
