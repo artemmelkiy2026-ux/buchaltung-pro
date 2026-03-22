@@ -275,7 +275,7 @@
       <span class="ic" style="position:relative;display:inline-flex">
         <i class="fas fa-bell"></i>
         <span id="notif-badge" style="display:none;position:absolute;top:-5px;right:-6px;background:#dc2626;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span>
-      </span>
+      </span> Info
     </div>
     <div class="nav-item" onclick="location.href='profile.html'" style="font-size:14px;color:var(--sub)">
       <span class="ic"><i class="fas fa-user"></i></span> Profil
@@ -2263,6 +2263,18 @@
     </div>
   </div>
 
+  <!-- §147 AO Aufbewahrungshinweis -->
+  <div style="background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px">
+    <i class="fas fa-archive" style="color:var(--blue);margin-top:2px;flex-shrink:0"></i>
+    <div style="font-size:12px;line-height:1.6">
+      <strong style="color:var(--text)">§147 AO — Aufbewahrungspflicht (10 Jahre)</strong><br>
+      <span style="color:var(--sub)">Rechnungen, Buchungsbelege, Kontoauszüge und alle Geschäftsunterlagen müssen gemäß §147 AO
+      <strong>10 Jahre</strong> aufbewahrt werden. Handelsbriefe und sonstige Unterlagen nach §147 Abs. 3 AO
+      mindestens <strong>6 Jahre</strong>. Exportieren Sie regelmäßig Ihre Daten als JSON-Backup
+      (Einstellungen → Datensicherung).</span>
+    </div>
+  </div>
+
   <!-- Auswahl Bereiche -->
   <div>
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">
@@ -2528,6 +2540,7 @@
             <div class="fg" style="margin:0"><label style="display:flex;align-items:center;gap:5px">Leistungsdatum <span style="font-size:10px;color:var(--sub);font-weight:400">(falls abweichend)</span></label><input type="date" id="rn-leistung" placeholder="= Rechnungsdatum"></div>
           </div>
           <div class="fg" style="margin:0"><label>Notiz / Zahlungshinweis <span style="font-size:10px;color:var(--sub)">(optional)</span></label><textarea id="rn-notiz" rows="2" placeholder="Bitte überweisen Sie den Betrag innerhalb von 14 Tagen..." style="min-height:60px;resize:vertical"></textarea></div>
+          <div class="fg" style="margin:0"><label>Leitweg-ID <span style="font-size:10px;color:var(--sub);font-weight:400">(optional &middot; nur für B2G / öffentl. Auftraggeber)</span></label><input type="text" id="rn-leitweg" placeholder="z.B. 04011000-1234567890-06" style="font-family:var(--mono);font-size:12px"></div>
         </div>
       </div>
     </div>

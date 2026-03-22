@@ -229,7 +229,7 @@ function openRechModal(){
   const faellig=new Date();faellig.setDate(faellig.getDate()+14);
   document.getElementById('rn-faellig').value=faellig.toISOString().split('T')[0];
   document.getElementById('rn-bet').value='';
-  ['rn-kunde','rn-adresse','rn-email','rn-tel','rn-notiz'].forEach(id=>document.getElementById(id).value='');
+  ['rn-kunde','rn-adresse','rn-email','rn-tel','rn-notiz','rn-leitweg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const sug = document.getElementById('rn-kunde-suggest');
   if (sug) sug.style.display = 'none';
   setRechStatus('offen');
@@ -376,6 +376,8 @@ function _openRechForm(r, id, title) {
   document.getElementById('rn-email').value=r.email||'';
   document.getElementById('rn-tel').value=r.tel||'';
   document.getElementById('rn-notiz').value=r.notiz||'';
+  const _leitwegEl = document.getElementById('rn-leitweg');
+  if (_leitwegEl) _leitwegEl.value = r.leitwegId || '';
   document.getElementById('rn-nr').dataset.kundeTel=r.tel||'';
   document.getElementById('rn-nr').dataset.kundeId=r.kundeId||'';
   updateRechBanner();
@@ -564,6 +566,7 @@ function saveRechnung(){
     email:document.getElementById('rn-email').value.trim(),
     tel:document.getElementById('rn-tel').value.trim()||document.getElementById('rn-nr').dataset.kundeTel||'',
     notiz:document.getElementById('rn-notiz').value.trim(),
+    leitwegId:document.getElementById('rn-leitweg')?.value.trim()||'',
     kundeId:document.getElementById('rn-nr').dataset.kundeId||'',
     positionen,
     netto, mwstBetrag:mwst, mwstRate:positionen.length>0?(positionen.find(p=>p.rate>0)?.rate||0):0, mwstMode:isKleinunternehmer(datum?datum.substring(0,4):new Date().getFullYear()+'')?'§19':'regel'
@@ -1725,6 +1728,7 @@ function generateXRechnungXML(r) {
         ${firma.ustid ? `<ram:SpecifiedTaxRegistration><ram:ID schemeID="VA">${esc(firma.ustid)}</ram:ID></ram:SpecifiedTaxRegistration>` : ''}
         ${firma.steuernr ? `<ram:SpecifiedTaxRegistration><ram:ID schemeID="FC">${esc(firma.steuernr)}</ram:ID></ram:SpecifiedTaxRegistration>` : ''}
       </ram:SellerTradeParty>
+      ${r.leitwegId ? `<ram:BuyerReference>${esc(r.leitwegId)}</ram:BuyerReference>` : ''}
       <ram:BuyerTradeParty>
         <ram:Name>${esc(r.kunde || 'Kunde')}</ram:Name>
         ${r.adresse ? `<ram:PostalTradeAddress><ram:LineOne>${esc(r.adresse)}</ram:LineOne><ram:CountryID>DE</ram:CountryID></ram:PostalTradeAddress>` : ''}

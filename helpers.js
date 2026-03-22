@@ -769,6 +769,7 @@ function _buildRechnungHTML(r) {
       <div class="meta-row"><span>Rechnungsdatum</span><span>${fd(r.datum)}</span></div>
       <div class="meta-row"><span>Leistungsdatum</span><span>${r.leistungsdatum && r.leistungsdatum !== r.datum ? fd(r.leistungsdatum) : fd(r.datum)}</span></div>
       <div class="meta-row"><span>Fällig bis</span><span>${r.faellig?fd(r.faellig):'—'}</span></div>
+      ${r.leitwegId ? `<div class="meta-row" style="font-size:10px"><span>Leitweg-ID</span><span style="font-family:monospace">${r.leitwegId}</span></div>` : ''}
     </div>
   </div>
 
