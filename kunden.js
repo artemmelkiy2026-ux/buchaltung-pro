@@ -43,9 +43,53 @@ function showWiedDetail(id) {
       { key: 'Status', val: isPaused ? '<span style="color:var(--sub)">Pausiert</span>' : '<span style="color:var(--green)">Aktiv</span>' },
     ],
     buttons: [
-      { label: 'Jetzt buchen', icon: 'fa-play', primary: true, action: () => wBuchen(id) },
+      { label: 'Jetzt buchen', icon: 'fa-hand-pointer', primary: true, action: () => wBuchen(id) },
       { label: 'Bearbeiten',   icon: 'fa-edit',  action: () => editWied(id) },
       { label: 'Löschen',      icon: 'fa-trash', danger: true, action: () => delWied(id) },
+    ]
+  });
+}
+
+// ── Info-Sheet für Wiederkehrend-Einträge (aus Einträge/Dashboard) ───────────
+function showWiedEintragInfo(wiedId) {
+  const w = (data.wiederkehrend||[]).find(x=>x.id===wiedId);
+  if (!w) return;
+  const isEin = w.typ === 'Einnahme';
+  const isPaused = w.status === 'paused';
+  const intervallLabel = {woechentlich:'Wöchentlich',monatlich:'Monatlich',quartalsweise:'Quartalsweise',halbjaehrlich:'Halbjährlich',jaehrlich:'Jährlich'};
+  const bookedCount = (data.eintraege||[]).filter(e=>e.beschreibung===w.bezeichnung&&e.notiz==='Wiederkehrend').length;
+  showDetailSheet({
+    title: '<i class="fas fa-lock" style="color:var(--sub);margin-right:6px"></i>'
+      + (w.bezeichnung||'Wiederkehrende Zahlung')
+      + ' <span style="font-size:11px;color:var(--sub);padding:2px 8px;background:var(--s2);border-radius:4px;margin-left:4px">'
+      + '<i class="fas fa-sync-alt" style="font-size:9px;margin-right:3px"></i>Wiederkehrend</span>',
+    rows: [
+      { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:${isEin?'var(--green)':'var(--red)'}">${isEin?'+':'−'}${fmt(w.betrag)}</span>` },
+      { key: 'Intervall',   val: intervallLabel[w.intervall] || w.intervall || '—' },
+      { key: 'Kategorie',   val: w.kategorie || '—' },
+      { key: 'Zahlungsart', val: w.zahlungsart || '—' },
+      { key: 'Nächste',     val: fdm(w.naechste) || '—' },
+      { key: 'Status',      val: isPaused ? '<span style="color:var(--sub)">⏸ Pausiert</span>' : '<span style="color:var(--green)">▶ Aktiv</span>' },
+      { key: 'Gebucht',     val: bookedCount + '× bisher' },
+      { key: 'Hinweis',     val: '<span style="color:var(--sub);font-size:12px">Dieser Eintrag wurde automatisch durch eine wiederkehrende Zahlung erstellt. Änderungen über den Bereich "Wiederkehrend".</span>' },
+    ],
+    buttons: [
+      { label: 'Zur Vorlage', icon: 'fa-sync-alt', primary: true, action: () => {
+          _closeDetailSheet();
+          const el = document.querySelector('.nav-item[onclick*="wiederkehrend"]');
+          if (el) nav('wiederkehrend', el);
+          // Подсвечиваем нужную карточку
+          setTimeout(() => {
+            const card = document.querySelector(`.wied-card[onclick*="${wiedId}"]`);
+            if (card) {
+              card.scrollIntoView({ behavior:'smooth', block:'center' });
+              card.style.transition = 'box-shadow .2s';
+              card.style.boxShadow = '0 0 0 3px var(--blue)';
+              setTimeout(() => { card.style.boxShadow = ''; }, 1500);
+            }
+          }, 400);
+        }
+      },
     ]
   });
 }
@@ -116,12 +160,12 @@ function renderWied(){
         </div>
         <div class="wied-card-actions" onclick="event.stopPropagation()">
           ${isMob() ? _moreBtn([
-            {icon:'fa-play',         label:'Jetzt buchen',  action:()=>wBuchen(w.id)},
+            {icon:'fa-hand-pointer', label:'Jetzt buchen',  action:()=>wBuchen(w.id)},
             {icon:'fa-pause',        label:w.status==='paused'?'Fortsetzen':'Pausieren', action:()=>_wTogglePause(w.id)},
             {icon:'fa-edit',         label:'Bearbeiten',    action:()=>editWied(w.id)},
             {icon:'fa-trash',        label:'Löschen',       danger:true, action:()=>delWied(w.id)}
           ]) : `
-            <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-play"></i></button>
+            <button class="rca-btn rca-green" onclick="wBuchen('${w.id}')" title="Jetzt buchen"><i class="fas fa-hand-pointer"></i></button>
             <button class="rca-btn" onclick="_wTogglePause('${w.id}')" title="${isPaused?'Fortsetzen':'Pausieren'}" style="${isPaused?'color:var(--green)':''}"><i class="fas fa-${isPaused?'play-circle':'pause'}"></i></button>
             <button class="rca-btn" onclick="editWied('${w.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
             <button class="rca-btn rca-red" onclick="delWied('${w.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
@@ -429,7 +473,9 @@ function wBuchenCore(id){
     id:Date.now()+'_'+Math.random().toString(36).slice(2,6),
     datum:w.naechste, typ:w.typ, kategorie:w.kategorie,
     zahlungsart:w.zahlungsart, beschreibung:w.bezeichnung,
-    notiz:'Wiederkehrend', betrag:w.betrag
+    notiz:'Wiederkehrend', betrag:w.betrag,
+    _fromWiederkehrend: true,
+    _wiederkehrendId: w.id
   };
   data.eintraege.unshift(newE);
   sbSaveEintrag(newE);

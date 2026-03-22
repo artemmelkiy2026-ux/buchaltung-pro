@@ -97,6 +97,15 @@ async function sbLoadAll() {
       e._rechnungId   = _rechByNr[e.belegnr];
     }
   });
+  // Wiederkehrend-Einträge: _fromWiederkehrend + _wiederkehrendId per bezeichnung
+  const _wiedByBezeichnung = {};
+  (wied.data || []).forEach(w => { if (w.bezeichnung) _wiedByBezeichnung[w.bezeichnung] = w.id; });
+  eintraege.forEach(e => {
+    if (!e.is_storno && e.notiz === 'Wiederkehrend' && e.beschreibung && _wiedByBezeichnung[e.beschreibung]) {
+      e._fromWiederkehrend = true;
+      e._wiederkehrendId   = _wiedByBezeichnung[e.beschreibung];
+    }
+  });
   const kunden        = (kun.data  || []).map(dbToKunde);
   const rechnungen    = (rech.data || []).map(r => dbToRechnung(r, rechPos.data || []));
   const wiederkehrend = (wied.data || []).map(dbToWied);

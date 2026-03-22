@@ -149,6 +149,7 @@ function renderLetzteEinnahmen(flashId=null) {
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
   list.innerHTML = recent.map(e => {
     const _isRech = e._fromRechnung && e._rechnungId;
+    const _isWied = e._fromWiederkehrend && e._wiederkehrendId;
     return `
     <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')"
          style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;
@@ -166,6 +167,7 @@ function renderLetzteEinnahmen(flashId=null) {
           <span>·</span>
           <span>${e.kategorie}</span>
           ${_isRech ? '<span>·</span><span style="color:var(--blue);font-weight:600"><i class="fas fa-lock" style="font-size:9px;margin-right:2px"></i>Rechnung</span>' : ''}
+          ${_isWied ? '<span>·</span><span style="color:var(--sub);font-weight:600"><i class="fas fa-lock" style="font-size:9px;margin-right:2px"></i>Wiederkehrend</span>' : ''}
         </div>
       </div>
       <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)">+${fmt(e.betrag)}</div>
@@ -191,6 +193,7 @@ function renderLetzteAusgaben(flashId=null) {
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
   list.innerHTML = recent.map(e => {
     const _isRech = e._fromRechnung && e._rechnungId;
+    const _isWied = e._fromWiederkehrend && e._wiederkehrendId;
     return `
     <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')"
          style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;
@@ -208,6 +211,7 @@ function renderLetzteAusgaben(flashId=null) {
           <span>·</span>
           <span>${e.kategorie}</span>
           ${_isRech ? '<span>·</span><span style="color:var(--blue);font-weight:600"><i class="fas fa-lock" style="font-size:9px;margin-right:2px"></i>Rechnung</span>' : ''}
+          ${_isWied ? '<span>·</span><span style="color:var(--sub);font-weight:600"><i class="fas fa-lock" style="font-size:9px;margin-right:2px"></i>Wiederkehrend</span>' : ''}
         </div>
       </div>
       <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--red);font-family:var(--mono)">−${fmt(e.betrag)}</div>
@@ -233,9 +237,14 @@ function flashRow(rowId) {
 function openEditFromList(id) {
   const entry = (data.eintraege||[]).find(e=>e.id===id);
   if(!entry) return;
-  // Rechnung-Einnahme — Info-Sheet mit Link zur Rechnung
+  // Rechnung-Einnahme → Info-Sheet mit Link zur Rechnung
   if(entry._fromRechnung && entry._rechnungId){
     showRechEintragInfo(entry._rechnungId);
+    return;
+  }
+  // Wiederkehrend-Eintrag → Info-Sheet mit Link zu Wiederkehrende Zahlungen
+  if(entry._fromWiederkehrend && entry._wiederkehrendId){
+    showWiedEintragInfo(entry._wiederkehrendId);
     return;
   }
   // Stornierte / Gegenbuchungen — nur Detail anzeigen, kein Editor
@@ -1086,11 +1095,14 @@ function renderEin(){
       
       // Виртуальная запись из Rechnung — замок
       const _isRechVirt = e._fromRechnung || (e.id && e.id.startsWith('__rech__'));
-      // Rechnung-Einnahmen: onClick öffnet Info-Sheet mit Link zur Rechnung
+      // Rechnung / Wiederkehrend: onClick öffnet Info-Sheet mit Link zum Ursprung
+      const _isWiedVirt = !!(e._fromWiederkehrend && e._wiederkehrendId);
       const _rechClickId = _isRechVirt ? (e._rechnungId || e.id) : e.id;
       const _clickAttr = _isRechVirt
         ? `onclick="showRechEintragInfo('${_rechClickId}')"`
-        : (st ? '' : `onclick="showEintragDetail('${e.id}')"`); 
+        : _isWiedVirt
+          ? `onclick="showWiedEintragInfo('${e._wiederkehrendId}')"`
+          : (st ? '' : `onclick="showEintragDetail('${e.id}')"`); 
       const _mobBtn = isMob() && !isReadonly && !_isRechVirt
         ? _moreBtn([
             {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
@@ -1126,7 +1138,8 @@ function renderEin(){
       const _stLblFull = stLbl ? stLbl+_korrekturTime : '';
 
       const _rechLock = ''; // замок только в _actionArea, не дублировать в заголовке
-      const _rechTag  = _isRechVirt ? '<span style="font-size:10px;background:var(--bdim);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600">Rechnung</span>' : '';
+      const _rechTag  = _isRechVirt  ? '<span style="font-size:10px;background:var(--bdim);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600">Rechnung</span>' : '';
+      const _wiedTag  = _isWiedVirt  ? '<span style="font-size:10px;background:var(--s2);color:var(--sub);padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600"><i class="fas fa-sync-alt" style="font-size:8px;margin-right:2px"></i>Wiederkehrend</span>' : '';
       // Gegenbuchung: Link zum Originaleintrag
       let _stornoTag = '';
       if(e.is_storno && e.storno_of){
@@ -1158,7 +1171,7 @@ function renderEin(){
       }
       // Gegenbuchungen stärker ausblenden als nur stornierte Originale
       const _stOpacity = e.is_storno ? '.40' : '.55';
-      const _rowStyle  = _isRechVirt ? 'cursor:pointer;opacity:.75' : (st ? 'cursor:default;opacity:'+_stOpacity : 'cursor:pointer');
+      const _rowStyle  = (_isRechVirt || _isWiedVirt) ? 'cursor:pointer;opacity:.9' : (st ? 'cursor:default;opacity:'+_stOpacity : 'cursor:pointer');
 
       return '<div class="ein-row'+(st?' ein-row-st':'')+(_isRechVirt?' ein-row-rech-virt':'')+'" '+_clickAttr+' style="'+_rowStyle+'">'
         +'<div class="ein-row-body">'
@@ -1174,11 +1187,11 @@ function renderEin(){
               +'</div>'
               +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
             +'</div>'
-            +'<div class="ein-row-sub">'+_infoLine+_rechTag+_stornoTag+_korrTag+'</div>'
+            +'<div class="ein-row-sub">'+_infoLine+_rechTag+_wiedTag+_stornoTag+_korrTag+'</div>'
             +'<div class="ein-row-mid">'
               +'<div class="ein-row-cat">'+_catLine+'</div>'
               +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
-                +(_isRechVirt
+                +((_isRechVirt || _isWiedVirt)
                   ? '<span style="font-size:13px;color:var(--sub);opacity:.5"><i class="fas fa-lock"></i></span>'
                   : st
                     ? (e.is_storno
