@@ -633,6 +633,11 @@ function _rechDuplizieren(id){
 
 async function delRech(id){
   const _rDel=data.rechnungen.find(r=>r.id===id); if(!_rDel) return;
+  // Сторнированные Rechnungen нельзя удалять (GoBD)
+  if(_rDel.status==='storniert' || _rDel._storniert){
+    toast('Stornierte Rechnungen können nicht gelöscht werden (GoBD §146)','err');
+    return;
+  }
   const warBezahlt = _rDel.status==='bezahlt';
   const confirmMsg = warBezahlt
     ? `Rechnung ${_rDel.nr} löschen?
@@ -1960,7 +1965,7 @@ function showRechDetail(id) {
     ],
     buttons: [
       { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editRech(id) },
-      { label: 'Löschen', icon: 'fa-trash', danger: true, action: () => delRech(id) },
+      // Löschen nur für nicht-stornierte — für stornierte ist showRechDetailReadonly zuständig
     ]
   });
 }
