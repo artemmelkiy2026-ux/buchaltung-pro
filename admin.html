@@ -1,301 +1,352 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MelaLogic — Admin</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; color: #0f172a; min-height: 100vh; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MelaLogic Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;--surface:#fff;--border:#e4e7ec;
+  --blue:#1a4578;--blue-light:#eff6ff;--blue-mid:#dbeafe;
+  --green:#3a8a4e;--green-light:#f0fdf4;
+  --red:#d63341;--red-light:#fef2f2;
+  --yellow:#d97706;--yellow-light:#fffbeb;
+  --text:#0f172a;--sub:#64748b;--sub2:#94a3b8;
+  --r:8px;--r2:12px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 
-    /* ── AUTH SCREEN ── */
-    #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-    .auth-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; text-align: center; }
-    .auth-box h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; color: #0f172a; }
-    .auth-box p { font-size: 13px; color: #64748b; margin-bottom: 28px; }
-    .auth-box input { width: 100%; padding: 11px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; margin-bottom: 12px; outline: none; transition: border-color .15s; }
-    .auth-box input:focus { border-color: #1a4578; }
-    .auth-box button { width: 100%; padding: 12px; background: #1a4578; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
-    .auth-box button:hover { opacity: .9; }
-    #auth-error { color: #dc2626; font-size: 13px; margin-top: 10px; }
+/* AUTH */
+#auth-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0f2d52 0%,#1a4578 60%,#3a8a4e 100%)}
+.auth-card{background:#fff;border-radius:20px;padding:44px 40px;width:380px;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.auth-logo{width:52px;height:52px;background:var(--blue);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:#fff;font-size:22px}
+.auth-card h1{text-align:center;font-size:22px;font-weight:700;margin-bottom:6px}
+.auth-card p{text-align:center;font-size:13px;color:var(--sub);margin-bottom:28px}
+.auth-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;outline:none;transition:border-color .15s;margin-bottom:10px;font-family:inherit}
+.auth-input:focus{border-color:var(--blue)}
+.auth-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.auth-btn:hover{opacity:.9}
+#auth-err{color:var(--red);font-size:12px;margin-top:8px;text-align:center;min-height:18px}
 
-    /* ── MAIN LAYOUT ── */
-    #admin-app { display: none; min-height: 100vh; }
-    .admin-header { background: #1a4578; color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
-    .admin-header h1 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-    .admin-header .user-info { font-size: 12px; opacity: .75; display: flex; align-items: center; gap: 12px; }
-    .admin-header .logout-btn { background: rgba(255,255,255,.15); border: none; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-    .admin-header .logout-btn:hover { background: rgba(255,255,255,.25); }
+/* APP */
+#app{display:none;min-height:100vh;flex-direction:column}
 
-    .admin-body { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 52px); }
+/* TOP BAR */
+.topbar{background:var(--blue);color:#fff;height:52px;display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0}
+.topbar-logo{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;margin-right:auto}
+.topbar-user{font-size:12px;opacity:.75}
+.topbar-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+.topbar-btn:hover{background:rgba(255,255,255,.25)}
 
-    /* ── SIDEBAR ── */
-    .admin-nav { background: #fff; border-right: 1px solid #e2e8f0; padding: 16px 0; }
-    .admin-nav-item { padding: 10px 20px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #475569; border-left: 3px solid transparent; transition: all .15s; }
-    .admin-nav-item:hover { background: #f8fafc; color: #1a4578; }
-    .admin-nav-item.active { background: #eff6ff; color: #1a4578; border-left-color: #1a4578; font-weight: 600; }
-    .admin-nav-item i { width: 16px; text-align: center; }
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 52px)}
 
-    /* ── CONTENT ── */
-    .admin-content { padding: 28px; }
-    .admin-section { display: none; }
-    .admin-section.active { display: block; }
+/* SIDEBAR */
+.sidebar{width:220px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.nav-section{padding:12px 12px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub2)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:var(--sub);cursor:pointer;border-left:3px solid transparent;transition:all .12s;position:relative}
+.nav-item:hover{background:#f8fafc;color:var(--blue)}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600}
+.nav-item i{width:16px;text-align:center;font-size:13px}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
 
-    .section-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; color: #0f172a; }
-    .section-sub { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:24px}
 
-    /* ── CARDS ── */
-    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-    .card-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+/* SECTION */
+.section{display:none}.section.active{display:block}
+.page-hdr{margin-bottom:22px}
+.page-hdr h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.page-hdr p{font-size:13px;color:var(--sub)}
 
-    /* ── STATS GRID ── */
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
-    .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; }
-    .stat-card .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-bottom: 8px; }
-    .stat-card .value { font-size: 28px; font-weight: 800; color: #0f172a; }
-    .stat-card .sub { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:16px}
+.stat .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub2);margin-bottom:8px}
+.stat .val{font-size:28px;font-weight:800;line-height:1}
+.stat .sub{font-size:11px;color:var(--sub2);margin-top:4px}
 
-    /* ── FORM ── */
-    .form-row { margin-bottom: 14px; }
-    .form-row label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; }
-    .form-row input, .form-row textarea, .form-row select {
-      width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px;
-      font-size: 13px; font-family: inherit; outline: none; transition: border-color .15s;
-      background: #fff; color: #0f172a;
-    }
-    .form-row input:focus, .form-row textarea:focus, .form-row select:focus { border-color: #1a4578; }
-    .form-row textarea { resize: vertical; min-height: 80px; }
-    .radio-group { display: flex; gap: 12px; }
-    .radio-group label { font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: 0; display: flex; align-items: center; gap: 6px; cursor: pointer; color: #0f172a; }
+/* CARD */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:16px}
+.card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-hdr h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-body{padding:18px}
 
-    /* ── BUTTONS ── */
-    .btn-primary { background: #1a4578; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: opacity .15s; }
-    .btn-primary:hover { opacity: .88; }
-    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
-    .btn-danger { background: #dc2626; color: #fff; border: none; padding: 7px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-    .btn-danger:hover { opacity: .85; }
-    .btn-outline { background: transparent; color: #475569; border: 1px solid #e2e8f0; padding: 7px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-    .btn-outline:hover { background: #f8fafc; }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--sub);transition:all .12s}
+.btn:hover{background:#f8fafc}
+.btn-blue{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-blue:hover{opacity:.88}
+.btn-red{background:var(--red);color:#fff;border-color:var(--red)}.btn-red:hover{opacity:.88}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green)}.btn-green:hover{opacity:.88}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-    /* ── USERS TABLE ── */
-    .users-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .users-table th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; border-bottom: 1px solid #e2e8f0; }
-    .users-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #0f172a; vertical-align: middle; }
-    .users-table tr:hover td { background: #f8fafc; }
-    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1a4578; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
-    .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-    .badge-green { background: #f0fdf4; color: #16a34a; }
-    .badge-gray  { background: #f1f5f9; color: #64748b; }
-    .badge-blue  { background: #eff6ff; color: #1a4578; }
+/* SEARCH BAR */
+.search-bar{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border)}
+.search-bar input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;outline:none}
+.search-bar input:focus{border-color:var(--blue)}
+.filter-btns{display:flex;gap:6px;flex-wrap:wrap}
+.filter-btn{padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:#fff;cursor:pointer;transition:all .12s;color:var(--sub)}
+.filter-btn.active,.filter-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
 
-    /* ── NOTIF LIST ── */
-    .notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; background: #fff; }
-    .notif-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; color: #fff; }
-    .notif-body { flex: 1; min-width: 0; }
-    .notif-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-    .notif-text  { font-size: 12px; color: #64748b; }
-    .notif-meta  { font-size: 11px; color: #94a3b8; margin-top: 5px; }
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--sub2);border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid #f8fafc;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#fafbfd}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-light);color:var(--green)}
+.badge-gray{background:#f1f5f9;color:var(--sub)}
+.badge-blue{background:var(--blue-light);color:var(--blue)}
+.badge-red{background:var(--red-light);color:var(--red)}
 
-    /* ── TOAST ── */
-    #admin-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a4578; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; z-index: 9999; }
+/* NOTIF ITEM */
+.notif-row{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #f8fafc;transition:background .1s}
+.notif-row:last-child{border-bottom:none}
+.notif-row:hover{background:#fafbfd}
+.notif-row.unread{background:var(--blue-light)}
+.notif-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:14px}
+.notif-content{flex:1;min-width:0}
+.notif-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.notif-body{font-size:12px;color:var(--sub);line-height:1.5}
+.notif-meta{font-size:11px;color:var(--sub2);margin-top:5px;display:flex;align-items:center;gap:8px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0}
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .admin-body { grid-template-columns: 1fr; }
-      .admin-nav { display: flex; overflow-x: auto; padding: 0; border-right: none; border-bottom: 1px solid #e2e8f0; }
-      .admin-nav-item { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
-      .admin-nav-item.active { border-left-color: transparent; border-bottom-color: #1a4578; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-  </style>
+/* COMPOSE FORM */
+.compose{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+.form-field{margin-bottom:14px}
+.form-field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:6px}
+.form-field input,.form-field textarea,.form-field select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;background:#fff;color:var(--text)}
+.form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:var(--blue)}
+.form-field textarea{resize:vertical;min-height:90px}
+.radio-row{display:flex;gap:16px}
+.radio-row label{font-size:13px;font-weight:400;text-transform:none;letter-spacing:0;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text)}
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.type-opt{border:1.5px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;cursor:pointer;transition:all .12s}
+.type-opt:hover{border-color:var(--blue)}
+.type-opt.selected{border-color:var(--blue);background:var(--blue-light)}
+.type-opt .ti{font-size:20px;margin-bottom:4px}
+.type-opt .tl{font-size:11px;font-weight:600;color:var(--sub)}
+
+/* PREVIEW */
+.preview-card{border:1.5px solid var(--border);border-radius:var(--r2);padding:16px;background:#fff}
+.preview-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub2);margin-bottom:10px}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;display:none;z-index:9999;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:50px 20px;color:var(--sub2)}
+.empty i{font-size:40px;opacity:.2;margin-bottom:12px;display:block}
+.empty p{font-size:14px;font-weight:600;margin-bottom:4px;color:var(--sub)}
+.empty span{font-size:12px}
+
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .compose{grid-template-columns:1fr}
+  .sidebar{width:180px}
+}
+@media(max-width:640px){
+  .sidebar{display:none}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+</style>
 </head>
 <body>
 
-<!-- ── AUTH ── -->
-<div id="auth-screen">
-  <div class="auth-box">
-    <div style="width:52px;height:52px;background:#1a4578;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
-      <i class="fas fa-shield-alt" style="color:#fff;font-size:22px"></i>
-    </div>
+<!-- AUTH -->
+<div id="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo"><i class="fas fa-shield-alt"></i></div>
     <h1>MelaLogic Admin</h1>
-    <p>Melde dich mit deinem Admin-Account an</p>
-    <input type="email" id="auth-email" placeholder="E-Mail" autocomplete="email">
-    <input type="password" id="auth-pass" placeholder="Passwort" autocomplete="current-password">
-    <button onclick="adminLogin()"><i class="fas fa-sign-in-alt" style="margin-right:6px"></i>Anmelden</button>
-    <div id="auth-error"></div>
+    <p>Nur für autorisierte Administratoren</p>
+    <input class="auth-input" type="email" id="ai-email" placeholder="E-Mail" autocomplete="email">
+    <input class="auth-input" type="password" id="ai-pass" placeholder="Passwort" autocomplete="current-password">
+    <button class="auth-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt" style="margin-right:7px"></i>Anmelden</button>
+    <div id="auth-err"></div>
   </div>
 </div>
 
-<!-- ── ADMIN APP ── -->
-<div id="admin-app">
-  <div class="admin-header">
-    <h1><i class="fas fa-shield-alt"></i> MelaLogic Admin</h1>
-    <div class="user-info">
-      <span id="admin-email-display"></span>
-      <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Abmelden</button>
-    </div>
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo"><i class="fas fa-shield-alt"></i> MelaLogic Admin</div>
+    <div class="topbar-user" id="top-email"></div>
+    <button class="topbar-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Abmelden</button>
   </div>
+  <div class="layout">
 
-  <div class="admin-body">
-    <!-- Nav -->
-    <nav class="admin-nav">
-      <div class="admin-nav-item active" onclick="showSection('overview')"><i class="fas fa-chart-bar"></i> Übersicht</div>
-      <div class="admin-nav-item" onclick="showSection('users')"><i class="fas fa-users"></i> Benutzer</div>
-      <div class="admin-nav-item" onclick="showSection('send')"><i class="fas fa-paper-plane"></i> Nachricht senden</div>
-      <div class="admin-nav-item" onclick="showSection('history')"><i class="fas fa-history"></i> Verlauf</div>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="nav-section">Übersicht</div>
+      <div class="nav-item active" data-sec="overview" onclick="navTo('overview',this)"><i class="fas fa-chart-bar"></i> Dashboard</div>
+      <div class="nav-section">Benutzer</div>
+      <div class="nav-item" data-sec="users" onclick="navTo('users',this)"><i class="fas fa-users"></i> Alle Benutzer <span class="nav-badge" id="nb-users" style="display:none">0</span></div>
+      <div class="nav-section">Kommunikation</div>
+      <div class="nav-item" data-sec="compose" onclick="navTo('compose',this)"><i class="fas fa-paper-plane"></i> Nachricht senden</div>
+      <div class="nav-item" data-sec="inbox" onclick="navTo('inbox',this)"><i class="fas fa-inbox"></i> Posteingang <span class="nav-badge" id="nb-notifs" style="display:none">0</span></div>
+      <div class="nav-item" data-sec="history" onclick="navTo('history',this)"><i class="fas fa-history"></i> Verlauf</div>
     </nav>
 
-    <!-- Content -->
-    <div class="admin-content">
+    <!-- MAIN -->
+    <div class="main">
 
       <!-- ── OVERVIEW ── -->
-      <div id="section-overview" class="admin-section active">
-        <div class="section-title">Übersicht</div>
-        <div class="section-sub">Statistiken und Systemstatus</div>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="label">Benutzer gesamt</div>
-            <div class="value" id="stat-users">—</div>
-            <div class="sub">registrierte Accounts</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Aktiv (30 Tage)</div>
-            <div class="value" id="stat-active">—</div>
-            <div class="sub">letzte Aktivität</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Nachrichten</div>
-            <div class="value" id="stat-notifs">—</div>
-            <div class="sub">gesendet</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Heute</div>
-            <div class="value" id="stat-today">—</div>
-            <div class="sub" id="stat-today-date"></div>
-          </div>
+      <div id="sec-overview" class="section active">
+        <div class="page-hdr"><h2>Dashboard</h2><p>Systemübersicht und Statistiken</p></div>
+        <div class="stats-row">
+          <div class="stat"><div class="lbl">Benutzer</div><div class="val" id="s-users">—</div><div class="sub">registriert</div></div>
+          <div class="stat"><div class="lbl">Aktiv 30 Tage</div><div class="val" id="s-active">—</div><div class="sub">zuletzt gesehen</div></div>
+          <div class="stat"><div class="lbl">Nachrichten</div><div class="val" id="s-msgs">—</div><div class="sub">gesendet</div></div>
+          <div class="stat"><div class="lbl">Heute</div><div class="val" id="s-today">—</div><div class="sub" id="s-today-date"></div></div>
         </div>
-
         <div class="card">
-          <div class="card-title"><i class="fas fa-bell" style="color:#1a4578"></i> Letzte Nachrichten</div>
-          <div id="overview-notifs">Wird geladen...</div>
+          <div class="card-hdr"><h3><i class="fas fa-bell" style="color:var(--blue)"></i> Letzte Nachrichten</h3><button class="btn" onclick="navTo('compose',document.querySelector('[data-sec=compose]'))"><i class="fas fa-plus"></i> Neue Nachricht</button></div>
+          <div id="ov-msgs">Wird geladen...</div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><h3><i class="fas fa-users" style="color:var(--green)"></i> Neueste Benutzer</h3></div>
+          <div id="ov-users" style="overflow-x:auto">Wird geladen...</div>
         </div>
       </div>
 
       <!-- ── USERS ── -->
-      <div id="section-users" class="admin-section">
-        <div class="section-title">Benutzer</div>
-        <div class="section-sub">Alle registrierten Accounts</div>
-
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="padding:14px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:13px;font-weight:600" id="users-count">Wird geladen...</div>
-            <button class="btn-outline" onclick="loadUsers()"><i class="fas fa-sync-alt"></i> Aktualisieren</button>
+      <div id="sec-users" class="section">
+        <div class="page-hdr"><h2>Benutzer</h2><p>Alle registrierten Accounts</p></div>
+        <div class="card">
+          <div class="search-bar">
+            <i class="fas fa-search" style="color:var(--sub2)"></i>
+            <input id="user-search" placeholder="Suche nach User-ID oder E-Mail..." oninput="filterUsers()">
+            <div class="filter-btns">
+              <button class="filter-btn active" data-filter="all" onclick="setUserFilter('all',this)">Alle</button>
+              <button class="filter-btn" data-filter="active" onclick="setUserFilter('active',this)">Aktiv</button>
+              <button class="filter-btn" data-filter="inactive" onclick="setUserFilter('inactive',this)">Inaktiv</button>
+            </div>
+            <button class="btn" onclick="loadUsers()"><i class="fas fa-sync-alt"></i></button>
           </div>
           <div style="overflow-x:auto">
-            <table class="users-table">
-              <thead>
-                <tr>
-                  <th>Benutzer</th>
-                  <th>E-Mail</th>
-                  <th>Registriert</th>
-                  <th>Status</th>
-                  <th>Aktion</th>
-                </tr>
-              </thead>
-              <tbody id="users-tbody">
-                <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:30px">Wird geladen...</td></tr>
-              </tbody>
+            <table class="tbl">
+              <thead><tr><th>Benutzer</th><th>User-ID</th><th>Erster Eintrag</th><th>Zuletzt aktiv</th><th>Einträge</th><th>Status</th><th></th></tr></thead>
+              <tbody id="users-tbody"><tr><td colspan="7" class="empty"><i class="fas fa-spinner fa-spin"></i></td></tr></tbody>
             </table>
+          </div>
+          <div style="padding:12px 18px;border-top:1px solid var(--border);font-size:12px;color:var(--sub2)" id="users-footer"></div>
+        </div>
+      </div>
+
+      <!-- ── COMPOSE ── -->
+      <div id="sec-compose" class="section">
+        <div class="page-hdr"><h2>Nachricht senden</h2><p>Benachrichtigungen an alle oder einzelne Benutzer</p></div>
+        <div class="compose">
+          <div class="card">
+            <div class="card-hdr"><h3><i class="fas fa-edit" style="color:var(--blue)"></i> Neue Nachricht</h3></div>
+            <div class="card-body">
+              <div class="form-field">
+                <label>Empfänger</label>
+                <div class="radio-row">
+                  <label><input type="radio" name="recip" value="all" checked onchange="onRecipChange()"> Alle Benutzer</label>
+                  <label><input type="radio" name="recip" value="one" onchange="onRecipChange()"> Bestimmter Nutzer</label>
+                </div>
+              </div>
+              <div class="form-field" id="recip-user-field" style="display:none">
+                <label>Benutzer wählen</label>
+                <select id="c-user"><option value="">— Benutzer auswählen —</option></select>
+              </div>
+              <div class="form-field">
+                <label>Typ</label>
+                <div class="type-grid">
+                  <div class="type-opt selected" data-type="info" onclick="selectType('info',this)"><div class="ti">ℹ️</div><div class="tl">Info</div></div>
+                  <div class="type-opt" data-type="success" onclick="selectType('success',this)"><div class="ti">✅</div><div class="tl">Erfolg</div></div>
+                  <div class="type-opt" data-type="warning" onclick="selectType('warning',this)"><div class="ti">⚠️</div><div class="tl">Warnung</div></div>
+                  <div class="type-opt" data-type="danger" onclick="selectType('danger',this)"><div class="ti">🔴</div><div class="tl">Dringend</div></div>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Titel *</label>
+                <input id="c-title" type="text" placeholder="Betreff der Nachricht" oninput="updatePreview()">
+              </div>
+              <div class="form-field">
+                <label>Nachrichtentext</label>
+                <textarea id="c-body" placeholder="Optionaler Nachrichtentext..." oninput="updatePreview()"></textarea>
+              </div>
+              <div class="form-field">
+                <label>Ablaufdatum (optional)</label>
+                <input id="c-expires" type="date">
+              </div>
+              <button class="btn btn-blue" id="send-btn" onclick="sendMsg()" style="width:100%;justify-content:center;padding:12px">
+                <i class="fas fa-paper-plane"></i> Nachricht senden
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview + Quick -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div class="preview-label">Vorschau</div>
+              <div class="preview-card" id="preview-box">
+                <div style="display:flex;align-items:flex-start;gap:12px">
+                  <div id="pv-icon" style="width:36px;height:36px;border-radius:9px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-bell" style="color:#fff;font-size:14px"></i></div>
+                  <div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                      <div id="pv-title" style="font-size:13px;font-weight:600">Titel der Nachricht</div>
+                      <span style="font-size:10px;background:var(--blue);color:#fff;padding:2px 8px;border-radius:20px;font-weight:600">MelaLogic</span>
+                    </div>
+                    <div id="pv-body" style="font-size:12px;color:var(--sub)">Nachrichtentext...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="preview-label">Schnell-Vorlagen</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="btn" onclick="useTemplate('update')" style="justify-content:flex-start;text-align:left"><i class="fas fa-star" style="color:var(--blue)"></i> Neues Update</button>
+                <button class="btn" onclick="useTemplate('maintenance')" style="justify-content:flex-start"><i class="fas fa-wrench" style="color:var(--yellow)"></i> Wartungsarbeiten</button>
+                <button class="btn" onclick="useTemplate('feature')" style="justify-content:flex-start"><i class="fas fa-rocket" style="color:var(--green)"></i> Neue Funktion</button>
+                <button class="btn" onclick="useTemplate('reminder')" style="justify-content:flex-start"><i class="fas fa-clock" style="color:var(--red)"></i> Wichtige Erinnerung</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- ── SEND ── -->
-      <div id="section-send" class="admin-section">
-        <div class="section-title">Nachricht senden</div>
-        <div class="section-sub">Benachrichtigungen an Benutzer schicken</div>
-
-        <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start">
-          <div class="card">
-            <div class="card-title"><i class="fas fa-paper-plane" style="color:#1a4578"></i> Neue Nachricht</div>
-
-            <div class="form-row">
-              <label>Empfänger</label>
-              <div class="radio-group">
-                <label><input type="radio" name="target" value="all" checked onchange="toggleTarget(this)"> Alle Benutzer</label>
-                <label><input type="radio" name="target" value="one" onchange="toggleTarget(this)"> Bestimmter Benutzer</label>
-              </div>
+      <!-- ── INBOX ── -->
+      <div id="sec-inbox" class="section">
+        <div class="page-hdr"><h2>Posteingang</h2><p>Alle gesendeten Nachrichten — sortiert nach Datum</p></div>
+        <div class="card">
+          <div class="search-bar">
+            <i class="fas fa-search" style="color:var(--sub2)"></i>
+            <input id="notif-search" placeholder="Nachricht suchen..." oninput="filterNotifs()">
+            <div class="filter-btns">
+              <button class="filter-btn active" data-nf="all" onclick="setNotifFilter('all',this)">Alle</button>
+              <button class="filter-btn" data-nf="info" onclick="setNotifFilter('info',this)">Info</button>
+              <button class="filter-btn" data-nf="warning" onclick="setNotifFilter('warning',this)">Warnung</button>
+              <button class="filter-btn" data-nf="danger" onclick="setNotifFilter('danger',this)">Dringend</button>
+              <button class="filter-btn" data-nf="success" onclick="setNotifFilter('success',this)">Erfolg</button>
             </div>
-
-            <div class="form-row" id="target-user-row" style="display:none">
-              <label>Benutzer auswählen</label>
-              <select id="msg-target-user">
-                <option value="">— Benutzer wählen —</option>
-              </select>
-            </div>
-
-            <div class="form-row">
-              <label>Typ</label>
-              <select id="msg-type">
-                <option value="info">ℹ️ Info (blau)</option>
-                <option value="success">✅ Erfolg (grün)</option>
-                <option value="warning">⚠️ Warnung (gelb)</option>
-                <option value="danger">🔴 Dringend (rot)</option>
-              </select>
-            </div>
-
-            <div class="form-row">
-              <label>Titel</label>
-              <input type="text" id="msg-title" placeholder="z.B. Neue Funktion verfügbar">
-            </div>
-
-            <div class="form-row">
-              <label>Nachricht</label>
-              <textarea id="msg-body" placeholder="Beschreibung der Nachricht..."></textarea>
-            </div>
-
-            <div class="form-row">
-              <label>Ablaufdatum (optional)</label>
-              <input type="date" id="msg-expires">
-            </div>
-
-            <button class="btn-primary" id="send-btn" onclick="sendNotification()">
-              <i class="fas fa-paper-plane"></i> Nachricht senden
-            </button>
+            <button class="btn btn-red" id="del-all-btn" onclick="deleteAllNotifs()" style="display:none"><i class="fas fa-trash"></i> Alle löschen</button>
           </div>
-
-          <!-- Preview -->
-          <div>
-            <div style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Vorschau</div>
-            <div id="msg-preview" style="border:1px solid #e2e8f0;border-radius:12px;padding:14px;background:#fff;display:flex;gap:12px;align-items:flex-start">
-              <div id="preview-icon" style="width:36px;height:36px;border-radius:9px;background:#1a4578;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <i class="fas fa-bell" style="color:#fff;font-size:14px"></i>
-              </div>
-              <div style="flex:1">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                  <div id="preview-title" style="font-size:13px;font-weight:600;color:#0f172a">Titel der Nachricht</div>
-                  <span style="font-size:10px;background:#1a4578;color:#fff;padding:2px 8px;border-radius:20px;font-weight:600">MelaLogic</span>
-                </div>
-                <div id="preview-body" style="font-size:12px;color:#64748b">Nachrichtentext erscheint hier...</div>
-              </div>
-            </div>
-          </div>
+          <div id="inbox-list">Wird geladen...</div>
+          <div style="padding:10px 18px;border-top:1px solid var(--border);font-size:12px;color:var(--sub2)" id="inbox-footer"></div>
         </div>
       </div>
 
       <!-- ── HISTORY ── -->
-      <div id="section-history" class="admin-section">
-        <div class="section-title">Nachrichtenverlauf</div>
-        <div class="section-sub">Alle gesendeten Benachrichtigungen</div>
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="padding:14px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:13px;font-weight:600" id="history-count">—</div>
-            <button class="btn-outline" onclick="loadHistory()"><i class="fas fa-sync-alt"></i> Aktualisieren</button>
-          </div>
-          <div id="history-list" style="padding:16px;display:flex;flex-direction:column;gap:8px">Wird geladen...</div>
+      <div id="sec-history" class="section">
+        <div class="page-hdr"><h2>Verlauf</h2><p>Statistiken der gesendeten Nachrichten</p></div>
+        <div class="stats-row">
+          <div class="stat"><div class="lbl">Info</div><div class="val" id="h-info">0</div></div>
+          <div class="stat"><div class="lbl">Warnung</div><div class="val" id="h-warn">0</div></div>
+          <div class="stat"><div class="lbl">Dringend</div><div class="val" id="h-danger">0</div></div>
+          <div class="stat"><div class="lbl">Erfolg</div><div class="val" id="h-success">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><h3>Alle gesendeten Nachrichten</h3></div>
+          <div id="hist-list" style="padding:16px;display:flex;flex-direction:column;gap:8px">Wird geladen...</div>
         </div>
       </div>
 
@@ -303,7 +354,7 @@
   </div>
 </div>
 
-<div id="admin-toast"></div>
+<div id="toast"></div>
 
 <script>
 const SUPA_URL = 'https://dvmhstytoonpacxwdxuj.supabase.co';
@@ -312,304 +363,366 @@ const ADMIN_EMAIL = 'euroavtokh@gmail.com';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 let adminUser = null;
-let allUsers  = [];
+let allUsers = [], allNotifs = [];
+let userFilter = 'all', notifFilter = 'all', selType = 'info';
 
 // ── AUTH ──────────────────────────────────────────────────────────────────
-async function adminLogin() {
-  const email = document.getElementById('auth-email').value.trim();
-  const pass  = document.getElementById('auth-pass').value;
-  const errEl = document.getElementById('auth-error');
-  errEl.textContent = '';
-
-  if (email !== ADMIN_EMAIL) {
-    errEl.textContent = 'Zugriff verweigert — kein Admin-Account.';
-    return;
-  }
-
+async function doLogin() {
+  const email = document.getElementById('ai-email').value.trim();
+  const pass  = document.getElementById('ai-pass').value;
+  const err   = document.getElementById('auth-err');
+  err.textContent = '';
+  if (email !== ADMIN_EMAIL) { err.textContent = 'Zugriff verweigert.'; return; }
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) { errEl.textContent = 'Fehler: ' + error.message; return; }
-
+  if (error) { err.textContent = error.message; return; }
   adminUser = data.user;
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('admin-app').style.display = 'block';
-  document.getElementById('admin-email-display').textContent = adminUser.email;
-  initAdmin();
+  bootApp();
 }
-
-async function adminLogout() {
-  await sb.auth.signOut();
-  location.reload();
-}
-
-// Enter key login
+async function doLogout() { await sb.auth.signOut(); location.reload(); }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('auth-screen').style.display !== 'none') adminLogin();
+  if (e.key === 'Enter' && document.getElementById('auth-wrap').style.display !== 'none') doLogin();
 });
 
-// ── INIT ──────────────────────────────────────────────────────────────────
-async function initAdmin() {
-  document.getElementById('stat-today-date').textContent = new Date().toLocaleDateString('de-DE');
-  await Promise.all([loadUsers(), loadHistory()]);
-  loadOverview();
+function bootApp() {
+  document.getElementById('auth-wrap').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('top-email').textContent = adminUser.email;
+  document.getElementById('s-today-date').textContent = new Date().toLocaleDateString('de-DE');
+  loadAll();
 }
 
-// ── SECTIONS ─────────────────────────────────────────────────────────────
-function showSection(id) {
-  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('section-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
-  if (id === 'users') loadUsers();
-  if (id === 'history') loadHistory();
+sb.auth.getSession().then(({ data }) => {
+  if (data.session?.user?.email === ADMIN_EMAIL) {
+    adminUser = data.session.user;
+    bootApp();
+  }
+});
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function navTo(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+// ── LOAD ALL ──────────────────────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadUsers(), loadNotifs()]);
+  renderOverview();
 }
 
 // ── USERS ─────────────────────────────────────────────────────────────────
 async function loadUsers() {
-  document.getElementById('users-count').textContent = 'Wird geladen...';
-  // Собираем уникальных пользователей из нескольких таблиц
-  const sources = await Promise.all([
-    sb.from('eintraege').select('user_id, created_at').order('created_at', {ascending:true}),
-    sb.from('rechnungen').select('user_id, created_at').order('created_at', {ascending:true}),
-    sb.from('kunden').select('user_id, created_at').order('created_at', {ascending:true}),
-  ]);
-
-  const userMap = {};
-  sources.forEach(({ data }) => {
-    (data || []).forEach(r => {
-      if (!userMap[r.user_id]) userMap[r.user_id] = { id: r.user_id, created_at: r.created_at, entries: 0, last_sign_in_at: r.created_at };
-      userMap[r.user_id].entries = (userMap[r.user_id].entries || 0) + 1;
-      if (r.created_at > userMap[r.user_id].last_sign_in_at) userMap[r.user_id].last_sign_in_at = r.created_at;
+  const tables = ['eintraege','rechnungen','kunden','angebote','fahrtenbuch'];
+  const results = await Promise.all(tables.map(t =>
+    sb.from(t).select('user_id,created_at').order('created_at',{ascending:true})
+  ));
+  const map = {};
+  results.forEach(({ data }, ti) => {
+    (data||[]).forEach(r => {
+      if (!map[r.user_id]) map[r.user_id] = { id:r.user_id, first:r.created_at, last:r.created_at, counts:{} };
+      map[r.user_id].counts[tables[ti]] = (map[r.user_id].counts[tables[ti]]||0)+1;
+      if (r.created_at > map[r.user_id].last) map[r.user_id].last = r.created_at;
     });
   });
+  allUsers = Object.values(map).sort((a,b) => b.last.localeCompare(a.last));
 
-  // Попробуем также получить email из notifications если есть
-  allUsers = Object.values(userMap).sort((a,b) => (b.last_sign_in_at||'').localeCompare(a.last_sign_in_at||''));
+  // Stats
+  const thirtyAgo = new Date(); thirtyAgo.setDate(thirtyAgo.getDate()-30);
+  const active = allUsers.filter(u => new Date(u.last) > thirtyAgo).length;
+  document.getElementById('s-users').textContent  = allUsers.length;
+  document.getElementById('s-active').textContent = active;
+  const nb = document.getElementById('nb-users');
+  nb.textContent = allUsers.length; nb.style.display = allUsers.length ? 'flex' : 'none';
 
-  renderUsers(allUsers);
-  fillUserSelect(allUsers);
+  // Fill select
+  const sel = document.getElementById('c-user');
+  sel.innerHTML = '<option value="">— Benutzer auswählen —</option>' +
+    allUsers.map(u => `<option value="${u.id}">${u.id.substring(0,12)}… (${u.counts.eintraege||0} Eintr.)</option>`).join('');
 
-  document.getElementById('stat-users').textContent  = allUsers.length;
-  const thirtyAgo = new Date(); thirtyAgo.setDate(thirtyAgo.getDate() - 30);
-  const active = allUsers.filter(u => u.last_sign_in_at && new Date(u.last_sign_in_at) > thirtyAgo);
-  document.getElementById('stat-active').textContent = active.length;
+  renderUsers();
 }
 
-function renderUsers(users) {
+function renderUsers() {
+  const q   = document.getElementById('user-search').value.toLowerCase();
+  const now = new Date();
+  const thirtyAgo = new Date(now); thirtyAgo.setDate(thirtyAgo.getDate()-30);
+  let list = allUsers.filter(u => {
+    if (q && !u.id.toLowerCase().includes(q)) return false;
+    if (userFilter === 'active')   return new Date(u.last) > thirtyAgo;
+    if (userFilter === 'inactive') return new Date(u.last) <= thirtyAgo;
+    return true;
+  });
   const tbody = document.getElementById('users-tbody');
-  document.getElementById('users-count').textContent = users.length + ' Benutzer';
-  if (!users.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:30px">Keine Benutzer gefunden</td></tr>';
+  document.getElementById('users-footer').textContent = list.length + ' Benutzer angezeigt';
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><i class="fas fa-users"></i><p>Keine Benutzer gefunden</p></div></td></tr>`;
     return;
   }
-  tbody.innerHTML = users.map(u => {
-    const email   = u.email || '—';
-    const shortId = u.id?.substring(0,8) + '…';
-    const initials= u.id?.substring(0,2).toUpperCase() || 'US';
-    const created = u.created_at ? new Date(u.created_at).toLocaleDateString('de-DE') : '—';
-    const lastSeen= u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString('de-DE') : '—';
-    const isActive= u.last_sign_in_at && (new Date() - new Date(u.last_sign_in_at)) < 30*86400000;
+  tbody.innerHTML = list.map(u => {
+    const init = u.id.substring(0,2).toUpperCase();
+    const first = u.first ? new Date(u.first).toLocaleDateString('de-DE') : '—';
+    const last  = u.last  ? new Date(u.last).toLocaleDateString('de-DE')  : '—';
+    const isAct = new Date(u.last) > thirtyAgo;
+    const total = Object.values(u.counts).reduce((s,v)=>s+v,0);
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:10px">
-        <div class="user-avatar">${initials}</div>
+        <div class="avatar">${init}</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:#0f172a">${shortId}</div>
-          <div style="font-size:11px;color:#94a3b8">${u.entries||0} Einträge</div>
+          <div style="font-size:12px;font-weight:600">${u.id.substring(0,8)}…</div>
+          <div style="font-size:11px;color:var(--sub2)">${total} Datensätze</div>
         </div>
       </div></td>
-      <td style="font-size:12px;color:#64748b;font-family:monospace">${u.id}</td>
-      <td style="font-size:12px;color:#64748b">${created}</td>
-      <td>
-        <div style="font-size:11px;color:#64748b">${lastSeen}</div>
-        <span class="badge ${isActive?'badge-green':'badge-gray'}" style="margin-top:3px">${isActive?'Aktiv':'Inaktiv'}</span>
+      <td style="font-size:11px;color:var(--sub);font-family:monospace">${u.id}</td>
+      <td style="font-size:12px;color:var(--sub)">${first}</td>
+      <td style="font-size:12px;color:var(--sub)">${last}</td>
+      <td style="font-size:12px">
+        ${Object.entries(u.counts).map(([k,v])=>`<span class="badge badge-gray" style="margin:1px">${k.substring(0,3)}: ${v}</span>`).join('')}
       </td>
-      <td><button class="btn-outline" onclick="quickSend('${u.id}','${shortId}')" style="font-size:11px;padding:5px 10px">
-        <i class="fas fa-paper-plane"></i> Nachricht
-      </button></td>
+      <td><span class="badge ${isAct?'badge-green':'badge-gray'}">${isAct?'Aktiv':'Inaktiv'}</span></td>
+      <td><button class="btn" onclick="quickMsg('${u.id}')" style="font-size:11px;padding:5px 10px"><i class="fas fa-paper-plane"></i></button></td>
     </tr>`;
   }).join('');
 }
 
-function fillUserSelect(users) {
-  const sel = document.getElementById('msg-target-user');
-  sel.innerHTML = '<option value="">— Benutzer wählen —</option>' +
-    users.map(u => `<option value="${u.id}">${u.email || u.id}</option>`).join('');
+function filterUsers() { renderUsers(); }
+function setUserFilter(f, el) {
+  userFilter = f;
+  document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderUsers();
 }
 
-function quickSend(userId, email) {
-  showSection('send');
-  document.querySelectorAll('.admin-nav-item')[2].classList.add('active');
-  document.querySelectorAll('.admin-nav-item').forEach((n,i) => { if(i!==2) n.classList.remove('active'); });
-  document.querySelector('input[name="target"][value="one"]').checked = true;
-  document.getElementById('target-user-row').style.display = 'block';
-  document.getElementById('msg-target-user').value = userId;
+function quickMsg(uid) {
+  navTo('compose', document.querySelector('[data-sec=compose]'));
+  document.querySelector('input[name=recip][value=one]').checked = true;
+  onRecipChange();
+  document.getElementById('c-user').value = uid;
 }
 
-// ── SEND NOTIFICATION ─────────────────────────────────────────────────────
-function toggleTarget(radio) {
-  document.getElementById('target-user-row').style.display = radio.value === 'one' ? 'block' : 'none';
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────
+async function loadNotifs() {
+  const { data } = await sb.from('notifications').select('*').order('created_at',{ascending:false});
+  allNotifs = data || [];
+
+  const nb = document.getElementById('nb-notifs');
+  nb.textContent = allNotifs.length; nb.style.display = allNotifs.length ? 'flex' : 'none';
+  document.getElementById('s-msgs').textContent = allNotifs.length;
+  document.getElementById('s-today').textContent =
+    allNotifs.filter(n => n.created_at?.startsWith(new Date().toISOString().split('T')[0])).length;
+
+  // History stats
+  ['info','warning','danger','success'].forEach(t => {
+    const el = document.getElementById('h-'+{info:'info',warning:'warn',danger:'danger',success:'success'}[t]);
+    if (el) el.textContent = allNotifs.filter(n=>n.type===t).length;
+  });
+
+  renderInbox();
+  renderHistory();
 }
 
-// Live preview
-['msg-title','msg-body','msg-type'].forEach(id => {
-  document.getElementById(id)?.addEventListener('input', updatePreview);
-  document.getElementById(id)?.addEventListener('change', updatePreview);
-});
+const NOTIF_COLORS = {info:'#1a4578',success:'#3a8a4e',warning:'#d97706',danger:'#dc2626'};
+const NOTIF_ICONS  = {info:'fa-bell',success:'fa-check-circle',warning:'fa-exclamation-triangle',danger:'fa-fire'};
+
+function renderInbox() {
+  const q = (document.getElementById('notif-search')?.value||'').toLowerCase();
+  let list = allNotifs.filter(n => {
+    if (notifFilter !== 'all' && n.type !== notifFilter) return false;
+    if (q && !n.title?.toLowerCase().includes(q) && !(n.body||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('inbox-footer').textContent = list.length + ' Nachrichten';
+  document.getElementById('del-all-btn').style.display = list.length ? '' : 'none';
+
+  const el = document.getElementById('inbox-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty"><i class="fas fa-inbox"></i><p>Keine Nachrichten</p><span>Sende deine erste Nachricht über "Nachricht senden"</span></div>`;
+    return;
+  }
+  el.innerHTML = list.map(n => {
+    const col  = NOTIF_COLORS[n.type]||'#1a4578';
+    const icon = NOTIF_ICONS[n.type]||'fa-bell';
+    const date = new Date(n.created_at).toLocaleString('de-DE');
+    return `<div class="notif-row" id="nr-${n.id}">
+      <div class="notif-icon" style="background:${col}"><i class="fas ${icon}"></i></div>
+      <div class="notif-content">
+        <div class="notif-title">${n.title}</div>
+        ${n.body ? `<div class="notif-body">${n.body}</div>` : ''}
+        <div class="notif-meta">
+          <span class="badge ${n.type==='danger'?'badge-red':n.type==='warning'?'badge-gray':'badge-blue'}">${n.type}</span>
+          <span>${n.target_user_id ? '→ Direkt' : '→ Alle'}</span>
+          <span>${date}</span>
+          ${n.expires_at ? `<span>⏱ bis ${new Date(n.expires_at).toLocaleDateString('de-DE')}</span>` : ''}
+        </div>
+      </div>
+      <button class="btn btn-red" onclick="delNotif('${n.id}')" style="flex-shrink:0;padding:6px 10px"><i class="fas fa-trash"></i></button>
+    </div>`;
+  }).join('');
+}
+
+function filterNotifs() { renderInbox(); }
+function setNotifFilter(f, el) {
+  notifFilter = f;
+  document.querySelectorAll('[data-nf]').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderInbox();
+}
+
+async function delNotif(id) {
+  const { error } = await sb.from('notifications').delete().eq('id',id);
+  if (error) { toast('Fehler: '+error.message, true); return; }
+  allNotifs = allNotifs.filter(n => n.id !== id);
+  renderInbox(); renderHistory();
+  document.getElementById('s-msgs').textContent = allNotifs.length;
+  toast('✓ Gelöscht');
+}
+
+async function deleteAllNotifs() {
+  if (!confirm('Alle gefilterten Nachrichten löschen?')) return;
+  const q = (document.getElementById('notif-search')?.value||'').toLowerCase();
+  const toDelete = allNotifs.filter(n => {
+    if (notifFilter !== 'all' && n.type !== notifFilter) return false;
+    if (q && !n.title?.toLowerCase().includes(q) && !(n.body||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  for (const n of toDelete) await sb.from('notifications').delete().eq('id',n.id);
+  allNotifs = allNotifs.filter(n => !toDelete.find(d=>d.id===n.id));
+  renderInbox(); renderHistory();
+  toast(`✓ ${toDelete.length} Nachrichten gelöscht`);
+}
+
+function renderHistory() {
+  const el = document.getElementById('hist-list');
+  if (!allNotifs.length) { el.innerHTML = `<div class="empty"><i class="fas fa-history"></i><p>Kein Verlauf</p></div>`; return; }
+  el.innerHTML = allNotifs.map(n => {
+    const col = NOTIF_COLORS[n.type]||'#1a4578';
+    const ico = NOTIF_ICONS[n.type]||'fa-bell';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:var(--r);background:#fff">
+      <div style="width:30px;height:30px;border-radius:7px;background:${col};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="fas ${ico}" style="color:#fff;font-size:11px"></i>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.title}</div>
+        <div style="font-size:11px;color:var(--sub2)">${new Date(n.created_at).toLocaleString('de-DE')} · ${n.target_user_id?'Direkt':'Alle'}</div>
+      </div>
+      <span class="badge badge-gray">${n.type}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── COMPOSE ───────────────────────────────────────────────────────────────
+function onRecipChange() {
+  const one = document.querySelector('input[name=recip]:checked').value === 'one';
+  document.getElementById('recip-user-field').style.display = one ? 'block' : 'none';
+}
+
+function selectType(t, el) {
+  selType = t;
+  document.querySelectorAll('.type-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  updatePreview();
+}
 
 function updatePreview() {
-  const title   = document.getElementById('msg-title').value || 'Titel der Nachricht';
-  const body    = document.getElementById('msg-body').value  || 'Nachrichtentext erscheint hier...';
-  const type    = document.getElementById('msg-type').value;
-  const colors  = { info:'#1a4578', success:'#3a8a4e', warning:'#d97706', danger:'#dc2626' };
-  const icons   = { info:'fa-bell', success:'fa-check-circle', warning:'fa-exclamation-triangle', danger:'fa-fire' };
-  document.getElementById('preview-icon').style.background = colors[type] || '#1a4578';
-  document.getElementById('preview-icon').innerHTML = `<i class="fas ${icons[type]||'fa-bell'}" style="color:#fff;font-size:14px"></i>`;
-  document.getElementById('preview-title').textContent = title;
-  document.getElementById('preview-body').textContent  = body;
+  const title = document.getElementById('c-title').value || 'Titel der Nachricht';
+  const body  = document.getElementById('c-body').value  || 'Nachrichtentext...';
+  const col   = NOTIF_COLORS[selType]||'#1a4578';
+  const ico   = NOTIF_ICONS[selType]||'fa-bell';
+  document.getElementById('pv-icon').style.background = col;
+  document.getElementById('pv-icon').innerHTML = `<i class="fas ${ico}" style="color:#fff;font-size:14px"></i>`;
+  document.getElementById('pv-title').textContent = title;
+  document.getElementById('pv-body').textContent  = body;
 }
 
-async function sendNotification() {
-  const target  = document.querySelector('input[name="target"]:checked').value;
-  const userId  = document.getElementById('msg-target-user').value;
-  const type    = document.getElementById('msg-type').value;
-  const title   = document.getElementById('msg-title').value.trim();
-  const body    = document.getElementById('msg-body').value.trim();
-  const expires = document.getElementById('msg-expires').value;
+function useTemplate(t) {
+  const tpls = {
+    update:      { type:'info',    title:'🎉 Neues Update verfügbar', body:'Eine neue Version von MelaLogic ist online. Alle Verbesserungen findest du im Changelog.' },
+    maintenance: { type:'warning', title:'⚙️ Wartungsarbeiten geplant', body:'Am Sonntag zwischen 2:00 und 4:00 Uhr ist das System möglicherweise kurz nicht erreichbar.' },
+    feature:     { type:'success', title:'🚀 Neue Funktion freigeschaltet', body:'Schau dir die neue Funktion an! Sie ist ab sofort in deinem Account verfügbar.' },
+    reminder:    { type:'danger',  title:'⚠️ Wichtige Erinnerung', body:'Bitte überprüfe deine offenen Einträge und stelle sicher, dass alle Daten korrekt sind.' },
+  };
+  const tp = tpls[t];
+  document.getElementById('c-title').value = tp.title;
+  document.getElementById('c-body').value  = tp.body;
+  selectType(tp.type, document.querySelector(`[data-type=${tp.type}]`));
+  updatePreview();
+}
 
-  if (!title) { showToast('Bitte Titel eingeben!', true); return; }
-  if (target === 'one' && !userId) { showToast('Bitte Benutzer wählen!', true); return; }
+async function sendMsg() {
+  const recip   = document.querySelector('input[name=recip]:checked').value;
+  const userId  = document.getElementById('c-user').value;
+  const title   = document.getElementById('c-title').value.trim();
+  const body    = document.getElementById('c-body').value.trim();
+  const expires = document.getElementById('c-expires').value;
+  if (!title) { toast('Bitte Titel eingeben!', true); return; }
+  if (recip === 'one' && !userId) { toast('Bitte Benutzer wählen!', true); return; }
 
   const btn = document.getElementById('send-btn');
   btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Wird gesendet...';
 
-  const record = {
-    title, body: body || null,
-    type,
-    target_user_id: target === 'one' ? userId : null,
+  const { error } = await sb.from('notifications').insert({
+    title, body: body||null, type: selType,
+    target_user_id: recip==='one' ? userId : null,
     expires_at: expires ? new Date(expires).toISOString() : null,
-  };
-
-  const { error } = await sb.from('notifications').insert(record);
+  });
 
   btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Nachricht senden';
+  if (error) { toast('Fehler: '+error.message, true); return; }
 
-  if (error) {
-    if (error.code === '42501') {
-      showToast('RLS-Fehler: INSERT Policy fehlt. Siehe Konsole.', true);
-      console.error('Füge diese Policy in Supabase hinzu:\nCREATE POLICY "Admin can insert" ON notifications FOR INSERT WITH CHECK (true);');
-    } else {
-      showToast('Fehler: ' + error.message, true);
-    }
-    return;
-  }
-
-  showToast(target === 'all' ? '✓ Nachricht an alle gesendet!' : '✓ Nachricht gesendet!');
-  document.getElementById('msg-title').value = '';
-  document.getElementById('msg-body').value  = '';
-  document.getElementById('msg-expires').value = '';
+  toast(recip==='all' ? '✓ An alle gesendet!' : '✓ Nachricht gesendet!');
+  document.getElementById('c-title').value = '';
+  document.getElementById('c-body').value  = '';
+  document.getElementById('c-expires').value = '';
   updatePreview();
-  loadHistory();
-  loadOverview();
-  document.getElementById('stat-notifs').textContent =
-    (+document.getElementById('stat-notifs').textContent || 0) + 1;
+  await loadNotifs();
+  renderOverview();
 }
 
-// ── HISTORY ───────────────────────────────────────────────────────────────
-async function loadHistory() {
-  const { data, error } = await sb.from('notifications')
-    .select('*').order('created_at', { ascending: false }).limit(100);
-
-  const list = document.getElementById('history-list');
-  const count = document.getElementById('history-count');
-  document.getElementById('stat-notifs').textContent = data?.length || 0;
-
-  if (error || !data?.length) {
-    list.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:30px">Keine Nachrichten vorhanden</div>';
-    count.textContent = '0 Nachrichten';
-    return;
-  }
-
-  count.textContent = data.length + ' Nachrichten';
-  const colors = { info:'#1a4578', success:'#3a8a4e', warning:'#d97706', danger:'#dc2626' };
-  const icons  = { info:'fa-bell', success:'fa-check-circle', warning:'fa-exclamation-triangle', danger:'fa-fire' };
-
-  list.innerHTML = data.map(n => `
-    <div class="notif-item">
-      <div class="notif-icon" style="background:${colors[n.type]||'#1a4578'}">
-        <i class="fas ${icons[n.type]||'fa-bell'}"></i>
-      </div>
-      <div class="notif-body">
-        <div class="notif-title">${n.title}</div>
-        ${n.body ? `<div class="notif-text">${n.body}</div>` : ''}
-        <div class="notif-meta">
-          ${n.target_user_id ? `<span class="badge badge-blue">Direkt</span>` : `<span class="badge badge-gray">Alle</span>`}
-          · ${new Date(n.created_at).toLocaleString('de-DE')}
-          ${n.expires_at ? ` · Läuft ab: ${new Date(n.expires_at).toLocaleDateString('de-DE')}` : ''}
+// ── OVERVIEW ─────────────────────────────────────────────────────────────
+function renderOverview() {
+  // Recent msgs
+  const el = document.getElementById('ov-msgs');
+  if (!allNotifs.length) { el.innerHTML = `<div class="empty" style="padding:24px"><i class="fas fa-bell-slash"></i><p>Noch keine Nachrichten</p></div>`; }
+  else {
+    const col  = n => NOTIF_COLORS[n.type]||'#1a4578';
+    const ico  = n => NOTIF_ICONS[n.type]||'fa-bell';
+    el.innerHTML = allNotifs.slice(0,5).map(n => `
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border)">
+        <div style="width:28px;height:28px;border-radius:7px;background:${col(n)};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="fas ${ico(n)}" style="color:#fff;font-size:11px"></i>
         </div>
-      </div>
-      <button class="btn-danger" onclick="deleteNotif('${n.id}', this)" title="Löschen">
-        <i class="fas fa-trash"></i>
-      </button>
-    </div>`).join('');
-}
-
-async function deleteNotif(id, btn) {
-  if (!confirm('Benachrichtigung löschen?')) return;
-  btn.disabled = true;
-  const { error } = await sb.from('notifications').delete().eq('id', id);
-  if (error) { showToast('Fehler beim Löschen', true); btn.disabled = false; return; }
-  btn.closest('.notif-item').remove();
-  showToast('✓ Gelöscht');
-  loadOverview();
-}
-
-// ── OVERVIEW ──────────────────────────────────────────────────────────────
-async function loadOverview() {
-  const { data } = await sb.from('notifications')
-    .select('*').order('created_at', { ascending: false }).limit(5);
-
-  const colors = { info:'#1a4578', success:'#3a8a4e', warning:'#d97706', danger:'#dc2626' };
-  const icons  = { info:'fa-bell', success:'fa-check-circle', warning:'fa-exclamation-triangle', danger:'fa-fire' };
-  const el = document.getElementById('overview-notifs');
-
-  if (!data?.length) {
-    el.innerHTML = '<div style="color:#94a3b8;font-size:13px;text-align:center;padding:20px">Noch keine Nachrichten gesendet</div>';
-    return;
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.title}</div>
+          <div style="font-size:11px;color:var(--sub2)">${new Date(n.created_at).toLocaleString('de-DE')}</div>
+        </div>
+        <span class="badge ${n.target_user_id?'badge-blue':'badge-gray'}">${n.target_user_id?'Direkt':'Alle'}</span>
+      </div>`).join('');
   }
 
-  el.innerHTML = data.map(n => `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">
-      <div style="width:28px;height:28px;border-radius:7px;background:${colors[n.type]||'#1a4578'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <i class="fas ${icons[n.type]||'fa-bell'}" style="color:#fff;font-size:11px"></i>
-      </div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.title}</div>
-        <div style="font-size:11px;color:#94a3b8">${new Date(n.created_at).toLocaleString('de-DE')} · ${n.target_user_id ? 'Direkt' : 'Alle'}</div>
-      </div>
-    </div>`).join('');
-
-  document.getElementById('stat-today').textContent =
-    data.filter(n => n.created_at?.startsWith(new Date().toISOString().split('T')[0])).length;
+  // Recent users
+  const uel = document.getElementById('ov-users');
+  if (!allUsers.length) { uel.innerHTML = `<div class="empty" style="padding:24px"><i class="fas fa-users"></i><p>Keine Benutzer gefunden</p></div>`; return; }
+  uel.innerHTML = `<table class="tbl"><thead><tr><th>User-ID</th><th>Erster Eintrag</th><th>Zuletzt aktiv</th><th>Datensätze</th></tr></thead><tbody>` +
+    allUsers.slice(0,5).map(u => {
+      const total = Object.values(u.counts).reduce((s,v)=>s+v,0);
+      return `<tr>
+        <td style="font-family:monospace;font-size:12px">${u.id.substring(0,16)}…</td>
+        <td style="font-size:12px;color:var(--sub)">${new Date(u.first).toLocaleDateString('de-DE')}</td>
+        <td style="font-size:12px;color:var(--sub)">${new Date(u.last).toLocaleDateString('de-DE')}</td>
+        <td><span class="badge badge-blue">${total}</span></td>
+      </tr>`;
+    }).join('') + '</tbody></table>';
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────
-function showToast(msg, isErr = false) {
-  const t = document.getElementById('admin-toast');
+function toast(msg, err=false) {
+  const t = document.getElementById('toast');
   t.textContent = msg;
-  t.style.background = isErr ? '#dc2626' : '#1a4578';
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3000);
+  t.style.cssText = `bottom:24px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;position:fixed;background:${err?'#dc2626':'#1a4578'};color:#fff;display:block`;
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.style.display = 'none', 3000);
 }
-
-// Check existing session
-sb.auth.getSession().then(({ data }) => {
-  if (data.session?.user?.email === ADMIN_EMAIL) {
-    adminUser = data.session.user;
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('admin-app').style.display = 'block';
-    document.getElementById('admin-email-display').textContent = adminUser.email;
-    initAdmin();
-  }
-});
 </script>
 </body>
 </html>
