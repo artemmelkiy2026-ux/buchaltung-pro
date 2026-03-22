@@ -283,8 +283,26 @@ function openEditFromList(id) {
     showEintragDetail(id);
     return;
   }
-  openEdit(id);
+  // Переходим в Einträge и подсвечиваем запись перед открытием редактора
+  const _curPage = document.querySelector('.page.active');
+  const _onEintraege = _curPage && _curPage.id === 'p-eintraege';
+  if (!_onEintraege) {
+    const navEl = document.querySelector('.nav-item[onclick*="eintraege"]');
+    nav('eintraege', navEl || null);
+    setTimeout(() => { highlightEintrag(id); openEdit(id); }, 300);
+  } else {
+    highlightEintrag(id);
+    openEdit(id);
+  }
 }
+
+// Перейти в раздел Einträge и подсветить конкретную запись
+function navToEintrag(id) {
+  const navEl = document.querySelector('.nav-item[onclick*="eintraege"]');
+  nav('eintraege', navEl || null);
+  setTimeout(() => highlightEintrag(id), 300);
+}
+
 function toggleMwstDropdown() {
   const panel   = document.getElementById('nf-mwst-panel');
   const arrow   = document.getElementById('nf-mwst-arrow');
@@ -1207,7 +1225,7 @@ function renderEin(){
       const _stOpacity = e.is_storno ? '.40' : '.55';
       const _rowStyle  = (_isRechVirt || _isWiedVirt) ? 'cursor:pointer;opacity:.9' : (st ? 'cursor:default;opacity:'+_stOpacity : 'cursor:pointer');
 
-      return '<div class="ein-row'+(st?' ein-row-st':'')+(_isRechVirt?' ein-row-rech-virt':'')+'" '+_clickAttr+' style="'+_rowStyle+'">'
+      return '<div class="ein-row'+(st?' ein-row-st':'')+(_isRechVirt?' ein-row-rech-virt':'')+'" id="ein-row-'+e.id+'" '+_clickAttr+' style="'+_rowStyle+'">'
         +'<div class="ein-row-body">'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
@@ -2036,6 +2054,56 @@ function highlightRechnung(rechId) {
       _switchToPage();
     } else if (attempts > 40) {
       clearInterval(retry); // сдаёмся через 4 секунды
+    }
+  }, 100);
+}
+
+// ── Highlight Eintrag — переключает страницу и мигает строкой ────────────────
+function highlightEintrag(eintragId) {
+  const _doHighlight = (row) => {
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.classList.remove('highlight-flash');
+    void row.offsetWidth;
+    row.classList.add('highlight-flash');
+    setTimeout(() => row.classList.remove('highlight-flash'), 2000);
+  };
+
+  const _findRow = () => document.getElementById('ein-row-' + eintragId)
+    || document.getElementById('lein-row-' + eintragId)
+    || document.getElementById('laus-row-' + eintragId);
+
+  // Переключаем на нужную страницу
+  const _switchToPage = () => {
+    const filtered = getFiltered();
+    const idx = filtered.findIndex(e => e.id === eintragId);
+    if (idx < 0) return false;
+    const targetPage = Math.floor(idx / einPerPage) + 1;
+    if (targetPage !== einPage) {
+      einPage = targetPage;
+      renderEin();
+      return true;
+    }
+    return false;
+  };
+
+  // Если строка уже в DOM — подсветить сразу
+  let row = _findRow();
+  if (row) { _doHighlight(row); return; }
+
+  // Переключаем страницу и ждём рендера
+  _switchToPage();
+
+  let attempts = 0;
+  const retry = setInterval(() => {
+    attempts++;
+    row = _findRow();
+    if (row) {
+      clearInterval(retry);
+      _doHighlight(row);
+    } else if (attempts === 5) {
+      _switchToPage();
+    } else if (attempts > 40) {
+      clearInterval(retry);
     }
   }, 100);
 }
