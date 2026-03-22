@@ -4157,15 +4157,14 @@ header { background: #fff; }
 
 /* ── HIGHLIGHT FLASH (мигание для привлечения внимания) ─────────────────── */
 @keyframes highlight-flash {
-  0%   { box-shadow: 0 0 0 0 rgba(220,38,38,.6); }
-  30%  { box-shadow: 0 0 0 8px rgba(220,38,38,.3); background: #fef2f2; }
-  60%  { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
-  80%  { background: #fef2f2; }
-  100% { box-shadow: none; background: transparent; }
+  0%   { background: transparent; }
+  25%  { background: #fef2f2; }
+  50%  { background: transparent; }
+  75%  { background: #fef2f2; }
+  100% { background: transparent; }
 }
 .highlight-flash {
-  animation: highlight-flash 1.2s ease 3;
-  border-radius: var(--r2);
+  animation: highlight-flash .8s ease 2;
 }
 
 /* ── ENTWURF STATUS ──────────────────────────────────────────────────────── */

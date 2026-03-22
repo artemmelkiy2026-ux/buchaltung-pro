@@ -1823,7 +1823,7 @@ function showRechEintragInfo(id) {
           _closeDetailSheet();
           const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
           nav('rechnungen', el);
-          setTimeout(() => highlightRechnung(rechId), 400);
+          highlightRechnung(rechId);
         }
       },
       { label: 'Stornieren & neu', icon: 'fa-undo', danger: true, action: () => {
@@ -1844,28 +1844,34 @@ function showRechEintragInfo(id) {
   });
 }
 
-// ── Highlight Rechnung (мигание для привлечения внимания) ─────────────────
+// ── Highlight Rechnung — ждёт рендера и мигает фоном ──────────────────────
 function highlightRechnung(rechId) {
-  // Скроллим к нужной карточке и заставляем мигать
-  const card = document.querySelector(`[data-rech-id="${rechId}"]`) ||
-               document.querySelector(`#rech-cards .rech-card`);
+  const _doHighlight = (card) => {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.remove('highlight-flash');
+    void card.offsetWidth; // reflow чтобы анимация перезапустилась
+    card.classList.add('highlight-flash');
+    setTimeout(() => card.classList.remove('highlight-flash'), 2000);
+  };
 
-  if (!card) {
-    // Попробуем найти через ID в data-атрибутах
-    const allCards = document.querySelectorAll('.rech-card');
-    for (const c of allCards) {
-      if (c.innerHTML.includes(rechId.substring(0,8))) {
-        c.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        c.classList.add('highlight-flash');
-        setTimeout(() => c.classList.remove('highlight-flash'), 4000);
-        return;
-      }
+  const _findCard = () => document.querySelector(`[data-rech-id="${rechId}"]`);
+
+  // Сразу пробуем найти
+  let card = _findCard();
+  if (card) { _doHighlight(card); return; }
+
+  // DOM ещё не готов — ждём с retry
+  let attempts = 0;
+  const retry = setInterval(() => {
+    attempts++;
+    card = _findCard();
+    if (card) {
+      clearInterval(retry);
+      _doHighlight(card);
+    } else if (attempts > 20) {
+      clearInterval(retry); // сдаёмся через 2 секунды
     }
-    return;
-  }
-  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  card.classList.add('highlight-flash');
-  setTimeout(() => card.classList.remove('highlight-flash'), 4000);
+  }, 100);
 }
 
 function showEintragDetail(id) {

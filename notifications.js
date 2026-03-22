@@ -47,11 +47,7 @@ function getSystemNotifications() {
         const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
         if (el) nav('rechnungen', el);
         // Мигаем все просроченные карточки
-        setTimeout(() => {
-          overdue.forEach(r => {
-            if (typeof highlightRechnung === 'function') highlightRechnung(r.id);
-          });
-        }, 500);
+        overdue.forEach(r => { if (typeof highlightRechnung === 'function') highlightRechnung(r.id); });
       }
     });
     // Отдельные уведомления для каждого просроченного счёта
@@ -145,9 +141,7 @@ function getSystemNotifications() {
       action: () => {
         const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
         if (el) nav('rechnungen', el);
-        setTimeout(() => {
-          longOpen.forEach(r => { if (typeof highlightRechnung === 'function') highlightRechnung(r.id); });
-        }, 500);
+        longOpen.forEach(r => { if (typeof highlightRechnung === 'function') highlightRechnung(r.id); });
       }
     });
   }
