@@ -4192,13 +4192,11 @@ header { background: #fff; }
 /* ── HIGHLIGHT FLASH (мигание для привлечения внимания) ─────────────────── */
 @keyframes highlight-flash {
   0%   { background: transparent; }
-  25%  { background: #fef2f2; }
-  50%  { background: transparent; }
-  75%  { background: #fef2f2; }
+  40%  { background: rgba(59,130,246,.12); }
   100% { background: transparent; }
 }
 .highlight-flash {
-  animation: highlight-flash .8s ease 2;
+  animation: highlight-flash .55s ease 2;
 }
 
 /* ── ENTWURF STATUS ──────────────────────────────────────────────────────── */

@@ -83,9 +83,10 @@ function showWiedEintragInfo(wiedId) {
             const card = document.querySelector(`.wied-card[onclick*="${wiedId}"]`);
             if (card) {
               card.scrollIntoView({ behavior:'smooth', block:'center' });
-              card.style.transition = 'box-shadow .2s';
-              card.style.boxShadow = '0 0 0 3px var(--blue)';
-              setTimeout(() => { card.style.boxShadow = ''; }, 1500);
+              card.classList.remove('highlight-flash');
+              void card.offsetWidth;
+              card.classList.add('highlight-flash');
+              setTimeout(() => card.classList.remove('highlight-flash'), 1200);
             }
           }, 400);
         }
