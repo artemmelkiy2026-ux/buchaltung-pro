@@ -1182,10 +1182,12 @@ async function open2FASetup() {
       colorLight:   '#ffffff',
       correctLevel: QRCode.CorrectLevel.M
     });
-    // Скругляем углы у canvas
+    // QRCode.js создаёт и canvas и img — убираем img, оставляем только canvas
     setTimeout(() => {
       const canvas = qrDiv.querySelector('canvas');
-      if (canvas) canvas.style.cssText = 'border-radius:8px;border:1px solid #e5e7eb;display:block';
+      const img    = qrDiv.querySelector('img');
+      if (img) img.remove();
+      if (canvas) canvas.style.cssText = 'border-radius:8px;border:1px solid #e5e7eb;display:block;margin:0 auto';
     }, 100);
     if (secretText) secretText.textContent = data.totp.secret;
     if (secretBox)  secretBox.style.display = 'block';
