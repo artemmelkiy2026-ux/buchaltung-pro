@@ -1125,16 +1125,39 @@ async function open2FASetup() {
   document.getElementById('twofa-verify-code').value = '';
 
   try {
-    // Удаляем незавершённые (unverified) факторы перед новой регистрацией
-    try {
-      const { data: existing } = await sb.auth.mfa.listFactors();
-      const unverified = (existing?.totp || []).filter(f => f.status !== 'verified');
-      for (const f of unverified) {
-        await sb.auth.mfa.unenroll({ factorId: f.id });
-      }
-    } catch(e) { /* игнорируем ошибки при очистке */ }
+    // Пробуем enroll — если ошибка "already exists", чистим и повторяем
+    let enrollData, enrollError;
 
-    const { data, error } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'MelaLogic Authenticator' });
+    // Первая попытка
+    ({ data: enrollData, error: enrollError } = await sb.auth.mfa.enroll({
+      factorType: 'totp', friendlyName: 'MelaLogic-' + Date.now()
+    }));
+
+    // Если фактор уже есть (unverified) — удаляем и пробуем снова
+    if (enrollError && enrollError.message && enrollError.message.includes('already exists')) {
+      try {
+        const { data: existing } = await sb.auth.mfa.listFactors();
+        const allFactors = [
+          ...(existing?.totp || []),
+          ...(existing?.phone || [])
+        ];
+        for (const f of allFactors) {
+          if (f.status !== 'verified') {
+            await sb.auth.mfa.unenroll({ factorId: f.id });
+          }
+        }
+      } catch(cleanErr) {
+        // listFactors не сработал — пробуем unenroll через повторный enroll
+        // который вернёт нам ID существующего фактора в ошибке
+        console.warn('[2FA cleanup]', cleanErr);
+      }
+      // Вторая попытка после очистки
+      ({ data: enrollData, error: enrollError } = await sb.auth.mfa.enroll({
+        factorType: 'totp', friendlyName: 'MelaLogic-' + Date.now()
+      }));
+    }
+
+    const data = enrollData, error = enrollError;
     if (error) throw error;
 
     _2faFactorId = data.id;
