@@ -610,7 +610,7 @@ function renderCalmBanners() {
   const gridPattern = `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0M-5 5L5-5M35 45L45 35' stroke='rgba(255,255,255,0.06)' stroke-width='1' fill='none'/%3E%3C/svg%3E")`;
 
   const card = (grad, icon, label, val, title, sub, extra='') => `
-    <div class="calm-card" style="background:${grad};border-radius:10px;padding:20px;position:relative;overflow:hidden;min-height:148px">
+    <div class="calm-card" style="background:${grad};border-radius:8px;padding:20px;position:relative;overflow:hidden;min-height:148px">
       <!-- Фоновый паттерн -->
       <div style="position:absolute;inset:0;background:${gridPattern};opacity:1;pointer-events:none"></div>
       <!-- Декоративные круги -->
@@ -619,7 +619,7 @@ function renderCalmBanners() {
       <!-- Контент -->
       <div style="position:relative;z-index:1">
         <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
-          <div class="calm-icon-wrap" style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div class="calm-icon-wrap" style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <i class="fas ${icon}" style="color:#fff;font-size:14px"></i>
           </div>
           <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)">${label}</span>
