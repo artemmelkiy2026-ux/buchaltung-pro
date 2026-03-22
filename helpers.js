@@ -731,7 +731,7 @@ function _buildRechnungHTML(r) {
     border-top: 1px solid var(--border);
     display: grid;
     grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 20px;
+    gap: 16px;
     font-size: 9px;
     color: var(--text-sub);
     line-height: 1.6;
@@ -841,9 +841,7 @@ function _buildRechnungHTML(r) {
       <strong>Kontakt</strong>
       ${firmaTel?'Tel: '+firmaTel+'<br>':''}
       ${firmaEmail}
-    </div>
-    <div class="footer-col">
-      <strong>Steuer</strong>
+      ${(firmaStNr||firmaUstId) ? '<br><strong style="margin-top:6px;display:block">Steuer</strong>' : ''}
       ${firmaStNr?'St.-Nr.: '+firmaStNr+'<br>':''}
       ${firmaUstId?'USt-ID: '+firmaUstId:''}
     </div>
