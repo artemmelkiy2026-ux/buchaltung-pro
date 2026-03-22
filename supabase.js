@@ -130,7 +130,7 @@ function dbToEintrag(r) {
   let _belegnr = '';
   let _notizClean = _rnotiz;
   if(_rnotiz.startsWith('§NR:')){ const nl=_rnotiz.indexOf('\n'); _belegnr=nl>0?_rnotiz.slice(4,nl):_rnotiz.slice(4); _notizClean=nl>0?_rnotiz.slice(nl+1):''; }
-  return { id:r.id, datum:r.datum||'', created_at:r.created_at||'', typ:r.typ, kategorie:r.kategorie||'', beschreibung:r.beschreibung||'', betrag:parseFloat(r.betrag)||0, zahlungsart:r.zahlungsart||'Sonstiges', notiz:_notizClean, belegnr:_belegnr, mwstRate:parseFloat(r.mwst_rate)||0, mwstBetrag:parseFloat(r.mwst_betrag)||0, nettoBetrag:parseFloat(r.netto_betrag)||0, vorsteuerRate:parseFloat(r.vorsteuer_rate)||0, vorsteuerBet:parseFloat(r.vorsteuer_bet)||0, mwstMode:r.mwst_mode||'§19', is_storno:r.is_storno||false, storno_of:r.storno_of||null, korrektur_von:r.korrektur_von||null };
+  return { id:r.id, datum:r.datum||'', leistungsdatum:r.leistungsdatum||'', created_at:r.created_at||'', typ:r.typ, kategorie:r.kategorie||'', beschreibung:r.beschreibung||'', betrag:parseFloat(r.betrag)||0, zahlungsart:r.zahlungsart||'Sonstiges', notiz:_notizClean, belegnr:_belegnr, mwstRate:parseFloat(r.mwst_rate)||0, mwstBetrag:parseFloat(r.mwst_betrag)||0, nettoBetrag:parseFloat(r.netto_betrag)||0, vorsteuerRate:parseFloat(r.vorsteuer_rate)||0, vorsteuerBet:parseFloat(r.vorsteuer_bet)||0, mwstMode:r.mwst_mode||'§19', is_storno:r.is_storno||false, storno_of:r.storno_of||null, korrektur_von:r.korrektur_von||null };
 }
 function dbToKunde(r) {
   return { id:r.id, name:r.name||'', ansprechpartner:r.ansprechpartner||'', email:r.email||'', tel:r.tel||'', strasse:r.strasse||'', plz:r.plz||'', ort:r.ort||'', iban:r.iban||'', ustid:r.ustid||'', notiz:r.notiz||'' };
@@ -147,7 +147,7 @@ function dbToRechnung(r, allPos) {
   const _posBrutto = r2(pos.reduce((s,p)=>s+(p.menge||1)*p.brutto,0));
   const _posMwst   = r2(_posBrutto - _posNetto);
   const _posRate   = pos.length>0?(pos.find(p=>p.rate>0)?.rate||0):0;
-  return { id:r.id, nr:r.nr||'', datum:r.datum||'', created_at:r.created_at||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', tel:r.tel||'', betrag:parseFloat(r.betrag)||0, netto:_posNetto||parseFloat(r.betrag)||0, mwstBetrag:_posMwst, mwstRate:_posRate, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', beschreibung:_extra.beschreibung||'', kategorie:_extra.kategorie||'', zahlungsart:_extra.zahlungsart||'', mahnung_history:_extra.mahnung_history||[], positionen:pos };
+  return { id:r.id, nr:r.nr||'', datum:r.datum||'', leistungsdatum:r.leistungsdatum||'', created_at:r.created_at||'', faellig:r.faellig||'', kunde:r.kunde||'', kundeId:r.kunde_id||'', adresse:r.adresse||'', email:r.email||'', tel:r.tel||'', betrag:parseFloat(r.betrag)||0, netto:_posNetto||parseFloat(r.betrag)||0, mwstBetrag:_posMwst, mwstRate:_posRate, status:r.status||'offen', mwstMode:r.mwst_mode||'§19', notiz:r.notiz||'', wa:r.wa||'', beschreibung:_extra.beschreibung||'', kategorie:_extra.kategorie||'', zahlungsart:_extra.zahlungsart||'', mahnung_history:_extra.mahnung_history||[], positionen:pos };
 }
 function dbToWied(r) {
   // Unpack extended meta from beschreibung if present
@@ -177,7 +177,7 @@ function dbToUstEintrag(r) {
 function eintragToDb(e) {
   // Сохраняем belegnr в notiz с маркером §NR:
   const _saveNotiz = e.belegnr ? ('§NR:'+e.belegnr+(e.notiz?'\n'+e.notiz:'')) : (e.notiz||null);
-  return { id:e.id, user_id:currentUser.id, datum:e.datum, typ:e.typ, kategorie:e.kategorie||null, beschreibung:e.beschreibung||null, betrag:e.betrag||0, zahlungsart:e.zahlungsart||null, notiz:_saveNotiz, mwst_rate:e.mwstRate||0, mwst_betrag:e.mwstBetrag||0, netto_betrag:e.nettoBetrag||0, vorsteuer_rate:e.vorsteuerRate||0, vorsteuer_bet:e.vorsteuerBet||0, mwst_mode:e.mwstMode||'§19', is_storno:e.is_storno||false, storno_of:e.storno_of||null, korrektur_von:e.korrektur_von||null };
+  return { id:e.id, user_id:currentUser.id, datum:e.datum, leistungsdatum:e.leistungsdatum||null, typ:e.typ, kategorie:e.kategorie||null, beschreibung:e.beschreibung||null, betrag:e.betrag||0, zahlungsart:e.zahlungsart||null, notiz:_saveNotiz, mwst_rate:e.mwstRate||0, mwst_betrag:e.mwstBetrag||0, netto_betrag:e.nettoBetrag||0, vorsteuer_rate:e.vorsteuerRate||0, vorsteuer_bet:e.vorsteuerBet||0, mwst_mode:e.mwstMode||'§19', is_storno:e.is_storno||false, storno_of:e.storno_of||null, korrektur_von:e.korrektur_von||null };
 }
 function kundeToDb(k) {
   return { id:k.id, user_id:currentUser.id, name:k.name||'', ansprechpartner:k.ansprechpartner||null, email:k.email||null, tel:k.tel||null, strasse:k.strasse||null, plz:k.plz||null, ort:k.ort||null, iban:k.iban||null, ustid:k.ustid||null, notiz:k.notiz||null };

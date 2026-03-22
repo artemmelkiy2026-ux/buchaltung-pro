@@ -23,6 +23,8 @@ function editE(e,id){
   setTimeout(()=>{
     setTyp(en.typ);
     document.getElementById('nf-dat').value=en.datum;
+    const _lEl = document.getElementById('nf-leistung');
+    if(_lEl) _lEl.value = en.leistungsdatum || '';
     document.getElementById('nf-bet').value=en.betrag;
     document.getElementById('nf-dsc').value=en.beschreibung||'';
     document.getElementById('nf-note').value=en.notiz||'';
@@ -93,6 +95,7 @@ async function saveEditFromForm(){
   const newId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
   const newEntry = {...origEntry,
     id: newId, datum, betrag, typ: curTyp,
+    leistungsdatum: document.getElementById('nf-leistung')?.value || '',
     kategorie: normKat(document.getElementById('nf-kat').value),
     zahlungsart: normZahl(document.getElementById('nf-zahl').value),
     beschreibung: document.getElementById('nf-dsc').value.trim()||normKat(document.getElementById('nf-kat').value),

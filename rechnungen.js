@@ -330,6 +330,8 @@ function _openRechForm(r, id, title) {
   document.getElementById('rn-nr').value=r.nr;
   document.getElementById('rn-dat').value=r.datum;
   document.getElementById('rn-faellig').value=r.faellig||'';
+  const _leistEl = document.getElementById('rn-leistung');
+  if(_leistEl) _leistEl.value=r.leistungsdatum||'';
   document.getElementById('rn-bet').value=r.betrag;
   setRechStatus(r.status||'offen');
   document.getElementById('rn-kunde').value=r.kunde||'';
@@ -402,9 +404,11 @@ function _buchRechnungAlsEinnahme(r) {
   const _rNetto = r.positionen&&r.positionen.length ? r2(r.positionen.reduce((s,p)=>s+(p.menge||1)*p.netto,0)) : (r.netto||r.betrag);
   const _rMwst  = r.positionen&&r.positionen.length ? r2(r.positionen.reduce((s,p)=>s+(p.menge||1)*(p.brutto-p.netto),0)) : (r.mwstBetrag||0);
   const _rRate  = r.positionen&&r.positionen.length ? (r.positionen.find(p=>p.rate>0)?.rate||0) : (r.mwstRate||0);
+  const _today = new Date().toISOString().split('T')[0];
   const newE = {
     id: Date.now()+'_'+Math.random().toString(36).slice(2,6),
-    datum: r.datum||new Date().toISOString().split('T')[0],
+    datum: _today, // Buchungsdatum = heute
+    leistungsdatum: r.leistungsdatum || r.datum || _today, // Leistungsdatum = Rechnungsdatum
     typ:'Einnahme',
     kategorie: r.kategorie||'Dienstleistung',
     zahlungsart: r.zahlungsart||'Überweisung',
@@ -511,6 +515,7 @@ function saveRechnung(){
     beschreibung:dsc,
     datum,
     faellig:document.getElementById('rn-faellig').value,
+    leistungsdatum:document.getElementById('rn-leistung')?.value||'',
     status:document.getElementById('rn-status').value,
     kunde:document.getElementById('rn-kunde').value.trim(),
     adresse:document.getElementById('rn-adresse').value.trim(),

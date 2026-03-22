@@ -374,7 +374,9 @@ function addEintrag(){
   const mwRate=mwRateRaw===null||mwRateRaw===undefined?19:parseFloat(mwRateRaw);
   const mwBet=r2(parseFloat(document.getElementById('nf-mwst-bet')?.value)||0);
   const netBet=r2(parseFloat(document.getElementById('nf-netto-bet')?.value)||betrag);
-  const entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,belegnr,betrag,created_at:new Date().toISOString()};
+  const _leistEl=document.getElementById('nf-leistung');
+  const leistungsdatum=_leistEl?.value||'';
+  const entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),datum,leistungsdatum,typ:curTyp,kategorie:normKat(kat),zahlungsart:normZahl(zahl),beschreibung:dsc||normKat(kat),notiz:note,belegnr,betrag,created_at:new Date().toISOString()};
   const entryYrMode=datum.substring(0,4);
   if(!isKleinunternehmer(entryYrMode)&&mwBet>0){
     if(curTyp==='Einnahme'){
@@ -1058,8 +1060,12 @@ function renderEin(){
       const _nrBadge = ''; // больше не нужен
 
       // Строка под заголовком: Zahlungsart + Datum — ВСЕГДА там
+      const _leistShow = e.leistungsdatum && e.leistungsdatum !== e.datum
+        ? '<span style="font-size:10px;color:var(--sub);margin-left:6px" title="Leistungsdatum"><i class="fas fa-calendar-alt" style="opacity:.5;font-size:9px"></i> Lst: '+fd(e.leistungsdatum)+'</span>'
+        : '';
       const _infoLine = '<span class="badge ein-row-badge '+(ZBADGE[e.zahlungsart]||'')+'">'+(e.zahlungsart||'—')+'</span>'
-        +'<span class="ein-row-date" style="margin-left:6px">'+fd(e.datum)+'</span>';
+        +'<span class="ein-row-date" style="margin-left:6px">'+fd(e.datum)+'</span>'
+        +_leistShow;
 
       const _catLine = ''
         +'<span class="ein-row-kat">'+e.kategorie+'</span>'
