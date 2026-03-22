@@ -1981,18 +1981,49 @@ function highlightRechnung(rechId) {
   const _doHighlight = (card) => {
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
     card.classList.remove('highlight-flash');
-    void card.offsetWidth; // reflow чтобы анимация перезапустилась
+    void card.offsetWidth;
     card.classList.add('highlight-flash');
     setTimeout(() => card.classList.remove('highlight-flash'), 2000);
   };
 
   const _findCard = () => document.querySelector(`[data-rech-id="${rechId}"]`);
 
-  // Сразу пробуем найти
+  // Шаг 1: вычисляем на какой странице находится Rechnung и переключаем
+  const _switchToPage = () => {
+    if (typeof data === 'undefined' || !data.rechnungen) return;
+    if (typeof rechPage === 'undefined' || typeof RECH_PER_PAGE === 'undefined') return;
+    // Фильтруем так же как renderRech
+    const filtered = (data.rechnungen || []).filter(r => {
+      if (typeof rechFilter === 'undefined' || rechFilter === 'alle') return true;
+      return r.status === rechFilter;
+    });
+    const idx = filtered.findIndex(r => r.id === rechId);
+    if (idx < 0) {
+      // Не найден в текущем фильтре — сбрасываем фильтр на "alle"
+      if (typeof rechFilter !== 'undefined' && rechFilter !== 'alle') {
+        rechFilter = 'alle';
+        rechPage = 1;
+        if (typeof renderRech === 'function') renderRech();
+        return true; // перерендерили
+      }
+      return false;
+    }
+    const targetPage = Math.floor(idx / RECH_PER_PAGE) + 1;
+    if (targetPage !== rechPage) {
+      rechPage = targetPage;
+      if (typeof renderRech === 'function') renderRech();
+      return true; // перерендерили
+    }
+    return false; // уже на правильной странице
+  };
+
+  // Шаг 2: если карточка уже в DOM — подсветить сразу
   let card = _findCard();
   if (card) { _doHighlight(card); return; }
 
-  // DOM ещё не готов — ждём с retry
+  // Шаг 3: переключаем страницу и ждём рендера
+  _switchToPage();
+
   let attempts = 0;
   const retry = setInterval(() => {
     attempts++;
@@ -2000,8 +2031,11 @@ function highlightRechnung(rechId) {
     if (card) {
       clearInterval(retry);
       _doHighlight(card);
-    } else if (attempts > 20) {
-      clearInterval(retry); // сдаёмся через 2 секунды
+    } else if (attempts === 5) {
+      // После 5 попыток пробуем ещё раз переключить (фильтр мог мешать)
+      _switchToPage();
+    } else if (attempts > 40) {
+      clearInterval(retry); // сдаёмся через 4 секунды
     }
   }, 100);
 }
