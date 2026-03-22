@@ -143,7 +143,7 @@ body {
 }
 .modal-overlay.open { display:flex; }
 .modal {
-  background:var(--card);border-radius:10px;
+  background:var(--card);border-radius:6px 20px 0 0;
   width:100%;max-width:560px;padding:24px;
   animation:slideUp .3s ease;
   padding-bottom:calc(24px + env(safe-area-inset-bottom, 0));
@@ -563,6 +563,9 @@ async function init() {
   document.getElementById('profile-name').textContent = currentEmail.split('@')[0];
   document.getElementById('profile-email').textContent = currentEmail;
   document.getElementById('current-email-sub').textContent = currentEmail;
+
+  // Проверяем статус 2FA только после установки сессии
+  check2FAStatus();
 
   // Загружаем user_data (pin + client_id)
   const { data } = await sb.from('user_data').select('pin_hash, client_id, deleted_at').eq('user_id', currentUser.id).maybeSingle();
@@ -1091,27 +1094,35 @@ let _2faFactorId = null;
 
 async function check2FAStatus() {
   try {
-    const { data } = await sb.auth.mfa.listFactors();
-    const totp = data?.totp?.find(f => f.status === 'verified');
+    const { data, error } = await sb.auth.mfa.listFactors();
+    if (error) throw error;
+    const totp = (data?.totp || []).find(f => f.status === 'verified');
     const sub  = document.getElementById('twofa-status-sub');
     const arrow = document.getElementById('twofa-arrow');
     if (totp) {
       _2faFactorId = totp.id;
-      if (sub) { sub.textContent = '✅ Aktiv — klicken zum Deaktivieren'; sub.style.color = '#22c55e'; }
+      if (sub) { sub.innerHTML = '✅ Aktiv — klicken zum Deaktivieren'; sub.style.color = '#22c55e'; }
       if (arrow) arrow.style.display = 'none';
     } else {
       _2faFactorId = null;
       if (sub) { sub.textContent = 'Nicht aktiv — klicken zum Aktivieren'; sub.style.color = ''; }
+      if (arrow) arrow.style.display = '';
     }
-  } catch(e) { console.error('[2FA status]', e); }
+  } catch(e) {
+    // AAL2 erforderlich oder anderer Fehler — Status unklar
+    console.warn('[2FA status]', e);
+  }
 }
 
 async function open2FASetup() {
   const modal = document.getElementById('modal-2fa');
   modal.style.display = 'flex';
 
+  // Всегда перепроверяем статус перед открытием
+  await check2FAStatus();
+
   if (_2faFactorId) {
-    // Уже включён — показываем деактивацию
+    // Уже есть verified фактор — показываем деактивацию
     document.getElementById('twofa-step-setup').style.display = 'none';
     document.getElementById('twofa-step-success').style.display = 'none';
     document.getElementById('twofa-step-disable').style.display = 'block';
@@ -1126,39 +1137,23 @@ async function open2FASetup() {
   document.getElementById('twofa-verify-code').value = '';
 
   try {
-    // Пробуем enroll — если ошибка "already exists", чистим и повторяем
-    let enrollData, enrollError;
-
-    // Первая попытка
-    ({ data: enrollData, error: enrollError } = await sb.auth.mfa.enroll({
-      factorType: 'totp', friendlyName: 'MelaLogic-' + Date.now()
-    }));
-
-    // Если фактор уже есть (unverified) — удаляем и пробуем снова
-    if (enrollError && enrollError.message && enrollError.message.includes('already exists')) {
-      try {
-        const { data: existing } = await sb.auth.mfa.listFactors();
-        const allFactors = [
-          ...(existing?.totp || []),
-          ...(existing?.phone || [])
-        ];
-        for (const f of allFactors) {
-          if (f.status !== 'verified') {
-            await sb.auth.mfa.unenroll({ factorId: f.id });
-          }
-        }
-      } catch(cleanErr) {
-        // listFactors не сработал — пробуем unenroll через повторный enroll
-        // который вернёт нам ID существующего фактора в ошибке
-        console.warn('[2FA cleanup]', cleanErr);
+    // Удаляем ВСЕ существующие факторы перед созданием нового
+    try {
+      const { data: existing } = await sb.auth.mfa.listFactors();
+      const allFactors = [
+        ...(existing?.totp  || []),
+        ...(existing?.phone || [])
+      ];
+      for (const f of allFactors) {
+        try { await sb.auth.mfa.unenroll({ factorId: f.id }); } catch(e) {}
       }
-      // Вторая попытка после очистки
-      ({ data: enrollData, error: enrollError } = await sb.auth.mfa.enroll({
-        factorType: 'totp', friendlyName: 'MelaLogic-' + Date.now()
-      }));
-    }
+    } catch(e) { console.warn('[2FA pre-cleanup]', e); }
 
-    const data = enrollData, error = enrollError;
+    // Создаём новый фактор
+    const { data, error } = await sb.auth.mfa.enroll({
+      factorType: 'totp',
+      friendlyName: 'MelaLogic-' + Date.now()
+    });
     if (error) throw error;
 
     _2faFactorId = data.id;
@@ -1252,8 +1247,7 @@ async function disable2FA() {
   }
 }
 
-// Проверяем статус при загрузке
-check2FAStatus();
+// Статус проверяется в init() после установки сессии
 </script>
 
 </body>
