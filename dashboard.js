@@ -621,7 +621,7 @@ function renderCalmBanners() {
   const gridPattern = `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0M-5 5L5-5M35 45L45 35' stroke='rgba(255,255,255,0.06)' stroke-width='1' fill='none'/%3E%3C/svg%3E")`;
 
   const card = (grad, icon, label, val, title, sub, pulse=false, extra='') => `
-    <div class="calm-card" style="background:${grad};border-radius:18px;padding:20px;position:relative;overflow:hidden;min-height:148px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
+    <div class="calm-card" style="background:${grad};border-radius:10px;padding:20px;position:relative;overflow:hidden;min-height:148px;box-shadow:0 4px 16px rgba(0,0,0,.15)">
       <!-- Фоновый паттерн -->
       <div style="position:absolute;inset:0;background:${gridPattern};opacity:1;pointer-events:none"></div>
       <!-- Декоративные круги -->
