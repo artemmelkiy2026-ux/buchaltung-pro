@@ -1971,6 +1971,45 @@
       <div class="fg"><label>Betreff</label><input type="text" id="email-tmpl-subject" placeholder="Rechnung Nr. {{NR}} — {{FIRMA}}"></div>
       <div class="fg" style="margin:0"><label>E-Mail Text</label><textarea id="email-tmpl-body" rows="7" style="font-family:monospace;font-size:12px" placeholder="Sehr geehrte Damen und Herren..."></textarea></div>
     </div>
+    <!-- ── Предпросмотр Rechnung ── -->
+    <div class="ang-block">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="ang-block-label" style="margin:0"><i class="fas fa-eye"></i> Vorschau — Wie sieht meine Rechnung aus?</div>
+        <button onclick="firmaVorschauRechnung()" class="btn" style="font-size:12px">
+          <i class="fas fa-sync-alt" style="margin-right:6px"></i>Aktualisieren
+        </button>
+      </div>
+      <p style="font-size:11px;color:var(--sub);margin:0 0 12px">
+        Beispiel-Rechnung mit Ihren aktuellen Firmendaten. Klicken Sie auf "Aktualisieren" nach dem Speichern.
+      </p>
+      <div id="firma-rechnung-preview" style="border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:#e5e7eb;padding:10px">
+        <iframe id="firma-rechnung-frame"
+                style="width:100%;height:500px;border:none;border-radius:6px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.1)"
+                title="Rechnungsvorschau"></iframe>
+      </div>
+    </div>
+
+    <!-- ── Предпросмотр E-Mail ── -->
+    <div class="ang-block">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="ang-block-label" style="margin:0"><i class="fas fa-envelope-open-text"></i> Vorschau — Wie sieht meine E-Mail aus?</div>
+        <button onclick="firmaVorschauEmail()" class="btn" style="font-size:12px">
+          <i class="fas fa-sync-alt" style="margin-right:6px"></i>Aktualisieren
+        </button>
+      </div>
+      <p style="font-size:11px;color:var(--sub);margin:0 0 12px">
+        So sieht die E-Mail aus, die Ihr Kunde erhält — mit Beispieldaten befüllt.
+      </p>
+      <div id="firma-email-preview"
+           style="border:1px solid var(--border);border-radius:var(--r2);background:var(--s1);padding:16px;font-size:13px;line-height:1.7">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:8px">
+          <strong>Betreff:</strong> <span id="firma-email-preview-subject" style="color:var(--text)">—</span>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin-bottom:12px">
+        <div id="firma-email-preview-body" style="white-space:pre-wrap;color:var(--text)">—</div>
+      </div>
+    </div>
+
     <div class="ang-block">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div class="ang-block-label" style="margin:0"><i class="fas fa-bell"></i> Zahlungserinnerungen</div>

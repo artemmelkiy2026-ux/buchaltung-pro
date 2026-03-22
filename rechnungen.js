@@ -154,7 +154,7 @@ function renderRech(){
               ` : `
                 ${r.status!=='bezahlt' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>` : ''}
                 ${r.status==='entwurf' ? `<button class="rda-btn rda-green" onclick="rechAusstellen('${r.id}')" title="Ausstellen"><i class="fas fa-paper-plane"></i></button>` : ''}
-                <button class="rda-btn" onclick="showRechDetail('${r.id}')" title="Vorschau"><i class="fas fa-eye"></i></button>
+                <button class="rda-btn" onclick="vorschauRechnungId('${r.id}')" title="HTML-Vorschau"><i class="fas fa-eye"></i></button>
                 ${r.status!=='entwurf' ? `<button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>` : ''}
                 <button class="rda-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
                 <button class="rda-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
@@ -1062,6 +1062,30 @@ function druckRechnung(){
   };
   openRechnungPrint(r);
 }
+// ── HTML-Vorschau einer gespeicherten Rechnung öffnen ─────────────────────
+function vorschauRechnungId(id) {
+  const r = data.rechnungen.find(x => x.id === id);
+  if (!r) return;
+  const html = buildRechnungHTML(r);
+  const modal = document.getElementById('vorschau-modal');
+  const frame = document.getElementById('vorschau-frame');
+  if (!modal || !frame) {
+    // Fallback — новое окно
+    const win = window.open('', '_blank', 'width=900,height=700');
+    win.document.write(html);
+    win.document.close();
+    return;
+  }
+  // Обновляем заголовок модала
+  const titleEl = modal.querySelector('.fas.fa-eye')?.parentElement;
+  if (titleEl) titleEl.innerHTML = '<i class="fas fa-eye" style="color:var(--blue)"></i> Vorschau — Rechnung ' + (r.nr || '');
+  frame.srcdoc = html;
+  window._vorschauHTML = html;
+  window._vorschauType = 'rechnung';
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
 function druckRechnungId(id){
   const r=data.rechnungen.find(x=>x.id===id);
   if(!r)return;
@@ -1201,10 +1225,97 @@ function openFirmaModal() {
   // Mahnung editor
   _populateMahnEditor();
   nav('firma', null);
+  // Автопредпросмотр после открытия формы
+  setTimeout(() => {
+    if (typeof firmaVorschauRechnung === 'function') firmaVorschauRechnung();
+    if (typeof firmaVorschauEmail    === 'function') firmaVorschauEmail();
+  }, 200);
 }
 
 function closeFirmaForm() {
   nav('rechnungen', document.querySelector('.nav-item[onclick*="rechnungen"]:not([onclick*="form"])') || null);
+}
+
+// ── Предпросмотр Rechnung в Firmenprofil ───────────────────────────────────
+function firmaVorschauRechnung() {
+  const p = JSON.parse(localStorage.getItem('bp_firma') || '{}');
+  // Читаем текущие значения из формы (если форма открыта)
+  const firma = {
+    name:          document.getElementById('firma-name')?.value     || p.name     || 'Muster GmbH',
+    strasse:       document.getElementById('firma-strasse')?.value  || p.strasse  || 'Musterstraße 1',
+    plz:           document.getElementById('firma-plz')?.value      || p.plz      || '67547',
+    ort:           document.getElementById('firma-ort')?.value      || p.ort      || 'Worms',
+    tel:           document.getElementById('firma-tel')?.value      || p.tel      || '',
+    email:         document.getElementById('firma-email')?.value    || p.email    || '',
+    iban:          document.getElementById('firma-iban')?.value     || p.iban     || '',
+    bic:           document.getElementById('firma-bic')?.value      || p.bic      || '',
+    steuernr:      document.getElementById('firma-steuernr')?.value || p.steuernr || '',
+    ustid:         document.getElementById('firma-ustid')?.value    || p.ustid    || '',
+    rechnung_footer: document.getElementById('firma-footer')?.value || p.rechnung_footer || '',
+    logo:          p.logo || null,
+  };
+  // Временно сохраняем в localStorage для buildRechnungHTML
+  const _backup = localStorage.getItem('bp_firma');
+  localStorage.setItem('bp_firma', JSON.stringify(firma));
+
+  // Демо-рехнунг
+  const today = new Date().toISOString().split('T')[0];
+  const demoR = {
+    nr: '2026-001',
+    datum: today,
+    faellig: new Date(Date.now() + 14*86400000).toISOString().split('T')[0],
+    kunde: 'Musterkunde GmbH',
+    adresse: 'Kundenstraße 5\n12345 Musterstadt',
+    email: 'kunde@beispiel.de',
+    tel: '+49 123 456789',
+    notiz: 'Zahlbar innerhalb von 14 Tagen.',
+    betrag: 1190.00,
+    netto: 1000.00,
+    mwstBetrag: 190.00,
+    mwstRate: 19,
+    mwstMode: null,
+    positionen: [
+      { bez: 'Webdesign & Entwicklung', menge: 1, netto: 600, brutto: 714, rate: 19, bezeichnung: 'Webdesign & Entwicklung' },
+      { bez: 'SEO-Optimierung',          menge: 2, netto: 200, brutto: 238, rate: 19, bezeichnung: 'SEO-Optimierung' },
+    ],
+  };
+
+  const html = buildRechnungHTML(demoR);
+
+  // Восстанавливаем оригинальные данные
+  if (_backup) localStorage.setItem('bp_firma', _backup);
+  else localStorage.removeItem('bp_firma');
+
+  const frame = document.getElementById('firma-rechnung-frame');
+  if (frame) frame.srcdoc = html;
+}
+
+// ── Предпросмотр E-Mail в Firmenprofil ────────────────────────────────────
+function firmaVorschauEmail() {
+  const tmpl = getEmailTemplate();
+  // Подставляем примерные данные
+  const demoVars = {
+    '{{NR}}':      '2026-001',
+    '{{KUNDE}}':   'Musterkunde GmbH',
+    '{{BETRAG}}':  '1.190,00 €',
+    '{{FAELLIG}}': new Date(Date.now() + 14*86400000).toLocaleDateString('de-DE'),
+    '{{FIRMA}}':   document.getElementById('firma-name')?.value || 'Ihre Firma',
+    '{{TEL}}':     document.getElementById('firma-tel')?.value  || '+49 000 000000',
+    '{{TAGE}}':    '5',
+    '{{STUFE}}':   '1',
+  };
+
+  let subject = tmpl.subject || '';
+  let body    = tmpl.body    || '';
+  Object.entries(demoVars).forEach(([k, v]) => {
+    subject = subject.replaceAll(k, v);
+    body    = body.replaceAll(k, v);
+  });
+
+  const subEl  = document.getElementById('firma-email-preview-subject');
+  const bodyEl = document.getElementById('firma-email-preview-body');
+  if (subEl)  subEl.textContent  = subject || '—';
+  if (bodyEl) bodyEl.textContent = body    || '—';
 }
 
 // Сжимаем изображение до maxW×maxH и maxKB — возвращает base64 или null
