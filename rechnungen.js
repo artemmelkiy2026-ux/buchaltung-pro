@@ -641,18 +641,24 @@ async function rechBezahlt(id){
     if (!data.eintraege.find(e => e.id === newE.id)) {
       data.eintraege.unshift(newE);
     }
-    // Сбрасываем фильтры и перерисовываем
-    const fjEl = document.getElementById('f-jahr');
-    const fmEl = document.getElementById('f-mon');
-    if (fjEl) fjEl.value = newE.datum.substring(0,4);
-    if (fmEl) fmEl.value = 'Alle';
+    // renderAll вызывает buildYearFilters который восстанавливает фильтры —
+    // поэтому сбрасываем ПОСЛЕ renderAll через requestAnimationFrame
     if (typeof einPage !== 'undefined') einPage = 1;
     if (typeof fTyp !== 'undefined') fTyp = 'Alle';
-    // Снимаем активный класс со всех ftab чтобы показать "Alle"
-    document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
-    const allTab = document.querySelector('.ftab[onclick*="Alle"]');
-    if (allTab) allTab.classList.add('active');
     renderAll();
+    // Сбрасываем фильтры уже после перерисовки и рендерим ещё раз
+    requestAnimationFrame(() => {
+      const fjEl = document.getElementById('f-jahr');
+      const fmEl = document.getElementById('f-mon');
+      if (fjEl && fjEl.value !== 'Alle' && fjEl.value !== newE.datum.substring(0,4)) {
+        fjEl.value = newE.datum.substring(0,4);
+        renderEin();
+      }
+      if (fmEl) fmEl.value = 'Alle';
+      document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+      const allTab = document.querySelector('.ftab[onclick*="Alle"]');
+      if (allTab) allTab.classList.add('active');
+    });
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
