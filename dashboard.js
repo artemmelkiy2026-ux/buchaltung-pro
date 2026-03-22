@@ -234,6 +234,28 @@ function flashRow(rowId) {
   }, 220);
 }
 
+// Поиск шаблона Wiederkehrend для данной записи (по флагу или по контенту)
+function _findWiedForEintrag(e) {
+  if (!e || e.is_storno) return null;
+  // 1. Прямой флаг
+  if (e._fromWiederkehrend && e._wiederkehrendId)
+    return (data.wiederkehrend||[]).find(w=>w.id===e._wiederkehrendId) || null;
+  // 2. notiz === 'Wiederkehrend' — ищем по bezeichnung
+  if (e.notiz === 'Wiederkehrend' && e.beschreibung) {
+    const byBez = (data.wiederkehrend||[]).find(w=>w.bezeichnung===e.beschreibung);
+    if (byBez) return byBez;
+    // 3. Ещё fallback: beschreibung содержит bezeichnung (частичное совпадение)
+    const byPartial = (data.wiederkehrend||[]).find(w=>
+      w.bezeichnung && (
+        e.beschreibung.includes(w.bezeichnung) ||
+        w.bezeichnung.includes(e.beschreibung)
+      )
+    );
+    if (byPartial) return byPartial;
+  }
+  return null;
+}
+
 function openEditFromList(id) {
   const entry = (data.eintraege||[]).find(e=>e.id===id);
   if(!entry) return;
@@ -253,15 +275,8 @@ function openEditFromList(id) {
   }
 
   // Wiederkehrend-Eintrag → Info-Sheet mit Link zu Wiederkehrende Zahlungen
-  // Прямой флаг или по notiz+beschreibung (для старых записей)
-  if(entry._fromWiederkehrend && entry._wiederkehrendId){
-    showWiedEintragInfo(entry._wiederkehrendId);
-    return;
-  }
-  if(entry.notiz === 'Wiederkehrend' && entry.beschreibung){
-    const _wiedMatch = (data.wiederkehrend||[]).find(w=>w.bezeichnung===entry.beschreibung);
-    if(_wiedMatch){ showWiedEintragInfo(_wiedMatch.id); return; }
-  }
+  const _wied = _findWiedForEintrag(entry);
+  if (_wied) { showWiedEintragInfo(_wied.id); return; }
 
   // Stornierte / Gegenbuchungen — nur Detail anzeigen, kein Editor
   if(entry.is_storno || entry._storniert){
@@ -1112,12 +1127,10 @@ function renderEin(){
       // Виртуальная запись из Rechnung — замок
       const _isRechVirt = e._fromRechnung || (e.id && e.id.startsWith('__rech__'));
       // Rechnung / Wiederkehrend: onClick öffnet Info-Sheet mit Link zum Ursprung
-      // Fallback для старых записей без флага: по notiz + beschreibung
-      const _wiedFallback = !e._fromWiederkehrend && e.notiz==='Wiederkehrend' && e.beschreibung
-        ? (data.wiederkehrend||[]).find(w=>w.bezeichnung===e.beschreibung)
-        : null;
-      const _isWiedVirt = !!(e._fromWiederkehrend && e._wiederkehrendId) || !!_wiedFallback;
-      const _wiedClickId = e._wiederkehrendId || (_wiedFallback?.id) || '';
+      // Fallback для старых записей без флага
+      const _wiedFallback = _findWiedForEintrag(e);
+      const _isWiedVirt   = !!_wiedFallback;
+      const _wiedClickId  = _wiedFallback?.id || '';
       const _rechClickId = _isRechVirt ? (e._rechnungId || e.id) : e.id;
       const _clickAttr = _isRechVirt
         ? `onclick="showRechEintragInfo('${_rechClickId}')"`
@@ -2012,9 +2025,7 @@ function showEintragDetail(id) {
   if (_rechMatch) { showRechEintragInfo(_rechMatch.id); return; }
 
   // Wiederkehrend — перенаправляем в раздел Wiederkehrende Zahlungen
-  const _wiedMatch = (!e.is_storno && e.notiz==='Wiederkehrend' && e.beschreibung)
-    ? (data.wiederkehrend||[]).find(w=>w.bezeichnung===e.beschreibung) : null;
-  if (e._fromWiederkehrend && e._wiederkehrendId) { showWiedEintragInfo(e._wiederkehrendId); return; }
+  const _wiedMatch = _findWiedForEintrag(e);
   if (_wiedMatch) { showWiedEintragInfo(_wiedMatch.id); return; }
 
   const isEin = e.typ==='Einnahme';
