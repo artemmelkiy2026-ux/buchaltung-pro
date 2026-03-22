@@ -5,7 +5,9 @@
 
 let _notifData   = [];
 let _notifUnread = 0;
-let _notifFilter = 'all'; // 'all' | 'danger' | 'warning' | 'admin' | 'archive'
+let _notifFilter  = 'all'; // 'all' | 'danger' | 'warning' | 'admin' | 'archive'
+let _notifPage    = 1;
+const NOTIF_PER_PAGE = 10;
 
 // ── Локальный кеш состояния (для мгновенного отклика UI) ──────────────────
 let _notifState = {
@@ -357,8 +359,17 @@ function renderNotificationsPage() {
           <div style="font-size:15px;font-weight:600;color:var(--text)">Archiv ist leer</div>
           <div style="font-size:13px;margin-top:6px">Geschlossene Benachrichtigungen erscheinen hier</div>
         </div>`;
+      if(typeof renderPager==='function') renderPager('notif-pagination',1,1,0,'_notifArchPagerCb');
       return;
     }
+    // Пагинация архива
+    const archTotal = arch.length;
+    const archTotalPages = Math.max(1, Math.ceil(archTotal / NOTIF_PER_PAGE));
+    if (_notifPage > archTotalPages) _notifPage = archTotalPages;
+    const archStart = (_notifPage - 1) * NOTIF_PER_PAGE;
+    const archPage  = arch.slice(archStart, archStart + NOTIF_PER_PAGE);
+    window._notifArchPagerCb = function(p){ _notifPage=p; renderNotificationsPage(); };
+
     container.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <span style="font-size:12px;color:var(--sub)">${arch.length} archivierte Meldung${arch.length!==1?'en':''}</span>
@@ -367,7 +378,7 @@ function renderNotificationsPage() {
           <i class="fas fa-trash"></i> Alle löschen
         </button>
       </div>
-      ${arch.map(n => {
+      ${archPage.map(n => {
         const cl = colors[n.type] || colors.info;
         const date = n.archived_at ? fd(n.archived_at.split('T')[0]) : '';
         return `<div data-arch-id="${n.id}"
@@ -392,6 +403,9 @@ function renderNotificationsPage() {
       const delBtn = e.target.closest('[data-arch-del]');
       if (delBtn) { _removeFromArchive(delBtn.dataset.archDel); renderNotificationsPage(); }
     };
+    // Пагинация архива
+    if(typeof renderPager==='function')
+      renderPager('notif-pagination', _notifPage, archTotalPages, archTotal, '_notifArchPagerCb');
     return;
   }
 
@@ -412,12 +426,21 @@ function renderNotificationsPage() {
           ${_notifFilter === 'all' ? 'Alles in Ordnung!' : 'Filter wechseln oder alle anzeigen'}
         </div>
       </div>`;
+    if(typeof renderPager==='function') renderPager('notif-pagination',1,1,0,'_notifPagerCb');
     return;
   }
 
-  window._notifActions = visible.map(n => n.action || null);
+  // Пагинация активных
+  const notifTotal      = visible.length;
+  const notifTotalPages = Math.max(1, Math.ceil(notifTotal / NOTIF_PER_PAGE));
+  if (_notifPage > notifTotalPages) _notifPage = notifTotalPages;
+  const notifStart  = (_notifPage - 1) * NOTIF_PER_PAGE;
+  const visiblePage = visible.slice(notifStart, notifStart + NOTIF_PER_PAGE);
+  window._notifPagerCb = function(p){ _notifPage=p; renderNotificationsPage(); };
 
-  container.innerHTML = visible.map((n, idx) => {
+  window._notifActions = visiblePage.map(n => n.action || null);
+
+  container.innerHTML = visiblePage.map((n, idx) => {
     const cl   = colors[n.type] || colors.info;
     const isSys = n.id && n.id.startsWith('sys-');
     const date  = n.created_at
@@ -469,6 +492,10 @@ function renderNotificationsPage() {
     const action = window._notifActions?.[+card.dataset.notifIdx];
     if (typeof action === 'function') action();
   };
+
+  // Пагинация активных уведомлений
+  if(typeof renderPager==='function')
+    renderPager('notif-pagination', _notifPage, notifTotalPages, notifTotal, '_notifPagerCb');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -477,6 +504,7 @@ function renderNotificationsPage() {
 
 function setNotifFilter(f) {
   _notifFilter = f;
+  _notifPage   = 1;
   renderNotificationsPage();
 }
 
