@@ -766,7 +766,8 @@ function _buildRechnungHTML(r) {
     </div>
     <div class="invoice-meta">
       <div class="meta-row"><span>Rechnungs-Nr.</span><span>${r.nr||'—'}</span></div>
-      <div class="meta-row"><span>Datum</span><span>${fd(r.datum)}</span></div>
+      <div class="meta-row"><span>Rechnungsdatum</span><span>${fd(r.datum)}</span></div>
+      <div class="meta-row"><span>Leistungsdatum</span><span>${r.leistungsdatum && r.leistungsdatum !== r.datum ? fd(r.leistungsdatum) : fd(r.datum)}</span></div>
       <div class="meta-row"><span>Fällig bis</span><span>${r.faellig?fd(r.faellig):'—'}</span></div>
     </div>
   </div>
@@ -839,6 +840,11 @@ function _buildRechnungHTML(r) {
       <strong>Kontakt</strong>
       ${firmaTel?'Tel: '+firmaTel+'<br>':''}
       ${firmaEmail}
+    </div>
+    <div class="footer-col">
+      <strong>Steuer</strong>
+      ${firmaStNr?'St.-Nr.: '+firmaStNr+'<br>':''}
+      ${firmaUstId?'USt-ID: '+firmaUstId:''}
     </div>
 
   </div>

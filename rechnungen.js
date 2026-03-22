@@ -579,7 +579,12 @@ function saveRechnung(){
       // Wenn neu auf bezahlt gesetzt → Einnahme automatisch buchen
       if(wasNotBezahlt && r.status==='bezahlt'){
         const newE = _buchRechnungAlsEinnahme(r);
-        if(newE){ sbLogRechnung(r,'bezahlt',{status:altWert.status},{status:'bezahlt',einnahme_betrag:r.betrag}); renderAll(); }
+        if(newE){
+          sbLogRechnung(r,'bezahlt',{status:altWert.status},{status:'bezahlt',einnahme_betrag:r.betrag});
+          const _fjEl2 = document.getElementById('f-jahr');
+          if(_fjEl2 && _fjEl2.value !== 'Alle') _fjEl2.value = new Date().getFullYear()+'';
+          renderAll();
+        }
       }
     }
     editRechId=null;
@@ -637,6 +642,10 @@ async function rechBezahlt(id){
   const newE = _buchRechnungAlsEinnahme(r);
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
+    // Сбрасываем фильтр Einträge на текущий год чтобы новая запись была видна
+    const _curYr = new Date().getFullYear()+'';
+    const _fjEl = document.getElementById('f-jahr');
+    if(_fjEl && _fjEl.value !== 'Alle' && _fjEl.value !== _curYr) _fjEl.value = _curYr;
     renderAll();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
