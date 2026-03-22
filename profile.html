@@ -307,6 +307,16 @@ body {
         </div>
         <i class="fa-solid fa-chevron-right setting-arrow"></i>
       </div>
+      <!-- 2FA TOTP -->
+      <div class="setting-row" id="twofa-row" onclick="open2FASetup()" style="cursor:pointer">
+        <div class="setting-icon" style="background:#fef3c7"><i class="fa-solid fa-shield-halved" style="color:#d97706"></i></div>
+        <div class="setting-body">
+          <div class="setting-label">Zwei-Faktor-Authentifizierung</div>
+          <div class="setting-sub" id="twofa-status-sub">Nicht aktiv — klicken zum Aktivieren</div>
+        </div>
+        <i class="fa-solid fa-chevron-right setting-arrow" id="twofa-arrow"></i>
+      </div>
+
       <!-- Face ID вкл/выкл -->
       <div class="setting-row" id="bio-row" style="cursor:default">
         <div class="setting-icon purple"><i class="fa-solid fa-fingerprint" id="bio-icon-fa"></i></div>
@@ -1006,5 +1016,190 @@ function copyClientId() {
 
 init();
 </script>
+<!-- 2FA Setup Modal -->
+<div class="modal-overlay" id="modal-2fa" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal">
+    <h3><i class="fa-solid fa-shield-halved" style="color:#d97706;margin-right:8px"></i>Zwei-Faktor-Authentifizierung</h3>
+
+    <!-- Step 1: QR Code -->
+    <div id="twofa-step-setup">
+      <p style="font-size:13px;color:#5a6a7e;margin-bottom:16px">
+        Scannen Sie den QR-Code mit einer Authenticator-App<br>
+        <strong>(Google Authenticator, Authy, 1Password, etc.)</strong>
+      </p>
+      <div id="twofa-qr-container" style="text-align:center;margin:16px 0;min-height:180px;display:flex;align-items:center;justify-content:center">
+        <div class="spinner" style="width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:#d97706;border-radius:50%;animation:spin .8s linear infinite"></div>
+      </div>
+      <div id="twofa-secret-box" style="display:none;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px;text-align:center;margin-bottom:16px">
+        <div style="font-size:11px;color:#5a6a7e;margin-bottom:4px">Manueller Code (falls QR nicht scannbar):</div>
+        <code id="twofa-secret-text" style="font-size:13px;font-weight:700;color:#1a2332;letter-spacing:2px"></code>
+      </div>
+      <p style="font-size:12px;color:#5a6a7e;margin-bottom:12px">Geben Sie den 6-stelligen Code aus der App ein:</p>
+      <input type="tel" id="twofa-verify-code" class="input" placeholder="000000" maxlength="6"
+             style="text-align:center;font-size:20px;letter-spacing:8px;font-weight:700"
+             oninput="this.value=this.value.replace(/\D/g,'')">
+      <div class="msg error" id="twofa-error" style="display:none"></div>
+      <button class="btn" id="twofa-verify-btn" onclick="verify2FA()"
+              style="width:100%;padding:12px;margin-top:12px;background:#d97706;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">
+        <i class="fas fa-check" style="margin-right:8px"></i>Bestätigen & aktivieren
+      </button>
+    </div>
+
+    <!-- Step 2: Успех -->
+    <div id="twofa-step-success" style="display:none;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">✅</div>
+      <div style="font-size:16px;font-weight:700;color:#1a2332;margin-bottom:8px">2FA erfolgreich aktiviert!</div>
+      <p style="font-size:13px;color:#5a6a7e;margin-bottom:20px">
+        Ihr Konto ist jetzt durch Zwei-Faktor-Authentifizierung geschützt.<br>
+        <strong>Speichern Sie die Backup-Codes sicher!</strong>
+      </p>
+      <div id="twofa-backup-codes" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-family:monospace;font-size:13px;margin-bottom:16px"></div>
+      <button class="btn" onclick="document.getElementById('modal-2fa').style.display='none'"
+              style="width:100%;padding:12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">
+        Schließen
+      </button>
+    </div>
+
+    <!-- Deaktivierung -->
+    <div id="twofa-step-disable" style="display:none">
+      <p style="font-size:13px;color:#5a6a7e;margin-bottom:16px">2FA ist aktiv. Zum Deaktivieren Code eingeben:</p>
+      <input type="tel" id="twofa-disable-code" class="input" placeholder="000000" maxlength="6"
+             style="text-align:center;font-size:20px;letter-spacing:8px;font-weight:700"
+             oninput="this.value=this.value.replace(/\D/g,'')">
+      <div class="msg error" id="twofa-disable-error" style="display:none"></div>
+      <button onclick="disable2FA()"
+              style="width:100%;padding:12px;margin-top:12px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">
+        <i class="fas fa-times" style="margin-right:8px"></i>2FA deaktivieren
+      </button>
+    </div>
+
+    <div style="text-align:center;margin-top:12px">
+      <span onclick="document.getElementById('modal-2fa').style.display='none'"
+            style="font-size:12px;color:#5a6a7e;cursor:pointer">Abbrechen</span>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+
+<script>
+// ── 2FA TOTP via Supabase MFA ──────────────────────────────────────────────
+let _2faFactorId = null;
+
+async function check2FAStatus() {
+  try {
+    const { data } = await sb.auth.mfa.listFactors();
+    const totp = data?.totp?.find(f => f.status === 'verified');
+    const sub  = document.getElementById('twofa-status-sub');
+    const arrow = document.getElementById('twofa-arrow');
+    if (totp) {
+      _2faFactorId = totp.id;
+      if (sub) { sub.textContent = '✅ Aktiv — klicken zum Deaktivieren'; sub.style.color = '#22c55e'; }
+      if (arrow) arrow.style.display = 'none';
+    } else {
+      _2faFactorId = null;
+      if (sub) { sub.textContent = 'Nicht aktiv — klicken zum Aktivieren'; sub.style.color = ''; }
+    }
+  } catch(e) { console.error('[2FA status]', e); }
+}
+
+async function open2FASetup() {
+  const modal = document.getElementById('modal-2fa');
+  modal.style.display = 'flex';
+
+  if (_2faFactorId) {
+    // Уже включён — показываем деактивацию
+    document.getElementById('twofa-step-setup').style.display = 'none';
+    document.getElementById('twofa-step-success').style.display = 'none';
+    document.getElementById('twofa-step-disable').style.display = 'block';
+    return;
+  }
+
+  // Включаем — запрашиваем QR
+  document.getElementById('twofa-step-setup').style.display = 'block';
+  document.getElementById('twofa-step-success').style.display = 'none';
+  document.getElementById('twofa-step-disable').style.display = 'none';
+  document.getElementById('twofa-error').style.display = 'none';
+  document.getElementById('twofa-verify-code').value = '';
+
+  try {
+    const { data, error } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'MelaLogic Authenticator' });
+    if (error) throw error;
+
+    _2faFactorId = data.id;
+    const qrContainer = document.getElementById('twofa-qr-container');
+    const secretBox   = document.getElementById('twofa-secret-box');
+    const secretText  = document.getElementById('twofa-secret-text');
+
+    qrContainer.innerHTML = `<img src="${data.totp.qr_code}" style="width:180px;height:180px;border-radius:8px;border:1px solid #e5e7eb" alt="QR Code">`;
+    if (secretText) secretText.textContent = data.totp.secret;
+    if (secretBox)  secretBox.style.display = 'block';
+  } catch(e) {
+    document.getElementById('twofa-qr-container').innerHTML =
+      '<div style="color:#ef4444;font-size:13px">Fehler beim Laden: ' + e.message + '</div>';
+  }
+}
+
+async function verify2FA() {
+  const code = document.getElementById('twofa-verify-code').value.trim();
+  const errEl = document.getElementById('twofa-error');
+  const btn   = document.getElementById('twofa-verify-btn');
+
+  if (code.length !== 6) {
+    errEl.textContent = 'Bitte 6-stelligen Code eingeben.';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>Prüfen...';
+  errEl.style.display = 'none';
+
+  try {
+    const { data: challengeData } = await sb.auth.mfa.challenge({ factorId: _2faFactorId });
+    const { error } = await sb.auth.mfa.verify({ factorId: _2faFactorId, challengeId: challengeData.id, code });
+    if (error) throw error;
+
+    // Успех
+    document.getElementById('twofa-step-setup').style.display = 'none';
+    document.getElementById('twofa-step-success').style.display = 'block';
+    check2FAStatus();
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check" style="margin-right:8px"></i>Bestätigen & aktivieren';
+    errEl.textContent = 'Falscher Code. Bitte erneut versuchen.';
+    errEl.style.display = 'block';
+  }
+}
+
+async function disable2FA() {
+  const code  = document.getElementById('twofa-disable-code').value.trim();
+  const errEl = document.getElementById('twofa-disable-error');
+
+  if (code.length !== 6) { errEl.textContent = 'Code erforderlich.'; errEl.style.display='block'; return; }
+
+  try {
+    const { data: challengeData } = await sb.auth.mfa.challenge({ factorId: _2faFactorId });
+    const { error: verifyErr } = await sb.auth.mfa.verify({ factorId: _2faFactorId, challengeId: challengeData.id, code });
+    if (verifyErr) throw verifyErr;
+
+    const { error } = await sb.auth.mfa.unenroll({ factorId: _2faFactorId });
+    if (error) throw error;
+
+    _2faFactorId = null;
+    document.getElementById('modal-2fa').style.display = 'none';
+    check2FAStatus();
+    alert('2FA wurde deaktiviert.');
+  } catch(e) {
+    errEl.textContent = 'Falscher Code oder Fehler: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+// Проверяем статус при загрузке
+check2FAStatus();
+</script>
+
 </body>
 </html>
