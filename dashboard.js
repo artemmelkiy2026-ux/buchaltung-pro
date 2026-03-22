@@ -596,7 +596,7 @@ function renderCalmBanners() {
           </div>
           <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)">${label}</span>
         </div>
-        <div style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:5px">${val}</div>
+        <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:5px">${val}</div>
         <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:3px">${title}</div>
         <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.4">${sub}</div>
         ${extra}
