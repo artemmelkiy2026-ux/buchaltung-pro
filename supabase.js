@@ -89,7 +89,8 @@ async function sbLoadAll() {
   eintraege.forEach(e => { if (stornoOfIds.has(e.id)) e._storniert = true; });
   // Rechnung-Einnahmen: _fromRechnung + _rechnungId per belegnr wiederherstellen
   const _rechByNr = {};
-  (rech.data || []).forEach(r => { if (r.nr) _rechByNr[r.nr] = r.id; });
+  // Берём последнюю по дате если вдруг два рехнунга с одним номером (edge case)
+  (rech.data || []).sort((a,b)=>a.datum>b.datum?1:-1).forEach(r => { if (r.nr) _rechByNr[r.nr] = r.id; });
   eintraege.forEach(e => {
     if (!e.is_storno && e.typ === 'Einnahme' && e.belegnr && _rechByNr[e.belegnr]) {
       e._fromRechnung = true;

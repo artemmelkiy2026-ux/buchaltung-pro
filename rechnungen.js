@@ -295,7 +295,11 @@ Danach gilt GoBD — Änderungen nur noch per Storno möglich.`,
 async function editRech(id){
   const r=data.rechnungen.find(x=>x.id===id);
   if(!r)return;
-
+  // Stornierte Rechnungen sind unveränderbar (GoBD §146)
+  if(r.status==='storniert' || r._storniert){
+    toast('Stornierte Rechnungen können nicht bearbeitet werden (GoBD §146)','err');
+    return;
+  }
   // Черновик — редактируем напрямую
   if(!r.status || r.status==='entwurf') {
     _openRechForm(r, id, 'Entwurf bearbeiten');
@@ -588,6 +592,14 @@ Nach dem Ausstellen gelten GoBD-Regeln — Änderungen nur noch per Storno mögl
 
 async function rechBezahlt(id){
   const r=data.rechnungen.find(x=>x.id===id);if(!r)return;
+  if(r.status==='storniert' || r._storniert){
+    toast('Stornierte Rechnungen können nicht als bezahlt markiert werden','err');
+    return;
+  }
+  if(r.status==='bezahlt'){
+    toast('Diese Rechnung ist bereits als bezahlt markiert','err');
+    return;
+  }
   const ok = await appConfirm(
     `Rechnung ${r.nr} auf bezahlt setzen und Einnahme ${fmt(r.betrag)} automatisch buchen?`,
     {title:'Rechnung bezahlt', icon:'✅', okLabel:'Ja, bezahlt + Einnahme', cancelLabel:'Abbrechen'}
@@ -623,6 +635,11 @@ function _rechDuplizieren(id){
   newR.datum = new Date().toISOString().split('T')[0];
   newR.status = 'offen';
   newR.created_at = new Date().toISOString();
+  // Убираем все флаги сторнирования из копии
+  delete newR._storniert;
+  delete newR.storniert_am;
+  delete newR._storniert_am;
+  delete newR.storno_von;
   newR.mahnung_history = [];
   delete newR.bezahlt_am;
   data.rechnungen.unshift(newR);
