@@ -528,7 +528,7 @@ function renderCalmBanners() {
         ? `linear-gradient(135deg, ${BLUE} 0%, #1e5494 60%, ${RED} 100%)`
         : `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`;
     c2Icon  = 'fa-tachometer-alt';
-    c2Label = 'KU-Limit 25.000 €';
+    c2Label = 'KU-Limit';
     c2Val   = limitPct + '%';
     c2Title = limOk ? 'Sicher' : limWarn ? 'Aufpassen!' : 'Kritisch!';
     c2Sub   = remaining > 0 ? `Noch ${fmt(remaining)} · ${forecastStr}` : 'Limit überschritten!';
@@ -557,7 +557,7 @@ function renderCalmBanners() {
       ? `linear-gradient(135deg, ${RED} 0%, #b02232 60%, #e8495a 100%)`
       : `linear-gradient(135deg, ${GREEN} 0%, #2d7a42 60%, #4aab62 100%)`;
   const resIcon  = isRegel ? 'fa-piggy-bank' : 'fa-tag';
-  const resLabel = isRegel ? 'MwSt-Reserve' : 'Kleinunternehmer';
+  const resLabel = isRegel ? 'MwSt-Reserve' : 'KU-Status';
   const resVal   = isRegel ? fmt(zahllast) : '§ 19';
   const resTitle = isRegel ? (zahllast > 0 ? 'Zurückhalten!' : 'Im grünen Bereich') : 'Kein MwSt-Ausweis';
   const resSub   = isRegel ? (zahllast > 0 ? `${fmt(zahllast)} reservieren` : 'Kein Rückstand') : `${fmt(ein)} von 25.000 €`;
