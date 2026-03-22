@@ -151,7 +151,6 @@
       <i class="fas fa-chevron-right mob-drawer-arrow"></i>
     </div>
     <div class="mob-drawer-group-body">
-      <div class="mob-drawer-child" onclick="mobNavDrawer('journal')">Journal</div>
       <div class="mob-drawer-child" onclick="mobNavDrawer('ust')">Umsatzsteuer</div>
     </div>
   </div>
@@ -257,7 +256,6 @@
     <i class="fas fa-chevron-right nav-group-arrow"></i>
   </div>
   <div class="nav-group-children" id="gobd-group">
-    <div class="nav-item nav-child" onclick="nav('journal',this)">Journal</div>
     <div class="nav-item nav-child" onclick="nav('ust',this)">Umsatzsteuer</div>
   </div>
 
@@ -2355,7 +2353,6 @@
                   <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
                 <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
-                  <div onclick="setRechStatus('entwurf')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-pencil-alt" style="color:var(--sub);font-size:14px;width:14px"></i> Entwurf</div>
                   <div onclick="setRechStatus('entwurf')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-pencil-alt" style="color:var(--sub);font-size:14px;width:14px"></i> Entwurf</div>
                   <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:14px;width:14px"></i> Offen</div>
                   <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:14px;width:14px"></i> Bezahlt</div>

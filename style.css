@@ -4174,3 +4174,11 @@ header { background: #fff; }
   color: #64748b;
 }
 .rech-badge-entwurf i { color: #64748b; }
+
+/* ── RECHNUNG VIRTUAL ENTRIES IN EINTRÄGE ───────────────────────────────── */
+.ein-row-rech-virt {
+  border-left: 3px solid var(--blue) !important;
+}
+.ein-row-rech-virt:hover {
+  background: var(--bdim) !important;
+}

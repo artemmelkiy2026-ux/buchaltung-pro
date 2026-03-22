@@ -1037,8 +1037,12 @@ function renderEin(){
           : '<span style="font-size:10px;color:var(--blue);font-family:var(--mono)"> Netto '+fmt(nettoVal)+' + '+fmt(mwstVal)+' VSt ('+mwstRate+'%)</span>')
         : '';
       
-      const _clickAttr = !st ? `onclick="showEintragDetail('${e.id}')"` : '';
-      const _mobBtn = isMob() && !st
+      // Виртуальная запись из Rechnung — замок
+      const _isRechVirt = e._fromRechnung || (e.id && e.id.startsWith('__rech__'));
+      const _clickAttr = _isRechVirt
+        ? `onclick="showRechEintragInfo('${e.id}')"`
+        : (!st ? `onclick="showEintragDetail('${e.id}')"` : '');
+      const _mobBtn = isMob() && !st && !_isRechVirt
         ? _moreBtn([
             {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
             {icon:'fa-times',  label:'Stornieren', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
@@ -1068,7 +1072,13 @@ function renderEin(){
         : '';
       const _stLblFull = stLbl ? stLbl+_korrekturTime : '';
 
-      return '<div class="ein-row'+(st?' ein-row-st':'')+'" '+_clickAttr+' style="cursor:'+(st?'default':'pointer')+'">'
+      const _rechLock = _isRechVirt ? '<i class="fas fa-lock" style="color:var(--sub);font-size:10px;margin-left:6px;opacity:.6" title="Erstellt durch Rechnung"></i>' : '';
+      const _rechTag  = _isRechVirt ? '<span style="font-size:10px;background:var(--bdim);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600">Rechnung</span>' : '';
+      const _stornoTag = e.storno_von ? '<span style="font-size:10px;background:var(--rdim);color:var(--red);padding:1px 6px;border-radius:4px;margin-left:6px">→ Korr. von '+e.storno_von+'</span>' : '';
+      const _korrTag   = e.korrektur_von ? '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:1px 6px;border-radius:4px;margin-left:6px">Korrektur von '+e.korrektur_von+'</span>' : '';
+      const _rowStyle  = _isRechVirt ? 'cursor:pointer;opacity:.75' : (st ? 'cursor:default;opacity:.55' : 'cursor:pointer');
+
+      return '<div class="ein-row'+(st?' ein-row-st':'')+(_isRechVirt?' ein-row-rech-virt':'')+'" '+_clickAttr+' style="'+_rowStyle+'">'
         +'<div class="ein-row-body">'
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
@@ -1077,15 +1087,17 @@ function renderEin(){
                 +_typBadge
                 +_nrBefore
                 +(e.beschreibung||e.kategorie)
+                +_rechLock
                 +_nrBadge
               +'</div>'
               +'<span class="amt '+(isEin?'ein':'aus')+'">'+(isEin?'+':'−')+fmt(e.betrag)+'</span>'
             +'</div>'
-            +'<div class="ein-row-sub">'+_infoLine+'</div>'
+            +'<div class="ein-row-sub">'+_infoLine+_rechTag+_stornoTag+_korrTag+'</div>'
             +'<div class="ein-row-mid">'
               +'<div class="ein-row-cat">'+_catLine+'</div>'
               +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
-                +(st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>'
+                +(_isRechVirt ? '<span style="font-size:11px;color:var(--sub)"><i class="fas fa-lock" style="font-size:9px"></i> Rechnung</span>'
+                  : st ? '<span style="font-size:10px;color:var(--sub)">GoBD</span>'
                   : (isMob() ? _mobBtn
                     : '<button class="rca-btn rca-red" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren"><i class="fas fa-trash"></i></button>'))
               +'</div>'
@@ -1782,6 +1794,48 @@ function parseBelegText(text) {
   else if (/überweisung/i.test(text))    result.zahlungsart = 'Überweisung';
 
   return result;
+}
+
+// ── Диалог для виртуальных записей из Rechnung ────────────────────────────
+function showRechEintragInfo(id) {
+  const rechId = id.replace('__rech__', '');
+  const r = (data.rechnungen || []).find(x => x.id === rechId);
+  if (!r) return;
+
+  showDetailSheet({
+    title: '<i class="fas fa-lock" style="color:var(--sub);margin-right:6px"></i>Eintrag aus Rechnung',
+    rows: [
+      { key: 'Rechnung',    val: `<strong>${r.nr}</strong>` },
+      { key: 'Kunde',       val: r.kunde || '—' },
+      { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-weight:700;color:var(--green)">+${fmt(r.betrag)}</span>` },
+      { key: 'Datum',       val: fd(r.datum) },
+      { key: 'Status',      val: r.status },
+      { key: 'Hinweis',     val: '<span style="color:var(--sub);font-size:12px">Dieser Eintrag wurde automatisch durch die Rechnung erstellt. Änderungen müssen über die Rechnung vorgenommen werden (GoBD §146).</span>' },
+    ],
+    buttons: [
+      { label: 'Zur Rechnung', icon: 'fa-file-invoice', primary: true, action: () => {
+          _closeDetailSheet();
+          const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
+          nav('rechnungen', el);
+          setTimeout(() => highlightRechnung(rechId), 400);
+        }
+      },
+      { label: 'Stornieren & neu', icon: 'fa-undo', danger: true, action: () => {
+          _closeDetailSheet();
+          const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
+          nav('rechnungen', el);
+          setTimeout(() => {
+            if (typeof delRech === 'function') {
+              appConfirm(
+                `Rechnung ${r.nr} stornieren und neue Korrekturrechnung erstellen?`,
+                [{label:'Ja, stornieren', danger:true}, {label:'Abbrechen'}]
+              ).then(idx => { if (idx === 0) delRech(rechId); });
+            }
+          }, 400);
+        }
+      },
+    ]
+  });
 }
 
 // ── Highlight Rechnung (мигание для привлечения внимания) ─────────────────
