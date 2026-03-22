@@ -495,8 +495,8 @@ function renderCalmBanners() {
     style.id = 'calm-keyframes';
     style.textContent = `
       @keyframes calm-in {
-        from { opacity:0; transform: translateY(22px) scale(.96); }
-        to   { opacity:1; transform: translateY(0)    scale(1); }
+        from { opacity:0; }
+        to   { opacity:1; }
       }
       @keyframes calm-glow {
         0%,100% { opacity:.6; }
@@ -506,15 +506,13 @@ function renderCalmBanners() {
         from { width:0 }
       }
       .calm-card {
-        transition: transform .18s, box-shadow .18s;
+        animation: calm-in .4s ease both;
         cursor: default;
       }
-      .calm-card:hover { transform: translateY(-3px);  }
-      .calm-banners-init .calm-card { animation: calm-in .5s cubic-bezier(.22,.68,0,1.2) both; }
-      .calm-banners-init .calm-card:nth-child(1) { animation-delay: 0ms; }
-      .calm-banners-init .calm-card:nth-child(2) { animation-delay: 80ms; }
-      .calm-banners-init .calm-card:nth-child(3) { animation-delay: 160ms; }
-      .calm-banners-init .calm-card:nth-child(4) { animation-delay: 240ms; }
+      .calm-card:nth-child(1) { animation-delay: 0ms; }
+      .calm-card:nth-child(2) { animation-delay: 60ms; }
+      .calm-card:nth-child(3) { animation-delay: 120ms; }
+      .calm-card:nth-child(4) { animation-delay: 180ms; }
     `;
     document.head.appendChild(style);
   }
@@ -625,16 +623,16 @@ function renderCalmBanners() {
       <!-- Фоновый паттерн -->
       <div style="position:absolute;inset:0;background:${gridPattern};opacity:1;pointer-events:none"></div>
       <!-- Декоративные круги -->
-      <div style="position:absolute;top:-28px;right:-28px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.08);${pulse?'animation:calm-pulse 2s ease-in-out infinite':''};pointer-events:none"></div>
+      <div style="position:absolute;top:-28px;right:-28px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none"></div>
       <div style="position:absolute;bottom:-18px;right:24px;width:65px;height:65px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none"></div>
       <!-- Контент -->
       <div style="position:relative;z-index:1">
         <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
-          <div class="calm-icon-wrap" style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0${pulse?';box-shadow:0 0 0 0 rgba(255,255,255,.4);animation:calm-glow 1.5s ease-in-out infinite':''}">
+          <div class="calm-icon-wrap" style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0${pulse?';box-shadow:0 0 0 0 rgba(255,255,255,.4)':''}">
             <i class="fas ${icon}" style="color:#fff;font-size:14px"></i>
           </div>
           <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65)">${label}</span>
-          ${pulse ? '<span style="margin-left:auto;width:7px;height:7px;border-radius:50%;background:#fff;animation:calm-glow 1s ease-in-out infinite;flex-shrink:0"></span>' : ''}
+          
         </div>
         <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1;margin-bottom:5px">${val}</div>
         <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:3px">${title}</div>
@@ -652,12 +650,7 @@ function renderCalmBanners() {
     card(resGrad, resIcon, resLabel, resVal, resTitle, resSub, resPulse) +
     card(trendGrad, trendIcon, 'Gewinn Trend', trendVal, trendTitle, trendSub, trendPulse);
 
-  // Анимация только при первой загрузке
-  if (!window._calmAnimDone) {
-    window._calmAnimDone = true;
-    wrap.classList.add('calm-banners-init');
-    setTimeout(() => wrap.classList.remove('calm-banners-init'), 1200);
-  }
+
 }
 
 
