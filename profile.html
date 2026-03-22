@@ -884,7 +884,7 @@ async function confirmLogout() {
 // ── Хелпер сообщений ──────────────────────────────────────────────────────
 function setMsg(id, text, type) {
   const el = document.getElementById(id);
-  el.textContent = text;
+  el.innerHTML = text;
   el.className = 'msg ' + type;
 }
 
