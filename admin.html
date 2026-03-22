@@ -190,6 +190,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="nav-item" data-sec="compose" onclick="navTo('compose',this)"><i class="fas fa-paper-plane"></i> Nachricht senden</div>
       <div class="nav-item" data-sec="inbox" onclick="navTo('inbox',this)"><i class="fas fa-inbox"></i> Posteingang <span class="nav-badge" id="nb-notifs" style="display:none">0</span></div>
       <div class="nav-item" data-sec="history" onclick="navTo('history',this)"><i class="fas fa-history"></i> Verlauf</div>
+      <div class="nav-item" data-sec="archive" onclick="navTo('archive',this)"><i class="fas fa-archive"></i> Archiv <span class="nav-badge" id="nb-archive" style="display:none">0</span></div>
     </nav>
 
     <!-- MAIN -->
@@ -350,6 +351,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
       </div>
 
+      <!-- ── ARCHIVE ── -->
+      <div id="sec-archive" class="section">
+        <div class="page-hdr"><h2>Archiv</h2><p>Archivierte Nachrichten — Nutzer sehen diese <b>weiterhin</b></p></div>
+        <div class="card p0">
+          <div class="card-hdr" style="display:flex;justify-content:space-between;align-items:center">
+            <span id="archive-count" style="font-size:13px;font-weight:600">0 archiviert</span>
+            <span style="font-size:11px;color:#94a3b8">Archiv = nur in Adminpanel ausgeblendet. Nutzer sehen Nachrichten noch.</span>
+          </div>
+          <div id="archive-list" style="padding:16px;display:flex;flex-direction:column;gap:8px">
+            <div class="empty"><i class="fas fa-archive"></i><p>Archiv ist leer</p></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -403,12 +418,21 @@ function navTo(id, el) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('sec-' + id).classList.add('active');
+  if (id === 'archive') loadArchive();
   if (el) el.classList.add('active');
 }
 
 // ── LOAD ALL ──────────────────────────────────────────────────────────────
 async function loadAll() {
   await Promise.all([loadUsers(), loadNotifs()]);
+  // Восстанавливаем локальный архив
+  const _savedArchive = _getAdminArchived();
+  if (_savedArchive.length) {
+    const archivedIds = new Set(_savedArchive.map(n => n.id));
+    allNotifs.forEach(n => { if (archivedIds.has(n.id)) n._adminArchived = true; });
+    const nb = document.getElementById('nb-archive');
+    if (nb) { nb.textContent = _savedArchive.length; nb.style.display = 'flex'; }
+  }
   renderOverview();
 }
 
@@ -549,6 +573,7 @@ const NOTIF_ICONS  = {info:'fa-bell',success:'fa-check-circle',warning:'fa-excla
 function renderInbox() {
   const q = (document.getElementById('notif-search')?.value||'').toLowerCase();
   let list = allNotifs.filter(n => {
+    if (n._adminArchived) return false; // локально архивированные
     if (notifFilter !== 'all' && n.type !== notifFilter) return false;
     if (q && !n.title?.toLowerCase().includes(q) && !(n.body||'').toLowerCase().includes(q)) return false;
     return true;
@@ -617,32 +642,135 @@ async function delNotif(id) {
   toast('✓ Gelöscht');
 }
 
-async function archiveNotif(id) {
+function archiveNotif(id) {
+  // Архив = только локально в adminpanel скрывается
+  // В БД НЕ меняется — пользователи видят по-прежнему
+  const notif = allNotifs.find(n => n.id === id);
+  if (!notif) return;
+
+  // Сохраняем в localStorage
+  const archived = _getAdminArchived();
+  if (!archived.find(n => n.id === id)) {
+    archived.unshift({ ...notif, archivedAt: new Date().toISOString() });
+    localStorage.setItem('ml_admin_archived', JSON.stringify(archived));
+  }
+
+  // Убираем из Posteingang визуально
+  notif._adminArchived = true;
   const el = document.getElementById('nr-'+id);
-  if (el) el.style.opacity = '0.4';
+  if (el) {
+    el.style.transition = 'opacity .3s, transform .3s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(20px)';
+    setTimeout(() => el.remove(), 300);
+  }
 
-  const { error } = await sb.from('notifications')
-    .update({ is_archived: true })
-    .eq('id', id);
+  // Обновляем счётчики
+  setTimeout(() => {
+    const active = allNotifs.filter(n => !n._adminArchived);
+    const footer = document.getElementById('inbox-footer');
+    if (footer) footer.textContent = active.length + ' Nachrichten';
+    if (!active.length) renderInbox();
+    // Обновить счётчик архива
+    const nb = document.getElementById('nb-archive');
+    const archived2 = _getAdminArchived();
+    if (nb) { nb.textContent = archived2.length; nb.style.display = archived2.length ? 'flex' : 'none'; }
+  }, 310);
 
-  if (error) {
-    toast('Fehler: '+error.message, true);
-    if (el) el.style.opacity = '1';
+  toast('✓ Archiviert — Nutzer sehen die Nachricht weiterhin');
+}
+
+function _getAdminArchived() {
+  try { return JSON.parse(localStorage.getItem('ml_admin_archived') || '[]'); } catch { return []; }
+}
+
+function loadArchive() {
+  // Архив хранится локально в браузере админа
+  const archived = _getAdminArchived();
+  renderArchiveList(archived);
+}
+
+function renderArchiveList(items) {
+  const el = document.getElementById('archive-list');
+  const cnt = document.getElementById('archive-count');
+  if (!el) return;
+
+  if (cnt) cnt.textContent = items.length + ' archiviert';
+  const nb = document.getElementById('nb-archive');
+  if (nb) { nb.textContent = items.length; nb.style.display = items.length ? 'flex' : 'none'; }
+
+  if (!items.length) {
+    el.innerHTML = '<div class="empty"><i class="fas fa-archive"></i><p>Archiv ist leer</p></div>';
     return;
   }
-  // В архив — убираем из активного списка, но НЕ удаляем из БД
-  const notif = allNotifs.find(n => n.id === id);
-  if (notif) notif.is_archived = true;
-  allNotifs = allNotifs.filter(n => n.id !== id); // убрать из активного inbox
-  archivedNotifs = archivedNotifs || [];
-  if (notif) archivedNotifs.unshift(notif);
 
+  const COLORS = { info:'#1a4578', success:'#3a8a4e', warning:'#d97706', danger:'#dc2626' };
+  const ICONS  = { info:'fa-bell', success:'fa-check-circle', warning:'fa-exclamation-triangle', danger:'fa-fire' };
+
+  el.innerHTML = items.map(n => {
+    const col  = COLORS[n.type] || '#1a4578';
+    const icon = ICONS[n.type]  || 'fa-bell';
+    const date = new Date(n.created_at).toLocaleString('de-DE');
+    return `<div class="notif-row" id="ar-${n.id}" style="opacity:.85">
+      <div class="notif-icon" style="background:${col}"><i class="fas ${icon}"></i></div>
+      <div class="notif-content">
+        <div class="notif-title">${n.title}</div>
+        ${n.body ? `<div class="notif-body">${n.body}</div>` : ''}
+        <div class="notif-meta">
+          <span class="badge ${n.type==='danger'?'badge-red':n.type==='warning'?'badge-gray':'badge-blue'}">${n.type}</span>
+          <span>${n.target_user_id ? '→ Direkt' : '→ Alle'}</span>
+          <span>${date}</span>
+          <span style="color:#f59e0b"><i class="fas fa-archive"></i> Archiviert</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn" onclick="unarchiveNotif('${n.id}')" style="padding:6px 10px;font-size:11px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;cursor:pointer;color:#16a34a" title="Wiederherstellen">
+          <i class="fas fa-undo"></i>
+        </button>
+        <button class="btn btn-red" onclick="delNotifFromArchive('${n.id}')" style="flex-shrink:0;padding:6px 10px" title="Endgültig löschen">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function unarchiveNotif(id) {
+  // Убираем из localStorage архива
+  let archived = _getAdminArchived();
+  archived = archived.filter(n => n.id !== id);
+  localStorage.setItem('ml_admin_archived', JSON.stringify(archived));
+
+  // Снимаем флаг в allNotifs
+  const notif = allNotifs.find(n => n.id === id);
+  if (notif) notif._adminArchived = false;
+
+  // Убираем из DOM архива
+  const el = document.getElementById('ar-'+id);
   if (el) el.remove();
-  renderHistory();
-  const cnt = document.getElementById('s-msgs');
-  if (cnt) cnt.textContent = allNotifs.length;
-  if (!allNotifs.filter(n=>!n.is_archived).length) renderInbox();
-  toast('✓ Archiviert — Nutzer können diese Nachricht nicht mehr sehen');
+
+  renderInbox();
+  loadArchive();
+  toast('✓ Wiederhergestellt — Nachricht ist wieder im Posteingang');
+}
+
+async function delNotifFromArchive(id) {
+  if (!confirm('Nachricht endgültig löschen? Nutzer verlieren den Zugriff sofort.')) return;
+  const el = document.getElementById('ar-'+id);
+  if (el) el.remove();
+
+  // Удаляем из БД — пользователи теряют доступ
+  const { error } = await sb.from('notifications').delete().eq('id', id);
+  if (error) { toast('Fehler: '+error.message, true); loadArchive(); return; }
+
+  // Удаляем из localStorage архива
+  let archived = _getAdminArchived();
+  archived = archived.filter(n => n.id !== id);
+  localStorage.setItem('ml_admin_archived', JSON.stringify(archived));
+
+  allNotifs = allNotifs.filter(n => n.id !== id);
+  loadArchive();
+  toast('✓ Endgültig gelöscht — Nutzer sehen diese Nachricht nicht mehr');
 }
 
 async function deleteAllNotifs() {

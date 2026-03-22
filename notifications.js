@@ -13,7 +13,6 @@ async function loadNotifications() {
       .from('notifications')
       .select('*')
       .or(`target_user_id.is.null,target_user_id.eq.${currentUser.id}`)
-      .neq('is_archived', true)
       .order('created_at', { ascending: false })
       .limit(50);
     if (error) throw error;
@@ -121,7 +120,8 @@ function getSystemNotifications() {
     });
   }
 
-  return notifs;
+  // Фильтруем закрытые пользователем
+  return notifs.filter(n => !_isSystemDismissed(n.id));
 }
 
 // ── Читанные уведомления (хранятся в localStorage) ────────────────────────
@@ -135,6 +135,21 @@ function _markRead(id) {
 function _markAllRead() {
   const ids = _notifData.map(n => n.id || n.sys_id || String(n.created_at));
   localStorage.setItem('ml_notif_read', JSON.stringify(ids));
+}
+
+// ── Dismissed системные уведомления ────────────────────────────────────────
+function _getDismissed() {
+  try { return JSON.parse(localStorage.getItem('ml_sys_dismissed') || '{}'); } catch { return {}; }
+}
+function _dismissSystem(id) {
+  const d = _getDismissed();
+  // Хранить 24 часа — потом снова показывать если проблема не решена
+  d[id] = Date.now() + 24*60*60*1000;
+  localStorage.setItem('ml_sys_dismissed', JSON.stringify(d));
+}
+function _isSystemDismissed(id) {
+  const d = _getDismissed();
+  return d[id] && d[id] > Date.now();
 }
 
 // ── Главная функция — собрать все уведомления и обновить счётчик ───────────
@@ -236,12 +251,26 @@ function renderNotificationsPage() {
           ${n.body ? `<div style="font-size:12px;color:var(--sub);line-height:1.5">${n.body}</div>` : ''}
           ${date ? `<div style="font-size:11px;color:var(--sub);margin-top:6px;opacity:.7">${date}</div>` : ''}
         </div>
-        ${n.action ? '<i class="fas fa-chevron-right" style="color:var(--sub);opacity:.4;flex-shrink:0;margin-top:2px"></i>' : ''}
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          ${n.action ? '<i class="fas fa-chevron-right" style="color:var(--sub);opacity:.4;margin-top:2px"></i>' : ''}
+          ${isSys ? `<button data-dismiss="${n.id}" style="background:none;border:none;color:var(--sub);font-size:11px;cursor:pointer;opacity:.5;padding:0" title="Für 24h ausblenden">✕</button>` : ''}
+        </div>
       </div>`;
   }).join('');
 
   // Делегированный обработчик кликов
   container.onclick = (e) => {
+    // Кнопка dismiss для системных
+    const dismissBtn = e.target.closest('[data-dismiss]');
+    if (dismissBtn) {
+      e.stopPropagation();
+      _dismissSystem(dismissBtn.dataset.dismiss);
+      dismissBtn.closest('[data-notif-idx]').remove();
+      _notifData = _notifData.filter(n => n.id !== dismissBtn.dataset.dismiss);
+      _notifUnread = Math.max(0, _notifUnread - 1);
+      _updateBell();
+      return;
+    }
     const card = e.target.closest('[data-notif-idx]');
     if (!card) return;
     const action = window._notifActions?.[+card.dataset.notifIdx];
