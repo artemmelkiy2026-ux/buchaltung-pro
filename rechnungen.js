@@ -6,6 +6,24 @@ const _RECH_ST_CFG = {
   'ueberfaellig':{icon:'fas fa-exclamation-circle', color:'var(--red)',    label:'Überfällig'},
 };
 
+// Обновляет поле номера в зависимости от статуса
+function _updateNrFieldForStatus(status) {
+  const nrEl = document.getElementById('rn-nr');
+  if (!nrEl) return;
+  if (status === 'entwurf') {
+    nrEl.placeholder = 'wird beim Ausstellen vergeben';
+    nrEl.style.color = 'var(--sub)';
+    nrEl.style.fontStyle = 'italic';
+  } else {
+    nrEl.placeholder = '2026-001';
+    nrEl.style.color = '';
+    nrEl.style.fontStyle = '';
+    if (!nrEl.value.trim()) {
+      nrEl.value = autoRechNr(new Date().getFullYear());
+    }
+  }
+}
+
 function setRechStatus(val){
   const cfg = _RECH_ST_CFG[val] || _RECH_ST_CFG['offen'];
   const inp  = document.getElementById('rn-status');
