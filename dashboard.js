@@ -215,6 +215,16 @@ function flashRow(rowId) {
 function openEditFromList(id) {
   const entry = (data.eintraege||[]).find(e=>e.id===id);
   if(!entry) return;
+  // Rechnung-Einnahme — Info-Sheet mit Link zur Rechnung
+  if(entry._fromRechnung && entry._rechnungId){
+    showRechEintragInfo(entry._rechnungId);
+    return;
+  }
+  // Stornierte / Gegenbuchungen — nur Detail anzeigen, kein Editor
+  if(entry.is_storno || entry._storniert){
+    showEintragDetail(id);
+    return;
+  }
   openEdit(id);
 }
 function toggleMwstDropdown() {
