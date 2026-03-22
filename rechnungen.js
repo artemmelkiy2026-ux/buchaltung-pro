@@ -1,5 +1,6 @@
 // ── RECHNUNG STATUS DROPDOWN ─────────────────────────────────────────────
 const _RECH_ST_CFG = {
+  'entwurf':     {icon:'fas fa-pencil-alt',         color:'var(--sub)',    label:'Entwurf'},
   'offen':       {icon:'fas fa-clock',              color:'var(--yellow)', label:'Offen'},
   'bezahlt':     {icon:'fas fa-check-circle',       color:'var(--green)',  label:'Bezahlt'},
   'ueberfaellig':{icon:'fas fa-exclamation-circle', color:'var(--red)',    label:'Überfällig'},
@@ -47,6 +48,7 @@ function renderRech(){
   let filtered = rechFilter==='alle' ? [...rech] : rech.filter(r=>r.status===rechFilter);
   if(q) filtered = filtered.filter(r=>(r.nr||'').toLowerCase().includes(q)||(r.kunde||'').toLowerCase().includes(q));
 
+  const entwurf = rech.filter(r=>r.status==='entwurf');
   const offen   = rech.filter(r=>r.status==='offen');
   const uebf    = rech.filter(r=>r.status==='ueberfaellig');
   const bezahlt = rech.filter(r=>r.status==='bezahlt');
@@ -92,6 +94,7 @@ function renderRech(){
   const pageItems = filtered.slice((rechPage-1)*RECH_PER_PAGE, rechPage*RECH_PER_PAGE);
 
   const statusCfg = {
+    entwurf:     {cls:'rech-badge-entwurf',  icon:'fas fa-pencil-alt',         label:'Entwurf',    color:'var(--sub)'},
     offen:       {cls:'rech-badge-offen',    icon:'fas fa-clock',              label:'Offen',      color:'var(--yellow)'},
     ueberfaellig:{cls:'rech-badge-ueber',    icon:'fas fa-exclamation-circle', label:'Überfällig', color:'var(--red)'},
     bezahlt:     {cls:'rech-badge-bezahlt',  icon:'fas fa-check-circle',       label:'Bezahlt',    color:'var(--green)'}
@@ -133,14 +136,15 @@ function renderRech(){
           <div class="rech-card-end" onclick="event.stopPropagation()">
             ${isMob() ? _moreBtn([
               ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
-              {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId(r.id)},
+              ...(r.status==='entwurf' ? [{icon:'fa-paper-plane', label:'Ausstellen', action:()=>rechAusstellen(r.id)}] : [{icon:'fa-print', label:'Drucken / PDF', action:()=>druckRechnungId(r.id)}]),
               {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
               {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
               {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
             ]) : `<div class="rech-desktop-actions">
               ${r.status!=='bezahlt' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>` : ''}
+              ${r.status==='entwurf' ? `<button class="rda-btn rda-green" onclick="rechAusstellen('${r.id}')" title="Ausstellen"><i class="fas fa-paper-plane"></i></button>` : ''}
               <button class="rda-btn" onclick="showRechDetail('${r.id}')" title="Vorschau"><i class="fas fa-eye"></i></button>
-              <button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
+              ${r.status!=='entwurf' ? `<button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>` : ''}
               <button class="rda-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
               <button class="rda-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
               <button class="rda-btn rda-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
@@ -210,13 +214,121 @@ function closeRechForm(){
   editRechId=null;
   nav('rechnungen', document.querySelector('.nav-item[onclick*="rechnungen"]:not([onclick*="form"])') || null);
 }
-function editRech(id){
+// ── GoBD Storno + Neuerstellung ──────────────────────────────────────────
+async function _rechStornierenGoBD(r) {
+  // Стернируем старый рехнунг
+  r.status = 'storniert';
+  r._storniert = true;
+  r._storniert_am = new Date().toISOString();
+  sbSaveRechnung(r);
+  sbLogRechnung(r, 'storniert', {status: r.status}, {status: 'storniert', grund: 'GoBD-Korrektur'});
+  // Если был bezahlt — сторнируем связанный Einnahme-Eintrag
+  if (r.status === 'bezahlt') {
+    const linked = (data.eintraege||[]).find(e =>
+      e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`) && !e.is_storno
+    );
+    if (linked) {
+      linked.is_storno = true;
+      linked._storniert = true;
+      await sbSaveEintrag(linked);
+    }
+  }
+  toast(`Rechnung ${r.nr} storniert`, 'ok');
+}
+
+function _editRechAsNew(orig) {
+  // Открываем форму с данными старого рехнунга, но новым номером
+  const newNr = autoRechNr(new Date().getFullYear());
+  editRechId = null; // это будет НОВЫЙ рехнунг, не редактирование
+  document.getElementById('rn-nr').value = newNr;
+  document.getElementById('rn-dat').value = new Date().toISOString().split('T')[0];
+  document.getElementById('rn-faellig').value = orig.faellig || '';
+  setRechStatus('entwurf');
+  document.getElementById('rn-kunde').value = orig.kunde || '';
+  document.getElementById('rn-adresse').value = orig.adresse || '';
+  document.getElementById('rn-email').value = orig.email || '';
+  document.getElementById('rn-tel').value = orig.tel || '';
+  document.getElementById('rn-notiz').value = orig.notiz || '';
+  document.getElementById('rn-nr').dataset.kundeTel = orig.tel || '';
+  document.getElementById('rn-nr').dataset.kundeId = orig.kundeId || '';
+  updateRechBanner();
+  const posData = orig.positionen && orig.positionen.length
+    ? orig.positionen.map(p => ({...p, id: 'pos-'+Date.now()+'_'+Math.random().toString(36).slice(2,6)}))
+    : [{bez: orig.beschreibung||'', menge:1, netto:orig.netto||orig.betrag||'', rate:orig.mwstRate||0, brutto:orig.betrag||''}];
+  setRechPositionen(posData);
+  const t = document.getElementById('rn-form-title');
+  if (t) t.textContent = `Neue Rechnung (Storno von ${orig.nr})`;
+  nav('rechnungen-form', null);
+  toast(`Neue Rechnung ${newNr} als Entwurf — bitte prüfen und ausstellen`, 'ok');
+}
+
+// Ausstellen: Entwurf → Offen
+async function rechAusstellen(id) {
+  const r = data.rechnungen.find(x => x.id === id);
+  if (!r || r.status !== 'entwurf') return;
+  const ok = await appConfirm(
+    `Rechnung ${r.nr} an ${r.kunde||'Kunde'} ausstellen?
+
+Danach gilt GoBD — Änderungen nur noch per Storno möglich.`,
+    {title:'Rechnung ausstellen', icon:'📄', okLabel:'Ja, ausstellen', cancelLabel:'Abbrechen'}
+  );
+  if (!ok) return;
+  r.status = 'offen';
+  sbSaveRechnung(r);
+  sbLogRechnung(r, 'ausgestellt', {status:'entwurf'}, {status:'offen'});
+  renderRech();
+  toast(`✓ Rechnung ${r.nr} ausgestellt`, 'ok');
+}
+
+async function editRech(id){
   const r=data.rechnungen.find(x=>x.id===id);
   if(!r)return;
-  editRechId=id;
+
+  // Черновик — редактируем напрямую
+  if(!r.status || r.status==='entwurf') {
+    _openRechForm(r, id, 'Entwurf bearbeiten');
+    return;
+  }
+
+  // Открытый счёт — предупреждение но разрешаем
+  if(r.status==='offen') {
+    const ok = await appConfirm(
+      `Rechnung ${r.nr} wurde bereits ausgestellt.
+
+Gemäß GoBD empfehlen wir: Storniere den alten Beleg und erstelle eine neue Rechnung.
+
+Möchtest du trotzdem direkt bearbeiten?`,
+      {title:'⚠️ GoBD-Hinweis', okLabel:'Direkt bearbeiten', cancelLabel:'Abbrechen', danger:false}
+    );
+    if(!ok) return;
+    _openRechForm(r, id, 'Rechnung bearbeiten');
+    return;
+  }
+
+  // Bezahlt/storniert — обязательно Storno + новый
+  if(r.status==='bezahlt' || r.status==='storniert') {
+    const ok = await appConfirm(
+      `Rechnung ${r.nr} (${r.status}) kann gemäß §14 UStG & GoBD nicht direkt geändert werden.
+
+Es wird automatisch erstellt:
+• Stornorechnung für ${r.nr}
+• Neue Rechnung mit der nächsten Nummer
+
+Fortfahren?`,
+      {title:'📋 Storno & Neuausstellung', okLabel:'Storno + Neu erstellen', cancelLabel:'Abbrechen', danger:false}
+    );
+    if(!ok) return;
+    _stornoUndNeu(r);
+    return;
+  }
+
+  _openRechForm(r, id, 'Rechnung bearbeiten');
+}
+
+function _openRechForm(r, id, title) {
+  editRechId = id;
   document.getElementById('rn-nr').value=r.nr;
-  const _rnDatEl2=document.getElementById('rn-dat');
-  _rnDatEl2.value=r.datum;
+  document.getElementById('rn-dat').value=r.datum;
   document.getElementById('rn-faellig').value=r.faellig||'';
   document.getElementById('rn-bet').value=r.betrag;
   setRechStatus(r.status||'offen');
@@ -226,12 +338,57 @@ function editRech(id){
   document.getElementById('rn-tel').value=r.tel||'';
   document.getElementById('rn-notiz').value=r.notiz||'';
   document.getElementById('rn-nr').dataset.kundeTel=r.tel||'';
+  document.getElementById('rn-nr').dataset.kundeId=r.kundeId||'';
   updateRechBanner();
   const posData=r.positionen&&r.positionen.length?r.positionen:[{bez:r.beschreibung||'',menge:1,netto:r.netto||r.betrag||'',rate:r.mwstRate||0,brutto:r.betrag||''}];
   setRechPositionen(posData);
   const t = document.getElementById('rn-form-title');
-  if (t) t.textContent = 'Rechnung bearbeiten';
+  if (t) t.textContent = title || 'Rechnung bearbeiten';
   nav('rechnungen-form', null);
+}
+
+function _stornoUndNeu(r) {
+  // 1. Storniere den alten Beleg
+  const storno = {
+    ...r,
+    id: Date.now()+'_storno_'+Math.random().toString(36).slice(2,5),
+    status: 'storniert',
+    storniert_am: new Date().toISOString().split('T')[0],
+    storno_von: r.nr,
+    _storniert: true,
+  };
+  // Если уже не storniert — добавляем запись
+  if(r.status !== 'storniert') {
+    r.status = 'storniert';
+    r._storniert = true;
+    r.storniert_am = new Date().toISOString().split('T')[0];
+    sbSaveRechnung(r);
+    sbLogRechnung(r, 'storniert', {status:'bezahlt'}, {status:'storniert', storno_von: r.nr});
+  }
+
+  // 2. Новый рехнунг с следующим номером
+  const newNr = autoRechNr(new Date().getFullYear());
+  const newR = {
+    ...r,
+    id: Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    nr: newNr,
+    datum: new Date().toISOString().split('T')[0],
+    status: 'entwurf',
+    storno_von: r.nr,
+    mahnung_history: [],
+  };
+  delete newR._storniert;
+  delete newR.storniert_am;
+
+  data.rechnungen.push(newR);
+  sbSaveRechnung(newR);
+  sbLogRechnung(newR, 'erstellt', null, {nr:newR.nr, status:'entwurf', storno_von:r.nr});
+
+  renderRech();
+  toast(`✓ ${r.nr} storniert · Neuer Entwurf ${newNr} erstellt`, 'ok');
+
+  // Открываем форму редактирования нового
+  setTimeout(() => _openRechForm(newR, newR.id, `Entwurf ${newNr} (aus Storno von ${r.nr})`), 300);
 }
 
 // Создаёт Einnahme из Rechnung и сохраняет в БД
@@ -392,6 +549,24 @@ function saveRechnung(){
   }
   renderRech(); closeRechForm(); toast('✓ Rechnung gespeichert!','ok'); checkMahnungen();
 }
+async function rechAusstellen(id) {
+  const r = data.rechnungen.find(x=>x.id===id);
+  if (!r) return;
+  const ok = await appConfirm(
+    `Entwurf ${r.nr} als offene Rechnung ausstellen?
+
+Nach dem Ausstellen gelten GoBD-Regeln — Änderungen nur noch per Storno möglich.`,
+    {title:'📄 Rechnung ausstellen', okLabel:'Ja, ausstellen', cancelLabel:'Abbrechen'}
+  );
+  if (!ok) return;
+  r.status = 'offen';
+  if (!r.datum) r.datum = new Date().toISOString().split('T')[0];
+  sbSaveRechnung(r);
+  sbLogRechnung(r, 'ausgestellt', {status:'entwurf'}, {status:'offen'});
+  renderRech();
+  toast(`✓ Rechnung ${r.nr} ausgestellt`, 'ok');
+}
+
 async function rechBezahlt(id){
   const r=data.rechnungen.find(x=>x.id===id);if(!r)return;
   const ok = await appConfirm(
@@ -1750,7 +1925,7 @@ function _sendMahnung(r) {
 function showRechDetail(id) {
   const r = (data.rechnungen||[]).find(x=>x.id===id);
   if (!r) return;
-  const statusLabels = {offen:'Offen',bezahlt:'Bezahlt',ueberfaellig:'Überfällig',storniert:'Storniert'};
+  const statusLabels = {entwurf:'Entwurf',offen:'Offen',bezahlt:'Bezahlt',ueberfaellig:'Überfällig',storniert:'Storniert'};
   showDetailSheet({
     title: `<i class="fas fa-file-invoice" style="color:var(--blue);margin-right:8px"></i>${r.nr||'Rechnung'}`,
     rows: [

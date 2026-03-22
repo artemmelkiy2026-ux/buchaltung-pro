@@ -4167,3 +4167,10 @@ header { background: #fff; }
   animation: highlight-flash 1.2s ease 3;
   border-radius: var(--r2);
 }
+
+/* ── ENTWURF STATUS ──────────────────────────────────────────────────────── */
+.rech-badge-entwurf {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.rech-badge-entwurf i { color: #64748b; }

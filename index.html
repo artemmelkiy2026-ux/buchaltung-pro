@@ -1219,6 +1219,7 @@
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="rech-cards"></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
     <button class="ftab active" onclick="setRechFilter('alle',this)">Alle</button>
+    <button class="ftab" onclick="setRechFilter('entwurf',this)"><i class="fas fa-pencil-alt" style="color:var(--sub)"></i> Entwurf</button>
     <button class="ftab" onclick="setRechFilter('offen',this)"><i class="fas fa-clock" style="color:var(--yellow)"></i> Offen</button>
     <button class="ftab" onclick="setRechFilter('ueberfaellig',this)"><i class="fas fa-exclamation-circle" style="color:var(--red)"></i> Überfällig</button>
     <button class="ftab" onclick="setRechFilter('bezahlt',this)"><i class="fas fa-check-circle" style="color:var(--green)"></i> Bezahlt</button>
@@ -2354,6 +2355,8 @@
                   <i class="fas fa-chevron-down" style="font-size:10px;color:var(--sub)"></i>
                 </button>
                 <div id="rn-status-panel" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--s1);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:4px">
+                  <div onclick="setRechStatus('entwurf')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-pencil-alt" style="color:var(--sub);font-size:14px;width:14px"></i> Entwurf</div>
+                  <div onclick="setRechStatus('entwurf')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-pencil-alt" style="color:var(--sub);font-size:14px;width:14px"></i> Entwurf</div>
                   <div onclick="setRechStatus('offen')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-clock" style="color:var(--yellow);font-size:14px;width:14px"></i> Offen</div>
                   <div onclick="setRechStatus('bezahlt')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-check-circle" style="color:var(--green);font-size:14px;width:14px"></i> Bezahlt</div>
                   <div onclick="setRechStatus('ueberfaellig')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><i class="fas fa-exclamation-circle" style="color:var(--red);font-size:14px;width:14px"></i> Überfällig</div>
