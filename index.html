@@ -272,8 +272,10 @@
   <!-- Bottom: Profile & Logout -->
   <div style="padding:10px 8px;display:flex;flex-direction:column;gap:2px">
     <div class="nav-item" onclick="nav('notifications',this)" style="font-size:14px;color:var(--sub);position:relative" id="nav-notifications">
-      <span class="ic"><i class="fas fa-bell"></i></span> Benachrichtigungen
-      <span id="notif-badge" style="display:none;position:absolute;top:6px;right:10px;background:#dc2626;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;align-items:center;justify-content:center;padding:0 4px"></span>
+      <span class="ic" style="position:relative;display:inline-flex">
+        <i class="fas fa-bell"></i>
+        <span id="notif-badge" style="display:none;position:absolute;top:-5px;right:-6px;background:#dc2626;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span>
+      </span>
     </div>
     <div class="nav-item" onclick="location.href='profile.html'" style="font-size:14px;color:var(--sub)">
       <span class="ic"><i class="fas fa-user"></i></span> Profil
