@@ -637,6 +637,10 @@ async function rechBezahlt(id){
 
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
+    // Убеждаемся что запись точно в data.eintraege
+    if (!data.eintraege.find(e => e.id === newE.id)) {
+      data.eintraege.unshift(newE);
+    }
     renderAll();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
