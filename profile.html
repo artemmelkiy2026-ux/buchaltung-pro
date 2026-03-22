@@ -1142,7 +1142,15 @@ async function open2FASetup() {
     const secretBox   = document.getElementById('twofa-secret-box');
     const secretText  = document.getElementById('twofa-secret-text');
 
-    qrContainer.innerHTML = `<img src="${data.totp.qr_code}" style="width:180px;height:180px;border-radius:8px;border:1px solid #e5e7eb" alt="QR Code">`;
+    // qr_code может быть SVG-строкой или data URI
+    const qrSrc = data.totp.qr_code;
+    if (qrSrc && qrSrc.startsWith('<svg')) {
+      // SVG напрямую
+      qrContainer.innerHTML = `<div style="width:180px;height:180px;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden;display:flex;align-items:center;justify-content:center;margin:0 auto">${qrSrc.replace(/<svg/, '<svg style="width:180px;height:180px;display:block"')}</div>`;
+    } else {
+      // URL или data URI
+      qrContainer.innerHTML = `<img src="${qrSrc}" style="width:180px;height:180px;border-radius:8px;border:1px solid #e5e7eb" alt="QR Code">`;
+    }
     if (secretText) secretText.textContent = data.totp.secret;
     if (secretBox)  secretBox.style.display = 'block';
   } catch(e) {
