@@ -629,10 +629,14 @@ async function rechBezahlt(id){
   const newE = _buchRechnungAlsEinnahme(r);
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
-    // Сбрасываем фильтр Einträge на текущий год чтобы новая запись была видна
+    // Сбрасываем фильтры Einträge чтобы новая запись точно была видна
     const _curYr = new Date().getFullYear()+'';
-    const _fjEl = document.getElementById('f-jahr');
-    if(_fjEl && _fjEl.value !== 'Alle' && _fjEl.value !== _curYr) _fjEl.value = _curYr;
+    const _fjEl  = document.getElementById('f-jahr');
+    const _fmEl  = document.getElementById('f-mon');
+    if(_fjEl) _fjEl.value = _curYr;
+    if(_fmEl) _fmEl.value = 'Alle';
+    // Сбрасываем на первую страницу
+    if(typeof einPage !== 'undefined') einPage = 1;
     renderAll();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
