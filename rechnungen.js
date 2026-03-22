@@ -1736,7 +1736,14 @@ function generateXRechnungXML(r) {
       </ram:BuyerTradeParty>
     </ram:ApplicableHeaderTradeAgreement>
 
-    <ram:ApplicableHeaderTradeDelivery/>
+    <ram:ApplicableHeaderTradeDelivery>
+      ${(r.leistungsdatum || r.datum) ? `
+      <ram:ActualDeliverySupplyChainEvent>
+        <ram:OccurrenceDateTime>
+          <udt:DateTimeString format="102">${((r.leistungsdatum||r.datum)||'').replace(/-/g,'')}</udt:DateTimeString>
+        </ram:OccurrenceDateTime>
+      </ram:ActualDeliverySupplyChainEvent>` : ''}
+    </ram:ApplicableHeaderTradeDelivery>
 
     <ram:ApplicableHeaderTradeSettlement>
       <ram:PaymentReference>${esc(r.nr)}</ram:PaymentReference>
