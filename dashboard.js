@@ -1097,7 +1097,7 @@ function renderEin(){
         : '';
       const _stLblFull = stLbl ? stLbl+_korrekturTime : '';
 
-      const _rechLock = _isRechVirt ? '<i class="fas fa-lock" style="color:var(--sub);font-size:10px;margin-left:6px;opacity:.6" title="Erstellt durch Rechnung"></i>' : '';
+      const _rechLock = ''; // замок только в _actionArea, не дублировать в заголовке
       const _rechTag  = _isRechVirt ? '<span style="font-size:10px;background:var(--bdim);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600">Rechnung</span>' : '';
       // Gegenbuchung: Link zum Originaleintrag
       let _stornoTag = '';
