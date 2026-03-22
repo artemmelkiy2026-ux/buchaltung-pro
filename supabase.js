@@ -87,6 +87,15 @@ async function sbLoadAll() {
   // GoBD: восстанавливаем _storniert для оригиналов после перезагрузки
   const stornoOfIds = new Set(eintraege.filter(e => e.is_storno && e.storno_of).map(e => e.storno_of));
   eintraege.forEach(e => { if (stornoOfIds.has(e.id)) e._storniert = true; });
+  // Rechnung-Einnahmen: _fromRechnung + _rechnungId per belegnr wiederherstellen
+  const _rechByNr = {};
+  (rech.data || []).forEach(r => { if (r.nr) _rechByNr[r.nr] = r.id; });
+  eintraege.forEach(e => {
+    if (!e.is_storno && e.typ === 'Einnahme' && e.belegnr && _rechByNr[e.belegnr]) {
+      e._fromRechnung = true;
+      e._rechnungId   = _rechByNr[e.belegnr];
+    }
+  });
   const kunden        = (kun.data  || []).map(dbToKunde);
   const rechnungen    = (rech.data || []).map(r => dbToRechnung(r, rechPos.data || []));
   const wiederkehrend = (wied.data || []).map(dbToWied);

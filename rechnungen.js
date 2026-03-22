@@ -141,7 +141,7 @@ function renderRech(){
               {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
               {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
             ]) : `<div class="rech-desktop-actions">
-              ${r.status!=='bezahlt' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>` : ''}
+              ${r.status!=='bezahlt' && r.status!=='storniert' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>` : ''}
               ${r.status==='entwurf' ? `<button class="rda-btn rda-green" onclick="rechAusstellen('${r.id}')" title="Ausstellen"><i class="fas fa-paper-plane"></i></button>` : ''}
               <button class="rda-btn" onclick="showRechDetail('${r.id}')" title="Vorschau"><i class="fas fa-eye"></i></button>
               ${r.status!=='entwurf' ? `<button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>` : ''}
@@ -418,7 +418,9 @@ function _buchRechnungAlsEinnahme(r) {
     betrag: r.betrag,
     nettoBetrag: _rNetto,
     mwstBetrag: _rMwst,
-    mwstRate: _rRate
+    mwstRate: _rRate,
+    _fromRechnung: true,
+    _rechnungId: r.id
   };
   data.eintraege.unshift(newE);
   sbSaveEintrag(newE);

@@ -1058,9 +1058,11 @@ function renderEin(){
       
       // Виртуальная запись из Rechnung — замок
       const _isRechVirt = e._fromRechnung || (e.id && e.id.startsWith('__rech__'));
+      // Rechnung-Einnahmen: onClick öffnet Info-Sheet mit Link zur Rechnung
+      const _rechClickId = _isRechVirt ? (e._rechnungId || e.id) : e.id;
       const _clickAttr = _isRechVirt
-        ? `onclick="showRechEintragInfo('\${e.id}')"`
-        : (st ? '' : `onclick="showEintragDetail('\${e.id}')"`); 
+        ? `onclick="showRechEintragInfo('${_rechClickId}')"`
+        : (st ? '' : `onclick="showEintragDetail('${e.id}')"`); 
       const _mobBtn = isMob() && !isReadonly && !_isRechVirt
         ? _moreBtn([
             {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
@@ -1846,18 +1848,21 @@ function parseBelegText(text) {
 
 // ── Диалог для виртуальных записей из Rechnung ────────────────────────────
 function showRechEintragInfo(id) {
-  const rechId = id.replace('__rech__', '');
+  // id может быть как rechnung.id напрямую, так и __rech__<id> (legacy)
+  const rechId = id.startsWith('__rech__') ? id.replace('__rech__', '') : id;
   const r = (data.rechnungen || []).find(x => x.id === rechId);
   if (!r) return;
 
+  const _rechStorniert = r.status === 'storniert' || r._storniert;
   showDetailSheet({
-    title: '<i class="fas fa-lock" style="color:var(--sub);margin-right:6px"></i>Eintrag aus Rechnung',
+    title: '<i class="fas fa-lock" style="color:var(--sub);margin-right:6px"></i>Eintrag aus Rechnung'
+      + (_rechStorniert ? ' <span style="font-size:11px;color:var(--red);padding:2px 7px;background:var(--rdim);border-radius:4px;margin-left:4px">Storniert</span>' : ''),
     rows: [
       { key: 'Rechnung',    val: `<strong>${r.nr}</strong>` },
       { key: 'Kunde',       val: r.kunde || '—' },
       { key: 'Betrag',      val: `<span style="font-family:var(--mono);font-weight:700;color:var(--green)">+${fmt(r.betrag)}</span>` },
       { key: 'Datum',       val: fd(r.datum) },
-      { key: 'Status',      val: r.status },
+      { key: 'Status',      val: `<span style="font-weight:600;color:${_rechStorniert ? 'var(--red)' : 'var(--green)'}">${r.status}</span>` },
       { key: 'Hinweis',     val: '<span style="color:var(--sub);font-size:12px">Dieser Eintrag wurde automatisch durch die Rechnung erstellt. Änderungen müssen über die Rechnung vorgenommen werden (GoBD §146).</span>' },
     ],
     buttons: [
@@ -1868,11 +1873,12 @@ function showRechEintragInfo(id) {
           highlightRechnung(rechId);
         }
       },
-      { label: 'Stornieren & neu', icon: 'fa-undo', danger: true, action: () => {
+      ...(_rechStorniert ? [] : [{ label: 'Stornieren', icon: 'fa-undo', danger: true, action: () => {
           _closeDetailSheet();
           const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
           nav('rechnungen', el);
           setTimeout(() => {
+            highlightRechnung(rechId);
             if (typeof delRech === 'function') {
               appConfirm(
                 `Rechnung ${r.nr} stornieren und neue Korrekturrechnung erstellen?`,
@@ -1881,7 +1887,7 @@ function showRechEintragInfo(id) {
             }
           }, 400);
         }
-      },
+      }]),
     ]
   });
 }
