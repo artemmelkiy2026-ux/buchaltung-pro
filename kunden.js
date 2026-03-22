@@ -520,11 +520,20 @@ function wBuchenCore(id){
   return newE;
 }
 
+function _resetEinFilter() {
+  // Сбрасываем фильтры Einträge чтобы новая запись была видна
+  const _fjEl = document.getElementById('f-jahr');
+  const _fmEl = document.getElementById('f-mon');
+  if(_fjEl) _fjEl.value = new Date().getFullYear()+'';
+  if(_fmEl) _fmEl.value = 'Alle';
+  if(typeof einPage !== 'undefined') einPage = 1;
+}
+
 function wBuchen(id){
   const newE = wBuchenCore(id);
   if(!newE) return;
+  _resetEinFilter();
   renderAll(); renderWied();
-  const w=data.wiederkehrend.find(x=>x.id===id);
   toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${newE.beschreibung} gebucht!`, 'ok');
 }
 
@@ -532,9 +541,8 @@ function wBuchenAlle(){
   const today=new Date().toISOString().split('T')[0];
   const faellig=(data.wiederkehrend||[]).filter(w=>w.naechste<=today&&w.status!=='paused');
   if(!faellig.length) return toast('Keine fälligen Zahlungen', 'err');
-  // Бронируем все без промежуточных renderAll
   faellig.forEach(w=>wBuchenCore(w.id));
-  // Один рендер после всех
+  _resetEinFilter();
   renderAll(); renderWied();
   toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> ${faellig.length} Zahlungen gebucht!`, 'ok');
 }
