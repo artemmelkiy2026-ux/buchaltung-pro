@@ -1126,8 +1126,21 @@ async function open2FASetup() {
     document.getElementById('twofa-step-setup').style.display = 'none';
     document.getElementById('twofa-step-success').style.display = 'none';
     document.getElementById('twofa-step-disable').style.display = 'block';
+    // Сбрасываем поле кода
+    const dc = document.getElementById('twofa-disable-code');
+    const de = document.getElementById('twofa-disable-error');
+    if (dc) dc.value = '';
+    if (de) de.style.display = 'none';
     return;
   }
+
+  // Сбрасываем форму настройки
+  document.getElementById('twofa-step-setup').style.display = 'block';
+  document.getElementById('twofa-step-success').style.display = 'none';
+  document.getElementById('twofa-step-disable').style.display = 'none';
+  document.getElementById('twofa-error').style.display = 'none';
+  document.getElementById('twofa-verify-code').value = '';
+  document.getElementById('twofa-qr-container').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:180px"><div style="width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:#d97706;border-radius:50%;animation:spin .8s linear infinite"></div></div>';
 
   // Включаем — запрашиваем QR
   document.getElementById('twofa-step-setup').style.display = 'block';
@@ -1214,7 +1227,7 @@ async function verify2FA() {
     // Успех
     document.getElementById('twofa-step-setup').style.display = 'none';
     document.getElementById('twofa-step-success').style.display = 'block';
-    check2FAStatus();
+    await check2FAStatus();
   } catch(e) {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-check" style="margin-right:8px"></i>Bestätigen & aktivieren';
@@ -1238,9 +1251,23 @@ async function disable2FA() {
     if (error) throw error;
 
     _2faFactorId = null;
+    // Обновляем статус в меню
+    await check2FAStatus();
+    // Закрываем модал с подтверждением
     document.getElementById('modal-2fa').style.display = 'none';
-    check2FAStatus();
-    alert('2FA wurde deaktiviert.');
+    // Показываем тост вместо alert
+    const sub = document.getElementById('twofa-status-sub');
+    if (sub) {
+      sub.innerHTML = 'Nicht aktiv — klicken zum Aktivieren';
+      sub.style.color = '';
+    }
+    // Мигание строки для подтверждения
+    const row = document.getElementById('twofa-row');
+    if (row) {
+      row.style.transition = 'background .3s';
+      row.style.background = '#f0fdf4';
+      setTimeout(() => row.style.background = '', 1000);
+    }
   } catch(e) {
     errEl.textContent = 'Falscher Code oder Fehler: ' + e.message;
     errEl.style.display = 'block';
