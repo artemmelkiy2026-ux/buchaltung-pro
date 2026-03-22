@@ -116,13 +116,16 @@ function renderRech(){
     );
     const stornoBadge = _rechStorno.length > 0
       ? `<span class="badge-storno" style="font-size:10px;padding:2px 6px;border-radius:4px">↩ Storniert</span>` : '';
-    const _rClick = `onclick="showRechDetail('${r.id}')"`;
+    const _isStorniert = r.status === 'storniert' || r._storniert;
+    const _rClick = _isStorniert
+      ? `onclick="showRechDetailReadonly('${r.id}')"`
+      : `onclick="showRechDetail('${r.id}')"`;
     // Anzahl Positionen
     const _rPosCount = (r.positionen||[]).length;
     // Wie alt ist die Rechnung?
     const _rDaysSince = r.datum ? Math.floor((Date.now()-new Date(r.datum))/(864e5)) : null;
     const _rAgeLabel = _rDaysSince===0?'Heute':_rDaysSince===1?'Gestern':_rDaysSince!==null?`vor ${_rDaysSince} Tagen`:'';
-    return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" data-rech-id="${r.id}" ${_rClick} style="cursor:pointer">
+    return `<div class="rech-card${(_isStorniert||_rechStorno.length)?' rech-card-storniert':''}" data-rech-id="${r.id}" ${_rClick} style="cursor:pointer;${_isStorniert?'pointer-events:auto':''}">
       <div class="rech-card-avatar ${st.cls}">
         <i class="${st.icon}"></i>
       </div>
@@ -134,20 +137,29 @@ function renderRech(){
         <div class="rech-card-row2">
           <div class="rech-card-kunde">${r.kunde||r.beschreibung||'—'}</div>
           <div class="rech-card-end" onclick="event.stopPropagation()">
-            ${isMob() ? _moreBtn([
-              ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
-              ...(r.status==='entwurf' ? [{icon:'fa-paper-plane', label:'Ausstellen', action:()=>rechAusstellen(r.id)}] : [{icon:'fa-print', label:'Drucken / PDF', action:()=>druckRechnungId(r.id)}]),
-              {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
-              {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
-              {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
-            ]) : `<div class="rech-desktop-actions">
-              ${r.status!=='bezahlt' && r.status!=='storniert' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>` : ''}
-              ${r.status==='entwurf' ? `<button class="rda-btn rda-green" onclick="rechAusstellen('${r.id}')" title="Ausstellen"><i class="fas fa-paper-plane"></i></button>` : ''}
-              <button class="rda-btn" onclick="showRechDetail('${r.id}')" title="Vorschau"><i class="fas fa-eye"></i></button>
-              ${r.status!=='entwurf' ? `<button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>` : ''}
-              <button class="rda-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
-              <button class="rda-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-              <button class="rda-btn rda-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+            ${isMob() ? (_isStorniert
+              ? _moreBtn([
+                  {icon:'fa-eye', label:'Details anzeigen', action:()=>showRechDetailReadonly(r.id)}
+                ])
+              : _moreBtn([
+                  ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
+                  ...(r.status==='entwurf' ? [{icon:'fa-paper-plane', label:'Ausstellen', action:()=>rechAusstellen(r.id)}] : [{icon:'fa-print', label:'Drucken / PDF', action:()=>druckRechnungId(r.id)}]),
+                  {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
+                  {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
+                  {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
+                ])) : `<div class="rech-desktop-actions">
+              ${_isStorniert ? `
+                <button class="rda-btn" onclick="showRechDetailReadonly('${r.id}')" title="Details anzeigen"><i class="fas fa-eye"></i></button>
+                <button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="PDF / Drucken"><i class="fas fa-print"></i></button>
+              ` : `
+                ${r.status!=='bezahlt' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>` : ''}
+                ${r.status==='entwurf' ? `<button class="rda-btn rda-green" onclick="rechAusstellen('${r.id}')" title="Ausstellen"><i class="fas fa-paper-plane"></i></button>` : ''}
+                <button class="rda-btn" onclick="showRechDetail('${r.id}')" title="Vorschau"><i class="fas fa-eye"></i></button>
+                ${r.status!=='entwurf' ? `<button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>` : ''}
+                <button class="rda-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
+                <button class="rda-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+                <button class="rda-btn rda-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+              `}
             </div>`}
           </div>
         </div>
@@ -1932,21 +1944,64 @@ function _sendMahnung(r) {
 function showRechDetail(id) {
   const r = (data.rechnungen||[]).find(x=>x.id===id);
   if (!r) return;
+  // Сторнированные — только readonly просмотр
+  if (r.status === 'storniert' || r._storniert) { showRechDetailReadonly(id); return; }
   const statusLabels = {entwurf:'Entwurf',offen:'Offen',bezahlt:'Bezahlt',ueberfaellig:'Überfällig',storniert:'Storniert'};
   showDetailSheet({
     title: `<i class="fas fa-file-invoice" style="color:var(--blue);margin-right:8px"></i>${r.nr||'Rechnung'}`,
     rows: [
-      { key: 'Betrag',  val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmt(r.betrag)}</span>` },
-      { key: 'Kunde',   val: r.kunde||'—' },
-      { key: 'Datum',   val: fd(r.datum) },
-      { key: 'Fällig',  val: r.faellig ? fd(r.faellig) : '—' },
-      { key: 'Status',  val: `<span class="badge">${statusLabels[r.status]||r.status}</span>` },
+      { key: 'Betrag',     val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--blue)">${fmt(r.betrag)}</span>` },
+      { key: 'Kunde',      val: r.kunde||'—' },
+      { key: 'Datum',      val: fd(r.datum) },
+      { key: 'Fällig',     val: r.faellig ? fd(r.faellig) : '—' },
+      { key: 'Status',     val: `<span class="badge">${statusLabels[r.status]||r.status}</span>` },
       { key: 'Positionen', val: (r.positionen||[]).length + ' Pos.' },
       ...(r.notiz ? [{ key: 'Notiz', val: r.notiz }] : []),
     ],
     buttons: [
       { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editRech(id) },
       { label: 'Löschen', icon: 'fa-trash', danger: true, action: () => delRech(id) },
+    ]
+  });
+}
+
+// ── Readonly-Ansicht für stornierte Rechnungen ──────────────────────────────
+function showRechDetailReadonly(id) {
+  const r = (data.rechnungen||[]).find(x=>x.id===id);
+  if (!r) return;
+  const statusLabels = {entwurf:'Entwurf',offen:'Offen',bezahlt:'Bezahlt',ueberfaellig:'Überfällig',storniert:'Storniert'};
+  // Позиции — полный список
+  const _posRows = (r.positionen||[]).map((p,i) =>
+    ({ key: `Pos. ${i+1}`, val: `${p.bezeichnung||'—'} · ${p.menge||1}× · ${fmt(p.brutto)} €` })
+  );
+  // Связанные Einträge — Einnahme + Gegenbuchung
+  const _linked = (data.eintraege||[]).filter(e =>
+    e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`)
+  );
+  const _linkedRows = _linked.map(e => ({
+    key: e.is_storno ? '↩ Gegenbuchung' : '✓ Einnahme',
+    val: `<span style="font-family:var(--mono);color:${e.is_storno?'var(--red)':'var(--green)'}">
+      ${e.is_storno?'−':'+'}${fmt(e.betrag)} €
+    </span> <span style="color:var(--sub);font-size:11px">${fd(e.datum)}</span>`
+  }));
+  showDetailSheet({
+    title: `<i class="fas fa-lock" style="color:var(--red);margin-right:8px"></i>${r.nr||'Rechnung'}
+      <span style="font-size:11px;color:var(--red);padding:2px 8px;background:var(--rdim);border-radius:4px;margin-left:6px;font-weight:600">Storniert</span>`,
+    rows: [
+      { key: 'Betrag',     val: `<span style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--sub);text-decoration:line-through">${fmt(r.betrag)}</span>` },
+      { key: 'Kunde',      val: r.kunde||'—' },
+      { key: 'Datum',      val: fd(r.datum) },
+      { key: 'Storniert',  val: r.storniert_am ? fd(r.storniert_am) : fd(r._storniert_am?.slice(0,10)||'') },
+      { key: 'Kategorie',  val: r.kategorie||'—' },
+      { key: 'Zahlungsart',val: r.zahlungsart||'—' },
+      { key: 'Positionen', val: (r.positionen||[]).length + ' Pos.' },
+      ..._posRows,
+      ...(_linkedRows.length ? _linkedRows : []),
+      ...(r.notiz ? [{ key: 'Notiz', val: r.notiz }] : []),
+      { key: 'Hinweis', val: '<span style="color:var(--sub);font-size:11px">Diese Rechnung wurde storniert und kann nicht mehr geändert werden (GoBD §146).</span>' },
+    ],
+    buttons: [
+      { label: 'PDF / Drucken', icon: 'fa-print', action: () => druckRechnungId(id) },
     ]
   });
 }
