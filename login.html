@@ -432,24 +432,60 @@ function showToast(msg, duration = 2500) {
   setTimeout(() => t.classList.remove('show'), duration);
 }
 
-// ── Обработка PASSWORD_RECOVERY (ссылка из письма) ──────────────────────
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === 'PASSWORD_RECOVERY') {
-    // Показываем форму нового пароля, НЕ редиректим
-    showResetPasswordPanel();
-  } else if (event === 'SIGNED_IN' && !window._inPasswordReset) {
-    // Обычный вход — редиректим
-    goAfterLogin();
-  }
-});
+// ── Обработка PASSWORD_RECOVERY ─────────────────────────────────────────
+// Проверяем hash ПЕРВЫМ — до любых session-проверок
+(async () => {
+  const hash   = window.location.hash;
+  const search = window.location.search;
+  const params = new URLSearchParams(search);
 
-// ── Если уже залогинен И это не recovery — на главную ────────────────────
-sb.auth.getSession().then(({ data: { session } }) => {
-  // Проверяем URL — если есть #access_token и type=recovery — не редиректим
-  const hash = window.location.hash;
-  const isRecovery = hash.includes('type=recovery') || hash.includes('type=magiclink');
-  if (session && !isRecovery) goAfterLogin();
-});
+  // Supabase v2 PKCE: передаёт code в query (?code=xxx&type=recovery)
+  // Supabase implicit: передаёт через hash (#access_token=xxx&type=recovery)
+  const isRecovery = hash.includes('type=recovery')
+    || search.includes('type=recovery')
+    || params.get('type') === 'recovery';
+
+  // Если есть code параметр — Supabase сам обменяет его на сессию
+  const hasCode = params.has('code');
+
+  if (isRecovery) {
+    // Устанавливаем флаг ДО того как Supabase обработает токен
+    window._inPasswordReset = true;
+    // Supabase v2 автоматически обменяет токены из hash на сессию
+    // Ждём этого и показываем форму
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      showResetPasswordPanel();
+    } else if (hasCode) {
+      // PKCE flow — ждём пока Supabase обменяет code на сессию
+      const { data: sub } = sb.auth.onAuthStateChange((event, s) => {
+        if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && window._inPasswordReset)) {
+          sub?.subscription?.unsubscribe?.();
+          showResetPasswordPanel();
+        }
+      });
+    } else {
+      // Fallback — просто показываем форму
+      showResetPasswordPanel();
+    }
+    return; // выходим — не делаем обычный редирект
+  }
+
+  // Обычный flow — слушаем изменения авторизации
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      window._inPasswordReset = true;
+      showResetPasswordPanel();
+    } else if (event === 'SIGNED_IN' && !window._inPasswordReset) {
+      goAfterLogin();
+    }
+  });
+
+  // Если уже залогинен — сразу на главную
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session && !window._inPasswordReset) goAfterLogin();
+  });
+})();
 
 // ── Биометрия для входа ───────────────────────────────────────────────────
 // Храним зашифрованные данные для входа в localStorage
