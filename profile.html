@@ -232,6 +232,7 @@ body {
 }
 .logout-row:hover { background:#fff0f0; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -1166,13 +1167,26 @@ async function open2FASetup() {
     const secretText  = document.getElementById('twofa-secret-text');
 
     // qr_code может быть SVG-строкой или data URI
-    const qrSrc = data.totp.qr_code || '';
-    // Всегда рендерим через iframe чтобы избежать проблем с SVG/HTML escaping
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'width:180px;height:180px;border:1px solid #e5e7eb;border-radius:8px;display:block;margin:0 auto';
-    iframe.srcdoc = `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box}body{display:flex;align-items:center;justify-content:center;width:180px;height:180px;background:#fff}</style></head><body>${qrSrc.startsWith('<svg') ? qrSrc.replace(/<svg/, '<svg style="width:180px;height:180px"') : '<img src="'+qrSrc+'" style="width:180px;height:180px">'}</body></html>`;
-    qrContainer.innerHTML = '';
-    qrContainer.appendChild(iframe);
+    // Генерируем QR сами из otpauth URI используя secret
+    const secret = data.totp.secret;
+    const email  = (await sb.auth.getUser()).data?.user?.email || 'user';
+    const otpauth = `otpauth://totp/MelaLogic:${encodeURIComponent(email)}?secret=${secret}&issuer=MelaLogic&algorithm=SHA1&digits=6&period=30`;
+
+    qrContainer.innerHTML = '<div id="twofa-qr-render" style="display:flex;justify-content:center"></div>';
+    const qrDiv = document.getElementById('twofa-qr-render');
+    new QRCode(qrDiv, {
+      text:         otpauth,
+      width:        180,
+      height:       180,
+      colorDark:    '#000000',
+      colorLight:   '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    // Скругляем углы у canvas
+    setTimeout(() => {
+      const canvas = qrDiv.querySelector('canvas');
+      if (canvas) canvas.style.cssText = 'border-radius:8px;border:1px solid #e5e7eb;display:block';
+    }, 100);
     if (secretText) secretText.textContent = data.totp.secret;
     if (secretBox)  secretBox.style.display = 'block';
   } catch(e) {
