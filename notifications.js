@@ -236,6 +236,7 @@ function renderNotificationsPage() {
 
   container.innerHTML = _notifData.map((n, idx) => {
     const cl = colors[n.type] || colors.info;
+    const isSys = n.id && n.id.startsWith('sys-');
     const date = n.created_at ? (n.created_at.length > 10 ? fd(n.created_at.split('T')[0]) : fd(n.created_at)) : '';
     return `
       <div data-notif-idx="${idx}"
