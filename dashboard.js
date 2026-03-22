@@ -147,21 +147,30 @@ function renderLetzteEinnahmen(flashId=null) {
   }
   const total = recent.reduce((s,e) => s + e.betrag, 0);
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
-  list.innerHTML = recent.map(e => `
-    <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:4px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
-      <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center">
+  list.innerHTML = recent.map(e => {
+    const _isRech = e._fromRechnung && e._rechnungId;
+    return `
+    <div id="lein-row-${e.id}" onclick="openEditFromList('${e.id}')"
+         style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;
+                border-radius:4px;margin-bottom:10px;cursor:pointer;transition:background .15s"
+         onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
+      <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);
+                  background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center">
         <i class="fas fa-arrow-up" style="color:var(--green);font-size:11px"></i>
       </div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
-        <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px">
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
+             title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
+        <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px;align-items:center">
           <span>${fd(e.datum)}</span>
           <span>·</span>
           <span>${e.kategorie}</span>
+          ${_isRech ? '<span>·</span><span style="color:var(--blue);font-weight:600"><i class="fas fa-lock" style="font-size:9px;margin-right:2px"></i>Rechnung</span>' : ''}
         </div>
       </div>
       <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)">+${fmt(e.betrag)}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   if(flashId) flashRow('lein-row-'+flashId);
 }
 
@@ -180,21 +189,30 @@ function renderLetzteAusgaben(flashId=null) {
   }
   const total = recent.reduce((s,e) => s + e.betrag, 0);
   if(sumEl) sumEl.textContent = 'Gesamt: ' + fmt(total);
-  list.innerHTML = recent.map(e => `
-    <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;border-radius:4px;margin-bottom:10px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
-      <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center">
+  list.innerHTML = recent.map(e => {
+    const _isRech = e._fromRechnung && e._rechnungId;
+    return `
+    <div id="laus-row-${e.id}" onclick="openEditFromList('${e.id}')"
+         style="display:flex;align-items:center;gap:10px;padding:10px 0px;background:transparent;
+                border-radius:4px;margin-bottom:10px;cursor:pointer;transition:background .15s"
+         onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='transparent'">
+      <div style="flex:0 0 auto;width:32px;height:32px;border-radius:var(--r);
+                  background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center">
         <i class="fas fa-arrow-down" style="color:var(--red);font-size:11px"></i>
       </div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
-        <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px">
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
+             title="${e.beschreibung}">${e.beschreibung||e.kategorie}</div>
+        <div style="font-size:11px;color:var(--sub);display:flex;gap:6px;margin-top:2px;align-items:center">
           <span>${fd(e.datum)}</span>
           <span>·</span>
           <span>${e.kategorie}</span>
+          ${_isRech ? '<span>·</span><span style="color:var(--blue);font-weight:600"><i class="fas fa-lock" style="font-size:9px;margin-right:2px"></i>Rechnung</span>' : ''}
         </div>
       </div>
       <div style="flex:0 0 auto;font-size:14px;font-weight:700;color:var(--red);font-family:var(--mono)">−${fmt(e.betrag)}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   if(flashId) flashRow('laus-row-'+flashId);
 }
 
