@@ -1133,7 +1133,7 @@ function renderEin(){
           if(_kOrig.zahlungsart && _kOrig.zahlungsart !== e.zahlungsart)
             _diffParts.push(_kOrig.zahlungsart+' → '+e.zahlungsart);
           const _diffStr = _diffParts.length ? ' · '+_diffParts.join(' · ') : ' · '+fd(_kOrig.datum);
-          _korrTag = '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:2px 8px;border-radius:4px;margin-left:6px">Korr. von: '+_kNr+fd(_kOrig.datum)+_diffStr+'</span>';
+          _korrTag = '<span style="font-size:10px;color:var(--green);">Korr. von: '+_kNr+fd(_kOrig.datum)+_diffStr+'</span>';
         } else {
           _korrTag = '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:2px 8px;border-radius:4px;margin-left:6px">Korrektur</span>';
         }
