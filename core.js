@@ -311,7 +311,7 @@ function nav(id, el){
   if(footer) footer.style.display = FORM_PAGES.includes(id) ? 'none' : '';
   if(id==='bericht') renderRep();
   if(id==='zahlungen') renderZ();
-  if(id==='dashboard') { renderDash(); if(typeof checkMahnungen==='function') try{checkMahnungen();}catch(e){} }
+  if(id==='dashboard') { renderDash(); }
   if(id==='notifications') { if(typeof renderNotificationsPage==='function') renderNotificationsPage(); }
   if(id==='journal') renderJournal();
   if(id==='prognose') renderProg();

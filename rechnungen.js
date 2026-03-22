@@ -1940,6 +1940,8 @@ function _mahnFaellig(r) {
   return diff >= 7;
 }
 
+let _mahnLastState = null; // отслеживаем состояние чтобы не дёргать анимацию лишний раз
+
 function checkMahnungen() {
   try {
     const banner    = document.getElementById('dash-mahnung-banner');
@@ -1996,10 +1998,13 @@ function checkMahnungen() {
       : [];
     const total = faellige.reduce((s,r) => s + (r.betrag||0), 0);
 
+    const newState = faellige.length > 0 ? 'alert' : 'ok';
+    const stateChanged = _mahnLastState !== newState;
+    _mahnLastState = newState;
+
     const _set = (alert) => {
       banner.classList.toggle('state-alert', alert);
       banner.classList.toggle('state-ok', !alert);
-      // Цвета
       const clr  = alert ? 'var(--red)'   : 'var(--green)';
       const bg   = alert ? 'var(--rdim,#fef2f2)' : 'var(--gdim,#f0fdf4)';
       const bord = alert ? 'var(--red)'   : 'var(--green)';
@@ -2010,10 +2015,12 @@ function checkMahnungen() {
       if (titleEl) { titleEl.style.color = clr; }
       if (arrowEl) { arrowEl.style.color = clr; arrowEl.style.display = alert ? '' : 'none'; }
       if (pulseEl) { pulseEl.style.display = alert ? 'block' : 'none'; }
-      // Анимация входа при смене состояния
-      banner.style.animation = 'none';
-      void banner.offsetWidth;
-      banner.style.animation = 'mahnung-slide-in .35s ease both';
+      // Анимация ТОЛЬКО при реальной смене состояния
+      if (stateChanged) {
+        banner.style.animation = 'none';
+        void banner.offsetWidth;
+        banner.style.animation = 'mahnung-slide-in .35s ease both';
+      }
     };
 
     if (!faellige.length) {
