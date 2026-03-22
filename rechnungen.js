@@ -292,22 +292,6 @@ function _editRechAsNew(orig) {
 }
 
 // Ausstellen: Entwurf → Offen
-async function rechAusstellen(id) {
-  const r = data.rechnungen.find(x => x.id === id);
-  if (!r || r.status !== 'entwurf') return;
-  const ok = await appConfirm(
-    `Rechnung ${r.nr} an ${r.kunde||'Kunde'} ausstellen?
-
-Danach gilt GoBD — Änderungen nur noch per Storno möglich.`,
-    {title:'Rechnung ausstellen', icon:'📄', okLabel:'Ja, ausstellen', cancelLabel:'Abbrechen'}
-  );
-  if (!ok) return;
-  r.status = 'offen';
-  sbSaveRechnung(r);
-  sbLogRechnung(r, 'ausgestellt', {status:'entwurf'}, {status:'offen'});
-  renderRech();
-  toast(`✓ Rechnung ${r.nr} ausgestellt`, 'ok');
-}
 
 async function editRech(id){
   const r=data.rechnungen.find(x=>x.id===id);

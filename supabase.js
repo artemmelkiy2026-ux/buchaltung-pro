@@ -340,7 +340,7 @@ async function sbSaveKunde(k) {
 }
 async function sbDeleteKunde(id) {
   if (!currentUser) return;
-  await sb.from('kunden').delete().eq('id',id).eq('user_id',currentUser.id);
+  try { await sb.from('kunden').delete().eq('id',id).eq('user_id',currentUser.id); } catch(e) { console.error('[sbDeleteKunde]', e); }
 }
 
 // ── PRODUKTE ──────────────────────────────────────────────────────────────
@@ -547,7 +547,7 @@ async function sbSaveVorlage(v) {
 
 async function sbDeleteVorlage(id) {
   if (!currentUser) return;
-  await sb.from('rech_vorlagen').delete().eq('id', id).eq('user_id', currentUser.id);
+  try { await sb.from('rech_vorlagen').delete().eq('id', id).eq('user_id', currentUser.id); } catch(e) { console.error('[sbDeleteVorlage]', e); }
 }
 
 async function sbDeleteRechnung(id) {
@@ -563,7 +563,7 @@ async function sbSaveWied(w) {
     if(error) console.error('sbSaveWied error:', error, 'payload:', payload);
   } catch(e) { console.error('sbSaveWied exception:', e); }
 }
-async function sbDeleteWied(id)    { if(!currentUser) return; await sb.from('wiederkehrend').delete().eq('id',id).eq('user_id',currentUser.id); }
+async function sbDeleteWied(id)    { if(!currentUser) return; try { await sb.from('wiederkehrend').delete().eq('id',id).eq('user_id',currentUser.id); } catch(e) { console.error('[sbDeleteWied]', e); } }
 async function sbSaveUstMode(j,m)  { if(!currentUser) return; await sb.from('ust_mode').upsert({user_id:currentUser.id,jahr:j,mode:m},{onConflict:'user_id,jahr'}); }
 async function sbSaveUstEintrag(e) {
   if (!currentUser) return;

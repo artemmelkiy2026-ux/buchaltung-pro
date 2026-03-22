@@ -21,6 +21,9 @@ function isMob(){return window.innerWidth<=768}
 function sum(arr,t){return arr.filter(e=>e.typ===t).reduce((s,e)=>s+(parseFloat(e.betrag)||0),0)}
 
 // ── USt-Modus (нужен dashboard.js и другим модулям) ──────────────────────
+// ── Konstanten (GoBD / UStG) ────────────────────────────────────────────────
+const KU_LIMIT_GRENZE = 25000; // §19 UStG Kleinunternehmergrenze
+
 function getUstModeForYear(yr){
   if(!yr) yr = new Date().getFullYear()+'';
   return (typeof data !== 'undefined' && data.ustModeByYear ? data.ustModeByYear[yr] : null) || '§19';
