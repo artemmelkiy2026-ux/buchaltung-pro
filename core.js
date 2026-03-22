@@ -219,6 +219,8 @@ function appInit(){
   },800);
   // Erneut nach 3s prüfen (langsame Verbindungen)
   setTimeout(()=>{ if(typeof checkMahnungen==='function') try{checkMahnungen();}catch(e){} },3000);
+  // Уведомления
+  setTimeout(()=>{ if(typeof refreshNotifications==='function') refreshNotifications(); },1500);
 }
 
 function buildYearFilters(){
@@ -301,6 +303,7 @@ function nav(id, el){
   if(id==='bericht') renderRep();
   if(id==='zahlungen') renderZ();
   if(id==='dashboard') { renderDash(); if(typeof checkMahnungen==='function') try{checkMahnungen();}catch(e){} }
+  if(id==='notifications') { if(typeof renderNotificationsPage==='function') renderNotificationsPage(); }
   if(id==='journal') renderJournal();
   if(id==='prognose') renderProg();
   if(id==='kategorien') renderKat();

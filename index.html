@@ -168,6 +168,11 @@
   <div style="border-top:1px solid var(--border);margin:4px 0"></div>
 
   <!-- Profil & Abmelden -->
+  <div class="mob-drawer-group-header" onclick="closeMobDrawer();nav('notifications',null)" style="color:var(--sub);position:relative">
+    <span class="mob-drawer-group-icon"><i class="fas fa-bell"></i></span>
+    <span>Benachrichtigungen</span>
+    <span id="notif-badge-mob" style="display:none;background:#dc2626;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;align-items:center;justify-content:center;padding:0 4px;margin-left:auto"></span>
+  </div>
   <div class="mob-drawer-group-header" onclick="closeMobDrawer();location.href='profile.html'" style="color:var(--sub)">
     <span class="mob-drawer-group-icon"><i class="fas fa-user"></i></span>
     <span>Profil & Einstellungen</span>
@@ -266,6 +271,10 @@
 
   <!-- Bottom: Profile & Logout -->
   <div style="padding:10px 8px;display:flex;flex-direction:column;gap:2px">
+    <div class="nav-item" onclick="nav('notifications',this)" style="font-size:14px;color:var(--sub);position:relative" id="nav-notifications">
+      <span class="ic"><i class="fas fa-bell"></i></span> Benachrichtigungen
+      <span id="notif-badge" style="display:none;position:absolute;top:6px;right:10px;background:#dc2626;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;align-items:center;justify-content:center;padding:0 4px"></span>
+    </div>
     <div class="nav-item" onclick="location.href='profile.html'" style="font-size:14px;color:var(--sub)">
       <span class="ic"><i class="fas fa-user"></i></span> Profil
     </div>
@@ -360,6 +369,25 @@
   </div>
 
 
+</div>
+</div>
+
+
+<!-- ── NOTIFICATIONS ── -->
+<div class="page" id="p-notifications">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title"><i class="fas fa-bell" style="color:var(--blue);margin-right:8px"></i>Benachrichtigungen</div>
+      <div class="ph-sub">Systemmeldungen &amp; Nachrichten</div>
+    </div>
+    <div class="ph-right">
+      <button class="btn" onclick="refreshNotifications()" style="font-size:12px">
+        <i class="fas fa-sync-alt"></i> Aktualisieren
+      </button>
+    </div>
+  </div>
+  <div id="notif-list" style="display:flex;flex-direction:column;gap:10px;max-width:680px"></div>
 </div>
 </div>
 
@@ -2482,6 +2510,7 @@
   </div>
 </div>
 
+<script src="notifications.js"></script>
 <script src="select_mode.js"></script>
 <script src="vorschau.js"></script>
 <script src="ki-audit.js"></script>
