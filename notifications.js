@@ -202,13 +202,16 @@ function renderNotificationsPage() {
     info:    { bg:'var(--s2)', border:'var(--border)', icon:'var(--blue)', badge:'var(--blue)' },
   };
 
-  container.innerHTML = _notifData.map(n => {
-    const c = colors[n.type] || colors.info;
+  // Сохраняем actions по индексу чтобы не вставлять функции в HTML
+  window._notifActions = _notifData.map(n => n.action || null);
+
+  container.innerHTML = _notifData.map((n, idx) => {
+    const cl = colors[n.type] || colors.info;
     const date = n.created_at ? (n.created_at.length > 10 ? fd(n.created_at.split('T')[0]) : fd(n.created_at)) : '';
     return `
-      <div onclick="${n.action ? '('+n.action.toString()+')()' : ''}" 
-           style="background:${c.bg};border:1px solid ${c.border};border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start;${n.action ? 'cursor:pointer' : ''}">
-        <div style="width:38px;height:38px;border-radius:10px;background:${c.badge};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <div data-notif-idx="${idx}"
+           style="background:${cl.bg};border:1px solid ${cl.border};border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start;${n.action ? 'cursor:pointer' : ''}">
+        <div style="width:38px;height:38px;border-radius:10px;background:${cl.badge};display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <i class="fas ${n.icon}" style="color:#fff;font-size:15px"></i>
         </div>
         <div style="flex:1;min-width:0">
@@ -222,4 +225,12 @@ function renderNotificationsPage() {
         ${n.action ? '<i class="fas fa-chevron-right" style="color:var(--sub);opacity:.4;flex-shrink:0;margin-top:2px"></i>' : ''}
       </div>`;
   }).join('');
+
+  // Делегированный обработчик кликов
+  container.onclick = (e) => {
+    const card = e.target.closest('[data-notif-idx]');
+    if (!card) return;
+    const action = window._notifActions?.[+card.dataset.notifIdx];
+    if (typeof action === 'function') action();
+  };
 }
