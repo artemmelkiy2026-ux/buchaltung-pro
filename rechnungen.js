@@ -637,9 +637,7 @@ async function rechBezahlt(id){
 
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
-    // Рендерим сразу и ещё раз через 300ms на случай задержки DOM
     renderAll();
-    setTimeout(() => renderAll(), 300);
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
