@@ -237,16 +237,32 @@ function flashRow(rowId) {
 function openEditFromList(id) {
   const entry = (data.eintraege||[]).find(e=>e.id===id);
   if(!entry) return;
+
   // Rechnung-Einnahme → Info-Sheet mit Link zur Rechnung
+  // Прямой флаг или по belegnr (для старых записей)
   if(entry._fromRechnung && entry._rechnungId){
     showRechEintragInfo(entry._rechnungId);
     return;
   }
+  const _rechMatch = !entry.is_storno && entry.typ==='Einnahme' && entry.belegnr
+    ? (data.rechnungen||[]).find(r=>r.nr===entry.belegnr)
+    : null;
+  if(_rechMatch){
+    showRechEintragInfo(_rechMatch.id);
+    return;
+  }
+
   // Wiederkehrend-Eintrag → Info-Sheet mit Link zu Wiederkehrende Zahlungen
+  // Прямой флаг или по notiz+beschreibung (для старых записей)
   if(entry._fromWiederkehrend && entry._wiederkehrendId){
     showWiedEintragInfo(entry._wiederkehrendId);
     return;
   }
+  if(entry.notiz === 'Wiederkehrend' && entry.beschreibung){
+    const _wiedMatch = (data.wiederkehrend||[]).find(w=>w.bezeichnung===entry.beschreibung);
+    if(_wiedMatch){ showWiedEintragInfo(_wiedMatch.id); return; }
+  }
+
   // Stornierte / Gegenbuchungen — nur Detail anzeigen, kein Editor
   if(entry.is_storno || entry._storniert){
     showEintragDetail(id);
@@ -1096,12 +1112,17 @@ function renderEin(){
       // Виртуальная запись из Rechnung — замок
       const _isRechVirt = e._fromRechnung || (e.id && e.id.startsWith('__rech__'));
       // Rechnung / Wiederkehrend: onClick öffnet Info-Sheet mit Link zum Ursprung
-      const _isWiedVirt = !!(e._fromWiederkehrend && e._wiederkehrendId);
+      // Fallback для старых записей без флага: по notiz + beschreibung
+      const _wiedFallback = !e._fromWiederkehrend && e.notiz==='Wiederkehrend' && e.beschreibung
+        ? (data.wiederkehrend||[]).find(w=>w.bezeichnung===e.beschreibung)
+        : null;
+      const _isWiedVirt = !!(e._fromWiederkehrend && e._wiederkehrendId) || !!_wiedFallback;
+      const _wiedClickId = e._wiederkehrendId || (_wiedFallback?.id) || '';
       const _rechClickId = _isRechVirt ? (e._rechnungId || e.id) : e.id;
       const _clickAttr = _isRechVirt
         ? `onclick="showRechEintragInfo('${_rechClickId}')"`
         : _isWiedVirt
-          ? `onclick="showWiedEintragInfo('${e._wiederkehrendId}')"`
+          ? `onclick="showWiedEintragInfo('${_wiedClickId}')"`
           : (st ? '' : `onclick="showEintragDetail('${e.id}')"`); 
       const _mobBtn = isMob() && !isReadonly && !_isRechVirt
         ? _moreBtn([

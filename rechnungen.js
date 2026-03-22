@@ -144,7 +144,7 @@ function renderRech(){
               : _moreBtn([
                   ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
                   ...(r.status==='entwurf' ? [{icon:'fa-paper-plane', label:'Ausstellen', action:()=>rechAusstellen(r.id)}] : [{icon:'fa-print', label:'Drucken / PDF', action:()=>druckRechnungId(r.id)}]),
-                  {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
+                  {icon:'fa-file-alt', label:'Als Vorlage',    action:()=>rechAlsVorlage(r.id)},
                   {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
                   {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
                 ])) : `<div class="rech-desktop-actions">
@@ -156,7 +156,7 @@ function renderRech(){
                 ${r.status==='entwurf' ? `<button class="rda-btn rda-green" onclick="rechAusstellen('${r.id}')" title="Ausstellen"><i class="fas fa-paper-plane"></i></button>` : ''}
                 <button class="rda-btn" onclick="vorschauRechnungId('${r.id}')" title="HTML-Vorschau"><i class="fas fa-eye"></i></button>
                 ${r.status!=='entwurf' ? `<button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>` : ''}
-                <button class="rda-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
+                <button class="rda-btn" onclick="rechAlsVorlage('${r.id}')" title="Als Vorlage speichern"><i class="fas fa-file-alt"></i></button>
                 <button class="rda-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
                 <button class="rda-btn rda-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
               `}
@@ -295,9 +295,13 @@ Danach gilt GoBD — Änderungen nur noch per Storno möglich.`,
 async function editRech(id){
   const r=data.rechnungen.find(x=>x.id===id);
   if(!r)return;
-  // Stornierte Rechnungen sind unveränderbar (GoBD §146)
+  // Stornierte und bezahlte Rechnungen sind unveränderbar
   if(r.status==='storniert' || r._storniert){
     toast('Stornierte Rechnungen können nicht bearbeitet werden (GoBD §146)','err');
+    return;
+  }
+  if(r.status==='bezahlt'){
+    showRechDetail(r.id);
     return;
   }
   // Черновик — редактируем напрямую
@@ -1066,17 +1070,19 @@ function druckRechnung(){
 function vorschauRechnungId(id) {
   const r = data.rechnungen.find(x => x.id === id);
   if (!r) return;
-  const html = buildRechnungHTML(r);
+  // Используем _buildRechnungHTML — красивая форма как для PDF/ZUGFeRD
+  const html = typeof _buildRechnungHTML === 'function'
+    ? _buildRechnungHTML(r)
+    : buildRechnungHTML(r);
   const modal = document.getElementById('vorschau-modal');
   const frame = document.getElementById('vorschau-frame');
   if (!modal || !frame) {
-    // Fallback — новое окно
     const win = window.open('', '_blank', 'width=900,height=700');
     win.document.write(html);
     win.document.close();
     return;
   }
-  // Обновляем заголовок модала
+  // Заголовок модала
   const titleEl = modal.querySelector('.fas.fa-eye')?.parentElement;
   if (titleEl) titleEl.innerHTML = '<i class="fas fa-eye" style="color:var(--blue)"></i> Vorschau — Rechnung ' + (r.nr || '');
   frame.srcdoc = html;
@@ -1280,7 +1286,10 @@ function firmaVorschauRechnung() {
     ],
   };
 
-  const html = buildRechnungHTML(demoR);
+  // Используем красивый шаблон _buildRechnungHTML (как для PDF)
+  const html = typeof _buildRechnungHTML === 'function'
+    ? _buildRechnungHTML(demoR)
+    : buildRechnungHTML(demoR);
 
   // Восстанавливаем оригинальные данные
   if (_backup) localStorage.setItem('bp_firma', _backup);
@@ -2092,8 +2101,9 @@ function showRechDetail(id) {
       ...(r.notiz ? [{ key: 'Notiz', val: r.notiz }] : []),
     ],
     buttons: [
-      { label: 'Bearbeiten',  icon: 'fa-edit',     primary: true, action: () => editRech(id) },
-      { label: 'Als Vorlage', icon: 'fa-file-alt',              action: () => { _closeDetailSheet(); rechAlsVorlage(id); } },
+      ...( r.status !== 'bezahlt' ? [{ label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editRech(id) }] : [] ),
+      { label: 'Als Vorlage',   icon: 'fa-file-alt',              action: () => { _closeDetailSheet(); rechAlsVorlage(id); } },
+      { label: 'Vorschau',      icon: 'fa-eye',                   action: () => { _closeDetailSheet(); vorschauRechnungId(id); } },
       // Löschen nur für nicht-stornierte — für stornierte ist showRechDetailReadonly zuständig
     ]
   });

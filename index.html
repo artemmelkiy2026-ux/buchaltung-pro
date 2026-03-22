@@ -112,6 +112,7 @@
     <div class="mob-drawer-group-body">
       <div class="mob-drawer-child" onclick="mobNavDrawer('angebote')">Angebote</div>
       <div class="mob-drawer-child" onclick="mobNavDrawer('rechnungen')">Rechnungen</div>
+      <div class="mob-drawer-child" onclick="mobNavDrawer('vorlagen')">Vorlagen</div>
     </div>
   </div>
 
@@ -223,6 +224,7 @@
   <div class="nav-group-children" id="auftraege-group">
     <div class="nav-item nav-child" onclick="nav('angebote',this)">Angebote</div>
     <div class="nav-item nav-child" onclick="nav('rechnungen',this)">Rechnungen</div>
+    <div class="nav-item nav-child" onclick="nav('vorlagen',this)"><i class="fas fa-file-alt" style="font-size:10px;margin-right:5px;opacity:.5"></i>Vorlagen</div>
   </div>
 
   <!-- Kontakte — раскрывающаяся группа -->
@@ -1279,6 +1281,7 @@
     <div class="ph-left"><div class="ph-title">Rechnungen</div><div class="ph-sub">Rechnungen erstellen · Zahlungsstatus verfolgen</div></div>
     <div class="ph-right">
       <button class="btn rech-hdr-btn" onclick="openFirmaModal()" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-building"></i><span class="rech-hdr-txt"> Firmenprofil</span></button>
+      <button class="btn rech-hdr-btn" onclick="nav('vorlagen',null)" style="background:var(--s2);border:1px solid var(--border)"><i class="fas fa-file-alt"></i><span class="rech-hdr-txt"> Vorlagen</span></button>
       <button class="btn primary rech-hdr-btn" onclick="openRechModal()"><i class="fas fa-plus"></i><span class="rech-hdr-txt"> Rechnung erstellen</span></button>
     </div>
   </div>

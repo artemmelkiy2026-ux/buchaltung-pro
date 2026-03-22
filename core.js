@@ -146,6 +146,7 @@ function openNavGroupIfNeeded(id) {
     'angebote-form': 'auftraege-group',
     'rechnungen':    'auftraege-group',
     'rechnungen-form':'auftraege-group',
+    'vorlagen':      'auftraege-group',
     'kunden':        'kontakte-group',
     'produkte':      'kontakte-group',
     'bericht':       'auswertung-group',
