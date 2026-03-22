@@ -1151,7 +1151,7 @@ function renderEin(){
               +'<div class="ein-row-cat">'+_catLine+'</div>'
               +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
                 +(_isRechVirt
-                  ? '<span style="font-size:11px;color:var(--sub)"><i class="fas fa-lock" style="font-size:9px"></i> Rechnung</span>'
+                  ? '<span style="font-size:13px;color:var(--sub);opacity:.5"><i class="fas fa-lock"></i></span>'
                   : st
                     ? (e.is_storno
                         ? '<span style="font-size:10px;color:var(--sub);padding:2px 6px;background:var(--rdim);border-radius:4px;opacity:.7">Storniert</span>'
