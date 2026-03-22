@@ -1113,8 +1113,17 @@ function renderEin(){
       if(isKorr){
         const _kOrig = data.eintraege.find(x=>x.id===e.korrektur_von);
         if(_kOrig){
-          const _kNr = _kOrig.belegnr ? ' Nr.'+_kOrig.belegnr+' ·' : '';
-          _korrTag = '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:2px 8px;border-radius:4px;margin-left:6px">Korr. von:'+_kNr+' '+fd(_kOrig.datum)+' · '+fmt(_kOrig.betrag)+' €</span>';
+          const _kNr = _kOrig.belegnr ? 'Nr.'+_kOrig.belegnr+' · ' : '';
+          // Показываем что изменилось: сумма и/или категория
+          const _diffParts = [];
+          if(_kOrig.betrag !== e.betrag)
+            _diffParts.push(fmt(_kOrig.betrag)+' → '+fmt(e.betrag));
+          if(_kOrig.kategorie && _kOrig.kategorie !== e.kategorie)
+            _diffParts.push(_kOrig.kategorie+' → '+e.kategorie);
+          if(_kOrig.zahlungsart && _kOrig.zahlungsart !== e.zahlungsart)
+            _diffParts.push(_kOrig.zahlungsart+' → '+e.zahlungsart);
+          const _diffStr = _diffParts.length ? ' · '+_diffParts.join(' · ') : ' · '+fd(_kOrig.datum);
+          _korrTag = '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:2px 8px;border-radius:4px;margin-left:6px">Korr. von: '+_kNr+fd(_kOrig.datum)+_diffStr+'</span>';
         } else {
           _korrTag = '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:2px 8px;border-radius:4px;margin-left:6px">Korrektur</span>';
         }
