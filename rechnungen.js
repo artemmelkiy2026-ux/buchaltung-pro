@@ -627,22 +627,24 @@ async function rechBezahlt(id){
   r.status='bezahlt';
   sbSaveRechnung(r);
   const newE = _buchRechnungAlsEinnahme(r);
+  // Сбрасываем фильтры Einträge чтобы новая запись точно была видна
+  const _curYr = new Date().getFullYear()+'';
+  const _fjEl  = document.getElementById('f-jahr');
+  const _fmEl  = document.getElementById('f-mon');
+  if(_fjEl) _fjEl.value = _curYr;
+  if(_fmEl) _fmEl.value = 'Alle';
+  if(typeof einPage !== 'undefined') einPage = 1;
+
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
-    // Сбрасываем фильтры Einträge чтобы новая запись точно была видна
-    const _curYr = new Date().getFullYear()+'';
-    const _fjEl  = document.getElementById('f-jahr');
-    const _fmEl  = document.getElementById('f-mon');
-    if(_fjEl) _fjEl.value = _curYr;
-    if(_fmEl) _fmEl.value = 'Alle';
-    // Сбрасываем на первую страницу
-    if(typeof einPage !== 'undefined') einPage = 1;
+    // Рендерим сразу и ещё раз через 300ms на случай задержки DOM
     renderAll();
+    setTimeout(() => renderAll(), 300);
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
-    renderRech();
+    renderAll();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
   checkMahnungen();
