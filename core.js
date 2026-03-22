@@ -267,10 +267,14 @@ function rechAlsEinnahmen(filterDatum) {
     .filter(r => {
       // Kein echter Einnahme-Eintrag für diese Rechnung vorhanden
       const hat = aktiveE.some(e =>
-        e.typ === 'Einnahme' &&
-        e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`)
+        e.typ === 'Einnahme' && (
+          (e.beschreibung && r.nr && e.beschreibung.includes(`Rechnung ${r.nr}:`)) ||
+          (e.belegnr && r.nr && e.belegnr === r.nr) ||
+          (e._rechnungId && e._rechnungId === r.id)
+        )
       );
       if (hat) return false;
+      if (!r.nr || r.nr.trim() === '') return false; // Entwurf ohne Nr — kein virtueller Eintrag
       if (filterDatum && r.datum && !r.datum.startsWith(filterDatum)) return false;
       return true;
     })
