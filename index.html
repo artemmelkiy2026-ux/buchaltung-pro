@@ -390,13 +390,52 @@
 
   <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
 
-    <!-- Левая колонка — список -->
-    <div id="notif-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <!-- Левая колонка — фильтры + список -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+
+      <!-- Фильтр-кнопки -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="notif-filter-all"
+          onclick="setNotifFilter('all')"
+          style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+                 background:var(--blue);color:#fff;font-size:12px;font-weight:700;cursor:pointer">
+          Alle
+        </button>
+        <button id="notif-filter-danger"
+          onclick="setNotifFilter('danger')"
+          style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer">
+          <i class="fas fa-fire" style="font-size:10px;margin-right:4px"></i>Dringend
+        </button>
+        <button id="notif-filter-warning"
+          onclick="setNotifFilter('warning')"
+          style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer">
+          <i class="fas fa-exclamation-triangle" style="font-size:10px;margin-right:4px"></i>Warnung
+        </button>
+        <button id="notif-filter-admin"
+          onclick="setNotifFilter('admin')"
+          style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer">
+          <i class="fas fa-shield-alt" style="font-size:10px;margin-right:4px"></i>MelaLogic
+        </button>
+        <button id="notif-filter-archive"
+          onclick="setNotifFilter('archive')"
+          style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer">
+          <i class="fas fa-archive" style="font-size:10px;margin-right:4px"></i>Archiv
+        </button>
+      </div>
+
+      <!-- Список -->
+      <div id="notif-list" style="display:flex;flex-direction:column;gap:10px"></div>
+
+    </div>
 
     <!-- Правая колонка — статус системы -->
     <div style="display:flex;flex-direction:column;gap:10px;position:sticky;top:20px">
 
-      <!-- Статус последнего обновления -->
+      <!-- Системстатус -->
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:16px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Systemstatus</div>
         <div id="notif-status-rows" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -405,26 +444,46 @@
         </div>
       </div>
 
-      <!-- Счётчики -->
+      <!-- Счётчики — кликабельные фильтры -->
       <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:16px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sub);margin-bottom:12px">Übersicht</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="background:var(--s2);border-radius:var(--r);padding:10px;text-align:center">
+
+          <div onclick="setNotifFilter('all')"
+               style="background:var(--s2);border-radius:var(--r);padding:10px;text-align:center;cursor:pointer;transition:opacity .15s"
+               onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
             <div style="font-size:22px;font-weight:800;color:var(--text)" id="notif-count-total">—</div>
             <div style="font-size:10px;color:var(--sub);margin-top:2px">Gesamt</div>
           </div>
-          <div style="background:var(--rdim);border-radius:var(--r);padding:10px;text-align:center">
+
+          <div onclick="setNotifFilter('danger')"
+               style="background:var(--rdim);border-radius:var(--r);padding:10px;text-align:center;cursor:pointer;transition:opacity .15s"
+               onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
             <div style="font-size:22px;font-weight:800;color:var(--red)" id="notif-count-urgent">—</div>
             <div style="font-size:10px;color:var(--sub);margin-top:2px">Dringend</div>
           </div>
-          <div style="background:var(--ydim,#fef9c3);border-radius:var(--r);padding:10px;text-align:center">
+
+          <div onclick="setNotifFilter('warning')"
+               style="background:var(--ydim,#fef9c3);border-radius:var(--r);padding:10px;text-align:center;cursor:pointer;transition:opacity .15s"
+               onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
             <div style="font-size:22px;font-weight:800;color:var(--yellow,#ca8a04)" id="notif-count-warn">—</div>
             <div style="font-size:10px;color:var(--sub);margin-top:2px">Warnung</div>
           </div>
-          <div style="background:var(--bdim);border-radius:var(--r);padding:10px;text-align:center">
+
+          <div onclick="setNotifFilter('admin')"
+               style="background:var(--bdim);border-radius:var(--r);padding:10px;text-align:center;cursor:pointer;transition:opacity .15s"
+               onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
             <div style="font-size:22px;font-weight:800;color:var(--blue)" id="notif-count-admin">—</div>
             <div style="font-size:10px;color:var(--sub);margin-top:2px">MelaLogic</div>
           </div>
+
+          <div onclick="setNotifFilter('archive')"
+               style="background:var(--s2);border-radius:var(--r);padding:10px;text-align:center;cursor:pointer;transition:opacity .15s;grid-column:1/-1"
+               onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+            <div style="font-size:22px;font-weight:800;color:var(--sub)" id="notif-count-archive">—</div>
+            <div style="font-size:10px;color:var(--sub);margin-top:2px"><i class="fas fa-archive" style="font-size:9px;margin-right:3px"></i>Archiv</div>
+          </div>
+
         </div>
       </div>
 
