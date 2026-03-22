@@ -2004,7 +2004,21 @@ function showEintragDetail(id) {
   }
   const e = (data.eintraege||[]).find(x=>x.id===id);
   if (!e) return;
+
+  // Rechnung-Einnahme — перенаправляем в раздел Rechnungen
+  const _rechMatch = (!e.is_storno && e.typ==='Einnahme' && e.belegnr)
+    ? (data.rechnungen||[]).find(r=>r.nr===e.belegnr) : null;
+  if (e._fromRechnung && e._rechnungId) { showRechEintragInfo(e._rechnungId); return; }
+  if (_rechMatch) { showRechEintragInfo(_rechMatch.id); return; }
+
+  // Wiederkehrend — перенаправляем в раздел Wiederkehrende Zahlungen
+  const _wiedMatch = (!e.is_storno && e.notiz==='Wiederkehrend' && e.beschreibung)
+    ? (data.wiederkehrend||[]).find(w=>w.bezeichnung===e.beschreibung) : null;
+  if (e._fromWiederkehrend && e._wiederkehrendId) { showWiedEintragInfo(e._wiederkehrendId); return; }
+  if (_wiedMatch) { showWiedEintragInfo(_wiedMatch.id); return; }
+
   const isEin = e.typ==='Einnahme';
+  const isSt  = e.is_storno || e._storniert;
   showDetailSheet({
     title: `<span class="badge ${isEin?'b-ein':'b-aus'}">${isEin?'<i class="fas fa-arrow-up" style="color:var(--green)"></i> Einnahme':'<i class="fas fa-arrow-down" style="color:var(--red)"></i> Ausgabe'}</span>`,
     rows: [
@@ -2013,10 +2027,10 @@ function showEintragDetail(id) {
       { key: 'Kategorie',   val: e.kategorie||'—' },
       { key: 'Beschreibung',val: e.beschreibung||'—' },
       { key: 'Zahlungsart', val: `<span class="badge ${ZBADGE[e.zahlungsart]||''}">${e.zahlungsart||'—'}</span>` },
-      ...(e.notiz  ? [{ key: 'Notiz',   val: e.notiz }] : []),
+      ...(e.notiz  ? [{ key: 'Notiz',    val: e.notiz }] : []),
       ...(e.belegnr? [{ key: 'Beleg-Nr.',val: e.belegnr }] : []),
     ],
-    buttons: [
+    buttons: isSt ? [] : [
       { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editE(null, id) },
       { label: 'Stornieren', icon: 'fa-times', danger: true, action: () => delE({stopPropagation:()=>{}}, id) },
     ]
