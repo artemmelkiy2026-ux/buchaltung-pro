@@ -506,15 +506,15 @@ function renderCalmBanners() {
         from { width:0 }
       }
       .calm-card {
-        animation: calm-in .5s cubic-bezier(.22,.68,0,1.2) both;
         transition: transform .18s, box-shadow .18s;
         cursor: default;
       }
       .calm-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.22) !important; }
-      .calm-card:nth-child(1) { animation-delay: 0ms; }
-      .calm-card:nth-child(2) { animation-delay: 80ms; }
-      .calm-card:nth-child(3) { animation-delay: 160ms; }
-      .calm-card:nth-child(4) { animation-delay: 240ms; }
+      .calm-banners-init .calm-card { animation: calm-in .5s cubic-bezier(.22,.68,0,1.2) both; }
+      .calm-banners-init .calm-card:nth-child(1) { animation-delay: 0ms; }
+      .calm-banners-init .calm-card:nth-child(2) { animation-delay: 80ms; }
+      .calm-banners-init .calm-card:nth-child(3) { animation-delay: 160ms; }
+      .calm-banners-init .calm-card:nth-child(4) { animation-delay: 240ms; }
     `;
     document.head.appendChild(style);
   }
@@ -651,6 +651,13 @@ function renderCalmBanners() {
     card(c2Grad, c2Icon, c2Label, c2Val, c2Title, c2Sub, c2Pulse, c2Bar) +
     card(resGrad, resIcon, resLabel, resVal, resTitle, resSub, resPulse) +
     card(trendGrad, trendIcon, 'Gewinn Trend', trendVal, trendTitle, trendSub, trendPulse);
+
+  // Анимация только при первой загрузке
+  if (!window._calmAnimDone) {
+    window._calmAnimDone = true;
+    wrap.classList.add('calm-banners-init');
+    setTimeout(() => wrap.classList.remove('calm-banners-init'), 1200);
+  }
 }
 
 
