@@ -91,6 +91,7 @@ window.addEventListener('supabase-ready', () => {
   if (!data.wiederkehrend) data.wiederkehrend = [];
   if (!data.rechnungenLog) data.rechnungenLog = [];
   if (!data.fahrtenbuch) data.fahrtenbuch = [];
+  if (!data.vorlagen)    data.vorlagen = [];
   // Migrate old ustMode
   if (data.ustMode) {
     const oldMode = data.ustMode;
@@ -325,6 +326,7 @@ function nav(id, el){
   if(id==='ust') renderUst();
   if(id==='ki-audit') initKiAudit();
   if(id==='wiederkehrend') renderWied();
+  if(id==='vorlagen') renderVorlagen();
   if(id==='fahrtenbuch') initFahrtenbuch();
   if(id==='eintraege') renderEin();
   if(id==='neu') updateNeuToolbar(false);

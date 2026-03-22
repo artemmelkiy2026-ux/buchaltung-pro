@@ -2516,6 +2516,28 @@ input, select, textarea {
 }
 
 /* ── Единая пагинация — фиксированная ширина, без сдвигов ── */
+/* ── VORLAGEN ────────────────────────────────────────────────────────────── */
+.vorl-card{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);
+  padding:14px 16px;transition:background .15s,box-shadow .15s;
+}
+.vorl-card:hover{ background:var(--s2);box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.vorl-card-left{ display:flex;align-items:center;gap:12px;flex:1;min-width:0; }
+.vorl-card-avatar{
+  width:40px;height:40px;border-radius:var(--r);flex-shrink:0;
+  background:var(--bdim);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.vorl-card-info{ flex:1;min-width:0; }
+.vorl-card-name{ font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.vorl-card-meta{ display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--sub); }
+.vorl-card-meta span{ display:flex;align-items:center;gap:3px; }
+.vorl-card-right{ display:flex;align-items:center;gap:10px;flex-shrink:0; }
+.vorl-card-betrag{ font-size:15px;font-weight:700;font-family:var(--mono);color:var(--blue);white-space:nowrap; }
+.vorl-card-actions{ display:flex;align-items:center;gap:4px; }
+
 .rech-card-storniert{
   opacity:0.5;
   filter:grayscale(30%);

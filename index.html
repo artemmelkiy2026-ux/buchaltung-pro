@@ -398,31 +398,36 @@
         <button id="notif-filter-all"
           onclick="setNotifFilter('all')"
           style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
-                 background:var(--blue);color:#fff;font-size:12px;font-weight:700;cursor:pointer">
+                 background:var(--blue);color:#fff;font-size:12px;font-weight:600;
+                 cursor:pointer;white-space:nowrap;box-sizing:border-box">
           Alle
         </button>
         <button id="notif-filter-danger"
           onclick="setNotifFilter('danger')"
           style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
-                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer">
+                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:600;
+                 cursor:pointer;white-space:nowrap;box-sizing:border-box">
           <i class="fas fa-fire" style="font-size:10px;margin-right:4px"></i>Dringend
         </button>
         <button id="notif-filter-warning"
           onclick="setNotifFilter('warning')"
           style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
-                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer">
+                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:600;
+                 cursor:pointer;white-space:nowrap;box-sizing:border-box">
           <i class="fas fa-exclamation-triangle" style="font-size:10px;margin-right:4px"></i>Warnung
         </button>
         <button id="notif-filter-admin"
           onclick="setNotifFilter('admin')"
           style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
-                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer">
+                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:600;
+                 cursor:pointer;white-space:nowrap;box-sizing:border-box">
           <i class="fas fa-shield-alt" style="font-size:10px;margin-right:4px"></i>MelaLogic
         </button>
         <button id="notif-filter-archive"
           onclick="setNotifFilter('archive')"
           style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);
-                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:500;cursor:pointer">
+                 background:var(--s2);color:var(--sub);font-size:12px;font-weight:600;
+                 cursor:pointer;white-space:nowrap;box-sizing:border-box">
           <i class="fas fa-archive" style="font-size:10px;margin-right:4px"></i>Archiv
         </button>
       </div>
@@ -2358,6 +2363,27 @@
 
 
 <!-- ── RECHNUNGEN FORM ── -->
+<!-- VORLAGEN PAGE -->
+<div class="page" id="p-vorlagen">
+<div class="page-inner">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title"><i class="fas fa-file-alt" style="color:var(--blue);margin-right:8px"></i>Vorlagen</div>
+      <div class="ph-sub">Gespeicherte Rechnungsvorlagen — Rechnung in einem Klick erstellen</div>
+    </div>
+  </div>
+  <div id="vorl-empty" class="empty-state" style="display:none">
+    <div class="ei"><i class="fas fa-file-alt"></i></div>
+    <p>Keine Vorlagen gespeichert</p>
+    <p style="font-size:13px;color:var(--sub);margin-top:8px">
+      Öffne eine Rechnung und klicke auf
+      <i class="fas fa-file-alt"></i> <strong>Als Vorlage speichern</strong>
+    </p>
+  </div>
+  <div id="vorl-list" style="display:flex;flex-direction:column;gap:10px"></div>
+</div>
+</div>
+
 <div class="page" id="p-rechnungen-form">
   <!-- Sticky шапка -->
   <div class="ang-sticky-header">
@@ -2591,6 +2617,7 @@
 <script src="ui.js"></script>
 <script src="reports.js"></script>
 <script src="rechnungen.js"></script>
+<script src="vorlagen.js"></script>
 <script src="angebote.js"></script>
 <script src="produkte.js"></script>
 <script src="kunden.js"></script>

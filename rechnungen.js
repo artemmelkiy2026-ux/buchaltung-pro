@@ -1981,7 +1981,8 @@ function showRechDetail(id) {
       ...(r.notiz ? [{ key: 'Notiz', val: r.notiz }] : []),
     ],
     buttons: [
-      { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editRech(id) },
+      { label: 'Bearbeiten',  icon: 'fa-edit',     primary: true, action: () => editRech(id) },
+      { label: 'Als Vorlage', icon: 'fa-file-alt',              action: () => { _closeDetailSheet(); rechAlsVorlage(id); } },
       // Löschen nur für nicht-stornierte — für stornierte ist showRechDetailReadonly zuständig
     ]
   });

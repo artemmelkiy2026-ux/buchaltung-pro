@@ -64,7 +64,7 @@ async function sbLoadAll() {
   if (!currentUser) return null;
   const uid = currentUser.id;
   try {
-  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang, prod] = await Promise.all([
+  const [ein, kun, rech, rechPos, wied, ustM, ustE, ang, prod, vorl] = await Promise.all([
     sb.from('eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('kunden').select('*').eq('user_id', uid).order('name'),
     sb.from('rechnungen').select('*').eq('user_id', uid).order('datum', { ascending: false }),
@@ -74,6 +74,7 @@ async function sbLoadAll() {
     sb.from('ust_eintraege').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('angebote').select('*').eq('user_id', uid).order('datum', { ascending: false }),
     sb.from('produkte').select('*').eq('user_id', uid).order('name'),
+    sb.from('rech_vorlagen').select('*').eq('user_id', uid).order('created_at', { ascending: false }),
   ]);
   // Fahrtenbuch — separate query, table may not exist yet
   var fb = { data: null, error: null };
@@ -119,10 +120,11 @@ async function sbLoadAll() {
   const produkte = (prod && !prod.error && prod.data) ? prod.data.map(dbToProdukt) : [];
   const fahrtenbuch = (fb && !fb.error && fb.data) ? fb.data.map(dbToFahrt) : [];
   const fbAutosArr  = (fbAutos && !fbAutos.error && fbAutos.data) ? fbAutos.data.map(dbToAuto) : [];
-  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog, produkte, fahrtenbuch, fbAutos: fbAutosArr };
+  const vorlagen = await sbLoadVorlagen();
+  return { eintraege, kunden, rechnungen, angebote, wiederkehrend, ustModeByYear, ustEintraege, rechnungenLog, produkte, fahrtenbuch, fbAutos: fbAutosArr, vorlagen };
   } catch(err) {
     console.error('[sbLoadAll error]', err);
-    return { eintraege:[], kunden:[], rechnungen:[], angebote:[], wiederkehrend:[], ustModeByYear:{}, ustEintraege:[], rechnungenLog:[], produkte:[], fahrtenbuch:[] };
+    return { eintraege:[], kunden:[], rechnungen:[], angebote:[], wiederkehrend:[], ustModeByYear:{}, ustEintraege:[], rechnungenLog:[], produkte:[], fahrtenbuch:[], vorlagen:[] };
   }
 }
 
@@ -487,6 +489,67 @@ async function sbSaveRechnung(r) {
     if (pErr) console.error('Save pos:', pErr);
   }
 }
+// ── RECH-VORLAGEN ─────────────────────────────────────────────────────────
+async function sbLoadVorlagen() {
+  if (!currentUser) return [];
+  try {
+    const { data, error } = await sb
+      .from('rech_vorlagen')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(v => ({
+      id:          v.id,
+      name:        v.name        || '',
+      beschreibung:v.beschreibung|| '',
+      kunde:       v.kunde       || '',
+      adresse:     v.adresse     || '',
+      email:       v.email       || '',
+      tel:         v.tel         || '',
+      kategorie:   v.kategorie   || '',
+      zahlungsart: v.zahlungsart || 'Überweisung',
+      betrag:      parseFloat(v.betrag)    || 0,
+      netto:       parseFloat(v.netto)     || 0,
+      mwstRate:    parseFloat(v.mwst_rate) || 0,
+      notiz:       v.notiz       || '',
+      positionen:  Array.isArray(v.positionen) ? v.positionen : [],
+      created_at:  v.created_at,
+    }));
+  } catch(e) {
+    console.error('[Vorlagen] load error:', e);
+    return [];
+  }
+}
+
+async function sbSaveVorlage(v) {
+  if (!currentUser) return;
+  const { error } = await sb.from('rech_vorlagen').upsert({
+    id:           v.id,
+    user_id:      currentUser.id,
+    name:         v.name         || '',
+    beschreibung: v.beschreibung || '',
+    kunde:        v.kunde        || '',
+    adresse:      v.adresse      || '',
+    email:        v.email        || '',
+    tel:          v.tel          || '',
+    kategorie:    v.kategorie    || '',
+    zahlungsart:  v.zahlungsart  || 'Überweisung',
+    betrag:       v.betrag       || 0,
+    netto:        v.netto        || 0,
+    mwst_rate:    v.mwstRate     || 0,
+    notiz:        v.notiz        || '',
+    positionen:   v.positionen   || [],
+    updated_at:   new Date().toISOString(),
+  }, { onConflict: 'id' });
+  if (error) console.error('[Vorlagen] save error:', error);
+}
+
+async function sbDeleteVorlage(id) {
+  if (!currentUser) return;
+  await sb.from('rech_vorlagen').delete().eq('id', id).eq('user_id', currentUser.id);
+}
+
 async function sbDeleteRechnung(id) {
   if (!currentUser) return;
   await sb.from('rechnungen_pos').delete().eq('rechnung_id',id).eq('user_id',currentUser.id);
