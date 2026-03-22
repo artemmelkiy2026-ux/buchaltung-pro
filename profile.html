@@ -1125,6 +1125,15 @@ async function open2FASetup() {
   document.getElementById('twofa-verify-code').value = '';
 
   try {
+    // Удаляем незавершённые (unverified) факторы перед новой регистрацией
+    try {
+      const { data: existing } = await sb.auth.mfa.listFactors();
+      const unverified = (existing?.totp || []).filter(f => f.status !== 'verified');
+      for (const f of unverified) {
+        await sb.auth.mfa.unenroll({ factorId: f.id });
+      }
+    } catch(e) { /* игнорируем ошибки при очистке */ }
+
     const { data, error } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'MelaLogic Authenticator' });
     if (error) throw error;
 
