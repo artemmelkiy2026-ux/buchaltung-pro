@@ -1033,19 +1033,21 @@ function renderEin(){
     document.getElementById('e-tbody').innerHTML = pageEntries.map(e => {
       const isEin = e.typ==='Einnahme';
       const st    = e.is_storno||e._storniert;
+      // Korrektur-Einträge sind ebenfalls readonly (nicht nochmal stornierbar aus der Liste)
+      const isKorr    = !!e.korrektur_von;
+      const isReadonly = st || isKorr;
       const rowYr = e.datum.substring(0,4);
       const hasMwst = e.mwstBetrag>0||e.vorsteuerBet>0;
       const mwstVal = isEin?(e.mwstBetrag||0):(e.vorsteuerBet||0);
       const nettoVal= isEin?(e.nettoBetrag||e.betrag):(e.betrag-(e.vorsteuerBet||0));
       const mwstRate= e.mwstRate||e.vorsteuerRate||0;
-      // Storno label
+      // Storno/Korrektur Badge
       let stLbl='';
-      if(e.is_storno&&e.storno_of){
-        const orig=data.eintraege.find(x=>x.id===e.storno_of);
-        stLbl='<span class="badge-storno">● Storno</span>';
+      if(e.is_storno && e.storno_of){
+        stLbl='<span class="badge-storno">↩ Gegenbuchung</span>';
       } else if(st){
         stLbl='<span class="badge-storno">● Storniert</span>';
-      } else if(e.korrektur_von){
+      } else if(isKorr){
         stLbl='<span class="badge-korrektur">● Korrektur</span>';
       }
       const mwstBadge = showMwst&&hasMwst
@@ -1057,9 +1059,9 @@ function renderEin(){
       // Виртуальная запись из Rechnung — замок
       const _isRechVirt = e._fromRechnung || (e.id && e.id.startsWith('__rech__'));
       const _clickAttr = _isRechVirt
-        ? `onclick="showRechEintragInfo('${e.id}')"`
-        : (!st ? `onclick="showEintragDetail('${e.id}')"` : '');
-      const _mobBtn = isMob() && !st && !_isRechVirt
+        ? `onclick="showRechEintragInfo('\${e.id}')"`
+        : (st ? '' : `onclick="showEintragDetail('\${e.id}')"`); 
+      const _mobBtn = isMob() && !isReadonly && !_isRechVirt
         ? _moreBtn([
             {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
             {icon:'fa-times',  label:'Stornieren', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
@@ -1095,9 +1097,29 @@ function renderEin(){
 
       const _rechLock = _isRechVirt ? '<i class="fas fa-lock" style="color:var(--sub);font-size:10px;margin-left:6px;opacity:.6" title="Erstellt durch Rechnung"></i>' : '';
       const _rechTag  = _isRechVirt ? '<span style="font-size:10px;background:var(--bdim);color:var(--blue);padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600">Rechnung</span>' : '';
-      const _stornoTag = e.storno_von ? '<span style="font-size:10px;background:var(--rdim);color:var(--red);padding:1px 6px;border-radius:4px;margin-left:6px">→ Korr. von '+e.storno_von+'</span>' : '';
-      const _korrTag   = e.korrektur_von ? '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:1px 6px;border-radius:4px;margin-left:6px">Korrektur von '+e.korrektur_von+'</span>' : '';
-      const _rowStyle  = _isRechVirt ? 'cursor:pointer;opacity:.75' : (st ? 'cursor:default;opacity:.55' : 'cursor:pointer');
+      // Gegenbuchung: Link zum Originaleintrag
+      let _stornoTag = '';
+      if(e.is_storno && e.storno_of){
+        const _stOrig = data.eintraege.find(x=>x.id===e.storno_of);
+        if(_stOrig){
+          const _stNr = _stOrig.belegnr ? ' Nr.'+_stOrig.belegnr+' ·' : '';
+          _stornoTag = '<span style="font-size:10px;background:var(--rdim);color:var(--red);padding:2px 8px;border-radius:4px;margin-left:6px">↩ hebt auf:'+_stNr+' '+fd(_stOrig.datum)+'</span>';
+        }
+      }
+      // Korrektur-Eintrag: Link zum korrigierten Eintrag
+      let _korrTag = '';
+      if(isKorr){
+        const _kOrig = data.eintraege.find(x=>x.id===e.korrektur_von);
+        if(_kOrig){
+          const _kNr = _kOrig.belegnr ? ' Nr.'+_kOrig.belegnr+' ·' : '';
+          _korrTag = '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:2px 8px;border-radius:4px;margin-left:6px">Korr. von:'+_kNr+' '+fd(_kOrig.datum)+' · '+fmt(_kOrig.betrag)+' €</span>';
+        } else {
+          _korrTag = '<span style="font-size:10px;background:var(--gdim);color:var(--green);padding:2px 8px;border-radius:4px;margin-left:6px">Korrektur</span>';
+        }
+      }
+      // Gegenbuchungen stärker ausblenden als nur stornierte Originale
+      const _stOpacity = e.is_storno ? '.40' : '.55';
+      const _rowStyle  = _isRechVirt ? 'cursor:pointer;opacity:.75' : (st ? 'cursor:default;opacity:'+_stOpacity : 'cursor:pointer');
 
       return '<div class="ein-row'+(st?' ein-row-st':'')+(_isRechVirt?' ein-row-rech-virt':'')+'" '+_clickAttr+' style="'+_rowStyle+'">'
         +'<div class="ein-row-body">'
@@ -1117,11 +1139,15 @@ function renderEin(){
             +'<div class="ein-row-mid">'
               +'<div class="ein-row-cat">'+_catLine+'</div>'
               +'<div class="ein-row-actions" onclick="event.stopPropagation()">'
-                +(_isRechVirt ? '<span style="font-size:11px;color:var(--sub)"><i class="fas fa-lock" style="font-size:9px"></i> Rechnung</span>'
-                  : st ? '<span style="font-size:10px;color:var(--sub);padding:2px 6px;background:var(--rdim);border-radius:4px">Storniert</span>'
-                  : (isMob() ? _mobBtn
-                    : '<button class="rca-btn rca-edit" onclick="event.stopPropagation();editE(event,\''+e.id+'\')" title="Bearbeiten / Korrigieren"><i class="fas fa-edit"></i></button>'
-                    +'<button class="rca-btn rca-storno" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren (GoBD)"><i class="fas fa-undo-alt"></i></button>'))
+                +(_isRechVirt
+                  ? '<span style="font-size:11px;color:var(--sub)"><i class="fas fa-lock" style="font-size:9px"></i> Rechnung</span>'
+                  : st
+                    ? (e.is_storno
+                        ? '<span style="font-size:10px;color:var(--sub);padding:2px 6px;background:var(--rdim);border-radius:4px;opacity:.7">↩ Gegenbuchung</span>'
+                        : '<span style="font-size:10px;color:var(--sub);padding:2px 6px;background:var(--rdim);border-radius:4px">Storniert</span>')
+                    : (isMob() ? _mobBtn
+                      : '<button class="rca-btn rca-edit" onclick="event.stopPropagation();editE(event,\''+e.id+'\')" title="Bearbeiten / Korrigieren"><i class="fas fa-edit"></i></button>'
+                      +'<button class="rca-btn rca-storno" onclick="event.stopPropagation();delE(event,\''+e.id+'\')" title="Stornieren (GoBD)"><i class="fas fa-undo-alt"></i></button>'))
               +'</div>'
             +'</div>'
             +(_stLblFull ? '<div class="ein-row-tags">'+_stLblFull+'</div>' : '')
