@@ -494,8 +494,8 @@ function _buildRechnungHTML(r) {
   const firmaWeb    = f.web         || '';
   const firmaIban   = f.iban        || '';
   const firmaBic    = f.bic         || '';
-  const firmaStNr   = f.steuernummer|| '';
-  const firmaUstId  = f.ust_id      || '';
+  const firmaStNr   = f.steuernummer || f.steuernr || '';
+  const firmaUstId  = f.ust_id      || f.ustid    || '';
   // mwstMode из счёта, или из настроек USt по году счёта
   const rJahr = r.datum ? r.datum.substring(0,4) : new Date().getFullYear()+'';
   const resolvedMode = r.mwstMode || (typeof getUstModeForYear==='function' ? getUstModeForYear(rJahr) : '§19');
