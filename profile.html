@@ -143,7 +143,7 @@ body {
 }
 .modal-overlay.open { display:flex; }
 .modal {
-  background:var(--card);border-radius:10px;
+  background:var(--card);border-radius:6px 20px 0 0;
   width:100%;max-width:560px;padding:24px;
   animation:slideUp .3s ease;
   padding-bottom:calc(24px + env(safe-area-inset-bottom, 0));
@@ -271,7 +271,7 @@ body {
         </div>
         <i class="fa-solid fa-chevron-right setting-arrow"></i>
       </div>
-      <div class="setting-row" onclick="openModal('modal-password')">
+      <div class="setting-row" onclick="openPasswordModal()">
         <div class="setting-icon blue"><i class="fa-solid fa-lock"></i></div>
         <div class="setting-body">
           <div class="setting-label">Passwort ändern</div>
@@ -383,8 +383,8 @@ body {
 <div class="modal-overlay" id="modal-password">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h3><i class="fa-solid fa-lock" style="color:var(--blue);margin-right:8px"></i>Passwort ändern</h3>
-    <div class="field">
+    <h3 id="pwd-modal-title"><i class="fa-solid fa-lock" style="color:var(--blue);margin-right:8px"></i>Passwort ändern</h3>
+    <div class="field" id="old-pwd-wrap">
       <label>Aktuelles Passwort</label>
       <input type="password" id="old-pwd" placeholder="••••••••">
     </div>
@@ -658,18 +658,42 @@ async function changeEmail() {
 }
 
 // ── Смена пароля ───────────────────────────────────────────────────────────
+function openPasswordModal() {
+  const title    = document.getElementById('pwd-modal-title');
+  const oldWrap  = document.getElementById('old-pwd-wrap');
+  const oldPwdEl = document.getElementById('old-pwd');
+  if (window._isGoogleUser) {
+    if (title)   title.innerHTML = '<i class="fa-solid fa-lock" style="color:var(--blue);margin-right:8px"></i>Passwort festlegen';
+    if (oldWrap) oldWrap.style.display = 'none';
+    if (oldPwdEl) oldPwdEl.value = '__GOOGLE__';
+  } else {
+    if (title)   title.innerHTML = '<i class="fa-solid fa-lock" style="color:var(--blue);margin-right:8px"></i>Passwort ändern';
+    if (oldWrap) oldWrap.style.display = '';
+    if (oldPwdEl) oldPwdEl.value = '';
+  }
+  const n1 = document.getElementById('new-pwd');
+  const n2 = document.getElementById('new-pwd2');
+  const pm = document.getElementById('pwd-msg');
+  if(n1) n1.value = '';
+  if(n2) n2.value = '';
+  if(pm) pm.innerHTML = '';
+  openModal('modal-password');
+}
+
 async function changePassword() {
   const oldPwd = document.getElementById('old-pwd').value;
   const newPwd = document.getElementById('new-pwd').value;
   const newPwd2 = document.getElementById('new-pwd2').value;
 
-  if (!oldPwd || !newPwd || !newPwd2) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Alle Felder ausfüllen', 'error'); return; }
+  const isGoogle = window._isGoogleUser || oldPwd === '__GOOGLE__';
+  if (!isGoogle && !oldPwd) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Alle Felder ausfüllen', 'error'); return; }
+  if (!newPwd || !newPwd2) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Alle Felder ausfüllen', 'error'); return; }
   if (newPwd.length < 6) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Mindestens 6 Zeichen', 'error'); return; }
   if (newPwd !== newPwd2) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Passwörter stimmen nicht überein', 'error'); return; }
 
   // Проверяем старый пароль
   const { error: signInErr } = await sb.auth.signInWithPassword({ email: currentEmail, password: oldPwd });
-  if (signInErr) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Aktuelles Passwort falsch', 'error'); return; }
+  if (!isGoogle && signInErr) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> Aktuelles Passwort falsch', 'error'); return; }
 
   const { error } = await sb.auth.updateUser({ password: newPwd });
   if (error) { setMsg('pwd-msg', '<i class="fas fa-times-circle" style="color:var(--red)"></i> ' + error.message, 'error'); return; }
@@ -682,7 +706,12 @@ async function changePassword() {
     localStorage.setItem('bp_bio_login', JSON.stringify(parsed));
   }
 
-  setMsg('pwd-msg', '<i class="fas fa-check-circle" style="color:var(--green)"></i> Passwort geändert', 'success');
+  window._isGoogleUser = false; // теперь есть пароль
+  const pwdLabel = document.querySelector('[onclick="openPasswordModal()"] .setting-label');
+  const pwdSub   = document.querySelector('[onclick="openPasswordModal()"] .setting-sub');
+  if (pwdLabel) pwdLabel.textContent = 'Passwort ändern';
+  if (pwdSub)   pwdSub.textContent   = 'Sicherheit Ihres Kontos';
+  setMsg('pwd-msg', '<i class="fas fa-check-circle" style="color:var(--green)"></i> Passwort gespeichert', 'success');
   setTimeout(() => closeModal('modal-password'), 2000);
 }
 
