@@ -78,12 +78,12 @@ function showWiedEintragInfo(wiedId) {
           _closeDetailSheet();
           const el = document.querySelector('.nav-item[onclick*="wiederkehrend"]');
           if (el) nav('wiederkehrend', el);
-          // Переключаем страницу если нужно и подсвечиваем
+          // Сначала переключаем страницу, потом ищем карточку
           setTimeout(() => {
             const _findWC = () => document.querySelector(`.wied-card[onclick*="${wiedId}"]`);
-            let wcard = _findWC();
-            // Если карточки нет — ищем страницу
-            if (!wcard && typeof data !== 'undefined' && data.wiederkehrend
+
+            // Всегда вычисляем нужную страницу и переключаем до поиска
+            if (typeof data !== 'undefined' && data.wiederkehrend
                 && typeof wiedPage !== 'undefined' && typeof WIED_PER_PAGE !== 'undefined') {
               const widx = (data.wiederkehrend||[]).findIndex(w => w.id === wiedId);
               if (widx >= 0) {
@@ -91,10 +91,11 @@ function showWiedEintragInfo(wiedId) {
                 if (tp !== wiedPage) { wiedPage = tp; if(typeof renderWied==='function') renderWied(); }
               }
             }
+
             let wa = 0;
             const wr = setInterval(() => {
               wa++;
-              wcard = _findWC();
+              const wcard = _findWC();
               if (wcard) {
                 clearInterval(wr);
                 wcard.scrollIntoView({ behavior:'smooth', block:'center' });
@@ -102,7 +103,7 @@ function showWiedEintragInfo(wiedId) {
                 void wcard.offsetWidth;
                 wcard.classList.add('highlight-flash');
                 setTimeout(() => wcard.classList.remove('highlight-flash'), 1200);
-              } else if (wa > 20) clearInterval(wr);
+              } else if (wa > 30) clearInterval(wr);
             }, 100);
           }, 400);
         }
