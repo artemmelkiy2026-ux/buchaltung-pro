@@ -419,8 +419,10 @@ function _stornoUndNeu(r) {
 // Создаёт Einnahme из Rechnung и сохраняет в БД
 // Возвращает созданный entry или null если уже существует
 function _buchRechnungAlsEinnahme(r) {
-  // Проверяем — нет ли уже Einnahme для этой Rechnung
+  // Проверяем — нет ли уже Einnahme für diese Rechnung
+  // Nur echte Einträge prüfen (nicht virtuelle __rech__)
   const alreadyBooked = data.eintraege.some(e =>
+    !e.id?.startsWith('__rech__') &&
     e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`) && !e.is_storno && !e._storniert
   );
   if (alreadyBooked) return null;
@@ -637,26 +639,21 @@ async function rechBezahlt(id){
 
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
+
     // Убеждаемся что запись в data.eintraege
     if (!data.eintraege.find(e => e.id === newE.id)) {
       data.eintraege.unshift(newE);
     }
-    // Сбрасываем тип фильтра
+    // Принудительно устанавливаем год через флаг — buildYearFilters его применит
+    window._forceFilterYear = newE.datum.substring(0,4);
     if (typeof einPage !== 'undefined') einPage = 1;
     if (typeof fTyp !== 'undefined') fTyp = 'Alle';
     document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
     const allTab = document.querySelector('.ftab[onclick*="Alle"]');
     if (allTab) allTab.classList.add('active');
-    // renderAll → buildYearFilters восстанавливает f-jahr
-    // Поэтому сначала рендерим, потом принудительно ставим нужный год
-    renderAll();
-    // После renderAll принудительно ставим год новой записи
-    const fjEl = document.getElementById('f-jahr');
     const fmEl = document.getElementById('f-mon');
-    if (fjEl) fjEl.value = newE.datum.substring(0,4);
     if (fmEl) fmEl.value = 'Alle';
-    // Перерисовываем Einträge с правильным фильтром
-    if (typeof renderEin === 'function') renderEin();
+    renderAll();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits

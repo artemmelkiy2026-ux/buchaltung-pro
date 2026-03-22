@@ -521,12 +521,15 @@ function wBuchenCore(id){
 }
 
 function _resetEinFilter() {
-  // Сбрасываем фильтры Einträge чтобы новая запись была видна
-  const _fjEl = document.getElementById('f-jahr');
+  // Принудительно устанавливаем год через флаг — buildYearFilters его применит
+  window._forceFilterYear = new Date().getFullYear()+'';
   const _fmEl = document.getElementById('f-mon');
-  if(_fjEl) _fjEl.value = new Date().getFullYear()+'';
   if(_fmEl) _fmEl.value = 'Alle';
   if(typeof einPage !== 'undefined') einPage = 1;
+  if(typeof fTyp !== 'undefined') fTyp = 'Alle';
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  const allTab = document.querySelector('.ftab[onclick*="Alle"]');
+  if (allTab) allTab.classList.add('active');
 }
 
 function wBuchen(id){

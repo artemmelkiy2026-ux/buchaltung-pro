@@ -237,16 +237,17 @@ function buildYearFilters(){
   const cur=new Date().getFullYear()+'';
   ['dash-yr','f-jahr','z-yr'].forEach(id=>{
     const el=document.getElementById(id); if(!el)return;
-    const prev=el.value;
-    // Если текущий год есть в списке — убеждаемся что он в опциях
-    // Сохраняем предыдущий выбор, но если года нет — ставим текущий
+    const prev = window._forceFilterYear && id === 'f-jahr' ? window._forceFilterYear : el.value;
     const opts = '<option value="Alle">Alle Jahre</option>'+js.map(j=>`<option${j===prev?' selected':''}>${j}</option>`).join('');
     el.innerHTML = opts;
-    // Если предыдущий выбор не найден в новых опциях — ставим текущий год
     if (prev && prev !== 'Alle' && !js.includes(prev)) {
       el.value = js.includes(cur) ? cur : 'Alle';
+    } else if (prev) {
+      el.value = prev;
     }
   });
+  // Сбрасываем флаг после применения
+  if (window._forceFilterYear) window._forceFilterYear = null;
   // rep-yr: only real years — preserve current selection
   const ry=document.getElementById('rep-yr');
   const allJahre=js.length?js:[cur];
