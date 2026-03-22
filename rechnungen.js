@@ -1924,28 +1924,95 @@ function _mahnFaellig(r) {
 
 function checkMahnungen() {
   try {
-    var banner = document.getElementById('dash-mahnung-banner');
+    const banner    = document.getElementById('dash-mahnung-banner');
     if (!banner) return;
-    if (!isMahnungEnabled()) { banner.style.display = 'none'; return; }
-    if (!data || !data.rechnungen || !data.rechnungen.length) { banner.style.display = 'none'; return; }
-    var today = new Date().toISOString().split('T')[0];
-    for (var i = 0; i < data.rechnungen.length; i++) {
-      var r = data.rechnungen[i];
+
+    // Добавляем CSS анимации один раз
+    if (!document.getElementById('mahnung-keyframes')) {
+      const s = document.createElement('style');
+      s.id = 'mahnung-keyframes';
+      s.textContent = `
+        @keyframes mahnung-pulse {
+          0%,100% { opacity: 0; }
+          50%      { opacity: 1; }
+        }
+        @keyframes mahnung-slide-in {
+          from { opacity:0; transform:translateY(-8px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+        @keyframes mahnung-bell-ring {
+          0%,100% { transform: rotate(0deg); }
+          15%     { transform: rotate(-18deg); }
+          30%     { transform: rotate(18deg); }
+          45%     { transform: rotate(-12deg); }
+          60%     { transform: rotate(12deg); }
+          75%     { transform: rotate(-6deg); }
+          90%     { transform: rotate(6deg); }
+        }
+        #dash-mahnung-banner.state-alert #dash-mahnung-icon {
+          animation: mahnung-bell-ring 1.2s ease 0.3s both;
+        }
+        #dash-mahnung-banner.state-ok { cursor:default; }
+        #dash-mahnung-banner.state-alert { cursor:pointer; }
+      `;
+      document.head.appendChild(s);
+    }
+
+    const titleEl   = document.getElementById('dash-mahnung-title');
+    const subEl     = document.getElementById('dash-mahnung-sub');
+    const iconWrap  = document.getElementById('dash-mahnung-icon-wrap');
+    const iconEl    = document.getElementById('dash-mahnung-icon');
+    const pulseEl   = document.getElementById('dash-mahnung-pulse');
+    const arrowEl   = document.getElementById('dash-mahnung-arrow');
+
+    // Обновляем статусы просроченных
+    const today = new Date().toISOString().split('T')[0];
+    (data.rechnungen||[]).forEach(r => {
       if (r.status === 'offen' && r.faellig && r.faellig < today) r.status = 'ueberfaellig';
+    });
+
+    // Собираем fällige
+    const mahnEnabled = isMahnungEnabled();
+    const faellige = mahnEnabled
+      ? (data.rechnungen||[]).filter(r => { try { return _mahnFaellig(r); } catch(e) { return false; } })
+      : [];
+    const total = faellige.reduce((s,r) => s + (r.betrag||0), 0);
+
+    const _set = (alert) => {
+      banner.classList.toggle('state-alert', alert);
+      banner.classList.toggle('state-ok', !alert);
+      // Цвета
+      const clr  = alert ? 'var(--red)'   : 'var(--green)';
+      const bg   = alert ? 'var(--rdim,#fef2f2)' : 'var(--gdim,#f0fdf4)';
+      const bord = alert ? 'var(--red)'   : 'var(--green)';
+      banner.style.background   = bg;
+      banner.style.borderColor  = bord;
+      if (iconWrap)  iconWrap.style.background = alert ? 'var(--red)' : 'var(--green)';
+      if (iconEl)  { iconEl.className = alert ? 'fas fa-bell' : 'fas fa-check-circle'; }
+      if (titleEl) { titleEl.style.color = clr; }
+      if (arrowEl) { arrowEl.style.color = clr; arrowEl.style.display = alert ? '' : 'none'; }
+      if (pulseEl) { pulseEl.style.display = alert ? 'block' : 'none'; }
+      // Анимация входа при смене состояния
+      banner.style.animation = 'none';
+      void banner.offsetWidth;
+      banner.style.animation = 'mahnung-slide-in .35s ease both';
+    };
+
+    if (!faellige.length) {
+      // Всё хорошо
+      _set(false);
+      if (titleEl) titleEl.textContent = 'Keine offenen Mahnungen';
+      if (subEl)   subEl.textContent   = mahnEnabled
+        ? 'Alle Rechnungen sind rechtzeitig bezahlt — weiter so!'
+        : 'Zahlungserinnerungen sind deaktiviert';
+      banner.onclick = null;
+    } else {
+      // Есть просрочки
+      _set(true);
+      if (titleEl) titleEl.textContent = faellige.length + ' Zahlungserinnerung' + (faellige.length > 1 ? 'en' : '') + ' fällig';
+      if (subEl)   subEl.textContent   = 'Offene Forderungen: ' + fmt(total) + ' — Jetzt Mahnungen versenden';
+      banner.onclick = openMahnModal;
     }
-    var faellige = [];
-    for (var i = 0; i < data.rechnungen.length; i++) {
-      try { if (_mahnFaellig(data.rechnungen[i])) faellige.push(data.rechnungen[i]); }
-      catch(err) {}
-    }
-    if (!faellige.length) { banner.style.display = 'none'; return; }
-    var titleEl = document.getElementById('dash-mahnung-title');
-    var subEl = document.getElementById('dash-mahnung-sub');
-    var total = 0;
-    for (var j = 0; j < faellige.length; j++) total += (faellige[j].betrag || 0);
-    if (titleEl) titleEl.textContent = faellige.length + ' Zahlungserinnerung' + (faellige.length > 1 ? 'en' : '') + ' fällig';
-    if (subEl) subEl.textContent = 'Offene Forderungen: ' + fmt(total) + ' — Jetzt Mahnungen versenden';
-    banner.style.display = 'flex';
   } catch(e) { console.error('[checkMahnungen]', e); }
 }
 
