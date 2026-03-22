@@ -1145,7 +1145,7 @@ function renderEin(){
                   ? '<span style="font-size:11px;color:var(--sub)"><i class="fas fa-lock" style="font-size:9px"></i> Rechnung</span>'
                   : st
                     ? (e.is_storno
-                        ? '<span style="font-size:10px;color:var(--sub);padding:2px 6px;background:var(--rdim);border-radius:4px;opacity:.7">↩ Gegenbuchung</span>'
+                        ? '<span style="font-size:10px;color:var(--sub);padding:2px 6px;background:var(--rdim);border-radius:4px;opacity:.7">Storniert</span>'
                         : '<span style="font-size:10px;color:var(--sub);padding:2px 6px;background:var(--rdim);border-radius:4px">Storniert</span>')
                     : (isMob() ? _mobBtn
                       : '<button class="rca-btn rca-edit" onclick="event.stopPropagation();editE(event,\''+e.id+'\')" title="Bearbeiten / Korrigieren"><i class="fas fa-edit"></i></button>'
