@@ -119,7 +119,7 @@ function renderRech(){
     // Wie alt ist die Rechnung?
     const _rDaysSince = r.datum ? Math.floor((Date.now()-new Date(r.datum))/(864e5)) : null;
     const _rAgeLabel = _rDaysSince===0?'Heute':_rDaysSince===1?'Gestern':_rDaysSince!==null?`vor ${_rDaysSince} Tagen`:'';
-    return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" ${_rClick} style="cursor:pointer">
+    return `<div class="rech-card${_rechStorno.length?' rech-card-storniert':''}" data-rech-id="${r.id}" ${_rClick} style="cursor:pointer">
       <div class="rech-card-avatar ${st.cls}">
         <i class="${st.icon}"></i>
       </div>
@@ -137,13 +137,14 @@ function renderRech(){
               {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
               {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
               {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
-            ]) : _moreBtn([
-              ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
-              {icon:'fa-print',   label:'Drucken / PDF',  action:()=>druckRechnungId(r.id)},
-              {icon:'fa-copy',    label:'Duplizieren',    action:()=>_rechDuplizieren(r.id)},
-              {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
-              {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
-            ])}
+            ]) : `<div class="rech-desktop-actions">
+              ${r.status!=='bezahlt' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>` : ''}
+              <button class="rda-btn" onclick="showRechDetail('${r.id}')" title="Vorschau"><i class="fas fa-eye"></i></button>
+              <button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>
+              <button class="rda-btn" onclick="_rechDuplizieren('${r.id}')" title="Duplizieren"><i class="fas fa-copy"></i></button>
+              <button class="rda-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
+              <button class="rda-btn rda-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+            </div>`}
           </div>
         </div>
         <div class="rech-card-meta">

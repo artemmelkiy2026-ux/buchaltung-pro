@@ -43,7 +43,33 @@ function getSystemNotifications() {
       title: `${overdue.length} überfällige Rechnung${overdue.length > 1 ? 'en' : ''}`,
       body: `Offene Forderungen: ${fmt(total)} — Mahnungen empfohlen`,
       created_at: todayStr,
-      action: () => { const el = document.querySelector('.nav-item[onclick*="rechnungen"]'); if(el) nav('rechnungen', el); }
+      action: () => {
+        const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
+        if (el) nav('rechnungen', el);
+        // Мигаем все просроченные карточки
+        setTimeout(() => {
+          overdue.forEach(r => {
+            if (typeof highlightRechnung === 'function') highlightRechnung(r.id);
+          });
+        }, 500);
+      }
+    });
+    // Отдельные уведомления для каждого просроченного счёта
+    overdue.slice(0, 3).forEach(r => {
+      const daysDue = Math.floor((new Date() - new Date(r.faellig)) / 86400000);
+      notifs.push({
+        id: `sys-overdue-${r.id}`,
+        type: 'danger',
+        icon: 'fa-exclamation-circle',
+        title: `Rechnung ${r.nr} — ${daysDue} Tage überfällig`,
+        body: `${r.kunde || r.beschreibung || '—'} · ${fmt(r.betrag)}`,
+        created_at: todayStr,
+        action: () => {
+          const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
+          if (el) nav('rechnungen', el);
+          setTimeout(() => { if (typeof highlightRechnung === 'function') highlightRechnung(r.id); }, 500);
+        }
+      });
     });
   }
 
@@ -116,7 +142,13 @@ function getSystemNotifications() {
       title: `${longOpen.length} Rechnung${longOpen.length > 1 ? 'en' : ''} seit 30+ Tagen offen`,
       body: longOpen.slice(0, 3).map(r => `${r.nr}: ${fmt(r.betrag)}`).join(' · '),
       created_at: todayStr,
-      action: () => { const el = document.querySelector('.nav-item[onclick*="rechnungen"]'); if(el) nav('rechnungen', el); }
+      action: () => {
+        const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
+        if (el) nav('rechnungen', el);
+        setTimeout(() => {
+          longOpen.forEach(r => { if (typeof highlightRechnung === 'function') highlightRechnung(r.id); });
+        }, 500);
+      }
     });
   }
 

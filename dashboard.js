@@ -1784,7 +1784,39 @@ function parseBelegText(text) {
   return result;
 }
 
+// ── Highlight Rechnung (мигание для привлечения внимания) ─────────────────
+function highlightRechnung(rechId) {
+  // Скроллим к нужной карточке и заставляем мигать
+  const card = document.querySelector(`[data-rech-id="${rechId}"]`) ||
+               document.querySelector(`#rech-cards .rech-card`);
+
+  if (!card) {
+    // Попробуем найти через ID в data-атрибутах
+    const allCards = document.querySelectorAll('.rech-card');
+    for (const c of allCards) {
+      if (c.innerHTML.includes(rechId.substring(0,8))) {
+        c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        c.classList.add('highlight-flash');
+        setTimeout(() => c.classList.remove('highlight-flash'), 4000);
+        return;
+      }
+    }
+    return;
+  }
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  card.classList.add('highlight-flash');
+  setTimeout(() => card.classList.remove('highlight-flash'), 4000);
+}
+
 function showEintragDetail(id) {
+  // Виртуальная запись из Rechnung — открываем редактор рехнунга
+  if (id && id.startsWith('__rech__')) {
+    const rechId = id.replace('__rech__', '');
+    const navEl = document.querySelector('.nav-item[onclick*="rechnungen"]');
+    nav('rechnungen', navEl);
+    setTimeout(() => highlightRechnung(rechId), 400);
+    return;
+  }
   const e = (data.eintraege||[]).find(x=>x.id===id);
   if (!e) return;
   const isEin = e.typ==='Einnahme';
