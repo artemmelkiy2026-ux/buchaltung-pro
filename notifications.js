@@ -1,12 +1,148 @@
 // ══════════════════════════════════════════════════════════════════════════════
 // NOTIFICATIONS SYSTEM — MelaLogic
+// Состояние синхронизируется через Supabase (notif_state), не localStorage
 // ══════════════════════════════════════════════════════════════════════════════
 
-let _notifData   = [];   // активные уведомления
+let _notifData   = [];
 let _notifUnread = 0;
 let _notifFilter = 'all'; // 'all' | 'danger' | 'warning' | 'admin' | 'archive'
 
-// ── Загрузка из Supabase ───────────────────────────────────────────────────
+// ── Локальный кеш состояния (для мгновенного отклика UI) ──────────────────
+let _notifState = {
+  read_ids:  [],   // прочитанные ID
+  archived:  [],   // архив [{...notif, archived_at}]
+  dismissed: {},   // системные скрытые {id: timestamp_до}
+};
+let _notifStateDirty = false; // есть несохранённые изменения
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Supabase — загрузка и сохранение состояния
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function _loadNotifState() {
+  if (!currentUser) return;
+  try {
+    const { data, error } = await sb
+      .from('notif_state')
+      .select('read_ids, archived, dismissed')
+      .eq('user_id', currentUser.id)
+      .single();
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = row not found
+    if (data) {
+      _notifState.read_ids  = Array.isArray(data.read_ids)  ? data.read_ids  : [];
+      _notifState.archived  = Array.isArray(data.archived)  ? data.archived  : [];
+      _notifState.dismissed = (data.dismissed && typeof data.dismissed === 'object') ? data.dismissed : {};
+    }
+  } catch(e) {
+    console.warn('[notif_state] load error:', e);
+    // Fallback: пробуем localStorage для плавного перехода
+    try {
+      const r = localStorage.getItem('ml_notif_read');
+      const a = localStorage.getItem('ml_notif_archive');
+      const d = localStorage.getItem('ml_sys_dismissed');
+      if (r) _notifState.read_ids  = JSON.parse(r);
+      if (a) _notifState.archived  = JSON.parse(a);
+      if (d) _notifState.dismissed = JSON.parse(d);
+    } catch(_) {}
+  }
+}
+
+async function _saveNotifState() {
+  if (!currentUser || !_notifStateDirty) return;
+  _notifStateDirty = false;
+  // Ограничиваем архив 100 записями
+  if (_notifState.archived.length > 100) {
+    _notifState.archived = _notifState.archived.slice(0, 100);
+  }
+  try {
+    await sb.from('notif_state').upsert({
+      user_id:    currentUser.id,
+      read_ids:   _notifState.read_ids,
+      archived:   _notifState.archived,
+      dismissed:  _notifState.dismissed,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+  } catch(e) {
+    console.warn('[notif_state] save error:', e);
+    _notifStateDirty = true; // попробуем позже
+  }
+}
+
+// Дебаунс сохранения — не дёргаем Supabase на каждый клик
+let _saveTimer = null;
+function _scheduleSave() {
+  _notifStateDirty = true;
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(_saveNotifState, 1500);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Архив
+// ══════════════════════════════════════════════════════════════════════════════
+
+function _getArchive() { return _notifState.archived; }
+
+function _archiveNotif(n) {
+  if (_notifState.archived.some(a => a.id === n.id)) return;
+  _notifState.archived.unshift({ ...n, archived_at: new Date().toISOString() });
+  _scheduleSave();
+}
+
+function _removeFromArchive(id) {
+  _notifState.archived = _notifState.archived.filter(a => a.id !== id);
+  _scheduleSave();
+}
+
+function _clearArchive() {
+  _notifState.archived = [];
+  _scheduleSave();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Dismissed (системные — скрыть на 24ч)
+// ══════════════════════════════════════════════════════════════════════════════
+
+function _getDismissed()    { return _notifState.dismissed; }
+
+function _dismissSystem(id) {
+  _notifState.dismissed[id] = Date.now() + 24*60*60*1000;
+  _scheduleSave();
+}
+
+function _isSystemDismissed(id) {
+  const d = _notifState.dismissed;
+  return d[id] && d[id] > Date.now();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Прочитанные
+// ══════════════════════════════════════════════════════════════════════════════
+
+function _getReadIds() { return _notifState.read_ids; }
+
+function _markRead(id) {
+  if (!_notifState.read_ids.includes(id)) {
+    _notifState.read_ids.push(id);
+    _scheduleSave();
+  }
+}
+
+function _markAllRead() {
+  const ids = _notifData.map(n => n.id || String(n.created_at));
+  let changed = false;
+  ids.forEach(id => {
+    if (!_notifState.read_ids.includes(id)) {
+      _notifState.read_ids.push(id);
+      changed = true;
+    }
+  });
+  if (changed) _scheduleSave();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Загрузка уведомлений из Supabase (от администратора)
+// ══════════════════════════════════════════════════════════════════════════════
+
 async function loadNotifications() {
   if (!currentUser) return [];
   try {
@@ -24,7 +160,10 @@ async function loadNotifications() {
   }
 }
 
-// ── Системные уведомления ─────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Системные уведомления (генерируются из данных программы)
+// ══════════════════════════════════════════════════════════════════════════════
+
 function getSystemNotifications() {
   const notifs = [];
   const today = new Date();
@@ -66,7 +205,7 @@ function getSystemNotifications() {
 
   // 2. Angebote bald ablaufend
   const in3days = new Date(today); in3days.setDate(in3days.getDate() + 3);
-  const in3Str = in3days.toISOString().split('T')[0];
+  const in3Str  = in3days.toISOString().split('T')[0];
   const expiring = (data.angebote || []).filter(a =>
     a.status === 'offen' && a.gueltig && a.gueltig >= todayStr && a.gueltig <= in3Str
   );
@@ -84,13 +223,12 @@ function getSystemNotifications() {
   const mo = today.getMonth(), yr = today.getFullYear();
   const frist = new Date(yr, mo + 1, 10);
   const diffDays = Math.ceil((frist - today) / 86400000);
-  const isRegel = !isKleinunternehmer(yr + '');
-  if (isRegel && diffDays <= 3 && diffDays >= 0) {
+  if (!isKleinunternehmer(yr + '') && diffDays <= 3 && diffDays >= 0) {
     const mon = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
     notifs.push({
       id: 'sys-ust-va', type: 'danger', icon: 'fa-landmark',
       title: `USt-Voranmeldung fällig in ${diffDays} Tag${diffDays !== 1 ? 'en' : ''}`,
-      body: `${mon[mo+1 > 11 ? 0 : mo+1]}-Meldung bis 10.${String(mo+2 > 12 ? 1 : mo+2).padStart(2,'0')}.${mo+2 > 12 ? yr+1 : yr}`,
+      body: `${mon[mo+1 > 11 ? 0 : mo+1]}-Meldung bis 10.${String(mo+2>12?1:mo+2).padStart(2,'0')}.${mo+2>12?yr+1:yr}`,
       created_at: todayStr,
       action: () => { const el = document.querySelector('.nav-item[onclick*="ust"]'); if(el) nav('ust', el); }
     });
@@ -99,7 +237,7 @@ function getSystemNotifications() {
   // 4. KU-Limit > 80%
   const curYrStr = today.getFullYear() + '';
   if (isKleinunternehmer(curYrStr)) {
-    const ye = activeEintraegeMitRech(curYrStr);
+    const ye  = activeEintraegeMitRech(curYrStr);
     const ein = sum(ye, 'Einnahme');
     const pct = Math.round(ein / 25000 * 100);
     if (pct >= 80) {
@@ -134,72 +272,31 @@ function getSystemNotifications() {
   return notifs.filter(n => !_isSystemDismissed(n.id));
 }
 
-// ── Архив (localStorage) ──────────────────────────────────────────────────
-function _getArchive() {
-  try { return JSON.parse(localStorage.getItem('ml_notif_archive') || '[]'); } catch { return []; }
-}
-function _archiveNotif(n) {
-  const arch = _getArchive();
-  // Не дублировать
-  if (arch.some(a => a.id === n.id)) return;
-  arch.unshift({ ...n, archived_at: new Date().toISOString() });
-  // Храним не более 100 записей
-  localStorage.setItem('ml_notif_archive', JSON.stringify(arch.slice(0, 100)));
-}
-function _removeFromArchive(id) {
-  const arch = _getArchive().filter(a => a.id !== id);
-  localStorage.setItem('ml_notif_archive', JSON.stringify(arch));
-}
-function _clearArchive() {
-  localStorage.removeItem('ml_notif_archive');
-}
+// ══════════════════════════════════════════════════════════════════════════════
+// Главная функция — собрать все уведомления и обновить счётчик
+// ══════════════════════════════════════════════════════════════════════════════
 
-// ── Dismissed (системные — скрыть на 24ч) ────────────────────────────────
-function _getDismissed() {
-  try { return JSON.parse(localStorage.getItem('ml_sys_dismissed') || '{}'); } catch { return {}; }
-}
-function _dismissSystem(id) {
-  const d = _getDismissed();
-  d[id] = Date.now() + 24*60*60*1000;
-  localStorage.setItem('ml_sys_dismissed', JSON.stringify(d));
-}
-function _isSystemDismissed(id) {
-  const d = _getDismissed();
-  return d[id] && d[id] > Date.now();
-}
-
-// ── Читанные ──────────────────────────────────────────────────────────────
-function _getReadIds() {
-  try { return JSON.parse(localStorage.getItem('ml_notif_read') || '[]'); } catch { return []; }
-}
-function _markRead(id) {
-  const ids = _getReadIds();
-  if (!ids.includes(id)) { ids.push(id); localStorage.setItem('ml_notif_read', JSON.stringify(ids)); }
-}
-function _markAllRead() {
-  const ids = _notifData.map(n => n.id || String(n.created_at));
-  localStorage.setItem('ml_notif_read', JSON.stringify(ids));
-}
-
-// ── Главная функция — собрать все уведомления ─────────────────────────────
 async function refreshNotifications() {
+  // Загружаем состояние из Supabase (синхронизация между устройствами)
+  await _loadNotifState();
+
   const sysNotifs = getSystemNotifications();
   const dbNotifs  = await loadNotifications();
 
   const allNotifs = [
     ...sysNotifs,
     ...dbNotifs.map(n => ({
-      id: n.id,
-      type: n.type || 'info',
-      icon: n.type === 'warning' ? 'fa-exclamation-triangle'
-          : n.type === 'danger'  ? 'fa-fire'
-          : n.type === 'success' ? 'fa-check-circle'
-          : 'fa-bell',
-      title: n.title,
-      body: n.body || '',
+      id:         n.id,
+      type:       n.type || 'info',
+      icon:       n.type === 'warning' ? 'fa-exclamation-triangle'
+                : n.type === 'danger'  ? 'fa-fire'
+                : n.type === 'success' ? 'fa-check-circle'
+                : 'fa-bell',
+      title:      n.title,
+      body:       n.body || '',
       created_at: n.created_at,
       from_admin: true,
-      action: null
+      action:     null
     }))
   ];
 
@@ -207,8 +304,7 @@ async function refreshNotifications() {
     (b.created_at || '').localeCompare(a.created_at || '')
   );
 
-  const readIds = _getReadIds();
-  _notifUnread = _notifData.filter(n => !readIds.includes(n.id)).length;
+  _notifUnread = _notifData.filter(n => !_getReadIds().includes(n.id)).length;
 
   _updateBell();
   if (document.getElementById('p-notifications')?.classList.contains('active')) {
@@ -216,18 +312,24 @@ async function refreshNotifications() {
   }
 }
 
-// ── Колокольчик ────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Колокольчик
+// ══════════════════════════════════════════════════════════════════════════════
+
 function _updateBell() {
   const val = _notifUnread > 9 ? '9+' : String(_notifUnread);
   ['notif-badge','notif-badge-mob'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     if (_notifUnread > 0) { el.textContent = val; el.style.display = 'flex'; }
-    else { el.style.display = 'none'; }
+    else el.style.display = 'none';
   });
 }
 
-// ── Страница уведомлений ──────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Страница уведомлений
+// ══════════════════════════════════════════════════════════════════════════════
+
 function renderNotificationsPage() {
   const container = document.getElementById('notif-list');
   if (!container) return;
@@ -236,8 +338,6 @@ function renderNotificationsPage() {
   _notifUnread = 0;
   _updateBell();
   _updateStatusPanel();
-
-  // Активный фильтр — обновляем кнопки
   _updateFilterButtons();
 
   const colors = {
@@ -259,20 +359,22 @@ function renderNotificationsPage() {
         </div>`;
       return;
     }
-    window._notifActions = arch.map(() => null);
     container.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <span style="font-size:12px;color:var(--sub)">${arch.length} archivierte Meldung${arch.length!==1?'en':''}</span>
-        <button onclick="_clearArchive();renderNotificationsPage()" style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:2px 6px">
+        <button onclick="_clearArchive();renderNotificationsPage()"
+                style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:2px 6px">
           <i class="fas fa-trash"></i> Alle löschen
         </button>
       </div>
-      ${arch.map((n, idx) => {
+      ${arch.map(n => {
         const cl = colors[n.type] || colors.info;
         const date = n.archived_at ? fd(n.archived_at.split('T')[0]) : '';
         return `<div data-arch-id="${n.id}"
-          style="background:${cl.bg};border:1px solid ${cl.border};border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;opacity:.7">
-          <div style="width:34px;height:34px;border-radius:8px;background:${cl.icon};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          style="background:${cl.bg};border:1px solid ${cl.border};border-radius:12px;padding:14px;
+                 display:flex;gap:12px;align-items:flex-start;opacity:.7">
+          <div style="width:34px;height:34px;border-radius:8px;background:${cl.icon};
+                      display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <i class="fas ${n.icon}" style="color:#fff;font-size:13px"></i>
           </div>
           <div style="flex:1;min-width:0">
@@ -280,7 +382,9 @@ function renderNotificationsPage() {
             ${n.body ? `<div style="font-size:11px;color:var(--sub);margin-top:3px">${n.body}</div>` : ''}
             ${date ? `<div style="font-size:10px;color:var(--sub);margin-top:5px;opacity:.6">Archiviert: ${date}</div>` : ''}
           </div>
-          <button data-arch-del="${n.id}" style="background:none;border:none;color:var(--sub);cursor:pointer;opacity:.5;padding:0;font-size:12px" title="Aus Archiv löschen">✕</button>
+          <button data-arch-del="${n.id}"
+                  style="background:none;border:none;color:var(--sub);cursor:pointer;opacity:.5;padding:0;font-size:12px"
+                  title="Aus Archiv löschen">✕</button>
         </div>`;
       }).join('')}`;
 
@@ -314,9 +418,9 @@ function renderNotificationsPage() {
   window._notifActions = visible.map(n => n.action || null);
 
   container.innerHTML = visible.map((n, idx) => {
-    const cl = colors[n.type] || colors.info;
+    const cl   = colors[n.type] || colors.info;
     const isSys = n.id && n.id.startsWith('sys-');
-    const date = n.created_at
+    const date  = n.created_at
       ? (n.created_at.length > 10 ? fd(n.created_at.split('T')[0]) : fd(n.created_at))
       : '';
     return `
@@ -346,14 +450,12 @@ function renderNotificationsPage() {
   }).join('');
 
   container.onclick = (e) => {
-    // Крестик — в архив
     const dismissBtn = e.target.closest('[data-dismiss]');
     if (dismissBtn) {
       e.stopPropagation();
       const id = dismissBtn.dataset.dismiss;
       const n  = visible.find(x => x.id === id);
       if (n) _archiveNotif(n);
-      // Системные — dismiss на 24ч
       if (id.startsWith('sys-')) _dismissSystem(id);
       _notifData = _notifData.filter(x => x.id !== id);
       _notifUnread = Math.max(0, _notifUnread - 1);
@@ -362,7 +464,6 @@ function renderNotificationsPage() {
       renderNotificationsPage();
       return;
     }
-    // Клик на карточку — action
     const card = e.target.closest('[data-notif-idx]');
     if (!card) return;
     const action = window._notifActions?.[+card.dataset.notifIdx];
@@ -370,7 +471,10 @@ function renderNotificationsPage() {
   };
 }
 
-// ── Фильтр-кнопки ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Фильтр-кнопки
+// ══════════════════════════════════════════════════════════════════════════════
+
 function setNotifFilter(f) {
   _notifFilter = f;
   renderNotificationsPage();
@@ -381,14 +485,16 @@ function _updateFilterButtons() {
     const btn = document.getElementById(`notif-filter-${f}`);
     if (!btn) return;
     const isActive = _notifFilter === f;
-    btn.style.background    = isActive ? 'var(--blue)' : 'var(--s2)';
-    btn.style.color         = isActive ? '#fff' : 'var(--sub)';
-    btn.style.borderColor   = isActive ? 'var(--blue)' : 'var(--border)';
-    btn.style.fontWeight    = isActive ? '700' : '500';
+    btn.style.background  = isActive ? 'var(--blue)' : 'var(--s2)';
+    btn.style.color       = isActive ? '#fff' : 'var(--sub)';
+    btn.style.borderColor = isActive ? 'var(--blue)' : 'var(--border)';
   });
 }
 
-// ── Кнопка обновления ─────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Кнопка обновления
+// ══════════════════════════════════════════════════════════════════════════════
+
 async function notifRefresh() {
   const btn  = document.getElementById('notif-refresh-btn');
   const icon = document.getElementById('notif-refresh-icon');
@@ -405,23 +511,25 @@ async function notifRefresh() {
   if (btn)  btn.disabled = false;
 }
 
-// ── Правая панель — статус и счётчики ─────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// Правая панель — статус и счётчики
+// ══════════════════════════════════════════════════════════════════════════════
+
 function _updateStatusPanel() {
-  const total   = _notifData.length;
-  const urgent  = _notifData.filter(n => n.type === 'danger').length;
-  const warn    = _notifData.filter(n => n.type === 'warning').length;
-  const admin   = _notifData.filter(n => n.from_admin).length;
-  const archCnt = _getArchive().length;
+  const total  = _notifData.length;
+  const urgent = _notifData.filter(n => n.type === 'danger').length;
+  const warn   = _notifData.filter(n => n.type === 'warning').length;
+  const admin  = _notifData.filter(n => n.from_admin).length;
+  const arch   = _getArchive().length;
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('notif-count-total',   total);
   set('notif-count-urgent',  urgent);
   set('notif-count-warn',    warn);
   set('notif-count-admin',   admin);
-  set('notif-count-archive', archCnt);
+  set('notif-count-archive', arch);
   set('notif-last-update',   new Date().toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}));
 
-  // Статус-строки
   const rows = document.getElementById('notif-status-rows');
   if (!rows) return;
   const checks = [
