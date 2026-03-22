@@ -564,6 +564,23 @@ async function init() {
   document.getElementById('profile-email').textContent = currentEmail;
   document.getElementById('current-email-sub').textContent = currentEmail;
 
+  // Определяем тип входа — Google OAuth или Email/Password
+  const identities  = currentUser.identities || [];
+  const isGoogle    = identities.some(i => i.provider === 'google');
+  const hasEmail    = identities.some(i => i.provider === 'email');
+  window._isGoogleUser = isGoogle && !hasEmail;
+
+  // Адаптируем строку Passwort
+  if (window._isGoogleUser) {
+    const pwdRow = document.querySelector('[onclick="openPasswordModal()"]');
+    if (pwdRow) {
+      const lbl = pwdRow.querySelector('.setting-label');
+      const sub = pwdRow.querySelector('.setting-sub');
+      if (lbl) lbl.textContent = 'Passwort festlegen';
+      if (sub) sub.textContent = 'Passwort für direkten Login hinzufügen';
+    }
+  }
+
   // Проверяем статус 2FA только после установки сессии
   check2FAStatus();
 
