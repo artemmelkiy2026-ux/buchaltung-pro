@@ -309,7 +309,7 @@ body {
       </div>
       <!-- 2FA TOTP -->
       <div class="setting-row" id="twofa-row" onclick="open2FASetup()" style="cursor:pointer">
-        <div class="setting-icon" style="background:#fef3c7"><i class="fa-solid fa-shield-halved" style="color:#d97706"></i></div>
+        <div class="setting-icon" style="background:#fef3c7"><i class="fa-solid fa-qrcode" style="color:#d97706"></i></div>
         <div class="setting-body">
           <div class="setting-label">Zwei-Faktor-Authentifizierung</div>
           <div class="setting-sub" id="twofa-status-sub">Nicht aktiv — klicken zum Aktivieren</div>
@@ -1166,14 +1166,13 @@ async function open2FASetup() {
     const secretText  = document.getElementById('twofa-secret-text');
 
     // qr_code может быть SVG-строкой или data URI
-    const qrSrc = data.totp.qr_code;
-    if (qrSrc && qrSrc.startsWith('<svg')) {
-      // SVG напрямую
-      qrContainer.innerHTML = `<div style="width:180px;height:180px;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden;display:flex;align-items:center;justify-content:center;margin:0 auto">${qrSrc.replace(/<svg/, '<svg style="width:180px;height:180px;display:block"')}</div>`;
-    } else {
-      // URL или data URI
-      qrContainer.innerHTML = `<img src="${qrSrc}" style="width:180px;height:180px;border-radius:8px;border:1px solid #e5e7eb" alt="QR Code">`;
-    }
+    const qrSrc = data.totp.qr_code || '';
+    // Всегда рендерим через iframe чтобы избежать проблем с SVG/HTML escaping
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'width:180px;height:180px;border:1px solid #e5e7eb;border-radius:8px;display:block;margin:0 auto';
+    iframe.srcdoc = `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box}body{display:flex;align-items:center;justify-content:center;width:180px;height:180px;background:#fff}</style></head><body>${qrSrc.startsWith('<svg') ? qrSrc.replace(/<svg/, '<svg style="width:180px;height:180px"') : '<img src="'+qrSrc+'" style="width:180px;height:180px">'}</body></html>`;
+    qrContainer.innerHTML = '';
+    qrContainer.appendChild(iframe);
     if (secretText) secretText.textContent = data.totp.secret;
     if (secretBox)  secretBox.style.display = 'block';
   } catch(e) {
