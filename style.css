@@ -3697,7 +3697,7 @@ header { background: #fff; }
     display:grid !important;
     grid-template-columns:40px 80px 1fr 260px 110px 90px;
     align-items:center;gap:0 12px;
-    border-radius:0;border-left:none;border-right:none;border-top:none;
+    border-radius:0;border-top:none;
     margin:0;min-height:70px;align-items: center;
     }
   #ang-list{ gap:0 !important; }
