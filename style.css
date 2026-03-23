@@ -1293,7 +1293,7 @@ input, select, textarea {
 .wied-card{
   display:flex;align-items:center;gap:14px;
   background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);
-  padding:16px 18px;transition:border-color .15s,box-shadow .15s;
+  padding:10px 10px;transition:border-color .15s,box-shadow .15s;
   position:relative;
 }
 .wied-card:hover{border-color:var(--border2);box-shadow:var(--shadow-hover)}
