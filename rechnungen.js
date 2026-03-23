@@ -163,9 +163,10 @@ function renderRech(){
               : _moreBtn([
                   ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
                   ...(r.status==='entwurf' ? [{icon:'fa-paper-plane', label:'Ausstellen', action:()=>rechAusstellen(r.id)}] : [{icon:'fa-print', label:'Drucken / PDF', action:()=>druckRechnungId(r.id)}]),
-                  {icon:'fa-file-alt', label:'Als Vorlage',    action:()=>rechAlsVorlage(r.id)},
+                  {icon:'fa-eye',     label:'HTML-Vorschau',  action:()=>vorschauRechnungId(r.id)},
+                  {icon:'fa-file-alt', label:'Als Vorlage',   action:()=>rechAlsVorlage(r.id)},
                   {icon:'fa-edit',    label:'Bearbeiten',     action:()=>editRech(r.id)},
-                  {icon:'fa-trash',   label:'Löschen',        danger:true, action:()=>delRech(r.id)}
+                  {icon:'fa-undo-alt', label:'Stornieren (GoBD)', danger:true, action:()=>delRech(r.id)}
                 ])) : `<div class="rech-desktop-actions">
               ${_isStorniert ? `
                 <button class="rda-btn" onclick="showRechDetailReadonly('${r.id}')" title="Details anzeigen"><i class="fas fa-eye"></i></button>
@@ -177,7 +178,7 @@ function renderRech(){
                 ${r.status!=='entwurf' ? `<button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>` : ''}
                 <button class="rda-btn" onclick="rechAlsVorlage('${r.id}')" title="Als Vorlage speichern"><i class="fas fa-file-alt"></i></button>
                 <button class="rda-btn" onclick="editRech('${r.id}')" title="Bearbeiten"><i class="fas fa-edit"></i></button>
-                <button class="rda-btn rda-red" onclick="delRech('${r.id}')" title="Löschen"><i class="fas fa-trash"></i></button>
+                <button class="rda-btn rda-red" onclick="delRech('${r.id}')" title="Stornieren (GoBD)"><i class="fas fa-undo-alt"></i></button>
               `}
             </div>`}
           </div>
@@ -570,9 +571,18 @@ function saveRechnung(){
         const newE = _buchRechnungAlsEinnahme(r);
         if(newE){
           sbLogRechnung(r,'bezahlt',{status:altWert.status},{status:'bezahlt',einnahme_betrag:r.betrag});
+          // Сбрасываем фильтры Einträge
           const _fjEl2 = document.getElementById('f-jahr');
-          if(_fjEl2 && _fjEl2.value !== 'Alle') _fjEl2.value = new Date().getFullYear()+'';
+          if(_fjEl2) _fjEl2.value = newE.datum.substring(0,4);
+          const _fmEl2 = document.getElementById('f-mon');
+          if(_fmEl2) _fmEl2.value = 'Alle';
+          if(typeof einPage !== 'undefined') einPage = 1;
+          if(typeof fTyp !== 'undefined') fTyp = 'Alle';
+          document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
+          const _allTab = document.querySelector('.ftab[onclick*="Alle"]');
+          if(_allTab) _allTab.classList.add('active');
           renderAll();
+          if(typeof renderDash === 'function') renderDash();
         }
       }
     }
@@ -587,8 +597,26 @@ function saveRechnung(){
     data.rechnungen.push(newR);
     sbSaveRechnung(newR);
     sbLogRechnung(newR, 'erstellt', null, {nr:newR.nr, betrag:newR.betrag, kunde:newR.kunde, status:newR.status});
+    // Если сразу bezahlt — буксуем Einnahme
+    if(newR.status === 'bezahlt'){
+      const _newE2 = _buchRechnungAlsEinnahme(newR);
+      if(_newE2){
+        const _fjEl3 = document.getElementById('f-jahr');
+        if(_fjEl3) _fjEl3.value = _newE2.datum.substring(0,4);
+        const _fmEl3 = document.getElementById('f-mon');
+        if(_fmEl3) _fmEl3.value = 'Alle';
+        if(typeof einPage !== 'undefined') einPage = 1;
+        if(typeof fTyp !== 'undefined') fTyp = 'Alle';
+        document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
+        const _allTab2 = document.querySelector('.ftab[onclick*="Alle"]');
+        if(_allTab2) _allTab2.classList.add('active');
+      }
+    }
   }
-  renderRech(); closeRechForm(); toast('✓ Rechnung gespeichert!','ok'); checkMahnungen();
+  renderRech(); closeRechForm();
+  if(typeof renderAll === 'function') renderAll();
+  if(typeof renderDash === 'function') renderDash();
+  toast('✓ Rechnung gespeichert!','ok'); checkMahnungen();
 }
 async function rechAusstellen(id) {
   const r = data.rechnungen.find(x=>x.id===id);
