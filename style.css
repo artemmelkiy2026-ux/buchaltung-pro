@@ -3629,22 +3629,22 @@ header { background: #fff; }
   #ein-thead{ grid-template-columns: 1fr 251px 190px 87px 40px; }
 
   /* Rechnungen: Status | Nr. | Kunde | Datum/Fällig | Betrag | Aktionen */
-  #rech-thead{ grid-template-columns: 40px 90px 1fr 220px 110px 210px; }
+  #rech-thead{ grid-template-columns:42px 90px 1fr 255px 110px 186px; }
 
   /* Angebote: avatar | Nr. | Kunde | Status/Details | Betrag | Aktionen */
-  #ang-thead{ grid-template-columns: 40px 80px 1fr 260px 110px 90px; }
+  #ang-thead{ grid-template-columns: 62px 56px 1fr 300px 110px 48px; }
 
   /* Kunden: avatar | Kunde | Umsatz */
   #kunden-thead{ grid-template-columns: 40px 1fr auto; }
 
   /* Produkte: avatar | Produkt | Details | Netto | Brutto | Aktionen */
-  #prod-thead{ grid-template-columns: 40px 1fr 200px 110px 110px 50px; }
+  #prod-thead{ grid-template-columns: 40px 1fr 706px 110px 110px 50px; }
 
   /* Wiederkehrend: avatar | Bezeichnung | Kategorie/Intervall | Nächste/Statistik | Betrag | Aktionen */
   #wied-thead{ grid-template-columns: 0px 1fr 569px 238px 197px; auto }
 
   /* Fahrtenbuch: avatar | Strecke | Details | Kilometer | Aktionen */
-  #fb-thead{ grid-template-columns: 36px 1fr 220px 100px 50px; }
+  #fb-thead{ grid-template-columns: 36px 1fr 261px 103px 7px; }
 
   /* ── RECHNUNGEN table ── */
   #rech-list{ gap:0 !important; }
