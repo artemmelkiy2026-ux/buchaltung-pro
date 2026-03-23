@@ -671,8 +671,6 @@ async function rechBezahlt(id){
     if (!data.eintraege.find(e => e.id === newE.id)) {
       data.eintraege.unshift(newE);
     }
-    // Сбрасываем сортировку на created_at — новая запись будет первой
-    if (typeof sortCol !== 'undefined') { sortCol = 'created_at'; sortAsc = false; }
     // Сбрасываем все фильтры Einträge
     if (typeof fTyp !== 'undefined') fTyp = 'Alle';
     if (typeof einPage !== 'undefined') einPage = 1;
@@ -696,9 +694,12 @@ async function rechBezahlt(id){
         if (_fjEl) _fjEl.value = 'Alle';
         if (typeof fTyp !== 'undefined') fTyp = 'Alle';
         if (typeof einPage !== 'undefined') einPage = 1;
+        if (typeof sortCol !== 'undefined') { sortCol = 'created_at'; sortAsc = false; }
         document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
         const _allTab = document.querySelector('.ftab[onclick*="Alle"]');
         if (_allTab) _allTab.classList.add('active');
+        const _fjEl2 = document.getElementById('f-jahr');
+        if (_fjEl2) _fjEl2.value = 'Alle';
         if (typeof renderEin === 'function') renderEin();
         if (typeof renderDash === 'function') renderDash();
         setTimeout(() => {
