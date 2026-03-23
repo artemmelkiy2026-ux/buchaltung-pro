@@ -4,10 +4,24 @@ async function delE(e,id){
   if(!confirm('Eintrag stornieren? (GoBD: Einträge können nicht gelöscht werden — es wird eine Storno-Gegenbuchung erstellt)'))return;
   const storno = await sbStornoEintrag(id);
   if (!storno) return toast('Fehler beim Stornieren','err');
-  // sbStornoEintrag уже пометил оригинал и сторно-запись локально
   data.eintraege.push(storno);
+  // Показываем сторнированные записи чтобы пользователь видел потухшую запись
+  window._showStornoEin = true;
+  const _stornoBtn = document.getElementById('ftab-storno-btn');
+  if (_stornoBtn) {
+    _stornoBtn.classList.add('active');
+    _stornoBtn.style.background = 'var(--rdim)';
+    const _stornoIcon = document.getElementById('ftab-storno-icon');
+    if (_stornoIcon) _stornoIcon.className = 'fas fa-eye';
+  }
   renderAll();
-  toast('↩️ Storno-Gegenbuchung erstellt','ok');
+  if(typeof renderDash === 'function') renderDash();
+  // Скроллим к сторнированной записи
+  setTimeout(() => {
+    const _row = document.getElementById('ein-row-' + id);
+    if (_row) _row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 200);
+  toast('↩️ Storno-Gegenbuchung erstellt — Eintrag ist jetzt als storniert markiert','ok');
 }
 function selR(tr){document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('sel'));tr.classList.add('sel');}
 
@@ -151,4 +165,3 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();persist();toast('✓ Gespeichert!','ok');}
 });
 document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');}));
-
