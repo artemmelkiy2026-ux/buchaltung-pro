@@ -56,7 +56,7 @@ function toggleRechStatusDropdown(){
 }
 
 // ── RECHNUNGEN ───────────────────────────────────────────────────────────
-let rechFilter='alle', editRechId=null, rechSort='datum', rechSortDir=-1, rechPage=1;
+let rechFilter='alle', editRechId=null, rechSort='updated_at', rechSortDir=-1, rechPage=1;
 const RECH_PER_PAGE=10;
 function renderRech(){
   const rech=data.rechnungen||[];
@@ -112,8 +112,19 @@ function renderRech(){
 
   // Сортировка
   filtered.sort((a,b)=>{
-    let av = rechSort==='betrag' ? (a.betrag||0) : (a[rechSort]||'');
-    let bv = rechSort==='betrag' ? (b.betrag||0) : (b[rechSort]||'');
+    // Сторнированные всегда в конец при сортировке (кроме фильтра 'storniert')
+    if(rechFilter==='alle'){
+      const aSt=(a.status==='storniert'||a._storniert)?1:0;
+      const bSt=(b.status==='storniert'||b._storniert)?1:0;
+      if(aSt!==bSt) return aSt-bSt;
+    }
+    let av,bv;
+    if(rechSort==='betrag'){ av=a.betrag||0; bv=b.betrag||0; }
+    else if(rechSort==='updated_at'){
+      // Берём самую позднюю из updated_at / created_at
+      av = a.updated_at||a.created_at||a.datum||'';
+      bv = b.updated_at||b.created_at||b.datum||'';
+    } else { av=a[rechSort]||''; bv=b[rechSort]||''; }
     return av<bv ? rechSortDir : av>bv ? -rechSortDir : 0;
   });
 
@@ -682,7 +693,8 @@ async function rechBezahlt(id){
   if(typeof einPage !== 'undefined') einPage = 1;
 
   if(newE){
-    sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
+    r.updated_at = new Date().toISOString();
+  sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
     // Гарантируем что запись есть в data.eintraege
     if (!data.eintraege.find(e => e.id === newE.id)) {
       data.eintraege.unshift(newE);
@@ -795,6 +807,7 @@ Gemäß GoBD §146 kann die Rechnung nicht gelöscht werden. Sie wird als storni
   _rDel.status = 'storniert';
   _rDel._storniert = true;
   _rDel._storniert_am = new Date().toISOString();
+  _rDel.updated_at = new Date().toISOString();
   sbSaveRechnung(_rDel);
   sbLogRechnung(_rDel,'storniert',{status:warBezahlt?'bezahlt':'offen'},{status:'storniert'});
 
