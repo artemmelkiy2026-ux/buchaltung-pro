@@ -667,49 +667,34 @@ async function rechBezahlt(id){
 
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
-    // Убеждаемся что запись в data.eintraege
+    // Гарантируем что запись есть в data.eintraege
     if (!data.eintraege.find(e => e.id === newE.id)) {
       data.eintraege.unshift(newE);
     }
-    // Сбрасываем все фильтры Einträge
+    // Сбрасываем все фильтры синхронно до рендера
     if (typeof fTyp !== 'undefined') fTyp = 'Alle';
     if (typeof einPage !== 'undefined') einPage = 1;
     document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
     const allTab = document.querySelector('.ftab[onclick*="Alle"]');
     if (allTab) allTab.classList.add('active');
-    const _fmEl = document.getElementById('f-mon');
-    if (_fmEl) _fmEl.value = 'Alle';
-    const _fkEl = document.getElementById('f-kat');
-    if (_fkEl) _fkEl.value = 'Alle';
-    const _fzEl = document.getElementById('f-zahl');
-    if (_fzEl) _fzEl.value = 'Alle';
+    ['f-mon','f-kat','f-zahl'].forEach(id => { const el=document.getElementById(id); if(el) el.value='Alle'; });
     const _fqEl = document.getElementById('f-q');
     if (_fqEl) _fqEl.value = '';
-    // Перезагружаем eintraege из Supabase чтобы гарантированно получить свежие данные
-    renderAll();
+    // Устанавливаем год фильтра напрямую ПЕРЕД buildYearFilters
+    window._forceFilterYear = newE.datum.substring(0,4);
+    // Рендерим всё
+    if(typeof renderDash === 'function') renderDash();
+    if(typeof renderEin === 'function') renderEin();
+    if(typeof renderRech === 'function') renderRech();
+    // Сбрасываем год на Alle и перерендериваем Einträge
+    const _fjFinal = document.getElementById('f-jahr');
+    if (_fjFinal) { _fjFinal.value = 'Alle'; if(typeof renderEin==='function') renderEin(); }
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
-    if (typeof sbRefreshEintraege === 'function') {
-      sbRefreshEintraege().then(() => {
-        const _fjEl = document.getElementById('f-jahr');
-        if (_fjEl) _fjEl.value = 'Alle';
-        if (typeof fTyp !== 'undefined') fTyp = 'Alle';
-        if (typeof einPage !== 'undefined') einPage = 1;
-        document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
-        const _allTab = document.querySelector('.ftab[onclick*="Alle"]');
-        if (_allTab) _allTab.classList.add('active');
-        if (typeof renderEin === 'function') renderEin();
-        if (typeof renderDash === 'function') renderDash();
-        setTimeout(() => {
-          const _newRow = document.getElementById('ein-row-' + newE.id);
-          if (_newRow) _newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 150);
-      });
-    }
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
-    window._forceFilterYear = new Date().getFullYear()+'';
-    renderAll();
+    if(typeof renderDash === 'function') renderDash();
+    if(typeof renderRech === 'function') renderRech();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
   checkMahnungen();
