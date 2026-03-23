@@ -671,7 +671,7 @@ async function rechBezahlt(id){
     if (!data.eintraege.find(e => e.id === newE.id)) {
       data.eintraege.unshift(newE);
     }
-    // Сбрасываем все фильтры Einträge чтобы запись была видна
+    // Сбрасываем все фильтры Einträge
     if (typeof fTyp !== 'undefined') fTyp = 'Alle';
     if (typeof einPage !== 'undefined') einPage = 1;
     document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
@@ -685,14 +685,18 @@ async function rechBezahlt(id){
     if (_fzEl) _fzEl.value = 'Alle';
     const _fqEl = document.getElementById('f-q');
     if (_fqEl) _fqEl.value = '';
-    // _forceFilterYear применится в buildYearFilters внутри renderAll
-    window._forceFilterYear = newE.datum.substring(0,4);
+    // renderAll пересоберёт buildYearFilters — после него явно ставим f-jahr на Alle
     renderAll();
-    // Скроллим к новой записи в Einträge
+    // После рендера сбрасываем год на Alle и рендерим Einträge снова
     setTimeout(() => {
+      const _fjEl = document.getElementById('f-jahr');
+      if (_fjEl && _fjEl.value !== 'Alle') {
+        _fjEl.value = 'Alle';
+        if (typeof renderEin === 'function') renderEin();
+      }
       const _newRow = document.getElementById('ein-row-' + newE.id);
       if (_newRow) _newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300);
+    }, 100);
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
