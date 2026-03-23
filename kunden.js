@@ -108,6 +108,22 @@ function showWiedEintragInfo(wiedId) {
           }, 400);
         }
       },
+      { label: 'Stornieren (GoBD)', icon: 'fa-undo-alt', danger: true, action: () => {
+          // Находим все связанные Einträge этой wiederkehrenden Zahlung
+          const linked = (data.eintraege||[]).filter(e =>
+            e.beschreibung === w.bezeichnung && e.notiz === 'Wiederkehrend' &&
+            !e.is_storno && !e._storniert
+          );
+          if (!linked.length) {
+            toast('Keine buchbaren Einträge gefunden', 'err');
+            return;
+          }
+          // Сторнируем последний (самый новый)
+          const last = linked.sort((a,b) => b.datum.localeCompare(a.datum))[0];
+          const fakeEvt = { stopPropagation: () => {} };
+          delE(fakeEvt, last.id);
+        }
+      },
     ]
   });
 }
