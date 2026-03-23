@@ -3750,7 +3750,7 @@ header { background: #fff; }
   .kunde-card-right .kunde-umsatz{ font-size:14px;font-family:var(--mono);white-space:nowrap; }
   .kunde-card-right .kunde-rech-cnt{ font-size:11px;white-space:nowrap; }
   .kunde-card-right .kunde-card-actions{ flex-shrink:0; }
-  #kunden-list .kunde-card:hover{ background:var(--s2); box-shadow:none; }
+  #kunden-list .kunde-card:hover{ background:#fafafa; box-shadow:none; }
 
   /* ── PRODUKTE table ── */
   #produkte-list{ gap:0 !important; }
@@ -3773,7 +3773,7 @@ header { background: #fff; }
   .prod-price-sub{ grid-column:5;grid-row:1;text-align:right;margin:0 !important; }
   .prod-actions{ grid-column:6;grid-row:1;justify-content:flex-end; }
 
-  #produkte-list .prod-card:hover{ background:var(--s2); box-shadow:none; }
+  #produkte-list .prod-card:hover{ background:#fafafa; box-shadow:none; }
 
   /* ── WIEDERKEHREND table ── */
   #wied-list{ gap:0 !important; }
@@ -3795,7 +3795,7 @@ header { background: #fff; }
   .wied-card-schedule span{ white-space:nowrap; }
   .wied-card-betrag{ grid-column:5;grid-row:1;font-size:14px !important;font-family:var(--mono);white-space:nowrap;text-align:right; }
   .wied-card-actions{ grid-column:6;grid-row:1;display:flex;gap:3px;justify-content:flex-end; }
-  #wied-list .wied-card:hover{ background:var(--s2); box-shadow:none; border-color:var(--border); }
+  #wied-list .wied-card:hover{ background:#fafafa; box-shadow:none; border-color:var(--border); }
 }
 
 /* ── STICKY PAGINATION ── */
@@ -3823,7 +3823,7 @@ header { background: #fff; }
 }
 .fb-row:first-child{ border-radius:var(--r) var(--r) 0 0; }
 .fb-row:last-of-type{ border-bottom:1px solid var(--border); }
-.fb-row:hover{ background:var(--s2); }
+.fb-row:hover{ background:#fafafa; }
 
 .fb-row-left{
   flex:1;min-width:0;
