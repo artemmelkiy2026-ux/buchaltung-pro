@@ -3819,7 +3819,7 @@ header { background: #fff; }
 .fb-row{
   display:flex;align-items:center;gap:14px;
   background:var(--s1);border:1px solid var(--border);border-bottom:none;
-  padding:14px 18px;transition:background .12s;
+  padding:10px 10px;transition:background .12s;
 }
 .fb-row:first-child{ border-radius:var(--r) var(--r) 0 0; }
 .fb-row:last-of-type{ border-bottom:1px solid var(--border); }
