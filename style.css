@@ -3638,7 +3638,7 @@ header { background: #fff; }
   .lt-c{ flex-shrink:0; }
 
   /* Einträge: Beschreibung | Info | Tags | Betrag | Aktionen */
-  #ein-thead{ grid-template-columns: 1fr 250px 190px 87px 50px; }
+  #ein-thead{ grid-template-columns: 1fr 250px 172px 106px 50px; }
 
   /* Rechnungen: Status | Nr. | Kunde | Datum/Fällig | Betrag | Aktionen */
   #rech-thead{ grid-template-columns:70px 52px 1fr 257px 101px 186px; }
@@ -3700,7 +3700,7 @@ header { background: #fff; }
   #e-tbody .ein-row-sub{ grid-column:1;grid-row:2;padding-top:3px; }
   #e-tbody .ein-row-cat{ grid-column:2;grid-row:1; }
   #e-tbody .ein-row-tags{ grid-column:3;grid-row:1; }
-  #e-tbody .amt{ grid-column:4;grid-row:1;text-align:right;font-size:14px; }
+  #e-tbody .amt{ grid-column:4;grid-row:1;text-align:left;font-size:14px; }
   #e-tbody .ein-row-actions{ grid-column:5;grid-row:1;justify-content:flex-end;display:flex; }
   #e-tbody .ein-row:hover{ background:#fafafa;border-color:var(--border); box-shadow:none; }
 
