@@ -3626,7 +3626,7 @@ header { background: #fff; }
   .lt-c{ flex-shrink:0; }
 
   /* Einträge: Beschreibung | Info | Tags | Betrag | Aktionen */
-  #ein-thead{ grid-template-columns: 1fr 250px 170px 110px 40px; }
+  #ein-thead{ grid-template-columns: 1fr 251px 190px 87px 40px; }
 
   /* Rechnungen: Status | Nr. | Kunde | Datum/Fällig | Betrag | Aktionen */
   #rech-thead{ grid-template-columns: 40px 90px 1fr 220px 110px 210px; }
