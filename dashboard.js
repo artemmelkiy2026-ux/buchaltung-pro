@@ -1158,7 +1158,7 @@ function renderEin(){
       const _mobBtn = isMob() && !isReadonly && !_isRechVirt
         ? _moreBtn([
             {icon:'fa-edit',   label:'Bearbeiten', action:()=>editE(null,e.id)},
-            {icon:'fa-times',  label:'Stornieren', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
+            {icon:'fa-undo-alt', label:'Stornieren (GoBD)', danger:true, action:()=>delE({stopPropagation:()=>{}},e.id)}
           ])
         : '';
 
@@ -1975,7 +1975,7 @@ function showRechEintragInfo(id) {
           highlightRechnung(rechId);
         }
       },
-      ...(_rechStorniert ? [] : [{ label: 'Stornieren', icon: 'fa-undo', danger: true, action: () => {
+      ...(_rechStorniert ? [] : [{ label: 'Stornieren (GoBD)', icon: 'fa-undo-alt', danger: true, action: () => {
           _closeDetailSheet();
           const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
           nav('rechnungen', el);
@@ -2145,7 +2145,7 @@ function showEintragDetail(id) {
     ],
     buttons: isSt ? [] : [
       { label: 'Bearbeiten', icon: 'fa-edit', primary: true, action: () => editE(null, id) },
-      { label: 'Stornieren', icon: 'fa-times', danger: true, action: () => delE({stopPropagation:()=>{}}, id) },
+      { label: 'Stornieren (GoBD)', icon: 'fa-undo-alt', danger: true, action: () => delE({stopPropagation:()=>{}}, id) },
     ]
   });
 }
