@@ -248,14 +248,16 @@ function closeRechForm(){
 }
 // ── GoBD Storno + Neuerstellung ──────────────────────────────────────────
 async function _rechStornierenGoBD(r) {
+  // Сохраняем предыдущий статус ДО изменения
+  const _prevStatus = r.status;
   // Стернируем старый рехнунг
   r.status = 'storniert';
   r._storniert = true;
   r._storniert_am = new Date().toISOString();
   sbSaveRechnung(r);
-  sbLogRechnung(r, 'storniert', {status: r.status}, {status: 'storniert', grund: 'GoBD-Korrektur'});
+  sbLogRechnung(r, 'storniert', {status: _prevStatus}, {status: 'storniert', grund: 'GoBD-Korrektur'});
   // Если был bezahlt — сторнируем связанный Einnahme-Eintrag
-  if (r.status === 'bezahlt') {
+  if (_prevStatus === 'bezahlt') {
     const linked = (data.eintraege||[]).find(e =>
       e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`) && !e.is_storno
     );
@@ -563,7 +565,11 @@ function saveRechnung(){
     if(r){
       const altWert={nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig};
       const wasNotBezahlt = r.status !== 'bezahlt';
+      // Сохраняем статус — форма не должна менять bezahlt/storniert на offen
+      const _prevSt = r.status;
       Object.assign(r,obj);
+      // Восстанавливаем статус если он был bezahlt или storniert
+      if(_prevSt === 'bezahlt' || _prevSt === 'storniert') r.status = _prevSt;
       sbSaveRechnung(r);
       sbLogRechnung(r,'geaendert',altWert,{nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig});
       // Wenn neu auf bezahlt gesetzt → Einnahme automatisch buchen
