@@ -3620,11 +3620,31 @@ header { background: #fff; }
     padding:9px 18px;
     font-size:11px;font-weight:600;color:var(--sub);
     text-transform:uppercase;letter-spacing:.05em;
-  grid-template-columns: 1fr 249px 125px 123px 69px;
     background:#fafafa;
     border-radius:var(--r) var(--r) 0 0;
   }
   .lt-c{ flex-shrink:0; }
+
+  /* Einträge: Beschreibung | Info | Tags | Betrag | Aktionen */
+  #ein-thead{ grid-template-columns: 1fr 250px 170px 110px 40px; }
+
+  /* Rechnungen: Status | Nr. | Kunde | Datum/Fällig | Betrag | Aktionen */
+  #rech-thead{ grid-template-columns: 40px 90px 1fr 220px 110px 210px; }
+
+  /* Angebote: avatar | Nr. | Kunde | Status/Details | Betrag | Aktionen */
+  #ang-thead{ grid-template-columns: 40px 80px 1fr 260px 110px 90px; }
+
+  /* Kunden: avatar | Kunde | Umsatz */
+  #kunden-thead{ grid-template-columns: 40px 1fr auto; }
+
+  /* Produkte: avatar | Produkt | Details | Netto | Brutto | Aktionen */
+  #prod-thead{ grid-template-columns: 40px 1fr 200px 110px 110px 50px; }
+
+  /* Wiederkehrend: avatar | Bezeichnung | Kategorie/Intervall | Nächste/Statistik | Betrag | Aktionen */
+  #wied-thead{ grid-template-columns: 36px 1fr 200px 200px 100px auto; }
+
+  /* Fahrtenbuch: avatar | Strecke | Details | Kilometer | Aktionen */
+  #fb-thead{ grid-template-columns: 36px 1fr 220px 100px 50px; }
 
   /* ── RECHNUNGEN table ── */
   #rech-list{ gap:0 !important; }
