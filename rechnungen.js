@@ -56,7 +56,7 @@ function toggleRechStatusDropdown(){
 }
 
 // ── RECHNUNGEN ───────────────────────────────────────────────────────────
-let rechFilter='alle', editRechId=null, rechSort='datum', rechSortDir=-1, rechPage=1;
+let rechFilter='alle', editRechId=null, rechSort='updated_at', rechSortDir=-1, rechPage=1;
 const RECH_PER_PAGE=10;
 function renderRech(){
   const rech=data.rechnungen||[];
@@ -102,8 +102,17 @@ function renderRech(){
 
   // Сортировка
   filtered.sort((a,b)=>{
-    let av = rechSort==='betrag' ? (a.betrag||0) : (a[rechSort]||'');
-    let bv = rechSort==='betrag' ? (b.betrag||0) : (b[rechSort]||'');
+    if(rechFilter !== 'storniert'){
+      const aSt = (a.status==='storniert'||a._storniert) ? 1 : 0;
+      const bSt = (b.status==='storniert'||b._storniert) ? 1 : 0;
+      if(aSt !== bSt) return aSt - bSt;
+    }
+    let av, bv;
+    if(rechSort==='betrag'){ av=a.betrag||0; bv=b.betrag||0; }
+    else if(rechSort==='updated_at'){
+      av = a.updated_at||a.created_at||a.datum||'';
+      bv = b.updated_at||b.created_at||b.datum||'';
+    } else { av=a[rechSort]||''; bv=b[rechSort]||''; }
     return av<bv ? rechSortDir : av>bv ? -rechSortDir : 0;
   });
 
@@ -564,6 +573,7 @@ function saveRechnung(){
       const altWert={nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig};
       const wasNotBezahlt = r.status !== 'bezahlt';
       Object.assign(r,obj);
+      r.updated_at = new Date().toISOString();
       sbSaveRechnung(r);
       sbLogRechnung(r,'geaendert',altWert,{nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig});
       // Wenn neu auf bezahlt gesetzt → Einnahme automatisch buchen
@@ -593,7 +603,7 @@ function saveRechnung(){
     if(dupNr) return toast(`Rechnungs-Nr. ${nr} bereits vergeben!`,'err');
     const dupEin = (data.eintraege||[]).find(e=>!e.is_storno&&!e._storniert&&e.typ==='Einnahme'&&_parseSeqNr(e.belegnr)===seq);
     if(dupEin) return toast(`Nr. ${nr} ist bereits durch eine Einnahme belegt!`,'err');
-    const newR={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj};
+    const newR={id:Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj, created_at:new Date().toISOString(), updated_at:new Date().toISOString()};
     data.rechnungen.push(newR);
     sbSaveRechnung(newR);
     sbLogRechnung(newR, 'erstellt', null, {nr:newR.nr, betrag:newR.betrag, kunde:newR.kunde, status:newR.status});
@@ -655,6 +665,7 @@ async function rechBezahlt(id){
   );
   if(!ok) return;
   r.status='bezahlt';
+  r.updated_at = new Date().toISOString();
   sbSaveRechnung(r);
   const newE = _buchRechnungAlsEinnahme(r);
   // Сбрасываем фильтры Einträge чтобы новая запись точно была видна
@@ -797,6 +808,7 @@ Gemäß GoBD §146 kann die Rechnung nicht gelöscht werden. Sie wird als storni
   _rDel.status = 'storniert';
   _rDel._storniert = true;
   _rDel._storniert_am = new Date().toISOString();
+  _rDel.updated_at = new Date().toISOString();
   sbSaveRechnung(_rDel);
   sbLogRechnung(_rDel,'storniert',{status:warBezahlt?'bezahlt':'offen'},{status:'storniert'});
 
