@@ -149,7 +149,7 @@ function mobNavDrawer(page) {
 // ═══════════════════════════════════════════════════════════════
 let editKundeId = null;
 
-let kundenSort='name', kundenSortAsc=true, kundenPage=1;
+let kundenSort='created_at', kundenSortAsc=false, kundenPage=1;
 const KUNDEN_PER_PAGE=10;
 
 function sortKunden(col){
@@ -200,6 +200,7 @@ function renderKunden(){
   const sorted = [...filtered].sort((a,b)=>{
     let av,bv;
     if(kundenSort==='umsatz'){ av=getKundeUmsatz(a.id); bv=getKundeUmsatz(b.id); }
+    else if(kundenSort==='created_at'){ av=a.created_at||a.name||''; bv=b.created_at||b.name||''; }
     else { av=(a[kundenSort]||'').toLowerCase(); bv=(b[kundenSort]||'').toLowerCase(); }
     const dir=kundenSortAsc?1:-1;
     return av<bv?-dir:av>bv?dir:0;

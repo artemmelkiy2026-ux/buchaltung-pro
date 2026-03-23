@@ -50,6 +50,12 @@ function renderProdukte() {
   }
   empty.style.display = 'none';
 
+  // Сортировка по created_at — последний добавленный первым
+  items = [...items].sort((a,b) => {
+    const ca = a.created_at||'', cb = b.created_at||'';
+    return cb.localeCompare(ca);
+  });
+
   // Пагинация
   const totalPages = Math.max(1, Math.ceil(items.length / PROD_PER_PAGE));
   if(prodPage > totalPages) prodPage = totalPages;
@@ -156,6 +162,7 @@ function saveAngProdukt(andNew) {
     const idx = data.produkte.findIndex(x => x.id === editProduktId);
     if (idx >= 0) data.produkte[idx] = prod;
   } else {
+    prod.created_at = prod.created_at || new Date().toISOString();
     data.produkte.push(prod);
   }
 

@@ -351,7 +351,7 @@ function saveFahrt() {
     if (f) { Object.assign(f,obj); if(typeof sbSaveFahrt==='function') sbSaveFahrt(f); }
     fbEditId=null;
   } else {
-    const newF = { id:'fb-'+Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj };
+    const newF = { id:'fb-'+Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj, created_at: new Date().toISOString() };
     data.fahrtenbuch.push(newF);
     if (typeof sbSaveFahrt==='function') sbSaveFahrt(newF);
   }

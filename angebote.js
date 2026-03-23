@@ -3,7 +3,7 @@
 
 let angPage = 1;
 let angFilter = 'alle';
-let angSort = 'datum';
+let angSort = 'created_at';
 let editAngId = null;
 let angPreisMode = 'brutto';
 const ANG_PER = 10;
@@ -119,7 +119,10 @@ function renderAngebote() {
 
   // Сортировка
   filtered.sort((a, b) => {
-    const av = a[angSort]||'', bv = b[angSort]||'';
+    let av, bv;
+    if(angSort==='created_at'){
+      av = a.updated_at||a.created_at||a.datum||''; bv = b.updated_at||b.created_at||b.datum||'';
+    } else { av = a[angSort]||''; bv = b[angSort]||''; }
     return av < bv ? 1 : av > bv ? -1 : 0;
   });
 
@@ -479,11 +482,11 @@ function saveAng() {
 
   if (editAngId) {
     const a = data.angebote.find(x=>x.id===editAngId);
-    if (a) { Object.assign(a, obj); sbSaveAngebot(a); }
+    if (a) { Object.assign(a, obj); a.updated_at = new Date().toISOString(); sbSaveAngebot(a); }
     editAngId = null;
   } else {
     if (data.angebote.find(a=>a.nr===nr)) return toast(`Nr. ${nr} bereits vergeben!`, 'err');
-    const newA = { id: Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj };
+    const newA = { id: Date.now()+'_'+Math.random().toString(36).slice(2,6), ...obj, created_at: new Date().toISOString() };
     data.angebote.push(newA);
     sbSaveAngebot(newA);
   }

@@ -1,6 +1,6 @@
 // ── WIEDERKEHREND ────────────────────────────────────────────────────────
 let wiedTyp='Ausgabe';
-let wiedSort='naechste', wiedSortAsc=true, wiedPage=1;
+let wiedSort='created_at', wiedSortAsc=false, wiedPage=1;
 const WIED_PER_PAGE=10;
 
 function sortWied(col){
@@ -143,7 +143,8 @@ function renderWied(){
 
   // Сортировка
   const sorted=[...wied].sort((a,b)=>{
-    let av=a[wiedSort]||'', bv=b[wiedSort]||'';
+    let av = wiedSort==='created_at' ? (a.created_at||a.naechste||'') : (a[wiedSort]||'');
+    let bv = wiedSort==='created_at' ? (b.created_at||b.naechste||'') : (b[wiedSort]||'');
     if(wiedSort==='betrag'){av=a.betrag;bv=b.betrag;}
     return av<bv?(wiedSortAsc?-1:1):av>bv?(wiedSortAsc?1:-1):0;
   });
@@ -345,7 +346,7 @@ function saveWied(){
     editWiedId=null;
     toast('Vorlage aktualisiert','ok');
   } else {
-    const newW={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),status:'active',buchungen:0,...obj};
+    const newW={id:Date.now()+'_'+Math.random().toString(36).slice(2,6),status:'active',buchungen:0,...obj,created_at:new Date().toISOString()};
     data.wiederkehrend.push(newW);
     sbSaveWied(newW);
     toast('Vorlage gespeichert','ok');
@@ -509,7 +510,8 @@ function wBuchenCore(id){
     zahlungsart:w.zahlungsart, beschreibung:w.bezeichnung,
     notiz:'Wiederkehrend', betrag:w.betrag,
     _fromWiederkehrend: true,
-    _wiederkehrendId: w.id
+    _wiederkehrendId: w.id,
+    created_at: new Date().toISOString()
   };
   data.eintraege.unshift(newE);
   sbSaveEintrag(newE);
