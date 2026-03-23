@@ -477,7 +477,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 .ang-card{
   display:grid;grid-template-columns:32px 1fr auto;gap:4px 10px;
   background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);
-  padding:14px 16px;cursor:pointer;
+  padding:10px 10px;cursor:pointer;
   transition:border-color .15s, box-shadow .15s;
 }
 .ang-card-avatar{ grid-column:1;grid-row:1;align-self:start;margin-top:2px; }
