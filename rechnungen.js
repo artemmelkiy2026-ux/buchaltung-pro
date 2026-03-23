@@ -628,19 +628,20 @@ function saveRechnung(){
     }
   }
   renderRech(); closeRechForm();
-  // Сбрасываем год в Dashboard и Einträge
-  const _dyEl2 = document.getElementById('dash-yr');
-  if (_dyEl2) _dyEl2.value = 'Alle';
-  const _fjEl4 = document.getElementById('f-jahr');
-  if (_fjEl4) _fjEl4.value = 'Alle';
+  // Сбрасываем фильтры и сортировку
   if(typeof fTyp !== 'undefined') fTyp = 'Alle';
   if(typeof einPage !== 'undefined') einPage = 1;
   if(typeof sortCol !== 'undefined') { sortCol = 'created_at'; sortAsc = false; }
   document.querySelectorAll('#p-eintraege .ftab').forEach(b => b.classList.remove('active'));
   const _allTabS = document.querySelector('#p-eintraege .ftab[onclick*="Alle"]');
   if (_allTabS) _allTabS.classList.add('active');
+  // renderAll вызывает buildYearFilters — после него явно ставим Alle
   if(typeof renderAll === 'function') renderAll();
-  if(typeof renderDash === 'function') renderDash();
+  // ПОСЛЕ renderAll сбрасываем год (buildYearFilters уже отработал)
+  const _fjFinalS = document.getElementById('f-jahr');
+  if (_fjFinalS && _fjFinalS.value !== 'Alle') { _fjFinalS.value = 'Alle'; if(typeof renderEin==='function') renderEin(); }
+  const _dyFinalS = document.getElementById('dash-yr');
+  if (_dyFinalS && _dyFinalS.value !== 'Alle') { _dyFinalS.value = 'Alle'; if(typeof renderDash==='function') renderDash(); }
   toast('✓ Rechnung gespeichert!','ok'); checkMahnungen();
 }
 async function rechAusstellen(id) {
@@ -701,14 +702,12 @@ async function rechBezahlt(id){
   ['f-mon','f-kat','f-zahl'].forEach(id => { const el=document.getElementById(id); if(el) el.value='Alle'; });
   const _fqB = document.getElementById('f-q'); if(_fqB) _fqB.value='';
   // Сбрасываем год ПОСЛЕ buildYearFilters через флаг
-  window._forceEinJahrAlle = true;
-  // Сбрасываем год Dashboard тоже
-  const _dyEl = document.getElementById('dash-yr');
-  if (_dyEl) _dyEl.value = 'Alle';
-  renderAll();
-  // После рендера ещё раз сбрасываем год и перерисовываем
+  // renderAll → buildYearFilters → после него ставим Alle
+  if(typeof renderAll === 'function') renderAll();
   const _fjFinal = document.getElementById('f-jahr');
-  if (_fjFinal) { _fjFinal.value = 'Alle'; if(typeof renderEin==='function') renderEin(); }
+  if (_fjFinal && _fjFinal.value !== 'Alle') { _fjFinal.value = 'Alle'; if(typeof renderEin==='function') renderEin(); }
+  const _dyFinal = document.getElementById('dash-yr');
+  if (_dyFinal && _dyFinal.value !== 'Alle') { _dyFinal.value = 'Alle'; if(typeof renderDash==='function') renderDash(); }
 
   toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(newE?newE.betrag:r.betrag)} gebucht`,'ok');
 
