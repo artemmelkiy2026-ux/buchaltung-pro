@@ -64,7 +64,17 @@ function renderRech(){
   rech.forEach(r=>{if(r.status==='offen'&&r.faellig&&r.faellig<today)r.status='ueberfaellig';});
 
   const q = (document.getElementById('rech-search')||{value:''}).value.toLowerCase();
-  let filtered = rechFilter==='alle' ? [...rech] : rech.filter(r=>r.status===rechFilter);
+  let filtered = rechFilter==='alle'
+    ? [...rech].sort((a,b) => {
+        // Сторнированные всегда в конец
+        const aSt = (a.status==='storniert'||a._storniert) ? 1 : 0;
+        const bSt = (b.status==='storniert'||b._storniert) ? 1 : 0;
+        if(aSt !== bSt) return aSt - bSt;
+        return 0; // остальная сортировка применится ниже
+      })
+    : rech.filter(r => rechFilter==='storniert'
+        ? (r.status==='storniert'||r._storniert)
+        : r.status===rechFilter);
   if(q) filtered = filtered.filter(r=>(r.nr||'').toLowerCase().includes(q)||(r.kunde||'').toLowerCase().includes(q));
 
   const entwurf = rech.filter(r=>r.status==='entwurf');
