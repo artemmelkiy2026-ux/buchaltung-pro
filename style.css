@@ -3863,7 +3863,7 @@ header { background: #fff; }
     display:grid !important;
     grid-template-columns:36px 1fr 220px 100px 50px;
     align-items:center;gap:0 12px;
-    border-radius:0;border-left:none;border-right:none;border-top:none;
+    border-radius:0;border-top:none;
     margin:0;padding:10px 18px;
   }
   #fb-list .fb-row:last-of-type{ border-radius:0 0 var(--r) var(--r);border-bottom:none; }
