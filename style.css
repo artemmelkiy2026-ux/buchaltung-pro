@@ -3653,7 +3653,7 @@ header { background: #fff; }
     grid-template-columns:40px 90px 1fr 220px 120px 210px;
     align-items:center;
     gap:0 12px;
-    border-radius:0;border-left:none;border-right:none;border-top:none;
+    border-radius:0;border-top:none;
     margin:0;min-height: 85px;
     }
   #rech-list .rech-card:last-child{ border-radius:0 0 var(--r) var(--r); }
@@ -3716,7 +3716,7 @@ header { background: #fff; }
     display:grid !important;
     grid-template-columns:40px 1fr auto;
     align-items:center;gap:0 16px;
-    border-radius:0;border-left:none;border-right:none;border-top:none;
+    border-radius:0;border-top:none;
     margin:0;padding:12px 18px;
     }
   #kunden-list .kunde-card:last-child{ border-radius:0 0 var(--r) var(--r); }
@@ -3758,7 +3758,7 @@ header { background: #fff; }
     display:grid !important;
     grid-template-columns:40px 1fr 200px 110px 110px 50px;
     align-items:center;gap:0 12px;
-    border-radius:0;border-left:none;border-right:none;border-top:none;
+    border-radius:0;border-top:none;
     margin:0;padding:10px 18px;
     }
   #produkte-list .prod-card:last-child{ border-radius:0 0 var(--r) var(--r); }
