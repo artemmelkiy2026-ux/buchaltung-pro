@@ -333,6 +333,32 @@ async function sbStornoEintrag(id) {
   if (error) { console.error('Storno error:', error); return null; }
   return storno;
 }
+// Быстрое обновление только eintraege из Supabase
+async function sbRefreshEintraege() {
+  if (!currentUser) return;
+  try {
+    const { data: einData } = await sb.from('eintraege').select('*')
+      .eq('user_id', currentUser.id).order('datum', { ascending: false });
+    if (!einData) return;
+    const eintraege = einData.map(dbToEintrag);
+    // Восстанавливаем _storniert
+    const stornoOfIds = new Set(eintraege.filter(e => e.is_storno && e.storno_of).map(e => e.storno_of));
+    eintraege.forEach(e => { if (stornoOfIds.has(e.id)) e._storniert = true; });
+    // Восстанавливаем _fromRechnung
+    const _rechByNr = {};
+    (data.rechnungen||[]).forEach(r => { if (r.nr) _rechByNr[r.nr] = r.id; });
+    eintraege.forEach(e => {
+      if (!e.is_storno && e.typ === 'Einnahme' && e.belegnr && _rechByNr[e.belegnr]) {
+        e._fromRechnung = true;
+        e._rechnungId   = _rechByNr[e.belegnr];
+      }
+    });
+    data.eintraege = eintraege;
+  } catch(err) {
+    console.error('[sbRefreshEintraege]', err);
+  }
+}
+
 async function sbSaveKunde(k) {
   if (!currentUser) { console.warn('sbSaveKunde: no user'); return; }
   const {error} = await sb.from('kunden').upsert(kundeToDb(k), {onConflict:'id'});

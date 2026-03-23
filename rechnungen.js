@@ -161,7 +161,7 @@ function renderRech(){
                   {icon:'fa-eye', label:'Details anzeigen', action:()=>showRechDetailReadonly(r.id)}
                 ])
               : _moreBtn([
-                  ...(r.status!=='bezahlt' ? [{icon:'fa-check', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
+                  ...(r.status!=='bezahlt' ? [{icon:'fa-check-circle', label:'Als bezahlt markieren', action:()=>rechBezahlt(r.id)}] : []),
                   ...(r.status==='entwurf' ? [{icon:'fa-paper-plane', label:'Ausstellen', action:()=>rechAusstellen(r.id)}] : [{icon:'fa-print', label:'Drucken / PDF', action:()=>druckRechnungId(r.id)}]),
                   {icon:'fa-eye',     label:'HTML-Vorschau',  action:()=>vorschauRechnungId(r.id)},
                   {icon:'fa-file-alt', label:'Als Vorlage',   action:()=>rechAlsVorlage(r.id)},
@@ -172,7 +172,7 @@ function renderRech(){
                 <button class="rda-btn" onclick="showRechDetailReadonly('${r.id}')" title="Details anzeigen"><i class="fas fa-eye"></i></button>
                 <button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="PDF / Drucken"><i class="fas fa-print"></i></button>
               ` : `
-                ${r.status!=='bezahlt' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren"><i class="fas fa-check"></i></button>` : ''}
+                ${r.status!=='bezahlt' ? `<button class="rda-btn rda-green" onclick="rechBezahlt('${r.id}')" title="Als bezahlt markieren" style="width:32px;height:32px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center"><i class="fas fa-check-circle"></i></button>` : ''}
                 ${r.status==='entwurf' ? `<button class="rda-btn rda-green" onclick="rechAusstellen('${r.id}')" title="Ausstellen"><i class="fas fa-paper-plane"></i></button>` : ''}
                 <button class="rda-btn" onclick="vorschauRechnungId('${r.id}')" title="HTML-Vorschau"><i class="fas fa-eye"></i></button>
                 ${r.status!=='entwurf' ? `<button class="rda-btn" onclick="druckRechnungId('${r.id}')" title="Drucken / PDF"><i class="fas fa-print"></i></button>` : ''}
@@ -685,19 +685,26 @@ async function rechBezahlt(id){
     if (_fzEl) _fzEl.value = 'Alle';
     const _fqEl = document.getElementById('f-q');
     if (_fqEl) _fqEl.value = '';
-    // renderAll пересоберёт buildYearFilters — после него явно ставим f-jahr на Alle
+    // Перезагружаем eintraege из Supabase чтобы гарантированно получить свежие данные
     renderAll();
-    // После рендера сбрасываем год на Alle и рендерим Einträge снова
-    setTimeout(() => {
-      const _fjEl = document.getElementById('f-jahr');
-      if (_fjEl && _fjEl.value !== 'Alle') {
-        _fjEl.value = 'Alle';
-        if (typeof renderEin === 'function') renderEin();
-      }
-      const _newRow = document.getElementById('ein-row-' + newE.id);
-      if (_newRow) _newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
+    if (typeof sbRefreshEintraege === 'function') {
+      sbRefreshEintraege().then(() => {
+        const _fjEl = document.getElementById('f-jahr');
+        if (_fjEl) _fjEl.value = 'Alle';
+        if (typeof fTyp !== 'undefined') fTyp = 'Alle';
+        if (typeof einPage !== 'undefined') einPage = 1;
+        document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+        const _allTab = document.querySelector('.ftab[onclick*="Alle"]');
+        if (_allTab) _allTab.classList.add('active');
+        if (typeof renderEin === 'function') renderEin();
+        if (typeof renderDash === 'function') renderDash();
+        setTimeout(() => {
+          const _newRow = document.getElementById('ein-row-' + newE.id);
+          if (_newRow) _newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      });
+    }
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
