@@ -2539,8 +2539,8 @@ input, select, textarea {
 .vorl-card-actions{ display:flex;align-items:center;gap:4px; }
 
 .rech-card-storniert{
-  opacity:0.5;
-  filter:grayscale(30%);
+  opacity:0.55;
+  filter:grayscale(40%);
   background:repeating-linear-gradient(
     -45deg,
     transparent,
@@ -2549,10 +2549,22 @@ input, select, textarea {
     rgba(239,68,68,.05) 16px
   );
   border-color:rgba(239,68,68,.15)!important;
+  cursor:default!important;
 }
 .rech-card-storniert:hover{
   opacity:0.65;
-  filter:grayscale(15%);
+  filter:grayscale(25%);
+  box-shadow:none!important;
+  border-color:rgba(239,68,68,.15)!important;
+}
+/* Только просмотр — все кнопки кроме eye и print скрыты */
+.rech-card-storniert .rda-green,
+.rech-card-storniert .rda-red,
+.rech-card-storniert [onclick*="editRech"],
+.rech-card-storniert [onclick*="rechAlsVorlage"],
+.rech-card-storniert [onclick*="rechAusstellen"],
+.rech-card-storniert [onclick*="rechBezahlt"] {
+  display:none!important;
 }
 .rech-card-storniert .rech-card-betrag{
   text-decoration:line-through;
