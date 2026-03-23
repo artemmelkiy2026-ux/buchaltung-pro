@@ -113,9 +113,9 @@ function renderRech(){
       av = a.updated_at||a.created_at||a.datum||'';
       bv = b.updated_at||b.created_at||b.datum||'';
     } else if(rechSort==='nr'){
-      // Парсим порядковый номер из "2026-34" → 34
       const _parseNr = s => { if(!s) return 0; const p=String(s).split('-'); return parseInt(p[p.length-1])||0; };
-      av = _parseNr(a.nr); bv = _parseNr(b.nr);
+      const na = _parseNr(a.nr), nb = _parseNr(b.nr);
+      return rechSortDir === -1 ? nb - na : na - nb;
     } else { av=a[rechSort]||''; bv=b[rechSort]||''; }
     return av<bv ? rechSortDir : av>bv ? -rechSortDir : 0;
   });
