@@ -459,7 +459,8 @@ function _buchRechnungAlsEinnahme(r) {
     mwstBetrag: _rMwst,
     mwstRate: _rRate,
     _fromRechnung: true,
-    _rechnungId: r.id
+    _rechnungId: r.id,
+    created_at: new Date().toISOString()
   };
   data.eintraege.unshift(newE);
   sbSaveEintrag(newE);
