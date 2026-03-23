@@ -138,7 +138,10 @@ function renderLetzteEinnahmen(flashId=null) {
   if (!list) return;
   const recent = activeEintraege()
     .filter(e => e.typ === 'Einnahme')
-    .sort((a,b) => b.datum.localeCompare(a.datum))
+    .sort((a,b) => {
+      const ca = a.created_at||a.datum||'', cb = b.created_at||b.datum||'';
+      return cb.localeCompare(ca);
+    })
     .slice(0, 7);
   if (!recent.length) {
     list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">Noch keine Einnahmen</div>';
@@ -182,7 +185,10 @@ function renderLetzteAusgaben(flashId=null) {
   if (!list) return;
   const recent = activeEintraege()
     .filter(e => e.typ === 'Ausgabe')
-    .sort((a,b) => b.datum.localeCompare(a.datum))
+    .sort((a,b) => {
+      const ca = a.created_at||a.datum||'', cb = b.created_at||b.datum||'';
+      return cb.localeCompare(ca);
+    })
     .slice(0, 7);
   if (!recent.length) {
     list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">Noch keine Ausgaben</div>';
@@ -1026,7 +1032,9 @@ function getFiltered(){
     });
   }
   return data.eintraege.filter(e=>{
-    if((e.is_storno||e._storniert) && !window._showStornoEin)return false; // GoBD
+    if(e._storniert && !window._showStornoEin)return false; // оригинал сторнирован — скрыт
+    if(e.is_storno && !window._showStornoEin)return false; // Gegenbuchung — скрыта
+    if(e._storniert && window._showStornoEin)return false; // оригинал НЕ показываем даже при showStornoEin — только Gegenbuchung
     if(fTyp!=='Alle'&&e.typ!==fTyp)return false;
     if(j!=='Alle'&&!e.datum.startsWith(j))return false;
     if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;

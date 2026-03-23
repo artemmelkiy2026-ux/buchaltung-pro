@@ -248,11 +248,13 @@ function buildYearFilters(){
   });
   // Сбрасываем флаг после применения
   if (window._forceFilterYear) window._forceFilterYear = null;
-  // Если установлен флаг — сбрасываем f-jahr на Alle
+  // Если установлен флаг — сбрасываем f-jahr на Alle и перерисовываем
   if (window._forceEinJahrAlle) {
     window._forceEinJahrAlle = null;
     const _fjReset = document.getElementById('f-jahr');
-    if (_fjReset) { _fjReset.value = 'Alle'; }
+    if (_fjReset) _fjReset.value = 'Alle';
+    const _dyReset = document.getElementById('dash-yr');
+    if (_dyReset) _dyReset.value = 'Alle';
   }
   // rep-yr: only real years — preserve current selection
   const ry=document.getElementById('rep-yr');
