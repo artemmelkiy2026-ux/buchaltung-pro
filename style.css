@@ -3781,7 +3781,7 @@ header { background: #fff; }
     display:grid !important;
     grid-template-columns:36px 1fr 200px 200px 100px auto;
     align-items:center;gap:0 12px;
-    border-radius:0;border-left:none;border-right:none;border-top:none;
+    border-radius:0;border-top:none;
     margin:0;padding:10px 18px;line-height: 1.2;
   }
   #wied-list .wied-card:last-child{ border-radius:0 0 var(--r) var(--r); }
