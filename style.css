@@ -3652,7 +3652,7 @@ header { background: #fff; }
   #e-tbody{ gap:0 !important; }
   #e-tbody .ein-row{
     display:grid;
-    grid-template-columns:1fr 220px 200px 110px 50px;
+    grid-template-columns:1fr 250px 170px 110px 40px;
     align-items:center;
     gap:0 12px;
     border-radius:0;border-left:none;border-right:none;border-top:none;
