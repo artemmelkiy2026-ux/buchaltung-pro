@@ -351,7 +351,6 @@ function nav(id, el){
   if(id==='vorlagen') renderVorlagen();
   if(id==='fahrtenbuch') initFahrtenbuch();
   if(id==='eintraege') renderEin();
-  if(id==='bankabgleich') { if(typeof initBankabgleich==='function') initBankabgleich(); }
   if(id==='neu') updateNeuToolbar(false);
 }
 
