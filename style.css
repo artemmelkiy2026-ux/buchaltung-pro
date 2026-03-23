@@ -3626,13 +3626,13 @@ header { background: #fff; }
   .lt-c{ flex-shrink:0; }
 
   /* Einträge: Beschreibung | Info | Tags | Betrag | Aktionen */
-  #ein-thead{ grid-template-columns: 1fr 251px 190px 87px 40px; }
+  #ein-thead{ grid-template-columns: 1fr 250px 190px 87px 40px; }
 
   /* Rechnungen: Status | Nr. | Kunde | Datum/Fällig | Betrag | Aktionen */
-  #rech-thead{ grid-template-columns:42px 90px 1fr 255px 110px 186px; }
+  #rech-thead{ grid-template-columns:70px 52px 1fr 257px 101px 186px; }
 
   /* Angebote: avatar | Nr. | Kunde | Status/Details | Betrag | Aktionen */
-  #ang-thead{ grid-template-columns: 62px 56px 1fr 300px 110px 48px; }
+  #ang-thead{ grid-template-columns: 56px 56px 1fr 300px 102px 48px; }
 
   /* Kunden: avatar | Kunde | Umsatz */
   #kunden-thead{ grid-template-columns: 40px 1fr auto; }
