@@ -2623,7 +2623,7 @@ input, select, textarea {
   transition:border-color .12s, background .12s;
 }
 .ein-row:hover{ border-color:var(--border2); background:var(--s2); }
-.ein-row-st{ opacity:.45 }
+/* ein-row-st — основной стиль в @media блоке ниже */
 
 /* Body: icon + content */
 .ein-row-body{
@@ -4265,14 +4265,30 @@ header { background: #fff; }
 .ftab-storno { opacity: .65; }
 .ftab-storno.active { opacity: 1; }
 
-/* Sторнированная строка — потухшая */
+/* Сторнированная строка — как rech-card-storniert */
 .ein-row-st {
-  opacity: .5;
+  opacity: 0.5;
+  filter: grayscale(30%);
   background: repeating-linear-gradient(
     -45deg,
     transparent,
     transparent 8px,
-    rgba(0,0,0,.02) 8px,
-    rgba(0,0,0,.02) 9px
+    rgba(239,68,68,.05) 8px,
+    rgba(239,68,68,.05) 16px
+  ) !important;
+  border-color: rgba(239,68,68,.15) !important;
+  cursor: default !important;
+}
+.ein-row-st:hover {
+  opacity: 0.65 !important;
+  filter: grayscale(15%);
+  box-shadow: none !important;
+  border-color: rgba(239,68,68,.15) !important;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    rgba(239,68,68,.05) 8px,
+    rgba(239,68,68,.05) 16px
   ) !important;
 }
