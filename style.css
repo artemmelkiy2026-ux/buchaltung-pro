@@ -3621,7 +3621,7 @@ header { background: #fff; }
     font-size:11px;font-weight:600;color:var(--sub);
     text-transform:uppercase;letter-spacing:.05em;
     background:#fafafa;
-    border-radius:var(--r) var(--r) 0 0;
+    border-radius:var(--r) var(--r) 0 0;border: 1px solid #e8e8e8;
   }
   .lt-c{ flex-shrink:0; }
 
@@ -3676,7 +3676,7 @@ header { background: #fff; }
     grid-template-columns:1fr 250px 170px 110px 40px;
     align-items:center;
     gap:0 12px;
-    border-radius:0;border-left:none;border-right:none;border-top:none;
+    border-radius:0;border-top:none;
     margin:0; min-height: 90px; padding-top:14px;padding-bottom:14px;
     }
   #e-tbody .ein-row:last-child{ border-radius:0 0 var(--r) var(--r); }
