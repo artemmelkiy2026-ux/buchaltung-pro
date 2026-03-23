@@ -733,36 +733,62 @@ function _rechDuplizieren(id){
 
 async function delRech(id){
   const _rDel=data.rechnungen.find(r=>r.id===id); if(!_rDel) return;
-  // Сторнированные Rechnungen нельзя удалять (GoBD)
+
+  // Уже сторнирована — только просмотр
   if(_rDel.status==='storniert' || _rDel._storniert){
-    toast('Stornierte Rechnungen können nicht gelöscht werden (GoBD §146)','err');
+    showRechDetailReadonly(id);
     return;
   }
+
+  // Черновик — можно удалить физически
+  if(_rDel.status==='entwurf'){
+    const _okDel = await appConfirm(
+      `Entwurf "${_rDel.nr||'Entwurf'}" löschen?`,
+      {title:'Entwurf löschen', icon:'🗑️', okLabel:'Löschen', danger:true}
+    );
+    if(!_okDel) return;
+    sbLogRechnung(_rDel,'geloescht',{nr:_rDel.nr,betrag:_rDel.betrag,status:_rDel.status,kunde:_rDel.kunde},null);
+    data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);
+    if(typeof sbDeleteRechnung==='function') sbDeleteRechnung(id);
+    renderRech();
+    toast(`Entwurf gelöscht`,'ok');
+    return;
+  }
+
+  // Все остальные статусы (offen, bezahlt, ueberfaellig) → только Stornieren
   const warBezahlt = _rDel.status==='bezahlt';
   const confirmMsg = warBezahlt
-    ? `Rechnung ${_rDel.nr} löschen?
-⚠ Diese Rechnung ist bezahlt — die zugehörige Einnahme wird storniert!`
-    : `Rechnung ${_rDel.nr} wirklich löschen?`;
-  const _okR=await appConfirm(confirmMsg,{title:'Rechnung löschen',icon:'🗑️',okLabel:'Löschen',danger:true});
-  if(!_okR)return;
-  // Wenn bezahlt → zugehörige Einnahme stornieren (GoBD)
+    ? `Rechnung ${_rDel.nr} stornieren?
+⚠ Diese Rechnung ist bezahlt — die zugehörige Einnahme wird ebenfalls storniert (GoBD §146).`
+    : `Rechnung ${_rDel.nr} stornieren?
+
+Gemäß GoBD §146 kann die Rechnung nicht gelöscht werden. Sie wird als storniert markiert und bleibt im System sichtbar.`;
+  const _okR = await appConfirm(confirmMsg, {
+    title:'Rechnung stornieren', icon:'↩️', okLabel:'Stornieren (GoBD)', danger:true
+  });
+  if(!_okR) return;
+
+  // Стornируем связанную Einnahme если bezahlt
   if(warBezahlt){
     const linkedE = data.eintraege.find(e =>
       e.beschreibung && e.beschreibung.includes(`Rechnung ${_rDel.nr}:`) && !e.is_storno && !e._storniert
     );
     if(linkedE){
       const storno = await sbStornoEintrag(linkedE.id);
-      if(storno){
-        data.eintraege.push(storno);
-        toast(`↩️ Einnahme "${linkedE.beschreibung}" wurde storniert`,'ok');
-      }
+      if(storno) data.eintraege.push(storno);
     }
   }
-  sbLogRechnung(_rDel,'geloescht',{nr:_rDel.nr,betrag:_rDel.betrag,status:_rDel.status,kunde:_rDel.kunde},null);
-  data.rechnungen=(data.rechnungen||[]).filter(r=>r.id!==id);
-  sbDeleteRechnung(id);
+
+  // Помечаем рехнунг как сторнированный (НЕ удаляем)
+  _rDel.status = 'storniert';
+  _rDel._storniert = true;
+  _rDel._storniert_am = new Date().toISOString();
+  sbSaveRechnung(_rDel);
+  sbLogRechnung(_rDel,'storniert',{status:warBezahlt?'bezahlt':'offen'},{status:'storniert'});
+
+  renderRech();
   renderAll();
-  toast(`Rechnung ${_rDel.nr} gelöscht`,'err');
+  toast(`↩️ Rechnung ${_rDel.nr} storniert (GoBD §146) — Rechnung bleibt als storniert sichtbar`,'ok');
 }
 // ── RECHNUNG POSITIONEN ───────────────────────────────────────────────────
 
