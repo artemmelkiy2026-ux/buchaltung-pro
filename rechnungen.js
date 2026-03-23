@@ -56,7 +56,7 @@ function toggleRechStatusDropdown(){
 }
 
 // ── RECHNUNGEN ───────────────────────────────────────────────────────────
-let rechFilter='alle', editRechId=null, rechSort='updated_at', rechSortDir=-1, rechPage=1;
+let rechFilter='alle', editRechId=null, rechSort='datum', rechSortDir=-1, rechPage=1;
 const RECH_PER_PAGE=10;
 function renderRech(){
   const rech=data.rechnungen||[];
@@ -64,17 +64,7 @@ function renderRech(){
   rech.forEach(r=>{if(r.status==='offen'&&r.faellig&&r.faellig<today)r.status='ueberfaellig';});
 
   const q = (document.getElementById('rech-search')||{value:''}).value.toLowerCase();
-  let filtered = rechFilter==='alle'
-    ? [...rech].sort((a,b) => {
-        // Сторнированные всегда в конец
-        const aSt = (a.status==='storniert'||a._storniert) ? 1 : 0;
-        const bSt = (b.status==='storniert'||b._storniert) ? 1 : 0;
-        if(aSt !== bSt) return aSt - bSt;
-        return 0; // остальная сортировка применится ниже
-      })
-    : rech.filter(r => rechFilter==='storniert'
-        ? (r.status==='storniert'||r._storniert)
-        : r.status===rechFilter);
+  let filtered = rechFilter==='alle' ? [...rech] : rech.filter(r=>r.status===rechFilter);
   if(q) filtered = filtered.filter(r=>(r.nr||'').toLowerCase().includes(q)||(r.kunde||'').toLowerCase().includes(q));
 
   const entwurf = rech.filter(r=>r.status==='entwurf');
@@ -112,19 +102,8 @@ function renderRech(){
 
   // Сортировка
   filtered.sort((a,b)=>{
-    // Сторнированные всегда в конец при сортировке (кроме фильтра 'storniert')
-    if(rechFilter==='alle'){
-      const aSt=(a.status==='storniert'||a._storniert)?1:0;
-      const bSt=(b.status==='storniert'||b._storniert)?1:0;
-      if(aSt!==bSt) return aSt-bSt;
-    }
-    let av,bv;
-    if(rechSort==='betrag'){ av=a.betrag||0; bv=b.betrag||0; }
-    else if(rechSort==='updated_at'){
-      // Берём самую позднюю из updated_at / created_at
-      av = a.updated_at||a.created_at||a.datum||'';
-      bv = b.updated_at||b.created_at||b.datum||'';
-    } else { av=a[rechSort]||''; bv=b[rechSort]||''; }
+    let av = rechSort==='betrag' ? (a.betrag||0) : (a[rechSort]||'');
+    let bv = rechSort==='betrag' ? (b.betrag||0) : (b[rechSort]||'');
     return av<bv ? rechSortDir : av>bv ? -rechSortDir : 0;
   });
 
@@ -269,16 +248,14 @@ function closeRechForm(){
 }
 // ── GoBD Storno + Neuerstellung ──────────────────────────────────────────
 async function _rechStornierenGoBD(r) {
-  // Сохраняем предыдущий статус ДО изменения
-  const _prevStatus = r.status;
   // Стернируем старый рехнунг
   r.status = 'storniert';
   r._storniert = true;
   r._storniert_am = new Date().toISOString();
   sbSaveRechnung(r);
-  sbLogRechnung(r, 'storniert', {status: _prevStatus}, {status: 'storniert', grund: 'GoBD-Korrektur'});
+  sbLogRechnung(r, 'storniert', {status: r.status}, {status: 'storniert', grund: 'GoBD-Korrektur'});
   // Если был bezahlt — сторнируем связанный Einnahme-Eintrag
-  if (_prevStatus === 'bezahlt') {
+  if (r.status === 'bezahlt') {
     const linked = (data.eintraege||[]).find(e =>
       e.beschreibung && e.beschreibung.includes(`Rechnung ${r.nr}:`) && !e.is_storno
     );
@@ -586,19 +563,12 @@ function saveRechnung(){
     if(r){
       const altWert={nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig};
       const wasNotBezahlt = r.status !== 'bezahlt';
-      // Сохраняем статус — форма не должна менять bezahlt/storniert на offen
-      const _prevSt = r.status;
       Object.assign(r,obj);
-      // Восстанавливаем статус если он был bezahlt или storniert
-      if(_prevSt === 'bezahlt' || _prevSt === 'storniert') r.status = _prevSt;
       sbSaveRechnung(r);
       sbLogRechnung(r,'geaendert',altWert,{nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig});
       // Wenn neu auf bezahlt gesetzt → Einnahme automatisch buchen
       if(wasNotBezahlt && r.status==='bezahlt'){
-        console.log('[rechBezahlt] status gesetzt:', r.status);
-  const newE = _buchRechnungAlsEinnahme(r);
-  console.log('[rechBezahlt] newE:', newE ? newE.id : 'NULL — bereits gebucht');
-  console.log('[rechBezahlt] data.eintraege count:', data.eintraege.length);
+        const newE = _buchRechnungAlsEinnahme(r);
         if(newE){
           sbLogRechnung(r,'bezahlt',{status:altWert.status},{status:'bezahlt',einnahme_betrag:r.betrag});
           // Сбрасываем фильтры Einträge
@@ -686,10 +656,7 @@ async function rechBezahlt(id){
   if(!ok) return;
   r.status='bezahlt';
   sbSaveRechnung(r);
-  console.log('[rechBezahlt] status gesetzt:', r.status);
   const newE = _buchRechnungAlsEinnahme(r);
-  console.log('[rechBezahlt] newE:', newE ? newE.id : 'NULL — bereits gebucht');
-  console.log('[rechBezahlt] data.eintraege count:', data.eintraege.length);
   // Сбрасываем фильтры Einträge чтобы новая запись точно была видна
   const _curYr = new Date().getFullYear()+'';
   const _fjEl  = document.getElementById('f-jahr');
@@ -699,36 +666,52 @@ async function rechBezahlt(id){
   if(typeof einPage !== 'undefined') einPage = 1;
 
   if(newE){
-    r.updated_at = new Date().toISOString();
-  sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
-    // Гарантируем что запись есть в data.eintraege
+    sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
+    // Убеждаемся что запись в data.eintraege
     if (!data.eintraege.find(e => e.id === newE.id)) {
       data.eintraege.unshift(newE);
     }
-    // Сбрасываем все фильтры синхронно до рендера
+    // Сбрасываем сортировку на created_at — новая запись будет первой
+    if (typeof sortCol !== 'undefined') { sortCol = 'created_at'; sortAsc = false; }
+    // Сбрасываем все фильтры Einträge
     if (typeof fTyp !== 'undefined') fTyp = 'Alle';
     if (typeof einPage !== 'undefined') einPage = 1;
     document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
     const allTab = document.querySelector('.ftab[onclick*="Alle"]');
     if (allTab) allTab.classList.add('active');
-    ['f-mon','f-kat','f-zahl'].forEach(id => { const el=document.getElementById(id); if(el) el.value='Alle'; });
+    const _fmEl = document.getElementById('f-mon');
+    if (_fmEl) _fmEl.value = 'Alle';
+    const _fkEl = document.getElementById('f-kat');
+    if (_fkEl) _fkEl.value = 'Alle';
+    const _fzEl = document.getElementById('f-zahl');
+    if (_fzEl) _fzEl.value = 'Alle';
     const _fqEl = document.getElementById('f-q');
     if (_fqEl) _fqEl.value = '';
-    // Устанавливаем год фильтра напрямую ПЕРЕД buildYearFilters
-    window._forceFilterYear = newE.datum.substring(0,4);
-    // Рендерим всё
-    if(typeof renderDash === 'function') renderDash();
-    if(typeof renderEin === 'function') renderEin();
-    if(typeof renderRech === 'function') renderRech();
-    // Сбрасываем год на Alle и перерендериваем Einträge
-    const _fjFinal = document.getElementById('f-jahr');
-    if (_fjFinal) { _fjFinal.value = 'Alle'; if(typeof renderEin==='function') renderEin(); }
+    // Перезагружаем eintraege из Supabase чтобы гарантированно получить свежие данные
+    renderAll();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
+    if (typeof sbRefreshEintraege === 'function') {
+      sbRefreshEintraege().then(() => {
+        const _fjEl = document.getElementById('f-jahr');
+        if (_fjEl) _fjEl.value = 'Alle';
+        if (typeof fTyp !== 'undefined') fTyp = 'Alle';
+        if (typeof einPage !== 'undefined') einPage = 1;
+        document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+        const _allTab = document.querySelector('.ftab[onclick*="Alle"]');
+        if (_allTab) _allTab.classList.add('active');
+        if (typeof renderEin === 'function') renderEin();
+        if (typeof renderDash === 'function') renderDash();
+        setTimeout(() => {
+          const _newRow = document.getElementById('ein-row-' + newE.id);
+          if (_newRow) _newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      });
+    }
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
-    if(typeof renderDash === 'function') renderDash();
-    if(typeof renderRech === 'function') renderRech();
+    window._forceFilterYear = new Date().getFullYear()+'';
+    renderAll();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
   checkMahnungen();
@@ -813,7 +796,6 @@ Gemäß GoBD §146 kann die Rechnung nicht gelöscht werden. Sie wird als storni
   _rDel.status = 'storniert';
   _rDel._storniert = true;
   _rDel._storniert_am = new Date().toISOString();
-  _rDel.updated_at = new Date().toISOString();
   sbSaveRechnung(_rDel);
   sbLogRechnung(_rDel,'storniert',{status:warBezahlt?'bezahlt':'offen'},{status:'storniert'});
 
