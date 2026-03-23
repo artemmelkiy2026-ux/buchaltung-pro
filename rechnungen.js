@@ -667,28 +667,38 @@ async function rechBezahlt(id){
 
   if(newE){
     sbLogRechnung(r,'bezahlt',{status:'offen'},{status:'bezahlt',einnahme_betrag:r.betrag,datum_bezahlt:newE.datum});
-
     // Убеждаемся что запись в data.eintraege
     if (!data.eintraege.find(e => e.id === newE.id)) {
       data.eintraege.unshift(newE);
     }
-    // Принудительно устанавливаем год через флаг — buildYearFilters его применит
-    window._forceFilterYear = newE.datum.substring(0,4);
-    if (typeof einPage !== 'undefined') einPage = 1;
+    // Сбрасываем все фильтры Einträge чтобы запись была видна
     if (typeof fTyp !== 'undefined') fTyp = 'Alle';
+    if (typeof einPage !== 'undefined') einPage = 1;
     document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
     const allTab = document.querySelector('.ftab[onclick*="Alle"]');
     if (allTab) allTab.classList.add('active');
-    const fmEl = document.getElementById('f-mon');
-    if (fmEl) fmEl.value = 'Alle';
+    const _fmEl = document.getElementById('f-mon');
+    if (_fmEl) _fmEl.value = 'Alle';
+    const _fkEl = document.getElementById('f-kat');
+    if (_fkEl) _fkEl.value = 'Alle';
+    const _fzEl = document.getElementById('f-zahl');
+    if (_fzEl) _fzEl.value = 'Alle';
+    const _fqEl = document.getElementById('f-q');
+    if (_fqEl) _fqEl.value = '';
+    // _forceFilterYear применится в buildYearFilters внутри renderAll
+    window._forceFilterYear = newE.datum.substring(0,4);
     renderAll();
-    if(typeof renderDash === 'function') renderDash();
+    // Скроллим к новой записи в Einträge
+    setTimeout(() => {
+      const _newRow = document.getElementById('ein-row-' + newE.id);
+      if (_newRow) _newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
+    window._forceFilterYear = new Date().getFullYear()+'';
     renderAll();
-    if(typeof renderDash === 'function') renderDash();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
   checkMahnungen();
