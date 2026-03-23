@@ -1164,9 +1164,13 @@ function renderEin(){
 
       const _typBadge = ''; // стрелка уже есть в ein-row-arrow
 
-      // Номер операции — ВСЕГДА перед заголовком (и мобиль и десктоп)
-      const _nrBefore = e.belegnr
-        ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;vertical-align:middle;flex-shrink:0">Nr.'+e.belegnr+'</span>'
+      // Номер операции — ВСЕГДА перед заголовком
+      // Для сторно-записи (Gegenbuchung) — берём belegnr оригинала
+      const _nrForDisplay = e.belegnr || (e.is_storno && e.storno_of
+        ? (data.eintraege.find(x=>x.id===e.storno_of)||{}).belegnr||''
+        : '');
+      const _nrBefore = _nrForDisplay
+        ? '<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:'+(st?'var(--sub)':'var(--blue)')+';color:#fff;vertical-align:middle;flex-shrink:0">Nr.'+_nrForDisplay+'</span>'
         : '';
       const _nrBadge = ''; // больше не нужен
 
