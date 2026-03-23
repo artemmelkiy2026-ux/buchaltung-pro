@@ -3641,7 +3641,7 @@ header { background: #fff; }
   #prod-thead{ grid-template-columns: 40px 1fr 200px 110px 110px 50px; }
 
   /* Wiederkehrend: avatar | Bezeichnung | Kategorie/Intervall | Nächste/Statistik | Betrag | Aktionen */
-  #wied-thead{ grid-template-columns: 36px 1fr 200px 200px 100px auto; }
+  #wied-thead{ grid-template-columns: 0px 1fr 569px 238px 197px; }
 
   /* Fahrtenbuch: avatar | Strecke | Details | Kilometer | Aktionen */
   #fb-thead{ grid-template-columns: 36px 1fr 220px 100px 50px; }
