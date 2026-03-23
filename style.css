@@ -3638,7 +3638,7 @@ header { background: #fff; }
   .lt-c{ flex-shrink:0; }
 
   /* Einträge: Beschreibung | Info | Tags | Betrag | Aktionen */
-  #ein-thead{ grid-template-columns: 1fr 250px 190px 87px 40px; }
+  #ein-thead{ grid-template-columns: 1fr 250px 190px 87px 50px; }
 
   /* Rechnungen: Status | Nr. | Kunde | Datum/Fällig | Betrag | Aktionen */
   #rech-thead{ grid-template-columns:70px 52px 1fr 257px 101px 186px; }
@@ -3685,7 +3685,7 @@ header { background: #fff; }
   #e-tbody{ gap:0 !important; }
   #e-tbody .ein-row{
     display:grid;
-    grid-template-columns:1fr 250px 170px 110px 40px;
+    grid-template-columns:1fr 250px 170px 110px 50px;
     align-items:center;
     gap:0 12px;
     border-radius:0;border-top:none;
