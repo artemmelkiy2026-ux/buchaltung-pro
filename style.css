@@ -3638,7 +3638,7 @@ header { background: #fff; }
   #kunden-thead{ grid-template-columns: 40px 1fr auto; }
 
   /* Produkte: avatar | Produkt | Details | Netto | Brutto | Aktionen */
-  #prod-thead{ grid-template-columns: 40px 1fr 706px 110px 110px 50px; }
+  #prod-thead{ grid-template-columns: 40px 1fr 706px 110px 100px 50px; }
 
   /* Wiederkehrend: avatar | Bezeichnung | Kategorie/Intervall | Nächste/Statistik | Betrag | Aktionen */
   #wied-thead{ grid-template-columns: 0px 1fr 569px 238px 197px; auto }
