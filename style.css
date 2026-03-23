@@ -104,8 +104,8 @@
   --shadow-md:0 2px 6px rgba(0,0,0,.06);
   --shadow-hover:0 2px 8px rgba(0,0,0,.08);
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font:500 14px/22px var(--sans);min-height:100vh;display:flex;flex-direction:column;overflow-y:scroll;-webkit-font-smoothing:antialiased}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font:500 14px/22px var(--sans);min-height:100vh;-webkit-text-size-adjust:100%;text-size-adjust:100%;display:flex;flex-direction:column;overflow-y:scroll;-webkit-font-smoothing:antialiased}
 html{scrollbar-gutter:stable}
 #loading-screen{position:fixed;inset:0;z-index:9998}
 #loading-screen[style*="display: none"],
@@ -2639,6 +2639,7 @@ input, select, textarea {
   font-size:15px;font-weight:600;color:var(--text);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;
   flex:1;min-width:0;display:flex;align-items:center;gap:15px;
+  -webkit-text-size-adjust:none;text-size-adjust:none;
 }
 .ein-row-arrow{
   display:inline-flex;align-items:center;justify-content:center;
@@ -2685,7 +2686,7 @@ input, select, textarea {
 @media(max-width:600px){
   .ein-row-icon{ width:40px;height:40px; }
   .ein-row-head .amt{ font-size:14px; }
-  .ein-row-desc{ font-size:15px; gap:6px; }
+  .ein-row-desc{ font-size:15px; gap:6px; -webkit-text-size-adjust:none; text-size-adjust:none; }
   .ein-row-mid{ flex-wrap:wrap; }
 }
 
