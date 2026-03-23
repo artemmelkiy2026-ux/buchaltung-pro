@@ -595,7 +595,10 @@ function saveRechnung(){
       sbLogRechnung(r,'geaendert',altWert,{nr:r.nr,betrag:r.betrag,status:r.status,kunde:r.kunde,faellig:r.faellig});
       // Wenn neu auf bezahlt gesetzt → Einnahme automatisch buchen
       if(wasNotBezahlt && r.status==='bezahlt'){
-        const newE = _buchRechnungAlsEinnahme(r);
+        console.log('[rechBezahlt] status gesetzt:', r.status);
+  const newE = _buchRechnungAlsEinnahme(r);
+  console.log('[rechBezahlt] newE:', newE ? newE.id : 'NULL — bereits gebucht');
+  console.log('[rechBezahlt] data.eintraege count:', data.eintraege.length);
         if(newE){
           sbLogRechnung(r,'bezahlt',{status:altWert.status},{status:'bezahlt',einnahme_betrag:r.betrag});
           // Сбрасываем фильтры Einträge
@@ -683,7 +686,10 @@ async function rechBezahlt(id){
   if(!ok) return;
   r.status='bezahlt';
   sbSaveRechnung(r);
+  console.log('[rechBezahlt] status gesetzt:', r.status);
   const newE = _buchRechnungAlsEinnahme(r);
+  console.log('[rechBezahlt] newE:', newE ? newE.id : 'NULL — bereits gebucht');
+  console.log('[rechBezahlt] data.eintraege count:', data.eintraege.length);
   // Сбрасываем фильтры Einträge чтобы новая запись точно была видна
   const _curYr = new Date().getFullYear()+'';
   const _fjEl  = document.getElementById('f-jahr');
