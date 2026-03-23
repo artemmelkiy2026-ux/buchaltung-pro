@@ -654,11 +654,13 @@ async function rechBezahlt(id){
     const fmEl = document.getElementById('f-mon');
     if (fmEl) fmEl.value = 'Alle';
     renderAll();
+    if(typeof renderDash === 'function') renderDash();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} bezahlt · Einnahme ${fmt(r.betrag)} gebucht`,'ok');
   } else {
     // Einnahme existiert bereits
     sbLogRechnung(r,'status',{status:'offen'},{status:'bezahlt'});
     renderAll();
+    if(typeof renderDash === 'function') renderDash();
     toast(`<i class="fas fa-check-circle" style="color:var(--green)"></i> Rechnung ${r.nr} als bezahlt markiert`,'ok');
   }
   checkMahnungen();
