@@ -1163,6 +1163,8 @@ function renderEin(){
         : '';
 
       const _typBadge = ''; // стрелка уже есть в ein-row-arrow
+      // Gegenbuchung — всегда стрелка вниз красная
+      const _arrowIsEin = e.is_storno ? false : isEin;
 
       // Номер операции — ВСЕГДА перед заголовком
       // Для сторно-записи (Gegenbuchung) — берём belegnr оригинала
@@ -1234,7 +1236,7 @@ function renderEin(){
           +'<div class="ein-row-content">'
             +'<div class="ein-row-head">'
               +'<div class="ein-row-desc">'
-                +'<span class="ein-row-arrow '+(isEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(isEin?'up':'down')+'"></i></span>'
+                +'<span class="ein-row-arrow '+(_arrowIsEin?'ein-row-arrow-in':'ein-row-arrow-out')+'"><i class="fas fa-arrow-'+(_arrowIsEin?'up':'down')+'"></i></span>'
                 +_typBadge
                 +_nrBefore
                 +(e.beschreibung||e.kategorie)
@@ -1981,17 +1983,7 @@ function showRechEintragInfo(id) {
       },
       ...(_rechStorniert ? [] : [{ label: 'Stornieren (GoBD)', icon: 'fa-undo-alt', danger: true, action: () => {
           _closeDetailSheet();
-          const el = document.querySelector('.nav-item[onclick*="rechnungen"]');
-          nav('rechnungen', el);
-          setTimeout(() => {
-            highlightRechnung(rechId);
-            if (typeof delRech === 'function') {
-              appConfirm(
-                `Rechnung ${r.nr} stornieren und neue Korrekturrechnung erstellen?`,
-                [{label:'Ja, stornieren', danger:true}, {label:'Abbrechen'}]
-              ).then(idx => { if (idx === 0) delRech(rechId); });
-            }
-          }, 400);
+          if (typeof delRech === 'function') delRech(rechId);
         }
       }]),
     ]
