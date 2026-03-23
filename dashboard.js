@@ -138,10 +138,7 @@ function renderLetzteEinnahmen(flashId=null) {
   if (!list) return;
   const recent = activeEintraege()
     .filter(e => e.typ === 'Einnahme')
-    .sort((a,b) => {
-      const ca = a.created_at||a.datum||'', cb = b.created_at||b.datum||'';
-      return cb.localeCompare(ca);
-    })
+    .sort((a,b) => b.datum.localeCompare(a.datum))
     .slice(0, 7);
   if (!recent.length) {
     list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">Noch keine Einnahmen</div>';
@@ -185,10 +182,7 @@ function renderLetzteAusgaben(flashId=null) {
   if (!list) return;
   const recent = activeEintraege()
     .filter(e => e.typ === 'Ausgabe')
-    .sort((a,b) => {
-      const ca = a.created_at||a.datum||'', cb = b.created_at||b.datum||'';
-      return cb.localeCompare(ca);
-    })
+    .sort((a,b) => b.datum.localeCompare(a.datum))
     .slice(0, 7);
   if (!recent.length) {
     list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--sub);font-size:13px">Noch keine Ausgaben</div>';
@@ -1032,9 +1026,7 @@ function getFiltered(){
     });
   }
   return data.eintraege.filter(e=>{
-    if(e._storniert && !window._showStornoEin)return false; // оригинал сторнирован — скрыт
-    if(e.is_storno && !window._showStornoEin)return false; // Gegenbuchung — скрыта
-    if(e._storniert && window._showStornoEin)return false; // оригинал НЕ показываем даже при showStornoEin — только Gegenbuchung
+    if((e.is_storno||e._storniert) && !window._showStornoEin)return false; // GoBD
     if(fTyp!=='Alle'&&e.typ!==fTyp)return false;
     if(j!=='Alle'&&!e.datum.startsWith(j))return false;
     if(m!=='Alle'&&e.datum.substring(5,7)!==m)return false;
@@ -1234,8 +1226,8 @@ function renderEin(){
         }
       }
       // Gegenbuchungen stärker ausblenden als nur stornierte Originale
-      const _stOpacity = e.is_storno ? '.40' : '.55';
-      const _rowStyle  = (_isRechVirt || _isWiedVirt) ? 'cursor:pointer;opacity:.9' : (st ? 'cursor:default;opacity:'+_stOpacity : 'cursor:pointer');
+      // Инлайновый стиль — для сторно убираем opacity/cursor, CSS класс ein-row-st сам всё задаёт
+      const _rowStyle  = (_isRechVirt || _isWiedVirt) ? 'cursor:pointer;opacity:.9' : (st ? '' : 'cursor:pointer');
 
       return '<div class="ein-row'+(st?' ein-row-st':'')+(_isRechVirt?' ein-row-rech-virt':'')+'" id="ein-row-'+e.id+'" '+_clickAttr+' style="'+_rowStyle+'">'
         +'<div class="ein-row-body">'
