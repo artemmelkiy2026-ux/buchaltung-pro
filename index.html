@@ -2625,6 +2625,50 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ═══════════════ BANKABGLEICH ═══════════════ -->
+<div class="page" id="p-bankabgleich">
+<div class="page-inner">
+
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-title"><i class="fas fa-university" style="margin-right:8px;color:var(--blue)"></i>Bankabgleich</div>
+      <div class="ph-sub">Kontoauszüge importieren · Transaktionen automatisch zuordnen</div>
+    </div>
+    <div class="ph-right" style="display:flex;gap:8px;align-items:center">
+      <button class="btn" onclick="autoMatchAll();renderBankabgleich()" style="background:var(--bdim);color:var(--blue);border:1px solid var(--blue);font-size:12px">
+        <i class="fas fa-magic"></i> Auto-Match
+      </button>
+      <button class="btn" onclick="clearBankData()" style="background:var(--rdim);color:var(--red);border:1px solid var(--red);font-size:12px">
+        <i class="fas fa-trash"></i> Leeren
+      </button>
+    </div>
+  </div>
+
+  <div id="bank-drop-zone" class="bank-drop-zone"></div>
+  <input type="file" id="bank-file-input" accept=".csv,.sta,.mt940,.xml,.txt" style="display:none">
+  <div id="bank-progress-bar"><div id="bank-progress-fill"></div></div>
+  <div class="bank-stats" id="bank-stats"></div>
+  <div id="bank-match-progress" style="margin-bottom:14px"></div>
+
+  <div class="bank-filters">
+    <button class="bank-ftab active" onclick="setBankFilter('all',this)">Alle</button>
+    <button class="bank-ftab" onclick="setBankFilter('unmatched',this)">
+      <i class="fas fa-circle" style="color:var(--yellow);font-size:8px;margin-right:4px"></i>Offen
+    </button>
+    <button class="bank-ftab" onclick="setBankFilter('matched',this)">
+      <i class="fas fa-circle" style="color:var(--blue);font-size:8px;margin-right:4px"></i>Zugeordnet
+    </button>
+    <button class="bank-ftab" onclick="setBankFilter('booked',this)">
+      <i class="fas fa-circle" style="color:var(--green);font-size:8px;margin-right:4px"></i>Gebucht
+    </button>
+    <button class="bank-ftab" onclick="setBankFilter('ignored',this)">Ignoriert</button>
+  </div>
+
+  <div id="bank-tx-container"></div>
+
+</div>
+</div>
+
 <footer id="legal-footer">
   <div class="footer-inner">
     <!-- Основная информация -->
@@ -2743,5 +2787,6 @@
 <script src="select_mode.js"></script>
 <script src="vorschau.js"></script>
 <script src="ki-audit.js"></script>
+<script src="banking.js"></script>
 </body>
 </html>
