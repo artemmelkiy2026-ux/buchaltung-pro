@@ -248,6 +248,12 @@ function buildYearFilters(){
   });
   // Сбрасываем флаг после применения
   if (window._forceFilterYear) window._forceFilterYear = null;
+  // Если установлен флаг — сбрасываем f-jahr на Alle
+  if (window._forceEinJahrAlle) {
+    window._forceEinJahrAlle = null;
+    const _fjReset = document.getElementById('f-jahr');
+    if (_fjReset) { _fjReset.value = 'Alle'; }
+  }
   // rep-yr: only real years — preserve current selection
   const ry=document.getElementById('rep-yr');
   const allJahre=js.length?js:[cur];
