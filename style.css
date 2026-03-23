@@ -491,7 +491,7 @@ th[onclick]:hover{color:var(--blue);background:var(--bdim)}
 .rech-card{
   display:flex; align-items:flex-start; gap:12px;
   background:var(--s1); border:1px solid var(--border); border-radius:var(--r2);
-  padding:16px 18px; cursor:pointer;
+  padding:10px 10px; cursor:pointer;
   transition:border-color .15s, box-shadow .15s, transform .1s;
 }
 .rech-card:hover{ border-color:var(--border2); box-shadow:var(--shadow-hover); }
